@@ -865,77 +865,36 @@ route('PATCH', '/api/admin/settings', async (req, res) => {
 // ── GENERATE IMAGE SVG (IA real) ──
 route('POST', '/api/user/generate-image', async (req, res) => {
   const payload = requireAuth(req, res); if (!payload) return;
-  const body = await parseBody(req);
-  const { prompt, format, network, brandColors, profileData } = body;
+  const { prompt, format, network } = await parseBody(req);
   if (!prompt) return err(res, 'prompt obrigatório');
   const user = db.getUserById(payload.id);
   if (user.quota_used >= user.quota_limit) return err(res, 'Cota mensal esgotada');
 
-  const cores = (brandColors && brandColors.length) ? brandColors : (user.cores || '#F36B2A, #0F1113').split(',').map(s=>s.trim());
-  const cor1 = cores[0] || '#F36B2A';
-  const cor2 = cores[1] || '#0F1113';
-  const cor3 = cores[2] || cor1;
-  const estilo = user.estilo || 'dark luxury';
-  const nicho = user.nicho || 'marketing digital';
-  const profissao = user.profissao || 'criador de conteúdo';
+  const system = `Você é diretor de arte especialista em criação de imagens SVG para redes sociais.
+REGRAS ABSOLUTAS:
+1. Responda APENAS com código SVG puro. Zero texto antes ou depois.
+2. Sem markdown, sem blocos de código, sem explicações.
+3. Comece com <svg e termine com </svg>
+4. Use viewBox="0 0 1080 1080" e xmlns="http://www.w3.org/2000/svg"
+5. font-family explícito em todo elemento text: font-family="Arial Black, Arial, sans-serif"
+6. dominant-baseline="central" em textos centralizados
+7. Fundo escuro. Hierarquia visual: dominante 60%, suporte 25%, accent 5-10%
+8. Cores do perfil têm PRIORIDADE ABSOLUTA. Use as cores fornecidas.
 
-  // Canvas-design philosophy: dark luxury editorial
-  const system = `Você é um diretor de arte de elite especializado em SVG para redes sociais.
-
-FILOSOFIA DE DESIGN — "Signal Noir":
-Composição editorial de luxo. Fundo escuro dominante. Hierarquia visual extrema.
-Um elemento visual central que domina 60% do espaço. Tipografia como elemento gráfico.
-Cores da marca aplicadas como accent points — nunca como fundos chapados.
-Tensão entre escala grande e pequena. Espaço negativo intencional.
-
-REGRAS TÉCNICAS ABSOLUTAS:
-1. Responda APENAS com SVG puro. Comece com <svg, termine com </svg>
-2. ZERO texto antes, depois ou ao redor do SVG
-3. viewBox="0 0 1080 1080" | xmlns="http://www.w3.org/2000/svg"
-4. Todo <text> com font-family="'Arial Black', Arial, sans-serif" explícito
-5. dominant-baseline="middle" e text-anchor="middle" em textos centrados
-6. Todos os elementos DENTRO do viewBox — nada fora dos limites 0,0,1080,1080
-7. Mínimo 8 elementos visuais distintos (backgrounds, shapes, lines, text)
-8. Use defs com linearGradient e radialGradient
-
-PALETA OBRIGATÓRIA:
-- Fundo: ${cor2} (cor mais escura)
-- Accent primário: ${cor1} (cor da marca)
-- Accent secundário: ${cor3}
-- Texto principal: #F5F4F1
-- Texto secundário: rgba(245,244,241,0.5)
-
-ESTRUTURA DO SVG (siga esta hierarquia):
-1. <rect> fundo completo com ${cor2}
-2. Gradiente radial ou linear de profundidade (opacidade 0.3-0.6)
-3. Elemento geométrico grande decorativo (círculo, diagonal, grid)
-4. Bloco de cor accent (${cor1}) como shape — NÃO como fundo inteiro
-5. Tipografia principal: palavra-chave do conceito em fonte grande (120-200px)
-6. Subtexto descritivo (32-48px)
-7. Linha divisória decorativa em ${cor1}
-8. Elementos de acabamento: pontos, linhas finas, formas geométricas
-
-CONCEITO A VISUALIZAR: "${prompt}"
-NICHO: ${nicho}
-PROFISSÃO: ${profissao}
-FORMATO: ${format || 'post'} para ${network || 'instagram'}
-
-IMPORTANTE: Crie uma composição que seja visualmente impactante, profissional e reconhecível como design de alto padrão. O resultado deve parecer feito por um designer sênior de uma agência tier-1.`;
+PERFIL DA MARCA:
+- Cores: ${user.cores || '#F36B2A, #0F1113'}
+- Estilo: ${user.estilo || 'dark luxury'}
+- Nicho: ${user.nicho || 'negócios'}`;
 
   try {
-    const raw = await callClaude({ system, userMsg: 'Gere o SVG agora. Comece diretamente com <svg', maxTokens: 4000 });
-    // Extract SVG robustly
-    let svg = raw;
-    const svgMatch = raw.match(/<svg[\s\S]*<\/svg>/i);
-    if (svgMatch) svg = svgMatch[0];
-    else if (!raw.trim().startsWith('<svg')) throw new Error('IA não retornou SVG válido. Tente novamente com uma ideia diferente.');
-    
-    // Validate it has actual content
-    if (svg.length < 200) throw new Error('SVG muito curto — tente novamente');
-    
+    const raw = await callClaude({ system, userMsg: `FORMATO: ${format} para ${network}
+CONCEITO: "${prompt}"
+
+Gere o SVG:`, maxTokens: 4000 });
+    const match = raw.match(/<svg[\s\S]*?<\/svg>/i);
+    if (!match) throw new Error('IA não retornou SVG válido. Tente novamente.');
     db.updateUser(payload.id, { quota_used: (user.quota_used || 0) + 1 });
-    db.addGeneration({ user_id: payload.id, format: format || 'post', network: network || 'instagram', concept_name: 'imagem-gerada', prompt: prompt.slice(0, 200) });
-    ok(res, { svg });
+    ok(res, { svg: match[0] });
   } catch(e) { err(res, e.message); }
 });
 
