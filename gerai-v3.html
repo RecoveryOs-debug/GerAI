@@ -356,7 +356,7 @@ body {
 }
 
 /* ── MAIN ── */
-.main { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow-y: auto; }
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow-y: auto; align-items: stretch; }
 
 /* ── TOPBAR ── */
 .tb {
@@ -428,7 +428,9 @@ body {
   padding: var(--sp-8);
   flex: 1;
   width: 100%;
-  max-width: 1280px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .pg.on { display: block; animation: fadeUp var(--t-base) var(--ease-out); }
 .pg-hd {
@@ -3021,7 +3023,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                 <!-- concept cards injected dynamically by JS -->
                 <div class="divider"></div>
                 <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:7px">Prompt selecionado</div>
-                <div class="cmd-box" id="cmd-out" style="word-break:break-word;font-size:11px">—<button class="cp-btn" onclick="cpElById('cmd-out')">Copiar</button></div>
+                <div class="cmd-box" id="cmd-out" data-prompt="" style="word-break:break-word;font-size:11px"><span id="cmd-out-txt">Selecione um conceito acima</span><button class="cp-btn" onclick="cpElById('cmd-out')">Copiar</button></div>
                 <button id="btn-gerar-img" onclick="gerarImagem()" style="width:100%;margin-top:12px;background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:var(--f);font-size:14px;font-weight:700;color:#fff;letter-spacing:-.02em;box-shadow:0 4px 20px rgba(243,107,42,.3);transition:all .15s">
                   <svg style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                   Gerar imagem com IA
@@ -3358,25 +3360,18 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                   Gravar
                 </button>
               </div>
-            </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <label for="ag-legenda-img-input" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;background:var(--ink-4);border:1.5px dashed var(--line-2);border-radius:var(--r2);cursor:pointer;font-size:11.5px;font-weight:600;color:var(--tx-2);transition:all var(--t-base);text-transform:none;letter-spacing:0" onmouseover="this.style.borderColor='var(--amber)';this.style.color='var(--amber)';this.style.background='var(--amber-10)'" onmouseout="this.style.borderColor='var(--line-2)';this.style.color='var(--tx-2)';this.style.background='var(--ink-4)'">
+              <svg style="width:13px;height:13px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              Imagem / Vídeo de referência
+              <input type="file" id="ag-legenda-img-input" accept="image/*,video/*" style="display:none" onchange="handleAgentFile(this,'legenda')">
+            </label>
           </div>
-          <div style="margin-top:8px">
-            <div style="display:flex;gap:6px">
-              <label for="ag-legenda-img" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;background:var(--bg3);border:1px dashed var(--b2);border-radius:var(--r2);cursor:pointer;font-size:12px;color:var(--t2);transition:all .15s" onmouseover="this.style.borderColor='var(--a)'" onmouseout="this.style.borderColor='var(--b2)'">
-                <svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                Imagem de referência
-                <input type="file" id="ag-legenda-img" accept="image/*,video/*" style="display:none" onchange="handleAgentFile(this,'legenda')">
-              </label>
-              <label for="ag-legenda-vid" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;background:var(--bg3);border:1px dashed var(--b2);border-radius:var(--r2);cursor:pointer;font-size:12px;color:var(--t2);transition:all .15s" onmouseover="this.style.borderColor='var(--a)'" onmouseout="this.style.borderColor='var(--b2)'">
-                <svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-                Vídeo de referência
-                <input type="file" id="ag-legenda-vid" accept="video/*" style="display:none" onchange="handleAgentFile(this,'legenda')">
-              </label>
-            </div>
-            <div id="ag-legenda-file-preview" style="display:none;margin-top:6px;padding:8px 10px;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r2);font-size:11px;color:var(--t1);display:flex;align-items:center;gap:8px">
-              <svg style="width:12px;height:12px;fill:none;stroke:var(--green);stroke-width:2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-              <span id="ag-legenda-file-name">arquivo.jpg</span>
-              <button onclick="clearAgentFile('legenda')" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--t3);font-size:14px;line-height:1">×</button>
+          <div id="ag-legenda-file-preview" style="display:none;margin-top:6px;padding:9px 12px;background:var(--ink-1);border:1px solid var(--line-1);border-radius:var(--r2);font-size:11.5px;color:var(--tx-1);align-items:center;gap:8px">
+            <svg style="width:12px;height:12px;fill:none;stroke:var(--ok);stroke-width:2.5;flex-shrink:0" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span id="ag-legenda-file-name">arquivo</span>
+            <button onclick="clearAgentFile('legenda')" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--tx-3);font-size:16px;line-height:1;padding:0">×</button>
+          </div>
             </div>
           </div>
           <div class="form-row" style="margin-top:4px">
@@ -3456,25 +3451,18 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                   Gravar
                 </button>
               </div>
-            </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <label for="ag-roteiro-yt-img-input" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;background:var(--ink-4);border:1.5px dashed var(--line-2);border-radius:var(--r2);cursor:pointer;font-size:11.5px;font-weight:600;color:var(--tx-2);transition:all var(--t-base);text-transform:none;letter-spacing:0" onmouseover="this.style.borderColor='var(--amber)';this.style.color='var(--amber)';this.style.background='var(--amber-10)'" onmouseout="this.style.borderColor='var(--line-2)';this.style.color='var(--tx-2)';this.style.background='var(--ink-4)'">
+              <svg style="width:13px;height:13px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              Imagem / Vídeo de referência
+              <input type="file" id="ag-roteiro-yt-img-input" accept="image/*,video/*" style="display:none" onchange="handleAgentFile(this,'roteiro-yt')">
+            </label>
           </div>
-          <div style="margin-top:8px">
-            <div style="display:flex;gap:6px">
-              <label for="ag-roteiro-yt-img" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;background:var(--bg3);border:1px dashed var(--b2);border-radius:var(--r2);cursor:pointer;font-size:12px;color:var(--t2);transition:all .15s" onmouseover="this.style.borderColor='var(--a)'" onmouseout="this.style.borderColor='var(--b2)'">
-                <svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                Imagem de referência
-                <input type="file" id="ag-roteiro-yt-img" accept="image/*,video/*" style="display:none" onchange="handleAgentFile(this,'roteiro-yt')">
-              </label>
-              <label for="ag-roteiro-yt-vid" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;background:var(--bg3);border:1px dashed var(--b2);border-radius:var(--r2);cursor:pointer;font-size:12px;color:var(--t2);transition:all .15s" onmouseover="this.style.borderColor='var(--a)'" onmouseout="this.style.borderColor='var(--b2)'">
-                <svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-                Vídeo de referência
-                <input type="file" id="ag-roteiro-yt-vid" accept="video/*" style="display:none" onchange="handleAgentFile(this,'roteiro-yt')">
-              </label>
-            </div>
-            <div id="ag-roteiro-yt-file-preview" style="display:none;margin-top:6px;padding:8px 10px;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r2);font-size:11px;color:var(--t1);display:flex;align-items:center;gap:8px">
-              <svg style="width:12px;height:12px;fill:none;stroke:var(--green);stroke-width:2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-              <span id="ag-roteiro-yt-file-name">arquivo.jpg</span>
-              <button onclick="clearAgentFile('roteiro-yt')" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--t3);font-size:14px;line-height:1">×</button>
+          <div id="ag-roteiro-yt-file-preview" style="display:none;margin-top:6px;padding:9px 12px;background:var(--ink-1);border:1px solid var(--line-1);border-radius:var(--r2);font-size:11.5px;color:var(--tx-1);align-items:center;gap:8px">
+            <svg style="width:12px;height:12px;fill:none;stroke:var(--ok);stroke-width:2.5;flex-shrink:0" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span id="ag-roteiro-yt-file-name">arquivo</span>
+            <button onclick="clearAgentFile('roteiro-yt')" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--tx-3);font-size:16px;line-height:1;padding:0">×</button>
+          </div>
             </div>
           </div>
           <div class="form-row" style="margin-top:4px">
@@ -3554,25 +3542,18 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                   Gravar
                 </button>
               </div>
-            </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <label for="ag-roteiro-reels-img-input" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;background:var(--ink-4);border:1.5px dashed var(--line-2);border-radius:var(--r2);cursor:pointer;font-size:11.5px;font-weight:600;color:var(--tx-2);transition:all var(--t-base);text-transform:none;letter-spacing:0" onmouseover="this.style.borderColor='var(--amber)';this.style.color='var(--amber)';this.style.background='var(--amber-10)'" onmouseout="this.style.borderColor='var(--line-2)';this.style.color='var(--tx-2)';this.style.background='var(--ink-4)'">
+              <svg style="width:13px;height:13px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              Imagem / Vídeo de referência
+              <input type="file" id="ag-roteiro-reels-img-input" accept="image/*,video/*" style="display:none" onchange="handleAgentFile(this,'roteiro-reels')">
+            </label>
           </div>
-          <div style="margin-top:8px">
-            <div style="display:flex;gap:6px">
-              <label for="ag-roteiro-reels-img" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;background:var(--bg3);border:1px dashed var(--b2);border-radius:var(--r2);cursor:pointer;font-size:12px;color:var(--t2);transition:all .15s" onmouseover="this.style.borderColor='var(--a)'" onmouseout="this.style.borderColor='var(--b2)'">
-                <svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                Imagem de referência
-                <input type="file" id="ag-roteiro-reels-img" accept="image/*,video/*" style="display:none" onchange="handleAgentFile(this,'roteiro-reels')">
-              </label>
-              <label for="ag-roteiro-reels-vid" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;background:var(--bg3);border:1px dashed var(--b2);border-radius:var(--r2);cursor:pointer;font-size:12px;color:var(--t2);transition:all .15s" onmouseover="this.style.borderColor='var(--a)'" onmouseout="this.style.borderColor='var(--b2)'">
-                <svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-                Vídeo de referência
-                <input type="file" id="ag-roteiro-reels-vid" accept="video/*" style="display:none" onchange="handleAgentFile(this,'roteiro-reels')">
-              </label>
-            </div>
-            <div id="ag-roteiro-reels-file-preview" style="display:none;margin-top:6px;padding:8px 10px;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r2);font-size:11px;color:var(--t1);display:flex;align-items:center;gap:8px">
-              <svg style="width:12px;height:12px;fill:none;stroke:var(--green);stroke-width:2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-              <span id="ag-roteiro-reels-file-name">arquivo.jpg</span>
-              <button onclick="clearAgentFile('roteiro-reels')" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--t3);font-size:14px;line-height:1">×</button>
+          <div id="ag-roteiro-reels-file-preview" style="display:none;margin-top:6px;padding:9px 12px;background:var(--ink-1);border:1px solid var(--line-1);border-radius:var(--r2);font-size:11.5px;color:var(--tx-1);align-items:center;gap:8px">
+            <svg style="width:12px;height:12px;fill:none;stroke:var(--ok);stroke-width:2.5;flex-shrink:0" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span id="ag-roteiro-reels-file-name">arquivo</span>
+            <button onclick="clearAgentFile('roteiro-reels')" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--tx-3);font-size:16px;line-height:1;padding:0">×</button>
+          </div>
             </div>
           </div>
           <div class="form-row" style="margin-top:4px">
@@ -3652,25 +3633,18 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                   Gravar
                 </button>
               </div>
-            </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <label for="ag-story-img-input" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;background:var(--ink-4);border:1.5px dashed var(--line-2);border-radius:var(--r2);cursor:pointer;font-size:11.5px;font-weight:600;color:var(--tx-2);transition:all var(--t-base);text-transform:none;letter-spacing:0" onmouseover="this.style.borderColor='var(--amber)';this.style.color='var(--amber)';this.style.background='var(--amber-10)'" onmouseout="this.style.borderColor='var(--line-2)';this.style.color='var(--tx-2)';this.style.background='var(--ink-4)'">
+              <svg style="width:13px;height:13px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              Imagem / Vídeo de referência
+              <input type="file" id="ag-story-img-input" accept="image/*,video/*" style="display:none" onchange="handleAgentFile(this,'story')">
+            </label>
           </div>
-          <div style="margin-top:8px">
-            <div style="display:flex;gap:6px">
-              <label for="ag-story-img" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;background:var(--bg3);border:1px dashed var(--b2);border-radius:var(--r2);cursor:pointer;font-size:12px;color:var(--t2);transition:all .15s" onmouseover="this.style.borderColor='var(--a)'" onmouseout="this.style.borderColor='var(--b2)'">
-                <svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                Imagem de referência
-                <input type="file" id="ag-story-img" accept="image/*,video/*" style="display:none" onchange="handleAgentFile(this,'story')">
-              </label>
-              <label for="ag-story-vid" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;background:var(--bg3);border:1px dashed var(--b2);border-radius:var(--r2);cursor:pointer;font-size:12px;color:var(--t2);transition:all .15s" onmouseover="this.style.borderColor='var(--a)'" onmouseout="this.style.borderColor='var(--b2)'">
-                <svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-                Vídeo de referência
-                <input type="file" id="ag-story-vid" accept="video/*" style="display:none" onchange="handleAgentFile(this,'story')">
-              </label>
-            </div>
-            <div id="ag-story-file-preview" style="display:none;margin-top:6px;padding:8px 10px;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r2);font-size:11px;color:var(--t1);display:flex;align-items:center;gap:8px">
-              <svg style="width:12px;height:12px;fill:none;stroke:var(--green);stroke-width:2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-              <span id="ag-story-file-name">arquivo.jpg</span>
-              <button onclick="clearAgentFile('story')" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--t3);font-size:14px;line-height:1">×</button>
+          <div id="ag-story-file-preview" style="display:none;margin-top:6px;padding:9px 12px;background:var(--ink-1);border:1px solid var(--line-1);border-radius:var(--r2);font-size:11.5px;color:var(--tx-1);align-items:center;gap:8px">
+            <svg style="width:12px;height:12px;fill:none;stroke:var(--ok);stroke-width:2.5;flex-shrink:0" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span id="ag-story-file-name">arquivo</span>
+            <button onclick="clearAgentFile('story')" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--tx-3);font-size:16px;line-height:1;padding:0">×</button>
+          </div>
             </div>
           </div>
           <div class="form-row" style="margin-top:4px">
@@ -3750,25 +3724,18 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                   Gravar
                 </button>
               </div>
-            </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <label for="ag-linkedin-img-input" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;background:var(--ink-4);border:1.5px dashed var(--line-2);border-radius:var(--r2);cursor:pointer;font-size:11.5px;font-weight:600;color:var(--tx-2);transition:all var(--t-base);text-transform:none;letter-spacing:0" onmouseover="this.style.borderColor='var(--amber)';this.style.color='var(--amber)';this.style.background='var(--amber-10)'" onmouseout="this.style.borderColor='var(--line-2)';this.style.color='var(--tx-2)';this.style.background='var(--ink-4)'">
+              <svg style="width:13px;height:13px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              Imagem / Vídeo de referência
+              <input type="file" id="ag-linkedin-img-input" accept="image/*,video/*" style="display:none" onchange="handleAgentFile(this,'linkedin')">
+            </label>
           </div>
-          <div style="margin-top:8px">
-            <div style="display:flex;gap:6px">
-              <label for="ag-linkedin-img" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;background:var(--bg3);border:1px dashed var(--b2);border-radius:var(--r2);cursor:pointer;font-size:12px;color:var(--t2);transition:all .15s" onmouseover="this.style.borderColor='var(--a)'" onmouseout="this.style.borderColor='var(--b2)'">
-                <svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                Imagem de referência
-                <input type="file" id="ag-linkedin-img" accept="image/*,video/*" style="display:none" onchange="handleAgentFile(this,'linkedin')">
-              </label>
-              <label for="ag-linkedin-vid" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;background:var(--bg3);border:1px dashed var(--b2);border-radius:var(--r2);cursor:pointer;font-size:12px;color:var(--t2);transition:all .15s" onmouseover="this.style.borderColor='var(--a)'" onmouseout="this.style.borderColor='var(--b2)'">
-                <svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-                Vídeo de referência
-                <input type="file" id="ag-linkedin-vid" accept="video/*" style="display:none" onchange="handleAgentFile(this,'linkedin')">
-              </label>
-            </div>
-            <div id="ag-linkedin-file-preview" style="display:none;margin-top:6px;padding:8px 10px;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r2);font-size:11px;color:var(--t1);display:flex;align-items:center;gap:8px">
-              <svg style="width:12px;height:12px;fill:none;stroke:var(--green);stroke-width:2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-              <span id="ag-linkedin-file-name">arquivo.jpg</span>
-              <button onclick="clearAgentFile('linkedin')" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--t3);font-size:14px;line-height:1">×</button>
+          <div id="ag-linkedin-file-preview" style="display:none;margin-top:6px;padding:9px 12px;background:var(--ink-1);border:1px solid var(--line-1);border-radius:var(--r2);font-size:11.5px;color:var(--tx-1);align-items:center;gap:8px">
+            <svg style="width:12px;height:12px;fill:none;stroke:var(--ok);stroke-width:2.5;flex-shrink:0" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span id="ag-linkedin-file-name">arquivo</span>
+            <button onclick="clearAgentFile('linkedin')" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--tx-3);font-size:16px;line-height:1;padding:0">×</button>
+          </div>
             </div>
           </div>
           <div class="form-row" style="margin-top:4px">
@@ -3848,25 +3815,18 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                   Gravar
                 </button>
               </div>
-            </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <label for="ag-tiktok-img-input" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;background:var(--ink-4);border:1.5px dashed var(--line-2);border-radius:var(--r2);cursor:pointer;font-size:11.5px;font-weight:600;color:var(--tx-2);transition:all var(--t-base);text-transform:none;letter-spacing:0" onmouseover="this.style.borderColor='var(--amber)';this.style.color='var(--amber)';this.style.background='var(--amber-10)'" onmouseout="this.style.borderColor='var(--line-2)';this.style.color='var(--tx-2)';this.style.background='var(--ink-4)'">
+              <svg style="width:13px;height:13px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              Imagem / Vídeo de referência
+              <input type="file" id="ag-tiktok-img-input" accept="image/*,video/*" style="display:none" onchange="handleAgentFile(this,'tiktok')">
+            </label>
           </div>
-          <div style="margin-top:8px">
-            <div style="display:flex;gap:6px">
-              <label for="ag-tiktok-img" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;background:var(--bg3);border:1px dashed var(--b2);border-radius:var(--r2);cursor:pointer;font-size:12px;color:var(--t2);transition:all .15s" onmouseover="this.style.borderColor='var(--a)'" onmouseout="this.style.borderColor='var(--b2)'">
-                <svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                Imagem de referência
-                <input type="file" id="ag-tiktok-img" accept="image/*,video/*" style="display:none" onchange="handleAgentFile(this,'tiktok')">
-              </label>
-              <label for="ag-tiktok-vid" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;background:var(--bg3);border:1px dashed var(--b2);border-radius:var(--r2);cursor:pointer;font-size:12px;color:var(--t2);transition:all .15s" onmouseover="this.style.borderColor='var(--a)'" onmouseout="this.style.borderColor='var(--b2)'">
-                <svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-                Vídeo de referência
-                <input type="file" id="ag-tiktok-vid" accept="video/*" style="display:none" onchange="handleAgentFile(this,'tiktok')">
-              </label>
-            </div>
-            <div id="ag-tiktok-file-preview" style="display:none;margin-top:6px;padding:8px 10px;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r2);font-size:11px;color:var(--t1);display:flex;align-items:center;gap:8px">
-              <svg style="width:12px;height:12px;fill:none;stroke:var(--green);stroke-width:2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-              <span id="ag-tiktok-file-name">arquivo.jpg</span>
-              <button onclick="clearAgentFile('tiktok')" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--t3);font-size:14px;line-height:1">×</button>
+          <div id="ag-tiktok-file-preview" style="display:none;margin-top:6px;padding:9px 12px;background:var(--ink-1);border:1px solid var(--line-1);border-radius:var(--r2);font-size:11.5px;color:var(--tx-1);align-items:center;gap:8px">
+            <svg style="width:12px;height:12px;fill:none;stroke:var(--ok);stroke-width:2.5;flex-shrink:0" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span id="ag-tiktok-file-name">arquivo</span>
+            <button onclick="clearAgentFile('tiktok')" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--tx-3);font-size:16px;line-height:1;padding:0">×</button>
+          </div>
             </div>
           </div>
           <div class="form-row" style="margin-top:4px">
@@ -4026,14 +3986,14 @@ async function doLogin() {
   const email = document.getElementById('le').value.trim();
   const pass  = document.getElementById('lp').value;
   if (!email || !pass) { toast('Preencha e-mail e senha'); return; }
-  const btn = document.querySelector('#sc-login .btn-p');
+  const btn = document.querySelector('#sc-login .auth-btn-main');
   btn.disabled = true; btn.textContent = 'Entrando...';
   try {
     const data = await api('POST', '/api/auth/login', { email, password: pass });
     token = data.token;
     me    = data.user;
     localStorage.setItem('gerai_token', token);
-    btn.disabled = false; btn.textContent = 'Entrar';
+    btn.disabled = false; btn.textContent = 'Entrar na conta';
     // new users without profissao go to onboarding
     if (!me.profissao) { go('ob'); for (let i=1;i<=7;i++) mkDots('od'+i,1); }
     else bootApp();
@@ -4049,7 +4009,7 @@ async function doSignup() {
   const pass  = document.getElementById('sp').value;
   if (!name || !email || !pass) { toast('Preencha todos os campos'); return; }
   if (pass.length < 8) { toast('Senha mínima de 8 caracteres'); return; }
-  const btn = document.querySelector('#sc-signup .btn-p');
+  const btn = document.querySelector('#sc-signup .auth-btn-main');
   btn.disabled = true; btn.textContent = 'Criando conta...';
   try {
     const data = await api('POST', '/api/auth/register', { name, email, password: pass });
@@ -4263,10 +4223,9 @@ async function runGen(refinedPrompt) {
     // update the static cmd-out box
     const cmdOutEl = document.getElementById('cmd-out');
     if (cmdOutEl) {
-      // safely update text — clear and rebuild
-      while (cmdOutEl.firstChild && cmdOutEl.firstChild.nodeType === 3) cmdOutEl.removeChild(cmdOutEl.firstChild);
-      const tn = document.createTextNode(firstPrompt);
-      cmdOutEl.insertBefore(tn, cmdOutEl.firstChild);
+      cmdOutEl.dataset.prompt = firstPrompt;
+      const sp = document.getElementById('cmd-out-txt');
+      if (sp) sp.textContent = firstPrompt;
     }
     // reset image tab
     document.getElementById('img-preview-wrap')?.classList.remove('vis');
@@ -5313,53 +5272,55 @@ function clearRefImage(e) {
 // Real gerarImagem override — uses ref image if available
 const _origGerarImagem = gerarImagem;
 async function gerarImagem() {
+  // Get prompt from data-prompt attribute (set by runGen) or from span text
   const cmdEl = document.getElementById('cmd-out');
-  const prompt = cmdEl?.childNodes[0]?.textContent?.trim() || '';
-  if (!prompt || prompt === '—') { toast('Selecione um conceito primeiro'); return; }
+  const prompt = (cmdEl?.dataset?.prompt || document.getElementById('cmd-out-txt')?.textContent || '').trim();
+  if (!prompt || prompt === '—' || prompt === 'Selecione um conceito acima') {
+    toast('Selecione um conceito primeiro na aba Conceitos', 'err'); return;
+  }
   switchOutTab('imagem');
   document.getElementById('img-preview-empty').style.display = 'none';
   document.getElementById('img-preview-wrap')?.classList.remove('vis');
   document.getElementById('img-gen-loading').style.display = 'flex';
   let si = 0;
   const stageEl = document.getElementById('img-gen-stage');
-  const IMG_STAGES = ['Lendo perfil...','Analisando referência...','Definindo composição...','Construindo SVG...','Refinando...','Finalizando...'];
-  const iv = setInterval(() => { if (si < IMG_STAGES.length) stageEl.textContent = IMG_STAGES[si++]; }, 900);
+  const stages = ['Lendo perfil da marca...','Definindo composição...','Aplicando cores...','Construindo SVG...','Refinando elementos...','Finalizando imagem...'];
+  const iv = setInterval(() => { if (stageEl && si < stages.length) stageEl.textContent = stages[si++]; }, 1000);
   const p = me || {};
-  // Build enhanced prompt combining concept + ref image info
-  let enhancedPrompt = prompt;
-  if (window._refImageB64) {
-    enhancedPrompt = `${prompt} | REFERÊNCIA VISUAL: use os elementos visuais, cores e estilo da imagem de referência fornecida como inspiração adicional`;
-  }
-  const body = {
-    prompt: enhancedPrompt,
-    format: _currentFmt,
-    network: _netMap[_currentNet] || 'instagram',
-    refImageBase64: window._refImageB64 || null
-  };
+  const brandColors = (p.cores || '#F06B28,#0A0D10').split(',').map(s=>s.trim()).filter(Boolean);
   try {
+    const body = {
+      prompt,
+      format: _currentFmt || 'post',
+      network: _netMap?.[_currentNet] || 'instagram',
+      brandColors,
+      profileData: { nicho: p.nicho, estilo: p.estilo, tom: p.tom, profissao: p.profissao }
+    };
+    if (window._refImageB64) body.refImageBase64 = window._refImageB64;
     const data = await api('POST', '/api/user/generate-image', body);
+    clearInterval(iv);
     const svgCode = data.svg;
-    if (!svgCode) throw new Error('Sem SVG na resposta');
+    if (!svgCode || svgCode.length < 100) throw new Error('Servidor não retornou SVG válido. Verifique a ANTHROPIC_API_KEY no Railway.');
     window._currentSVG = svgCode;
     _currentSVG = svgCode;
-    _currentImgName = `gerai-${_currentFmt}-${Date.now()}`;
-    document.getElementById('img-preview-thumb').innerHTML = svgCode;
+    _currentImgName = 'gerai-' + (_currentFmt||'post') + '-' + Date.now();
+    const thumbEl = document.getElementById('img-preview-thumb');
+    if (thumbEl) thumbEl.innerHTML = svgCode;
     document.getElementById('img-gen-loading').style.display = 'none';
     document.getElementById('img-preview-wrap')?.classList.add('vis');
-    toast('Imagem gerada!', 'ok');
+    toast('Imagem gerada com sucesso!', 'ok');
     if (me) { me.quota_used = (me.quota_used||0)+1; updateQuota(); }
   } catch(e) {
     clearInterval(iv);
     document.getElementById('img-gen-loading').style.display = 'none';
     document.getElementById('img-preview-empty').style.display = 'flex';
-    document.getElementById('img-preview-empty').innerHTML = `<span style="color:var(--red);font-size:12px;text-align:center">${esc(e.message)}</span><button class="btn btn-g btn-sm" onclick="gerarImagem()">Tentar novamente</button>`;
-    toast(e.message, 'err'); return;
-  } finally { clearInterval(iv); }
+    document.getElementById('img-preview-empty').innerHTML = 
+      '<svg style="width:28px;height:28px;fill:none;stroke:var(--err);stroke-width:1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+      '<span style="color:var(--err);font-size:12px;text-align:center;max-width:220px">' + esc(e.message) + '</span>' +
+      '<button class="btn btn-g btn-sm" onclick="gerarImagem()">Tentar novamente</button>';
+    toast(e.message, 'err');
+  }
 }
-
-// ─────────────────────────────────────────────────
-// COLOR PICKER
-// ─────────────────────────────────────────────────
 function addColorDot() {
   const dots = document.getElementById('prof-color-dots');
   if (!dots) return;

@@ -865,37 +865,102 @@ route('PATCH', '/api/admin/settings', async (req, res) => {
 // ── GENERATE IMAGE SVG (IA real) ──
 route('POST', '/api/user/generate-image', async (req, res) => {
   const payload = requireAuth(req, res); if (!payload) return;
-  const { prompt, format, network } = await parseBody(req);
+  const body = await parseBody(req);
+  const { prompt, format, network, brandColors, profileData } = body;
   if (!prompt) return err(res, 'prompt obrigatório');
   const user = db.getUserById(payload.id);
-  if (user.quota_used >= user.quota_limit) return err(res, 'Cota mensal esgotada');
+  if (user.quota_used >= user.quota_limit) return err(res, 'Cota mensal esgotada. Faça upgrade do plano.');
 
-  const system = `Você é diretor de arte especialista em criação de imagens SVG para redes sociais.
-REGRAS ABSOLUTAS:
-1. Responda APENAS com código SVG puro. Zero texto antes ou depois.
-2. Sem markdown, sem blocos de código, sem explicações.
-3. Comece com <svg e termine com </svg>
-4. Use viewBox="0 0 1080 1080" e xmlns="http://www.w3.org/2000/svg"
-5. font-family explícito em todo elemento text: font-family="Arial Black, Arial, sans-serif"
-6. dominant-baseline="central" em textos centralizados
-7. Fundo escuro. Hierarquia visual: dominante 60%, suporte 25%, accent 5-10%
-8. Cores do perfil têm PRIORIDADE ABSOLUTA. Use as cores fornecidas.
+  const cores = (brandColors && brandColors.length >= 1)
+    ? brandColors
+    : (user.cores || '#F06B28,#0A0D10').split(',').map(s => s.trim());
+
+  const cor1 = cores[0] || '#F06B28';
+  const cor2 = cores[1] || '#0A0D10';
+  const nicho = user.nicho || profileData?.nicho || 'marketing digital';
+  const profissao = user.profissao || profileData?.profissao || 'criador de conteúdo';
+  const estilo = user.estilo || profileData?.estilo || 'editorial moderno';
+
+  const system = `Você é um especialista em criação de imagens SVG para redes sociais.
+
+REGRAS ABSOLUTAS — SIGA EXATAMENTE:
+1. Sua resposta deve conter APENAS código SVG válido
+2. Comece com: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080">
+3. Termine com: </svg>
+4. NÃO inclua nenhum texto, explicação, markdown ou backtick
+5. Todo elemento <text> DEVE ter font-family="Arial, sans-serif" explícito
+6. Todos os elementos devem estar dentro do viewBox 0 0 1080 1080
 
 PERFIL DA MARCA:
-- Cores: ${user.cores || '#F36B2A, #0F1113'}
-- Estilo: ${user.estilo || 'dark luxury'}
-- Nicho: ${user.nicho || 'negócios'}`;
+- Cor primária: ${cor1}
+- Cor de fundo: ${cor2}
+- Nicho: ${nicho}
+- Profissão: ${profissao}
+- Estilo: ${estilo}
+
+ESTRUTURA DO SVG:
+- Background rect: use ${cor2} ou gradiente escuro
+- Elemento geométrico decorativo grande
+- Bloco de cor ${cor1} como accent
+- Texto principal do conceito (grande, 80-160px)
+- Subtexto de apoio (30-50px)
+- Elementos de acabamento (linhas, pontos, formas)
+
+Use defs com linearGradient. Crie algo visualmente impactante e profissional.`;
+
+  const userMsg = `CONCEITO: "${prompt}"
+FORMATO: ${format || 'post'} para ${network || 'instagram'}
+
+Gere o SVG agora. Comece com <svg`;
 
   try {
-    const raw = await callClaude({ system, userMsg: `FORMATO: ${format} para ${network}
-CONCEITO: "${prompt}"
+    const raw = await callClaude({ system, userMsg, maxTokens: 4000 });
 
-Gere o SVG:`, maxTokens: 4000 });
-    const match = raw.match(/<svg[\s\S]*?<\/svg>/i);
-    if (!match) throw new Error('IA não retornou SVG válido. Tente novamente.');
+    // Extract SVG — multiple strategies
+    let svg = '';
+
+    // Strategy 1: direct SVG
+    if (raw.trim().startsWith('<svg')) {
+      svg = raw.trim();
+    }
+    // Strategy 2: extract from surrounding text
+    else {
+      const match = raw.match(/<svg[\s\S]*?<\/svg>/i);
+      if (match) svg = match[0];
+    }
+    // Strategy 3: extract from markdown code block
+    if (!svg) {
+      const mdMatch = raw.match(/```(?:svg|xml)?\s*([\s\S]*?)```/i);
+      if (mdMatch) {
+        const inner = mdMatch[1].trim();
+        if (inner.startsWith('<svg')) svg = inner;
+      }
+    }
+
+    if (!svg || svg.length < 50) {
+      console.error('SVG extraction failed. Raw response (first 300):', raw.slice(0, 300));
+      throw new Error('A IA não gerou um SVG válido. Tente novamente com uma descrição diferente.');
+    }
+
+    // Ensure xmlns is present
+    if (!svg.includes('xmlns=')) {
+      svg = svg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+    }
+
     db.updateUser(payload.id, { quota_used: (user.quota_used || 0) + 1 });
-    ok(res, { svg: match[0] });
-  } catch(e) { err(res, e.message); }
+    db.addGeneration({
+      user_id: payload.id,
+      format: format || 'post',
+      network: network || 'instagram',
+      concept_name: 'imagem-svg',
+      prompt: prompt.slice(0, 200)
+    });
+
+    ok(res, { svg });
+  } catch(e) {
+    console.error('generate-image error:', e.message);
+    err(res, e.message);
+  }
 });
 
 // ── PUBLIC PLANS + PACKAGES (landing page & user) ──
