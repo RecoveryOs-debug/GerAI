@@ -177,6 +177,7 @@ body {
 /* ── SCREENS ── */
 .sc { display: none; min-height: 100vh; }
 .sc.on { display: flex; flex-direction: column; animation: fadeUp var(--t-base) var(--ease-out); }
+#sc-login.on, #sc-signup.on { align-items: center; justify-content: center; min-height: 100vh; }
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -1773,24 +1774,121 @@ tr:hover .td-actions { opacity: 1; }
   justify-content:center;align-items:center;padding:40px 20px;
   background:radial-gradient(ellipse 50% 35% at 50% 0%,rgba(243,107,42,.04) 0%,transparent 70%);
 }
-.auth-wrap{width:100%;max-width:360px}
-.auth-logo{font-size:16px;font-weight:700;letter-spacing:-0.3px;text-align:center;margin-bottom:28px}
-.auth-logo b{color:var(--a)}
-.auth-card{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r3);padding:24px}
-.auth-title{font-size:17px;font-weight:700;letter-spacing:-0.3px;margin-bottom:3px}
-.auth-sub{font-size:12px;color:var(--t2);margin-bottom:20px}
-.auth-sep{display:flex;align-items:center;gap:10px;margin:14px 0;font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.05em;text-transform:uppercase}
-.auth-sep::before,.auth-sep::after{content:'';flex:1;height:1px;background:var(--b1)}
-.oauth-btn{
-  display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
-  padding:9px;background:var(--surface);border:1px solid var(--b2);border-radius:var(--r2);
-  font-family:var(--f);font-size:13px;font-weight:500;color:var(--t0);cursor:pointer;
-  transition:all .12s;
+.auth-wrap{
+  width:100%;max-width:400px;
+  padding:var(--sp-5);
 }
-.oauth-btn:hover{background:var(--surface2);border-color:var(--b3)}
-.auth-foot{text-align:center;margin-top:14px;font-size:12px;color:var(--t2)}
-.auth-foot a{color:var(--a);cursor:pointer;font-weight:600;text-decoration:none}
-.auth-hint{font-size:11px;color:var(--t3);margin-top:4px}
+.auth-logo-area{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  margin-bottom:var(--sp-8);
+}
+.auth-logo-mark{
+  width:36px;height:36px;border-radius:var(--r3);
+  background:var(--amber-grd);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 12px var(--amber-30);
+}
+.auth-logo-mark svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.5}
+.auth-logo-name{
+  font-family:var(--f-display);font-size:22px;font-weight:800;
+  letter-spacing:-.5px;color:var(--tx-0);
+}
+.auth-logo-name b{color:var(--amber)}
+.auth-card{
+  background:var(--ink-3);
+  border:1px solid var(--line-2);
+  border-radius:var(--r4);
+  padding:var(--sp-8);
+  box-shadow:0 4px 24px rgba(0,0,0,.25),0 0 0 1px var(--line-1);
+}
+.auth-title{
+  font-family:var(--f-display);
+  font-size:22px;font-weight:800;
+  letter-spacing:-.6px;margin-bottom:5px;
+}
+.auth-sub{font-size:13px;color:var(--tx-2);margin-bottom:24px;line-height:1.5}
+.auth-field{position:relative;margin-bottom:14px}
+.auth-field label{
+  display:block;font-size:10.5px;font-weight:700;
+  color:var(--amber);letter-spacing:.08em;
+  text-transform:uppercase;margin-bottom:6px;
+}
+.auth-field input{
+  width:100%;background:var(--ink-2);
+  border:1px solid var(--line-2);
+  color:var(--tx-0);border-radius:var(--r2);
+  padding:11px 14px;font-family:var(--f-body);font-size:13.5px;
+  outline:none;transition:border-color var(--t-base),box-shadow var(--t-base);
+}
+.auth-field input:focus{border-color:var(--amber);box-shadow:0 0 0 3px var(--amber-10)}
+.auth-field input::placeholder{color:var(--tx-3)}
+.auth-field-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.auth-field-lbl{font-size:10.5px;font-weight:700;color:var(--amber);letter-spacing:.08em;text-transform:uppercase}
+.auth-forgot{
+  font-size:11.5px;font-weight:500;color:var(--amber);
+  cursor:pointer;text-decoration:none;
+  transition:opacity var(--t-base);
+}
+.auth-forgot:hover{opacity:.75;text-decoration:underline}
+.auth-btn-main{
+  width:100%;
+  background:var(--amber-grd);color:#fff;border:none;
+  border-radius:var(--r2);padding:13px 20px;
+  font-family:var(--f-display);font-size:14px;font-weight:700;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  letter-spacing:-.02em;
+  transition:all .2s var(--ease-out);
+  box-shadow:0 2px 8px var(--amber-30),0 4px 20px rgba(240,107,40,.15);
+  margin-top:20px;
+}
+.auth-btn-main:hover{
+  background:linear-gradient(135deg,var(--amber-h),var(--amber));
+  transform:translateY(-1px);
+  box-shadow:0 4px 16px var(--amber-30),0 8px 32px rgba(240,107,40,.2);
+}
+.auth-btn-main:active{transform:scale(.98)}
+.auth-sep{
+  display:flex;align-items:center;gap:10px;
+  margin:18px 0;font-size:11px;color:var(--tx-3);
+}
+.auth-sep::before,.auth-sep::after{content:'';flex:1;height:1px;background:var(--line-1)}
+.oauth-btn{
+  width:100%;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  padding:11px 16px;
+  background:var(--ink-4);
+  border:1px solid var(--line-2);border-radius:var(--r2);
+  font-family:var(--f-body);font-size:13px;font-weight:600;
+  color:var(--tx-0);cursor:pointer;
+  transition:all var(--t-base);
+}
+.oauth-btn:hover{background:var(--ink-5);border-color:var(--line-3)}
+.auth-foot{
+  text-align:center;margin-top:20px;
+  font-size:13px;color:var(--tx-2);
+}
+.auth-foot a{
+  color:var(--amber);cursor:pointer;font-weight:600;
+  text-decoration:none;
+}
+.auth-foot a:hover{text-decoration:underline}
+.auth-hint{font-size:11px;color:var(--tx-3);margin-top:5px;line-height:1.5}
+.auth-error{
+  background:rgba(240,64,64,.08);border:1px solid rgba(240,64,64,.2);
+  border-radius:var(--r2);padding:10px 13px;
+  font-size:12.5px;color:var(--err);margin-top:12px;
+  display:none;
+}
+.auth-back{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  margin-top:14px;font-size:12px;color:var(--tx-2);cursor:pointer;
+  transition:color var(--t-base);
+}
+.auth-back:hover{color:var(--tx-0)}
+.auth-terms{font-size:11px;color:var(--tx-3);text-align:center;margin-top:14px;line-height:1.6}
+.auth-terms a{color:var(--tx-2);cursor:pointer}
+.auth-terms a:hover{color:var(--amber)}
 .forgot{font-size:11px;color:var(--t2);cursor:pointer;float:right;margin-top:-10px;margin-bottom:10px}
 
 /* ══════════════════════════════════
@@ -2556,214 +2654,120 @@ label, .form-row > label, .agent-lbl, .out-lbl{color:var(--a)!important}
 <!-- ══ LOGIN ══ -->
 <div class="sc" id="sc-login">
   <div class="auth-wrap">
-    <div class="auth-logo">Ger<b>AI</b></div>
-    <div class="auth-card">
-      <div class="auth-title">Entrar na conta</div>
-      <div class="auth-sub">Bem-vindo de volta.</div>
-      <div class="form-row"><label>E-mail</label><input type="email" id="le" placeholder="pedro@empresa.com"></div>
-      <div class="form-row">
-        <label>Senha</label>
-        <input type="password" id="lp" placeholder="••••••••">
-        <span class="forgot" onclick="">Esqueci minha senha</span>
+
+    <!-- Logo -->
+    <div class="auth-logo-area">
+      <div class="auth-logo-mark">
+        <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
       </div>
-      <button class="btn btn-p btn-full" onclick="doLogin()">Entrar</button>
+      <div class="auth-logo-name">Ger<b>AI</b></div>
+    </div>
+
+    <div class="auth-card">
+      <div class="auth-title">Bom ver você</div>
+      <div class="auth-sub">Entre na sua conta para continuar gerando conteúdo.</div>
+
+      <div class="auth-field">
+        <label>E-mail</label>
+        <input type="email" id="le" placeholder="pedro@empresa.com" autocomplete="email">
+      </div>
+
+      <div class="auth-field">
+        <div class="auth-field-row">
+          <span class="auth-field-lbl">Senha</span>
+          <a class="auth-forgot" onclick="toast('Em breve: redefinição de senha por e-mail','ok')">Esqueci minha senha</a>
+        </div>
+        <input type="password" id="lp" placeholder="••••••••" autocomplete="current-password">
+      </div>
+
+      <div class="auth-error" id="login-err"></div>
+
+      <button class="auth-btn-main" onclick="doLogin()">
+        <svg style="width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Entrar na conta
+      </button>
+
       <div class="auth-sep">ou</div>
-      <button class="oauth-btn">
+
+      <button class="oauth-btn" onclick="toast('Em breve!','ok')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
         Continuar com Google
       </button>
     </div>
-    <div class="auth-foot">Não tem conta? <a onclick="go('signup')">Criar grátis</a></div>
-    <div style="text-align:center;margin-top:10px"><button class="btn btn-g btn-sm" onclick="go('land')">← Voltar</button></div>
+
+    <div class="auth-foot">
+      Não tem conta? <a onclick="go('signup')">Criar conta grátis →</a>
+    </div>
+
+    <div class="auth-back" onclick="go('land')">
+      <svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Voltar ao início
+    </div>
+
   </div>
 </div>
 
 <!-- ══ SIGNUP ══ -->
 <div class="sc" id="sc-signup">
   <div class="auth-wrap">
-    <div class="auth-logo">Ger<b>AI</b></div>
-    <div class="auth-card">
-      <div class="auth-title">Criar conta</div>
-      <div class="auth-sub">Grátis para começar. Sem cartão de crédito.</div>
-      <div class="form-row"><label>Nome completo</label><input type="text" id="sn" placeholder="Pedro Silva"></div>
-      <div class="form-row"><label>E-mail</label><input type="email" id="se" placeholder="pedro@empresa.com"></div>
-      <div class="form-row">
-        <label>Senha</label>
-        <input type="password" id="sp" placeholder="Mínimo 8 caracteres">
-        <div class="auth-hint">Use letras, números e símbolos</div>
+
+    <!-- Logo -->
+    <div class="auth-logo-area">
+      <div class="auth-logo-mark">
+        <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
       </div>
-      <button class="btn btn-p btn-full" onclick="doSignup()" style="margin-top:4px">Criar conta grátis</button>
+      <div class="auth-logo-name">Ger<b>AI</b></div>
+    </div>
+
+    <div class="auth-card">
+      <div class="auth-title">Criar sua conta</div>
+      <div class="auth-sub">Grátis para começar. Sem cartão de crédito.</div>
+
+      <div class="auth-field">
+        <label>Nome completo</label>
+        <input type="text" id="sn" placeholder="Pedro Silva" autocomplete="name">
+      </div>
+
+      <div class="auth-field">
+        <label>E-mail</label>
+        <input type="email" id="se" placeholder="pedro@empresa.com" autocomplete="email">
+      </div>
+
+      <div class="auth-field">
+        <label>Senha</label>
+        <input type="password" id="sp" placeholder="Mínimo 8 caracteres" autocomplete="new-password">
+        <div class="auth-hint">Use ao menos 8 caracteres com letras e números</div>
+      </div>
+
+      <div class="auth-error" id="signup-err"></div>
+
+      <button class="auth-btn-main" onclick="doSignup()">
+        <svg style="width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+        Criar conta grátis
+      </button>
+
       <div class="auth-sep">ou</div>
-      <button class="oauth-btn">
+
+      <button class="oauth-btn" onclick="toast('Em breve!','ok')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
         Cadastrar com Google
       </button>
-      <div style="margin-top:12px;font-size:11px;color:var(--t3);text-align:center;line-height:1.6">
-        Ao criar conta você concorda com os <a style="color:var(--t2);cursor:pointer">Termos de Uso</a> e <a style="color:var(--t2);cursor:pointer">Política de Privacidade</a>
+
+      <div class="auth-terms">
+        Ao criar conta você concorda com os
+        <a>Termos de Uso</a> e <a>Política de Privacidade</a>
       </div>
     </div>
-    <div class="auth-foot">Já tem conta? <a onclick="go('login')">Entrar</a></div>
-    <div style="text-align:center;margin-top:10px"><button class="btn btn-g btn-sm" onclick="go('land')">← Voltar</button></div>
-  </div>
-</div>
 
-<!-- ══ ONBOARDING ══ -->
-<div class="sc" id="sc-ob">
-  <div class="ob-wrap">
-    <div class="ob-hd">
-      <div class="ob-logo">Ger<b>AI</b></div>
-      <span class="t-xs c-2 fw-6" id="ob-n">1 de 7</span>
-    </div>
-    <div class="ob-prog-wrap">
-      <div class="ob-prog"><div class="ob-prog-fill" id="ob-fill" style="width:14%"></div></div>
+    <div class="auth-foot">
+      Já tem conta? <a onclick="go('login')">Entrar →</a>
     </div>
 
-    <!-- s1 -->
-    <div id="obs-1">
-      <div class="ob-qlbl">Passo 1 de 7</div>
-      <div class="ob-qtitle">Qual é a sua profissão?</div>
-      <div class="ob-qsub">Isso calibra o estilo visual e o tom de todos os seus conteúdos.</div>
-      <div class="ob-card">
-        <div class="form-row"><label>Profissão</label><input id="ob-prof" placeholder="Ex: Mentor de Vendas, Nutricionista..."></div>
-        <div class="chips" style="margin-top:8px">
-          <div class="chip" onclick="fc('ob-prof',this,'Mentor / Coach')">Mentor / Coach</div>
-          <div class="chip" onclick="fc('ob-prof',this,'Consultor')">Consultor</div>
-          <div class="chip" onclick="fc('ob-prof',this,'Profissional de Saúde')">Saúde</div>
-          <div class="chip" onclick="fc('ob-prof',this,'Designer')">Designer</div>
-          <div class="chip" onclick="fc('ob-prof',this,'Advogado')">Advogado</div>
-          <div class="chip" onclick="fc('ob-prof',this,'Empreendedor')">Empreendedor</div>
-        </div>
-      </div>
-      <div class="ob-nav"><div></div><div class="ob-dots" id="od1"></div><button class="btn btn-p btn-sm" onclick="obGo(2)">Próximo →</button></div>
+    <div class="auth-back" onclick="go('land')">
+      <svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Voltar ao início
     </div>
 
-    <!-- s2 -->
-    <div id="obs-2" style="display:none">
-      <div class="ob-qlbl">Passo 2 de 7</div>
-      <div class="ob-qtitle">Qual é o seu nicho?</div>
-      <div class="ob-qsub">Nicho específico gera conteúdo muito mais preciso e relevante.</div>
-      <div class="ob-card">
-        <div class="form-row"><label>Nicho de mercado</label><input id="ob-nicho" placeholder="Ex: Vendas B2B, Finanças Pessoais..."></div>
-        <div class="chips" style="margin-top:8px">
-          <div class="chip" onclick="fc('ob-nicho',this,'Vendas B2B')">Vendas B2B</div>
-          <div class="chip" onclick="fc('ob-nicho',this,'Marketing Digital')">Marketing Digital</div>
-          <div class="chip" onclick="fc('ob-nicho',this,'Saúde & Bem-estar')">Saúde</div>
-          <div class="chip" onclick="fc('ob-nicho',this,'Finanças Pessoais')">Finanças</div>
-          <div class="chip" onclick="fc('ob-nicho',this,'Desenvolvimento Pessoal')">Dev. Pessoal</div>
-          <div class="chip" onclick="fc('ob-nicho',this,'Tech / SaaS')">Tech / SaaS</div>
-        </div>
-      </div>
-      <div class="ob-nav"><button class="btn btn-g btn-sm" onclick="obGo(1)">← Voltar</button><div class="ob-dots" id="od2"></div><button class="btn btn-p btn-sm" onclick="obGo(3)">Próximo →</button></div>
-    </div>
-
-    <!-- s3 -->
-    <div id="obs-3" style="display:none">
-      <div class="ob-qlbl">Passo 3 de 7</div>
-      <div class="ob-qtitle">Quem é seu público?</div>
-      <div class="ob-qsub">Quanto mais específico, melhor o resultado visual.</div>
-      <div class="ob-card">
-        <div class="form-row"><label>Público-alvo</label><textarea rows="3" id="ob-pub" placeholder="Ex: Gestores comerciais 30–45 anos, empresas médias B2B..."></textarea></div>
-        <div class="form-row" style="margin-top:4px"><label>Faixa etária</label>
-          <div class="chips">
-            <div class="chip" onclick="tc(this)">18–24</div><div class="chip" onclick="tc(this)">25–34</div>
-            <div class="chip on" onclick="tc(this)">35–44</div><div class="chip" onclick="tc(this)">45–54</div><div class="chip" onclick="tc(this)">55+</div>
-          </div>
-        </div>
-      </div>
-      <div class="ob-nav"><button class="btn btn-g btn-sm" onclick="obGo(2)">← Voltar</button><div class="ob-dots" id="od3"></div><button class="btn btn-p btn-sm" onclick="obGo(4)">Próximo →</button></div>
-    </div>
-
-    <!-- s4 -->
-    <div id="obs-4" style="display:none">
-      <div class="ob-qlbl">Passo 4 de 7</div>
-      <div class="ob-qtitle">Tom de voz</div>
-      <div class="ob-qsub">Define a linguagem visual de todo o seu conteúdo. Selecione até 3.</div>
-      <div class="ob-card">
-        <div class="chips">
-          <div class="chip" onclick="tc(this)">Autoridade</div><div class="chip on" onclick="tc(this)">Provocativo</div>
-          <div class="chip" onclick="tc(this)">Acolhedor</div><div class="chip" onclick="tc(this)">Técnico</div>
-          <div class="chip" onclick="tc(this)">Inspiracional</div><div class="chip" onclick="tc(this)">Descontraído</div>
-          <div class="chip on" onclick="tc(this)">Premium</div><div class="chip" onclick="tc(this)">Educativo</div>
-          <div class="chip" onclick="tc(this)">Urgente</div><div class="chip" onclick="tc(this)">Empático</div>
-        </div>
-      </div>
-      <div class="ob-nav"><button class="btn btn-g btn-sm" onclick="obGo(3)">← Voltar</button><div class="ob-dots" id="od4"></div><button class="btn btn-p btn-sm" onclick="obGo(5)">Próximo →</button></div>
-    </div>
-
-    <!-- s5 -->
-    <div id="obs-5" style="display:none">
-      <div class="ob-qlbl">Passo 5 de 7</div>
-      <div class="ob-qtitle">Cores da marca</div>
-      <div class="ob-qsub">Aplicadas automaticamente em todas as gerações.</div>
-      <div class="ob-card">
-        <div class="form-row"><label>Cor primária</label>
-          <div class="c-inp-row">
-            <div class="c-swatch" id="sw1" style="background:#F36B2A"><input type="color" value="#F36B2A" oninput="sc1(1,this.value)"></div>
-            <input id="ob-c1" value="#F36B2A" style="font-family:monospace;font-size:12px" oninput="ss1(1,this.value)">
-          </div>
-        </div>
-        <div class="form-row"><label>Cor secundária <span style="color:var(--t3);font-weight:400;text-transform:none">(opcional)</span></label>
-          <div class="c-inp-row">
-            <div class="c-swatch" id="sw2" style="background:#0F1113"><input type="color" value="#0F1113" oninput="sc1(2,this.value)"></div>
-            <input id="ob-c2" value="#0F1113" style="font-family:monospace;font-size:12px" oninput="ss1(2,this.value)">
-          </div>
-        </div>
-        <div class="form-row" style="margin-top:2px"><label>Paletas por nicho</label>
-          <div class="chips">
-            <div class="chip" onclick="ap('#1A3A6B','#C9A84C')">Finanças</div>
-            <div class="chip" onclick="ap('#2D6B4A','#F5F4F1')">Saúde</div>
-            <div class="chip on" onclick="ap('#F36B2A','#0F1113')">Dark Tech</div>
-            <div class="chip" onclick="ap('#E94560','#0D0D0D')">Marketing</div>
-            <div class="chip" onclick="ap('#6B3AE0','#C9A84C')">Coach</div>
-          </div>
-        </div>
-      </div>
-      <div class="ob-nav"><button class="btn btn-g btn-sm" onclick="obGo(4)">← Voltar</button><div class="ob-dots" id="od5"></div><button class="btn btn-p btn-sm" onclick="obGo(6)">Próximo →</button></div>
-    </div>
-
-    <!-- s6 -->
-    <div id="obs-6" style="display:none">
-      <div class="ob-qlbl">Passo 6 de 7</div>
-      <div class="ob-qtitle">Estilo visual</div>
-      <div class="ob-qsub">Como você quer ser percebido visualmente?</div>
-      <div class="ob-card">
-        <div class="chips">
-          <div class="chip on" onclick="tc(this)">Dark Luxury</div><div class="chip" onclick="tc(this)">Minimalista</div>
-          <div class="chip" onclick="tc(this)">Editorial</div><div class="chip" onclick="tc(this)">Vibrante</div>
-          <div class="chip" onclick="tc(this)">Futurista</div><div class="chip" onclick="tc(this)">Orgânico</div>
-          <div class="chip" onclick="tc(this)">Corporate</div><div class="chip" onclick="tc(this)">Lifestyle</div>
-        </div>
-      </div>
-      <div class="ob-nav"><button class="btn btn-g btn-sm" onclick="obGo(5)">← Voltar</button><div class="ob-dots" id="od6"></div><button class="btn btn-p btn-sm" onclick="obGo(7)">Próximo →</button></div>
-    </div>
-
-    <!-- s7 -->
-    <div id="obs-7" style="display:none">
-      <div class="ob-qlbl">Passo 7 de 7</div>
-      <div class="ob-qtitle">Redes sociais</div>
-      <div class="ob-qsub">Formatos otimizados automaticamente por plataforma.</div>
-      <div class="ob-card">
-        <div class="ob-net-grid">
-          <div class="ob-net on" onclick="this.classList.toggle('on')">
-            <div class="ob-net-ico"><svg class="ico" style="color:var(--t1)" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div>
-            <div><div class="ob-net-name">Instagram</div><div class="ob-net-sub">Feed, Stories, Reels</div></div>
-          </div>
-          <div class="ob-net" onclick="this.classList.toggle('on')">
-            <div class="ob-net-ico"><svg class="ico" style="color:var(--t1)" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></div>
-            <div><div class="ob-net-name">LinkedIn</div><div class="ob-net-sub">Feed, Artigos</div></div>
-          </div>
-          <div class="ob-net" onclick="this.classList.toggle('on')">
-            <div class="ob-net-ico"><svg class="ico" style="color:var(--t1)" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg></div>
-            <div><div class="ob-net-name">YouTube</div><div class="ob-net-sub">Thumbnail, Banner</div></div>
-          </div>
-          <div class="ob-net" onclick="this.classList.toggle('on')">
-            <div class="ob-net-ico"><svg class="ico" style="color:var(--t1)" viewBox="0 0 24 24"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg></div>
-            <div><div class="ob-net-name">TikTok</div><div class="ob-net-sub">Vertical, Stories</div></div>
-          </div>
-        </div>
-      </div>
-      <div class="ob-nav"><button class="btn btn-g btn-sm" onclick="obGo(6)">← Voltar</button><div class="ob-dots" id="od7"></div><button class="btn btn-p btn-sm" onclick="finOb()">Concluir →</button></div>
-    </div>
   </div>
 </div>
 
@@ -4035,7 +4039,7 @@ async function doLogin() {
     else bootApp();
   } catch(e) {
     btn.disabled = false; btn.textContent = 'Entrar';
-    toast(e.message, 'err');
+    toast(e.message, 'err'); const le=document.getElementById('login-err'); if(le){le.textContent=e.message;le.style.display='block';};
   }
 }
 
@@ -4057,7 +4061,7 @@ async function doSignup() {
     for (let i=1;i<=7;i++) mkDots('od'+i,1);
   } catch(e) {
     btn.disabled = false; btn.textContent = 'Criar conta grátis';
-    toast(e.message, 'err');
+    toast(e.message, 'err'); const se=document.getElementById('signup-err'); if(se){se.textContent=e.message;se.style.display='block';};
   }
 }
 
