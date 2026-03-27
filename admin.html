@@ -514,14 +514,14 @@ async function loadDashboard() {
     // KPI cards
     const kpiRow = document.getElementById('kpi-row');
     const mrr = (_stats.mrr / 100).toFixed(2);
-    const costBrl = (_stats.total_cost_brl || 0).toFixed(2);
-    const margin = _stats.mrr > 0 ? (((_stats.mrr/100 - (_stats.total_cost_brl||0)) / (_stats.mrr/100)) * 100).toFixed(1) : '—';
+    const costUsd = (_stats.total_cost_usd || 0).toFixed(4);
+    const margin = _stats.mrr > 0 ? (((_stats.mrr/100 - ((_stats.total_cost_usd||0)*5.2)) / (_stats.mrr/100)) * 100).toFixed(1) : '—';
     kpiRow.innerHTML = `
       ${kpi('Usuários',_stats.total_users,'',svgPeople())}
       ${kpi('Ativos',_stats.active_users,'',svgCheck())}
       ${kpi('Gerações',_stats.total_generations,'',svgPulse())}
       ${kpi('MRR (R$)','R$'+mrr,'receita mensal',svgMoney())}
-      ${kpi('Custo IA (R$)','R$'+costBrl,'custo Anthropic',svgCost())}
+      ${kpi('Custo IA (USD)','$'+costUsd,'custo Anthropic',svgCost())}
     `;
 
     // Line chart — gerações por mês
@@ -547,15 +547,15 @@ async function loadDashboard() {
     // Feature cost bars
     const byFeature = _stats.by_feature || {};
     const featEl = document.getElementById('chart-features');
-    const feats = Object.entries(byFeature).sort((a,b) => b[1].cost_brl - a[1].cost_brl).slice(0,6);
+    const feats = Object.entries(byFeature).sort((a,b) => b[1].cost_usd - a[1].cost_usd).slice(0,6);
     if (feats.length > 0) {
-      const maxCost = Math.max(...feats.map(f => f[1].cost_brl), 0.001);
+      const maxCost = Math.max(...feats.map(f => f[1].cost_usd), 0.000001);
       featEl.innerHTML = feats.map(([name, d]) => {
-        const pct = Math.round((d.cost_brl / maxCost) * 100);
+        const pct = Math.round((d.cost_usd / maxCost) * 100);
         return `<div class="prog-row">
           <div class="prog-lbl">${name}</div>
           <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
-          <div class="prog-val">R$${d.cost_brl.toFixed(4)}</div>
+          <div class="prog-val">$${(d.cost_usd||0).toFixed(5)}</div>
         </div>`;
       }).join('');
     } else {
@@ -573,7 +573,7 @@ async function loadDashboard() {
             <div class="av-name">${u.name}</div>
             <div class="av-role">${u.count} gerações</div>
           </div>
-          <div class="av-right"><span style="font-size:11.5px;color:var(--or);font-family:monospace">R$${u.cost_brl.toFixed(4)}</span></div>
+          <div class="av-right"><span style="font-size:11.5px;color:var(--or);font-family:monospace">$${(u.cost_usd||0).toFixed(5)}</span></div>
         </div>
       `).join('');
     } else {
@@ -625,17 +625,17 @@ async function loadCosts() {
       aApi('GET', '/api/admin/stats')
     ]);
     const s = statsD.stats;
-    const costBrl = (s.total_cost_brl || 0).toFixed(4);
+    const costUsd = (s.total_cost_usd || 0).toFixed(6);
     const totalTokens = (s.total_tokens || 0).toLocaleString('pt-BR');
     const byFeature = s.by_feature || {};
     const topFeature = Object.entries(byFeature).sort((a,b)=>b[1].cost_brl-a[1].cost_brl)[0];
 
     document.getElementById('kpi-costs').innerHTML = `
-      ${kpi('Custo total R$','R$'+costBrl,'custo Anthropic total',svgCost())}
+      ${kpi('Custo total USD','$'+costUsd,'custo Anthropic total',svgCost())}
       ${kpi('Total tokens',totalTokens,'input+output',svgPulse())}
       ${kpi('Gerações',s.total_generations,'',svgPulse())}
       ${kpi('Feature + cara',topFeature?topFeature[0]:'—',topFeature?'R$'+topFeature[1].cost_brl.toFixed(4):'',svgMoney())}
-      ${kpi('Custo médio/gen','R$'+(s.total_generations?((s.total_cost_brl||0)/s.total_generations).toFixed(5):'0'),'por geração',svgCost())}
+      ${kpi('Custo médio/gen','$'+(s.total_generations?((s.total_cost_usd||0)/s.total_generations).toFixed(6):'0'),'por geração',svgCost())}
     `;
 
     const tbody = document.querySelector('#cost-table tbody');
@@ -650,7 +650,7 @@ async function loadCosts() {
         <td>${g.user_name}</td>
         <td class="mono">${(g.input_tokens||0).toLocaleString()}</td>
         <td class="mono">${(g.output_tokens||0).toLocaleString()}</td>
-        <td class="mono" style="color:var(--or)">R$${(g.cost_brl||0).toFixed(6)}</td>
+        <td class="mono" style="color:var(--or)">$${(g.cost_usd||0).toFixed(6)}</td>
         <td class="mono">${g.credits_used||1}</td>
         <td style="color:var(--tx2)">${new Date(g.created_at).toLocaleString('pt-BR')}</td>
       </tr>
@@ -725,7 +725,7 @@ async function loadGenerations() {
         <td>${usersMap[g.user_id]||'—'}</td>
         <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tx2)">${g.prompt||'—'}</td>
         <td class="mono">${(g.total_tokens||0).toLocaleString()}</td>
-        <td class="mono" style="color:var(--or)">R$${(g.cost_brl||0).toFixed(5)}</td>
+        <td class="mono" style="color:var(--or)">$${(g.cost_usd||0).toFixed(6)}</td>
         <td style="color:var(--tx2)">${new Date(g.created_at).toLocaleString('pt-BR')}</td>
       </tr>
     `).join('');

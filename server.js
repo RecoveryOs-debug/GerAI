@@ -557,16 +557,16 @@ class DB {
     }, 0);
     // Cost aggregations
     const gens = this.data.generations;
-    const totalCostBrl = gens.reduce((s,g) => s + (g.cost_brl||0) + (g.image_cost_brl||0), 0);
+    const totalCostUsd = gens.reduce((s,g) => s + (g.cost_usd||0) + (g.image_cost_usd||0), 0);
     const totalTokens  = gens.reduce((s,g) => s + (g.total_tokens||0), 0);
 
     // By feature
     const byFeature = {};
     gens.forEach(g => {
       const f = g.feature || g.format || 'unknown';
-      if (!byFeature[f]) byFeature[f] = { uses: 0, cost_brl: 0, tokens: 0 };
+      if (!byFeature[f]) byFeature[f] = { uses: 0, cost_usd: 0, tokens: 0 };
       byFeature[f].uses++;
-      byFeature[f].cost_brl += (g.cost_brl||0);
+      byFeature[f].cost_usd += (g.cost_usd||0);
       byFeature[f].tokens   += (g.total_tokens||0);
     });
 
@@ -574,24 +574,24 @@ class DB {
     const byMonth = {};
     gens.forEach(g => {
       const m = g.created_at?.slice(0,7) || 'unknown';
-      if (!byMonth[m]) byMonth[m] = { count: 0, cost_brl: 0 };
+      if (!byMonth[m]) byMonth[m] = { count: 0, cost_usd: 0 };
       byMonth[m].count++;
-      byMonth[m].cost_brl += (g.cost_brl||0);
+      byMonth[m].cost_usd += (g.cost_usd||0);
     });
 
     // Heavy users (top 5 by cost)
     const userCosts = {};
     gens.forEach(g => {
-      if (!userCosts[g.user_id]) userCosts[g.user_id] = { cost_brl: 0, count: 0 };
-      userCosts[g.user_id].cost_brl += (g.cost_brl||0);
+      if (!userCosts[g.user_id]) userCosts[g.user_id] = { cost_usd: 0, count: 0 };
+      userCosts[g.user_id].cost_usd += (g.cost_usd||0);
       userCosts[g.user_id].count++;
     });
     const topUsers = Object.entries(userCosts)
-      .sort((a,b) => b[1].cost_brl - a[1].cost_brl)
+      .sort((a,b) => b[1].cost_usd - a[1].cost_usd)
       .slice(0, 5)
       .map(([uid, d]) => {
         const u = this.data.users.find(x => x.id === uid);
-        return { user_id: uid, name: u?.name || 'Desconhecido', email: u?.email || '', ...d };
+        return { user_id: uid, name: u?.name || 'Desconhecido', email: u?.email || '', cost_usd: parseFloat((d.cost_usd||0).toFixed(6)), count: d.count };
       });
 
     return {
@@ -600,7 +600,7 @@ class DB {
       total_generations: gens.length,
       plan_breakdown: breakdown,
       mrr: totalRevenue,
-      total_cost_brl: parseFloat(totalCostBrl.toFixed(4)),
+      total_cost_usd: parseFloat(totalCostUsd.toFixed(6)),
       total_tokens: totalTokens,
       by_feature: byFeature,
       by_month: byMonth,
@@ -867,7 +867,7 @@ route('GET', '/api/admin/stats', async (req, res) => {
 route('GET', '/api/admin/user-stats/:id', async (req, res, params) => {
   const payload = requireAdmin(req, res); if (!payload) return;
   const gens = db.data.generations.filter(g => g.user_id === params.id);
-  const totalCost = gens.reduce((s,g) => s + (g.cost_brl||0), 0);
+  const totalCost = gens.reduce((s,g) => s + (g.cost_usd||0), 0);
   const totalCredits = gens.reduce((s,g) => s + (g.credits_used||1), 0);
   const byFeature = {};
   gens.forEach(g => {
@@ -875,7 +875,7 @@ route('GET', '/api/admin/user-stats/:id', async (req, res, params) => {
     if (!byFeature[f]) byFeature[f] = 0;
     byFeature[f]++;
   });
-  ok(res, { user_id: params.id, total_generations: gens.length, total_cost_brl: parseFloat(totalCost.toFixed(4)), total_credits: totalCredits, by_feature: byFeature });
+  ok(res, { user_id: params.id, total_generations: gens.length, total_cost_usd: parseFloat(totalCost.toFixed(6)), total_credits: totalCredits, by_feature: byFeature });
 });
 
 route('GET', '/api/admin/users', async (req, res) => {
@@ -1125,7 +1125,7 @@ route('GET', '/api/admin/cost-report', async (req, res) => {
       input_tokens: g.input_tokens || 0,
       output_tokens: g.output_tokens || 0,
       total_tokens: g.total_tokens || 0,
-      cost_brl: parseFloat((g.cost_brl || 0).toFixed(6)),
+      cost_usd: parseFloat((g.cost_usd || 0).toFixed(6)),
       credits_used: g.credits_used || 1,
       created_at: g.created_at
     };
