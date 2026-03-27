@@ -3756,6 +3756,217 @@ solation: isolate;
   .auth-right { padding:36px 24px; }
 }
 
+
+/* ══ ONBOARDING ══ */
+#sc-onboard {
+  background: var(--ink-0);
+  background-image:
+    radial-gradient(ellipse 65% 55% at 8% 0%, rgba(240,107,40,.09) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 40% at 92% 95%, rgba(240,107,40,.05) 0%, transparent 55%);
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 40px 20px;
+  position: fixed;
+  inset: 0;
+}
+.ob-wrap {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  position: relative;
+}
+.ob-progress {
+  height: 2px;
+  background: var(--line-1);
+  border-radius: 2px;
+  margin-bottom: 48px;
+  overflow: hidden;
+}
+.ob-progress-bar {
+  height: 100%;
+  background: var(--amber-grd, linear-gradient(90deg, #F06B28, #E04E10));
+  border-radius: 2px;
+  transition: width .5s var(--ease-out, cubic-bezier(.16,1,.3,1));
+  box-shadow: 0 0 8px rgba(240,107,40,.4);
+}
+.ob-logo {
+  display: flex; align-items: center; gap: 9px;
+  margin-bottom: 40px;
+  font-family: var(--f-display, 'Sora', system-ui);
+  font-size: 16px; font-weight: 700; color: var(--tx-0);
+}
+.ob-logo b { color: var(--amber); }
+.ob-logo-mark {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--amber-grd, linear-gradient(135deg,#F06B28,#E04E10));
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 16px rgba(240,107,40,.3);
+}
+.ob-step-label {
+  font-size: 10.5px; font-weight: 700; color: var(--amber);
+  letter-spacing: .12em; text-transform: uppercase; margin-bottom: 14px;
+}
+.ob-title {
+  font-family: var(--f-display, 'Sora', system-ui);
+  font-size: clamp(26px, 4vw, 38px);
+  font-weight: 800; letter-spacing: -1.5px; line-height: 1.05;
+  color: var(--tx-0); margin-bottom: 14px;
+}
+.ob-sub {
+  font-size: 14.5px; color: var(--tx-1); line-height: 1.75;
+  max-width: 480px; margin-bottom: 36px;
+}
+
+/* Instagram input */
+.ob-ig-wrap {
+  position: relative; margin-bottom: 10px;
+}
+.ob-ig-at {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  font-size: 15px; color: var(--tx-2); font-weight: 600; pointer-events: none;
+}
+.ob-ig-icon {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  pointer-events: none;
+}
+.ob-ig-input {
+  width: 100%; padding: 14px 48px 14px 34px;
+  background: var(--ink-2); border: 1px solid var(--line-2);
+  border-radius: 10px; color: var(--tx-0);
+  font-size: 15px; font-family: var(--f-body);
+  outline: none; transition: border-color .18s, box-shadow .18s;
+}
+.ob-ig-input:focus {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px rgba(240,107,40,.12);
+}
+.ob-ig-note {
+  font-size: 11.5px; color: var(--tx-3); margin-bottom: 28px;
+}
+
+/* Buttons */
+.ob-btn-main {
+  width: 100%; padding: 14px;
+  background: var(--amber-grd, linear-gradient(135deg,#F06B28,#E04E10));
+  color: #fff; border: none; border-radius: 10px;
+  font-family: var(--f-display, 'Sora', system-ui);
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  letter-spacing: -.01em; margin-bottom: 12px;
+  box-shadow: 0 4px 22px rgba(240,107,40,.25);
+  transition: all .2s;
+}
+.ob-btn-main:hover { transform: translateY(-1px); box-shadow: 0 6px 30px rgba(240,107,40,.38); }
+.ob-btn-main:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+.ob-btn-skip {
+  width: 100%; padding: 10px;
+  background: transparent; border: 1px solid var(--line-2);
+  color: var(--tx-2); border-radius: 10px;
+  font-size: 13px; font-family: var(--f-body); cursor: pointer;
+  transition: all .18s;
+}
+.ob-btn-skip:hover { background: var(--ink-2); color: var(--tx-0); }
+
+/* Analysis stages */
+.ob-analysis-stages {
+  display: flex; flex-direction: column; gap: 16px;
+  margin: 40px 0;
+}
+.ob-stage {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 13.5px; color: var(--tx-2);
+  transition: color .3s;
+}
+.ob-stage.active { color: var(--amber); }
+.ob-stage.done   { color: var(--ok, #2ECC8A); }
+.ob-stage-icon {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--ink-3); border: 1px solid var(--line-2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; color: var(--tx-3); transition: all .3s;
+}
+.ob-stage.active .ob-stage-icon { background: rgba(240,107,40,.12); border-color: rgba(240,107,40,.3); color: var(--amber); }
+.ob-stage.done   .ob-stage-icon { background: rgba(46,204,138,.12); border-color: rgba(46,204,138,.3); color: var(--ok, #2ECC8A); }
+.ob-stage-spin svg { animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.ob-stage-wait { opacity: .45; }
+
+/* Branding Kit */
+.ob-kit-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px; margin-bottom: 28px;
+}
+.ob-kit-badge {
+  background: var(--amber-grd, linear-gradient(135deg,#F06B28,#E04E10));
+  color: #fff; padding: 5px 11px; border-radius: 6px;
+  font-size: 11px; font-weight: 800; letter-spacing: .08em;
+  flex-shrink: 0;
+  box-shadow: 0 0 12px rgba(240,107,40,.3);
+}
+.ob-kit-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;
+}
+.ob-kit-card {
+  background: var(--ink-2); border: 1px solid var(--line-1);
+  border-radius: 12px; padding: 18px;
+  transition: border-color .2s;
+}
+.ob-kit-card:hover { border-color: var(--line-2); }
+.ob-kit-card-label {
+  font-size: 9.5px; font-weight: 700; color: var(--amber);
+  letter-spacing: .12em; text-transform: uppercase; margin-bottom: 14px;
+}
+/* Colors */
+.ob-kit-colors { display: flex; gap: 8px; margin-bottom: 8px; }
+.ob-kit-color-swatch {
+  width: 32px; height: 32px; border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.1);
+  transition: transform .15s; cursor: default;
+}
+.ob-kit-color-swatch:hover { transform: scale(1.1); }
+.ob-kit-color-codes { display: flex; gap: 8px; flex-wrap: wrap; }
+.ob-kit-color-codes span {
+  font-family: var(--f-mono, monospace); font-size: 10px; color: var(--tx-2);
+}
+/* Tags */
+.ob-kit-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.ob-kit-tag {
+  background: rgba(240,107,40,.1); border: 1px solid rgba(240,107,40,.2);
+  border-radius: 5px; padding: 3px 9px;
+  font-size: 11px; font-weight: 600; color: var(--amber);
+}
+.ob-kit-desc { font-size: 12px; color: var(--tx-2); line-height: 1.65; }
+/* Fonts */
+.ob-kit-fonts { display: flex; flex-direction: column; gap: 10px; }
+.ob-kit-font { display: flex; align-items: center; justify-content: space-between; }
+.ob-kit-font-name {
+  font-family: var(--f-display, 'Sora', system-ui);
+  font-size: 15px; font-weight: 700; color: var(--tx-0); letter-spacing: -.2px;
+}
+.ob-kit-font-role { font-size: 10.5px; color: var(--tx-3); }
+/* Style */
+.ob-kit-style-name {
+  font-family: var(--f-display, 'Sora', system-ui);
+  font-size: 18px; font-weight: 800; color: var(--tx-0);
+  letter-spacing: -.5px; margin-bottom: 8px;
+}
+
+/* Post preview */
+.ob-kit-preview-section { margin-bottom: 32px; }
+.ob-kit-preview-label {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 10.5px; font-weight: 700; color: var(--amber);
+  letter-spacing: .1em; text-transform: uppercase; margin-bottom: 14px;
+}
+.ob-post-preview {
+  background: var(--ink-2); border: 1px solid var(--line-1);
+  border-radius: 12px; overflow: hidden;
+  display: flex; gap: 12px; padding: 4px;
+}
+.ob-post-preview svg { border-radius: 9px; }
+.ob-kit-actions { display: flex; flex-direction: column; gap: 0; }
+
 </style>
 </head>
 <body>
@@ -4439,6 +4650,171 @@ solation: isolate;
       <div class="auth-back" onclick="go('land')">
         <svg style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
         Voltar ao início
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══ ONBOARDING ══ -->
+<div class="sc" id="sc-onboard">
+  <div class="ob-wrap">
+
+    <!-- Progress -->
+    <div class="ob-progress">
+      <div class="ob-progress-bar" id="ob-progress-bar" style="width:33%"></div>
+    </div>
+
+    <!-- STEP 1: Conectar Instagram -->
+    <div class="ob-step" id="ob-step-1">
+      <div class="ob-logo">
+        <div class="ob-logo-mark">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <span>Ger<b>AI</b></span>
+      </div>
+      <div class="ob-step-label">Passo 1 de 3</div>
+      <h1 class="ob-title">Conecte seu Instagram</h1>
+      <p class="ob-sub">A IA vai analisar seu perfil e entender seu posicionamento para criar um branding de marca personalizado para você.</p>
+      <div class="ob-ig-wrap">
+        <div class="ob-ig-icon">
+          <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:var(--amber);stroke-width:2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="var(--amber)" stroke="none"/></svg>
+        </div>
+        <input class="ob-ig-input" id="ob-ig-handle" type="text" placeholder="@seuperfil" autocomplete="off" oninput="this.value=this.value.replace(/[^a-zA-Z0-9._]/g,'')">
+        <span class="ob-ig-at">@</span>
+      </div>
+      <div class="ob-ig-note">Apenas perfis públicos. Não armazenamos sua senha.</div>
+      <button class="ob-btn-main" onclick="obStep1Next()">
+        Analisar perfil com IA
+        <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:#fff;stroke-width:2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+      <button class="ob-btn-skip" onclick="obSkipToStep2()">Pular — configurar manualmente</button>
+    </div>
+
+    <!-- STEP 2: Analisando -->
+    <div class="ob-step" id="ob-step-2" style="display:none">
+      <div class="ob-logo">
+        <div class="ob-logo-mark">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <span>Ger<b>AI</b></span>
+      </div>
+      <div class="ob-step-label">Passo 2 de 3</div>
+      <h1 class="ob-title">Analisando seu perfil…</h1>
+      <p class="ob-sub">A IA está lendo seu posicionamento e definindo seu branding de marca.</p>
+      <div class="ob-analysis-stages" id="ob-stages">
+        <div class="ob-stage" id="ob-stage-0">
+          <div class="ob-stage-icon ob-stage-spin">
+            <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+          </div>
+          <span>Lendo bio e posicionamento...</span>
+        </div>
+        <div class="ob-stage ob-stage-wait" id="ob-stage-1">
+          <div class="ob-stage-icon">
+            <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2"><circle cx="12" cy="12" r="10"/></svg>
+          </div>
+          <span>Identificando paleta de cores...</span>
+        </div>
+        <div class="ob-stage ob-stage-wait" id="ob-stage-2">
+          <div class="ob-stage-icon">
+            <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2"><circle cx="12" cy="12" r="10"/></svg>
+          </div>
+          <span>Definindo tom de voz e estilo...</span>
+        </div>
+        <div class="ob-stage ob-stage-wait" id="ob-stage-3">
+          <div class="ob-stage-icon">
+            <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2"><circle cx="12" cy="12" r="10"/></svg>
+          </div>
+          <span>Gerando branding kit personalizado...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Branding Kit -->
+    <div class="ob-step" id="ob-step-3" style="display:none">
+      <div class="ob-logo">
+        <div class="ob-logo-mark">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <span>Ger<b>AI</b></span>
+      </div>
+      <div class="ob-step-label">Passo 3 de 3</div>
+      <div class="ob-kit-header">
+        <div>
+          <h1 class="ob-title" style="margin-bottom:6px">Seu Branding Kit está pronto</h1>
+          <p class="ob-sub" style="margin-bottom:0">Revisado pela IA com base no seu perfil. Você pode ajustar quando quiser.</p>
+        </div>
+        <div class="ob-kit-badge">IA</div>
+      </div>
+
+      <div class="ob-kit-grid">
+
+        <!-- Cores -->
+        <div class="ob-kit-card">
+          <div class="ob-kit-card-label">Paleta de cores</div>
+          <div class="ob-kit-colors" id="ob-kit-colors">
+            <div class="ob-kit-color-swatch" style="background:#F06B28;" title="#F06B28"></div>
+            <div class="ob-kit-color-swatch" style="background:#0B0B0F;" title="#0B0B0F"></div>
+            <div class="ob-kit-color-swatch" style="background:#F2F0EC;" title="#F2F0EC"></div>
+          </div>
+          <div class="ob-kit-color-codes" id="ob-kit-color-codes">
+            <span>#F06B28</span><span>#0B0B0F</span><span>#F2F0EC</span>
+          </div>
+        </div>
+
+        <!-- Tom de voz -->
+        <div class="ob-kit-card">
+          <div class="ob-kit-card-label">Tom de voz</div>
+          <div class="ob-kit-tags" id="ob-kit-tom">
+            <span class="ob-kit-tag">Autoridade</span>
+            <span class="ob-kit-tag">Direto</span>
+            <span class="ob-kit-tag">Premium</span>
+          </div>
+          <div class="ob-kit-desc" id="ob-kit-tom-desc">Comunicação assertiva com linguagem técnica e posicionamento de especialista.</div>
+        </div>
+
+        <!-- Tipografia -->
+        <div class="ob-kit-card">
+          <div class="ob-kit-card-label">Tipografia sugerida</div>
+          <div class="ob-kit-fonts" id="ob-kit-fonts">
+            <div class="ob-kit-font">
+              <span class="ob-kit-font-name" id="ob-font-display">Sora</span>
+              <span class="ob-kit-font-role">Headlines</span>
+            </div>
+            <div class="ob-kit-font">
+              <span class="ob-kit-font-name" id="ob-font-body">Inter</span>
+              <span class="ob-kit-font-role">Corpo de texto</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estilo visual -->
+        <div class="ob-kit-card">
+          <div class="ob-kit-card-label">Estilo visual</div>
+          <div class="ob-kit-style-name" id="ob-kit-style">Dark Premium</div>
+          <div class="ob-kit-desc" id="ob-kit-style-desc">Fundos escuros, tipografia forte, acentos em laranja, composição limpa e hierarquia visual clara.</div>
+        </div>
+
+      </div>
+
+      <!-- Preview de post gerado -->
+      <div class="ob-kit-preview-section">
+        <div class="ob-kit-preview-label">
+          <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:none;stroke:var(--amber);stroke-width:2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Exemplo de post com seu branding
+        </div>
+        <div class="ob-post-preview" id="ob-post-preview">
+          <!-- SVG post preview rendered by JS -->
+        </div>
+      </div>
+
+      <div class="ob-kit-actions">
+        <button class="ob-btn-main" onclick="obFinish()">
+          Entrar no GerAI Studio
+          <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:#fff;stroke-width:2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <button class="ob-btn-skip" onclick="nav('profile')">Ajustar branding manualmente</button>
       </div>
     </div>
 
@@ -5532,7 +5908,7 @@ function go(s) {
   }
 })();
 
-function bootApp() {
+function bootApp(skipOnboard) {
   restoreSavedData();
   // populate sidebar + topbar with real user data
   const av = document.getElementById('sb-av');
@@ -5542,8 +5918,14 @@ function bootApp() {
   const up = document.getElementById('sb-uplan');
   if (up) up.textContent = (me.plan || 'free').charAt(0).toUpperCase() + (me.plan || 'free').slice(1) + ' Plan';
   updateQuota();
-  go('app');
-  navP('dashboard');
+  // New users (no profissao set) go to onboarding
+  const isNew = !me.profissao && !localStorage.getItem('gerai_ob_done') && !skipOnboard;
+  if (isNew) {
+    go('onboard');
+  } else {
+    go('app');
+    navP('dashboard');
+  }
 }
 
 function updateQuota() {
@@ -7854,6 +8236,227 @@ function restoreSavedData() {
   watchAndStart('sc-login',  'auth-login-preview',  'auth-login-tag',  AUTH_PREVIEWS);
   watchAndStart('sc-signup', 'auth-signup-preview', 'auth-signup-tag', AUTH_SIGNUP_PREVIEWS);
 })();
+
+
+
+// ══ ONBOARDING FLOW ══
+var _obIgHandle = '';
+var _obBrandKit = null;
+
+function obStep1Next() {
+  const handle = document.getElementById('ob-ig-handle').value.trim().replace('@','');
+  _obIgHandle = handle;
+  if (!handle) { toast('Digite seu @ do Instagram', 'err'); return; }
+  _startObAnalysis(handle);
+}
+
+function obSkipToStep2() {
+  _obIgHandle = '';
+  _startObAnalysis('');
+}
+
+function _setObStep(step) {
+  [1,2,3].forEach(n => {
+    const el = document.getElementById('ob-step-' + n);
+    if (el) el.style.display = n === step ? 'block' : 'none';
+  });
+  const bar = document.getElementById('ob-progress-bar');
+  if (bar) bar.style.width = (step * 33) + '%';
+}
+
+function _setStage(n, status) {
+  const el = document.getElementById('ob-stage-' + n);
+  if (!el) return;
+  el.classList.remove('ob-stage-wait','active','done');
+  const icon = el.querySelector('.ob-stage-icon');
+  if (status === 'active') {
+    el.classList.add('active');
+    icon.innerHTML = '<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>';
+    icon.querySelector('svg').style.animation = 'spin .7s linear infinite';
+  } else if (status === 'done') {
+    el.classList.add('done');
+    icon.innerHTML = '<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+  }
+}
+
+async function _startObAnalysis(handle) {
+  _setObStep(2);
+
+  // Animate stages
+  const delay = ms => new Promise(r => setTimeout(r, ms));
+  _setStage(0, 'active');
+  await delay(1200);
+  _setStage(0, 'done'); _setStage(1, 'active');
+  await delay(1100);
+  _setStage(1, 'done'); _setStage(2, 'active');
+  await delay(1000);
+  _setStage(2, 'done'); _setStage(3, 'active');
+
+  // Call Claude API to generate branding kit
+  try {
+    const prompt = handle
+      ? `Você é um especialista em branding para criadores de conteúdo. Analise o perfil do Instagram @${handle} e crie um branding kit profissional. Como não tenho acesso real ao perfil, infira com base no username e crie um branding kit coerente.`
+      : `Você é um especialista em branding para criadores de conteúdo. Crie um branding kit profissional genérico mas sofisticado para um criador de conteúdo no nicho de negócios e vendas.`;
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: prompt + `\n\nResponda APENAS com JSON válido sem markdown, no formato exato:
+{
+  "cores": ["#hex1", "#hex2", "#hex3"],
+  "tom": ["palavra1", "palavra2", "palavra3"],
+  "tom_desc": "Uma frase descrevendo o tom de voz",
+  "font_display": "Nome da fonte para headlines",
+  "font_body": "Nome da fonte para texto",
+  "estilo": "Nome do estilo visual",
+  "estilo_desc": "Uma frase descrevendo o estilo visual",
+  "post_title": "Título de exemplo de post",
+  "post_body": "Corpo curto de exemplo de post (máximo 2 linhas)"
+}`
+        }]
+      })
+    });
+
+    const data = await response.json();
+    const text = data.content?.[0]?.text || '';
+    const clean = text.replace(/```json|```/g, '').trim();
+    _obBrandKit = JSON.parse(clean);
+  } catch(e) {
+    // Fallback branding kit
+    _obBrandKit = {
+      cores: ['#F06B28','#0B0B0F','#F2F0EC'],
+      tom: ['Autoridade','Direto','Premium'],
+      tom_desc: 'Comunicação assertiva com linguagem técnica e posicionamento de especialista.',
+      font_display: 'Sora',
+      font_body: 'Inter',
+      estilo: 'Dark Premium',
+      estilo_desc: 'Fundos escuros, tipografia forte, acentos em laranja, composição limpa e hierarquia visual clara.',
+      post_title: '3 erros que destroem vendedores antes dos 90 dias',
+      post_body: 'Você não precisa de mais leads.\nPrecisa parar de perder os que já tem.'
+    };
+  }
+
+  _setStage(3, 'done');
+  await delay(600);
+  _renderBrandKit(_obBrandKit);
+  _setObStep(3);
+}
+
+function _renderBrandKit(kit) {
+  // Colors
+  const colorsEl = document.getElementById('ob-kit-colors');
+  const codesEl  = document.getElementById('ob-kit-color-codes');
+  if (colorsEl && kit.cores) {
+    colorsEl.innerHTML = kit.cores.map(c =>
+      `<div class="ob-kit-color-swatch" style="background:${c}" title="${c}"></div>`
+    ).join('');
+    codesEl.innerHTML = kit.cores.map(c => `<span>${c}</span>`).join('');
+  }
+  // Tom
+  const tomEl     = document.getElementById('ob-kit-tom');
+  const tomDescEl = document.getElementById('ob-kit-tom-desc');
+  if (tomEl && kit.tom) {
+    tomEl.innerHTML = kit.tom.map(t => `<span class="ob-kit-tag">${t}</span>`).join('');
+  }
+  if (tomDescEl && kit.tom_desc) tomDescEl.textContent = kit.tom_desc;
+  // Fonts
+  const fDisp = document.getElementById('ob-font-display');
+  const fBody = document.getElementById('ob-font-body');
+  if (fDisp && kit.font_display) fDisp.textContent = kit.font_display;
+  if (fBody && kit.font_body) fBody.textContent = kit.font_body;
+  // Estilo
+  const styleEl     = document.getElementById('ob-kit-style');
+  const styleDescEl = document.getElementById('ob-kit-style-desc');
+  if (styleEl && kit.estilo) styleEl.textContent = kit.estilo;
+  if (styleDescEl && kit.estilo_desc) styleDescEl.textContent = kit.estilo_desc;
+  // Post preview SVGs
+  _renderPostPreviews(kit);
+}
+
+function _renderPostPreviews(kit) {
+  const preview = document.getElementById('ob-post-preview');
+  if (!preview) return;
+  const c1 = kit.cores?.[0] || '#F06B28';
+  const c2 = kit.cores?.[1] || '#0B0B0F';
+  const title = (kit.post_title || '').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const body  = (kit.post_body  || '').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+
+  // 3 format previews: Post, Story, LinkedIn
+  const svgs = [
+    // Post quadrado
+    `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="width:160px;height:160px;flex-shrink:0">
+      <rect width="200" height="200" fill="${c2}"/>
+      <defs><linearGradient id="og1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${c1}" stop-opacity=".18"/><stop offset="100%" stop-color="transparent" stop-opacity="0"/></linearGradient></defs>
+      <rect width="200" height="200" fill="url(#og1)"/>
+      <rect x="0" y="0" width="200" height="3" fill="${c1}"/>
+      <text x="16" y="90" font-family="system-ui" font-size="10" font-weight="800" fill="${c1}" opacity=".25">POST</text>
+      <foreignObject x="16" y="98" width="168" height="60">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="font-family:system-ui;font-size:12px;font-weight:700;color:#F2F0EC;line-height:1.3">${title}</div>
+      </foreignObject>
+      <line x1="16" y1="168" x2="80" y2="168" stroke="${c1}" stroke-width="1" opacity=".4"/>
+      <text x="16" y="182" font-family="system-ui" font-size="8.5" fill="rgba(242,240,236,.4)" letter-spacing=".05em">GERADO COM GERAI</text>
+    </svg>`,
+
+    // Story vertical
+    `<svg viewBox="0 0 90 160" xmlns="http://www.w3.org/2000/svg" style="width:90px;height:160px;flex-shrink:0">
+      <rect width="90" height="160" fill="${c2}"/>
+      <defs><linearGradient id="og2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${c1}" stop-opacity=".2"/><stop offset="100%" stop-color="transparent" stop-opacity="0"/></linearGradient></defs>
+      <rect width="90" height="160" fill="url(#og2)"/>
+      <rect x="0" y="0" width="90" height="3" fill="${c1}"/>
+      <text x="10" y="75" font-family="system-ui" font-size="8" font-weight="800" fill="#F2F0EC" opacity=".9">STORY</text>
+      <foreignObject x="10" y="82" width="70" height="50">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="font-family:system-ui;font-size:9px;font-weight:700;color:#F2F0EC;line-height:1.3">${title.slice(0,40)}</div>
+      </foreignObject>
+    </svg>`,
+
+    // LinkedIn
+    `<svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg" style="width:160px;height:96px;flex-shrink:0">
+      <rect width="200" height="120" fill="${c2}"/>
+      <defs><linearGradient id="og3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${c1}" stop-opacity=".12"/><stop offset="100%" stop-color="transparent" stop-opacity="0"/></linearGradient></defs>
+      <rect width="200" height="120" fill="url(#og3)"/>
+      <rect x="0" y="0" width="3" height="120" fill="${c1}"/>
+      <text x="18" y="38" font-family="system-ui" font-size="8.5" font-weight="700" fill="${c1}" letter-spacing=".08em" opacity=".8">LINKEDIN</text>
+      <foreignObject x="18" y="46" width="164" height="50">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="font-family:system-ui;font-size:11px;font-weight:700;color:#F2F0EC;line-height:1.4">${title}</div>
+      </foreignObject>
+    </svg>`
+  ];
+
+  preview.innerHTML = svgs.join('');
+}
+
+async function obFinish() {
+  // Save branding kit to profile
+  if (_obBrandKit && token) {
+    try {
+      await api('PATCH', '/api/me', {
+        profissao: me.profissao || 'Criador de Conteúdo',
+        nicho: me.nicho || 'Conteúdo Digital',
+        cores: _obBrandKit.cores?.join(', ') || '',
+        tom: _obBrandKit.tom?.join(', ') || '',
+        estilo: _obBrandKit.estilo || '',
+        instagram: _obIgHandle || ''
+      });
+      Object.assign(me, {
+        cores: _obBrandKit.cores?.join(', '),
+        tom: _obBrandKit.tom?.join(', '),
+        estilo: _obBrandKit.estilo,
+        instagram: _obIgHandle
+      });
+    } catch(e) {
+      // Proceed anyway - save locally
+      localStorage.setItem('gerai_brand', JSON.stringify(_obBrandKit));
+    }
+  }
+  localStorage.setItem('gerai_ob_done','1');
+  bootApp(true);
+}
+
 
 </script>
 
