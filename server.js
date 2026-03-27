@@ -770,13 +770,13 @@ route('POST', '/api/user/generate', async (req, res) => {
 
   let concepts;
   try {
-    const raw = await callClaude({
+    const { text: rawText, usage: usageConcepts } = await callClaude({
       system: getConceptsSkill(user),
       userMsg: `Formato: ${format}\nRede: ${network}\nIdeia: "${input}"\n\nGere os 3 conceitos em JSON:`,
       maxTokens: 1500
     });
     // extract JSON
-    const jsonMatch = raw.match(/\[[\s\S]*\]/);
+    const jsonMatch = rawText.match(/\[[\s\S]*\]/);
     if (!jsonMatch) throw new Error('JSON inválido');
     concepts = JSON.parse(jsonMatch[0]);
   } catch {
@@ -792,6 +792,8 @@ route('POST', '/api/user/generate', async (req, res) => {
   const gen = db.addGeneration({
     user_id: payload.id, feature: 'imagem',
     format, network, concept_name: concepts[0].name, prompt: concepts[0].prompt,
+    input_tokens: usageConcepts?.input_tokens || 0,
+    output_tokens: usageConcepts?.output_tokens || 0,
     credits_used: 1
   });
   ok(res, { generation: gen, concepts });
@@ -804,7 +806,7 @@ route('POST', '/api/user/refine-prompt', async (req, res) => {
   if (!input) return err(res, 'input obrigatório');
   const user = db.getUserById(payload.id);
   try {
-    const refined = await callClaude({
+    const { text: refined, usage: _refineUsage } = await callClaude({
       system: getRefineSkill(user),
       userMsg: `Input bruto: "${input}"\nFormato: ${format || 'post'}\nRede: ${network || 'instagram'}\n\nGere o prompt refinado:`,
       maxTokens: 300
@@ -1012,27 +1014,27 @@ FORMATO: ${format || 'post'} para ${network || 'instagram'}
 Gere o SVG agora. Comece com <svg`;
 
   try {
-    const raw = await callClaude({ system, userMsg, maxTokens: 4000 });
+    const { text: rawSvg, usage: usageImg } = await callClaude({ system, userMsg, maxTokens: 4000 });
     
     // Extract SVG robustly
     let svg = '';
-    if (raw.trim().startsWith('<svg')) {
-      svg = raw.trim();
+    if (rawSvg.trim().startsWith('<svg')) {
+      svg = rawSvg.trim();
     } else {
-      const match = raw.match(/<svg[\s\S]*?<\/svg>/i);
+      const match = rawSvg.match(/<svg[\s\S]*?<\/svg>/i);
       if (match) svg = match[0];
       else {
-        const mdMatch = raw.match(/```(?:svg|xml)?\s*([\s\S]*?)```/i);
+        const mdMatch = rawSvg.match(/```(?:svg|xml)?\s*([\s\S]*?)```/i);
         if (mdMatch && mdMatch[1].trim().startsWith('<svg')) svg = mdMatch[1].trim();
       }
     }
 
     if (!svg || svg.length < 100) {
-      console.error('SVG generation failed. Response:', raw.slice(0, 200));
+      console.error('SVG generation failed. Response:', rawSvg.slice(0, 200));
       throw new Error('A IA não gerou um SVG válido. Tente reformular o conceito.');
     }
 
-    if (!svg.includes('xmlns=')) svg = svg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+    if (svg && !svg.includes('xmlns=')) svg = svg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
 
     db.updateUser(payload.id, { quota_used: (user.quota_used||0)+1 });
     db.addGeneration({
@@ -1042,6 +1044,8 @@ Gere o SVG agora. Comece com <svg`;
       concept_name: prompt.slice(0,60),
       prompt: prompt.slice(0,200),
       svg_data: svg,
+      input_tokens: usageImg?.input_tokens || 0,
+      output_tokens: usageImg?.output_tokens || 0,
       credits_used: 1
     });
 
