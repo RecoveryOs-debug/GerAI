@@ -1,5 +1,5 @@
 /**
- * GerAI Backend — Node.js puro, zero dependências
+ * AutoPostt Backend — Node.js puro, zero dependências
  * Anthropic API integrada no servidor (ANTHROPIC_API_KEY via env var)
  */
 
@@ -45,7 +45,7 @@ function callClaude({ system, userMsg, maxTokens = 2000 }) {
         try {
           const parsed = JSON.parse(data);
           if (parsed.error) return reject(new Error(parsed.error.message || 'Erro Anthropic'));
-          resolve({ text: parsed.content?.[0]?.text || '', usage: parsed.usage || {} });
+          resolve(parsed.content?.[0]?.text || '');
         } catch { reject(new Error('Resposta inválida da API')); }
       });
     });
@@ -71,7 +71,7 @@ function callClaudeMessages({ system, messages, maxTokens = 2500 }) {
         try {
           const parsed = JSON.parse(data);
           if (parsed.error) return reject(new Error(parsed.error.message || 'Erro Anthropic'));
-          resolve({ text: parsed.content?.[0]?.text || '', usage: parsed.usage || {} });
+          resolve(parsed.content?.[0]?.text || '');
         } catch { reject(new Error('Resposta inválida da API')); }
       });
     });
@@ -358,15 +358,15 @@ class DB {
       }],
       generations: [],
       plans: [
-        { id: 'free',  name: 'Free',  price: 0,    quota: 10,  features: ['10 gerações/mês', 'Post e Story', 'Perfil de marca'] },
-        { id: 'pro',   name: 'Pro',   price: 4700, quota: 100, features: ['100 gerações/mês', 'Todos os 6 agentes', 'Geração de imagem com IA', 'Histórico ilimitado', 'Perfil de marca completo'] },
-        { id: 'elite', name: 'Elite', price: 9700, quota: 500, features: ['500 gerações/mês', 'Tudo do Pro', 'Suporte prioritário', 'API access', 'Múltiplos perfis de marca'] }
+        { id: 'free',    name: 'Starter',  price: 4700,  quota: 5,   features: ['5 gerações gratuitas (trial)', 'Criação automática de copy', 'Publicação automática', '1 conta conectada', 'Suporte por email'] },
+        { id: 'pro',     name: 'Pro',      price: 9700,  quota: 9999, features: ['Posts ilimitados', 'Criativo gerado automaticamente', 'Carrossel estruturado', 'Múltiplas contas', 'Prioridade de geração', 'Suporte prioritário'] },
+        { id: 'elite',   name: 'Business', price: 19700, quota: 99999, features: ['Tudo do Pro', 'Contas ilimitadas', 'Dashboard de controle', 'Relatório de desempenho', 'Suporte VIP', 'Onboarding dedicado'] }
       ],
       packages: [
         { id: 'pack50',  name: 'Pacote 50',  price: 1900, quota: 50,  description: '50 gerações avulsas. Sem validade.', active: true },
         { id: 'pack150', name: 'Pacote 150', price: 4900, quota: 150, description: '150 gerações avulsas. Melhor custo-benefício.', active: true }
       ],
-      settings: { app_name: 'GerAI', maintenance_mode: false, registration_open: true, default_plan: 'free' }
+      settings: { app_name: 'AutoPostt', maintenance_mode: false, registration_open: true, default_plan: 'free' }
     };
   }
 
@@ -391,11 +391,12 @@ class DB {
   createUser({ name, email, password, plan = 'free', role = 'user' }) {
     if (this.data.users.find(u => u.email === email)) throw new Error('E-mail já cadastrado');
     const planData = this.data.plans.find(p => p.id === plan) || this.data.plans[0];
+    const trialQuota = (plan === 'free') ? 5 : planData.quota;
     const user = {
       id: this._id(), name, email,
       password: this._hashSync(password),
       role, plan,
-      quota_limit: planData.quota,
+      quota_limit: trialQuota,
       quota_used: 0,
       status: 'active',
       created_at: new Date().toISOString()
@@ -445,20 +446,13 @@ class DB {
   }
 
   addGeneration(gen) {
-    // Calculate costs (Sonnet: $3/M input, $15/M output)
     const inp = gen.input_tokens || 0;
     const out = gen.output_tokens || 0;
-    const cost_usd = (inp / 1_000_000 * 3) + (out / 1_000_000 * 15);
-    const cost_brl = cost_usd * 5.20; // BRL conversion
-    const img_usd  = gen.image_cost_usd || 0;
-    const img_brl  = img_usd * 5.20;
+    const cost_usd = parseFloat(((inp / 1_000_000 * 3) + (out / 1_000_000 * 15)).toFixed(6));
     const g = {
       id: this._id(), ...gen,
       input_tokens: inp, output_tokens: out, total_tokens: inp + out,
-      cost_usd: parseFloat(cost_usd.toFixed(6)),
-      cost_brl: parseFloat(cost_brl.toFixed(6)),
-      image_cost_usd: parseFloat(img_usd.toFixed(6)),
-      image_cost_brl: parseFloat(img_brl.toFixed(6)),
+      cost_usd,
       credits_used: gen.credits_used || 1,
       created_at: new Date().toISOString()
     };
@@ -555,45 +549,32 @@ class DB {
       const plan = this.data.plans.find(p => p.id === u.plan);
       return sum + (plan?.price || 0);
     }, 0);
-    // Cost aggregations
     const gens = this.data.generations;
-    const totalCostUsd = gens.reduce((s,g) => s + (g.cost_usd||0) + (g.image_cost_usd||0), 0);
+    const totalCostUsd = gens.reduce((s,g) => s + (g.cost_usd||0), 0);
     const totalTokens  = gens.reduce((s,g) => s + (g.total_tokens||0), 0);
-
-    // By feature
     const byFeature = {};
     gens.forEach(g => {
       const f = g.feature || g.format || 'unknown';
-      if (!byFeature[f]) byFeature[f] = { uses: 0, cost_usd: 0, tokens: 0 };
-      byFeature[f].uses++;
-      byFeature[f].cost_usd += (g.cost_usd||0);
-      byFeature[f].tokens   += (g.total_tokens||0);
+      if (!byFeature[f]) byFeature[f] = { uses:0, cost_usd:0, tokens:0 };
+      byFeature[f].uses++; byFeature[f].cost_usd += (g.cost_usd||0); byFeature[f].tokens += (g.total_tokens||0);
     });
-
-    // By month (last 6)
     const byMonth = {};
     gens.forEach(g => {
       const m = g.created_at?.slice(0,7) || 'unknown';
-      if (!byMonth[m]) byMonth[m] = { count: 0, cost_usd: 0 };
-      byMonth[m].count++;
-      byMonth[m].cost_usd += (g.cost_usd||0);
+      if (!byMonth[m]) byMonth[m] = { count:0, cost_usd:0 };
+      byMonth[m].count++; byMonth[m].cost_usd += (g.cost_usd||0);
     });
-
-    // Heavy users (top 5 by cost)
     const userCosts = {};
     gens.forEach(g => {
-      if (!userCosts[g.user_id]) userCosts[g.user_id] = { cost_usd: 0, count: 0 };
-      userCosts[g.user_id].cost_usd += (g.cost_usd||0);
-      userCosts[g.user_id].count++;
+      if (!userCosts[g.user_id]) userCosts[g.user_id] = { cost_usd:0, count:0 };
+      userCosts[g.user_id].cost_usd += (g.cost_usd||0); userCosts[g.user_id].count++;
     });
     const topUsers = Object.entries(userCosts)
-      .sort((a,b) => b[1].cost_usd - a[1].cost_usd)
-      .slice(0, 5)
-      .map(([uid, d]) => {
+      .sort((a,b) => b[1].cost_usd - a[1].cost_usd).slice(0,5)
+      .map(([uid,d]) => {
         const u = this.data.users.find(x => x.id === uid);
-        return { user_id: uid, name: u?.name || 'Desconhecido', email: u?.email || '', cost_usd: parseFloat((d.cost_usd||0).toFixed(6)), count: d.count };
+        return { user_id:uid, name:u?.name||'Desconhecido', email:u?.email||'', cost_usd:parseFloat(d.cost_usd.toFixed(6)), count:d.count };
       });
-
     return {
       total_users: users.length,
       active_users: users.filter(u => u.status === 'active').length,
@@ -770,13 +751,13 @@ route('POST', '/api/user/generate', async (req, res) => {
 
   let concepts;
   try {
-    const { text: rawText, usage: usageConcepts } = await callClaude({
+    const raw = await callClaude({
       system: getConceptsSkill(user),
       userMsg: `Formato: ${format}\nRede: ${network}\nIdeia: "${input}"\n\nGere os 3 conceitos em JSON:`,
       maxTokens: 1500
     });
     // extract JSON
-    const jsonMatch = rawText.match(/\[[\s\S]*\]/);
+    const jsonMatch = raw.match(/\[[\s\S]*\]/);
     if (!jsonMatch) throw new Error('JSON inválido');
     concepts = JSON.parse(jsonMatch[0]);
   } catch {
@@ -789,13 +770,7 @@ route('POST', '/api/user/generate', async (req, res) => {
   }
 
   db.updateUser(payload.id, { quota_used: (user.quota_used || 0) + 1 });
-  const gen = db.addGeneration({
-    user_id: payload.id, feature: 'imagem',
-    format, network, concept_name: concepts[0].name, prompt: concepts[0].prompt,
-    input_tokens: usageConcepts?.input_tokens || 0,
-    output_tokens: usageConcepts?.output_tokens || 0,
-    credits_used: 1
-  });
+  const gen = db.addGeneration({ user_id: payload.id, feature: 'imagem', format, network, concept_name: concepts[0].name, prompt: concepts[0].prompt, credits_used: 1 });
   ok(res, { generation: gen, concepts });
 });
 
@@ -806,7 +781,7 @@ route('POST', '/api/user/refine-prompt', async (req, res) => {
   if (!input) return err(res, 'input obrigatório');
   const user = db.getUserById(payload.id);
   try {
-    const { text: refined, usage: _refineUsage } = await callClaude({
+    const refined = await callClaude({
       system: getRefineSkill(user),
       userMsg: `Input bruto: "${input}"\nFormato: ${format || 'post'}\nRede: ${network || 'instagram'}\n\nGere o prompt refinado:`,
       maxTokens: 300
@@ -846,16 +821,9 @@ route('POST', '/api/user/generate-content', async (req, res) => {
     } else {
       messages = [{ role: 'user', content: input }];
     }
-    const { text: responseText, usage: usageContent } = await callClaudeMessages({ system, messages, maxTokens: 2500 });
+    const responseText = await callClaudeMessages({ system, messages, maxTokens: 2500 });
     db.updateUser(payload.id, { quota_used: (user.quota_used || 0) + 1 });
-    db.addGeneration({
-      user_id: payload.id, feature: agent,
-      format: tipo || agent, network: rede || 'instagram',
-      concept_name: agent, prompt: input.slice(0, 200),
-      input_tokens: usageContent.input_tokens || 0,
-      output_tokens: usageContent.output_tokens || 0,
-      credits_used: 1
-    });
+    db.addGeneration({ user_id: payload.id, feature: agent, format: tipo || agent, network: rede || 'instagram', concept_name: agent, prompt: input.slice(0, 200), credits_used: 1 });
     ok(res, { content: responseText, agent, rede, tipo });
   } catch(e) { err(res, e.message); }
 });
@@ -864,20 +832,6 @@ route('POST', '/api/user/generate-content', async (req, res) => {
 route('GET', '/api/admin/stats', async (req, res) => {
   const payload = requireAdmin(req, res); if (!payload) return;
   ok(res, { stats: db.getStats() });
-});
-
-route('GET', '/api/admin/user-stats/:id', async (req, res, params) => {
-  const payload = requireAdmin(req, res); if (!payload) return;
-  const gens = db.data.generations.filter(g => g.user_id === params.id);
-  const totalCost = gens.reduce((s,g) => s + (g.cost_usd||0), 0);
-  const totalCredits = gens.reduce((s,g) => s + (g.credits_used||1), 0);
-  const byFeature = {};
-  gens.forEach(g => {
-    const f = g.feature || g.format || 'unknown';
-    if (!byFeature[f]) byFeature[f] = 0;
-    byFeature[f]++;
-  });
-  ok(res, { user_id: params.id, total_generations: gens.length, total_cost_usd: parseFloat(totalCost.toFixed(6)), total_credits: totalCredits, by_feature: byFeature });
 });
 
 route('GET', '/api/admin/users', async (req, res) => {
@@ -1014,39 +968,34 @@ FORMATO: ${format || 'post'} para ${network || 'instagram'}
 Gere o SVG agora. Comece com <svg`;
 
   try {
-    const { text: rawSvg, usage: usageImg } = await callClaude({ system, userMsg, maxTokens: 4000 });
+    const raw = await callClaude({ system, userMsg, maxTokens: 4000 });
     
     // Extract SVG robustly
     let svg = '';
-    if (rawSvg.trim().startsWith('<svg')) {
-      svg = rawSvg.trim();
+    if (raw.trim().startsWith('<svg')) {
+      svg = raw.trim();
     } else {
-      const match = rawSvg.match(/<svg[\s\S]*?<\/svg>/i);
+      const match = raw.match(/<svg[\s\S]*?<\/svg>/i);
       if (match) svg = match[0];
       else {
-        const mdMatch = rawSvg.match(/```(?:svg|xml)?\s*([\s\S]*?)```/i);
+        const mdMatch = raw.match(/```(?:svg|xml)?\s*([\s\S]*?)```/i);
         if (mdMatch && mdMatch[1].trim().startsWith('<svg')) svg = mdMatch[1].trim();
       }
     }
 
     if (!svg || svg.length < 100) {
-      console.error('SVG generation failed. Response:', rawSvg.slice(0, 200));
+      console.error('SVG generation failed. Response:', raw.slice(0, 200));
       throw new Error('A IA não gerou um SVG válido. Tente reformular o conceito.');
     }
 
-    if (svg && !svg.includes('xmlns=')) svg = svg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+    if (!svg.includes('xmlns=')) svg = svg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
 
     db.updateUser(payload.id, { quota_used: (user.quota_used||0)+1 });
     db.addGeneration({
       user_id: payload.id, feature: 'gerar-imagem',
-      format: format||'post',
-      network: network||'instagram',
-      concept_name: prompt.slice(0,60),
-      prompt: prompt.slice(0,200),
-      svg_data: svg,
-      input_tokens: usageImg?.input_tokens || 0,
-      output_tokens: usageImg?.output_tokens || 0,
-      credits_used: 1
+      format: format||'post', network: network||'instagram',
+      concept_name: prompt.slice(0,60), prompt: prompt.slice(0,200),
+      svg_data: svg, credits_used: 1
     });
 
     ok(res, { svg });
@@ -1115,26 +1064,31 @@ route('POST', '/api/user/apply-package', async (req, res) => {
 // ── STATIC ──
 route('GET', '/api/admin/cost-report', async (req, res) => {
   const payload = requireAdmin(req, res); if (!payload) return;
-  const url = new URL('http://x' + req.url);
-  const month = url.searchParams.get('month'); // YYYY-MM filter
-  let gens = db.data.generations;
-  if (month) gens = gens.filter(g => g.created_at?.startsWith(month));
+  const gens = db.data.generations;
   const report = gens.map(g => {
     const u = db.data.users.find(x => x.id === g.user_id);
-    return {
-      id: g.id,
-      feature: g.feature || g.format || 'unknown',
-      user_name: u?.name || 'Desconhecido',
-      user_email: u?.email || '',
-      input_tokens: g.input_tokens || 0,
-      output_tokens: g.output_tokens || 0,
-      total_tokens: g.total_tokens || 0,
-      cost_usd: parseFloat((g.cost_usd || 0).toFixed(6)),
-      credits_used: g.credits_used || 1,
-      created_at: g.created_at
-    };
+    return { id:g.id, feature:g.feature||g.format||'unknown', user_name:u?.name||'?', user_email:u?.email||'',
+      input_tokens:g.input_tokens||0, output_tokens:g.output_tokens||0, total_tokens:g.total_tokens||0,
+      cost_usd:parseFloat((g.cost_usd||0).toFixed(6)), credits_used:g.credits_used||1, created_at:g.created_at };
   });
   ok(res, { report, total: report.length });
+});
+
+route('GET', '/api/admin/user-stats/:id', async (req, res, params) => {
+  const payload = requireAdmin(req, res); if (!payload) return;
+  const gens = db.data.generations.filter(g => g.user_id === params.id);
+  const totalCost = gens.reduce((s,g) => s+(g.cost_usd||0), 0);
+  const totalCredits = gens.reduce((s,g) => s+(g.credits_used||1), 0);
+  const byFeature = {};
+  gens.forEach(g => { const f=g.feature||g.format||'unknown'; if(!byFeature[f])byFeature[f]=0; byFeature[f]++; });
+  ok(res, { user_id:params.id, total_generations:gens.length, total_cost_usd:parseFloat(totalCost.toFixed(6)), total_credits:totalCredits, by_feature:byFeature });
+});
+
+route('GET', '/landing', async (req, res) => {
+  const file = path.join(__dirname, 'landing.html');
+  if (!fs.existsSync(file)) { err(res, 'landing.html not found', 404); return; }
+  res.writeHead(200, { 'Content-Type': 'text/html' });
+  fs.createReadStream(file).pipe(res);
 });
 
 route('GET', '/admin', async (req, res) => {
@@ -1146,7 +1100,7 @@ route('GET', '/admin', async (req, res) => {
 
 route('GET', '/', async (req, res) => {
   const file = path.join(__dirname, 'gerai-v3.html');
-  if (!fs.existsSync(file)) { ok(res, { status: 'GerAI API running', version: '1.0.0' }); return; }
+  if (!fs.existsSync(file)) { ok(res, { status: 'AutoPostt API running', version: '1.0.0' }); return; }
   res.writeHead(200, { 'Content-Type': 'text/html' });
   fs.createReadStream(file).pipe(res);
 });
@@ -1178,10 +1132,10 @@ server.listen(PORT, HOST, () => {
   const hasKey = !!ANTHROPIC_KEY;
   console.log(`
 ╔════════════════════════════════════════════╗
-║         GerAI Backend v2.0.0               ║
+║         AutoPostt Backend v2.0.0               ║
 ╠════════════════════════════════════════════╣
-║  Server:   http://localhost:${PORT}          ║
-║  Admin UI: http://localhost:${PORT}/admin    ║
+║  Server:   http://localhost:${PORT}           ║
+║  Admin UI: http://localhost:${PORT}/admin     ║
 ║  AI Engine: ${hasKey ? '✓ Anthropic conectada  ' : '✗ ANTHROPIC_API_KEY ausente'}     ║
 ╠════════════════════════════════════════════╣
 ║  Admin login:                              ║
