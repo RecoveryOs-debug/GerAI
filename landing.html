@@ -1208,13 +1208,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opa
 const APP_URL = '';  // same origin: ''; different domain: 'https://app.autopostt.com.br'
 
 function go(screen) {
-  // Redirect to app with screen param
-  if (APP_URL) {
-    window.location.href = APP_URL + '?screen=' + screen;
-  } else {
-    // Same origin — app is at /app
-    window.location.href = '/app?screen=' + screen;
-  }
+  const base = APP_URL || '/app';
+  window.location.href = base + '?screen=' + screen;
 }
 
 // Load plans dynamically from API

@@ -2493,1124 +2493,14 @@ label, .form-row > label, .agent-lbl, .out-lbl{color:var(--a)!important}
 [data-theme="light"] #btn-gerar-img { background: #E8EAED !important; border-color: rgba(0,0,0,.1) !important; color: #0A0C0F !important; }
 
 
-#sc-land {
-  --lac:       #F5C518;
-  --lac2:      #FFD740;
-  --lac3:      #FFE066;
-  --lac-dim:   rgba(245,197,24,.10);
-  --lac-glow:  rgba(245,197,24,.28);
-  --lac-glow2: rgba(245,197,24,.14);
-  --lbg:       #0D0D0F;
-  --lbg2:      #111116;
-  --lbg3:      #16161C;
-  --lbg4:      #1C1C24;
-  --ltx:       #F2F0EC;
-  --ltx2:      #7E7D8C;
-  --ltx3:      #3A3944;
-  --lline:     rgba(255,255,255,.06);
-  --lline2:    rgba(255,255,255,.11);
-  --lfd:       'Sora', system-ui, sans-serif;
-  --lfb:       'Inter', system-ui, sans-serif;
-  --ease-e:    cubic-bezier(.16,1,.3,1);
-  --ease-s:    cubic-bezier(.4,0,.2,1);
 
-  /* L1: warm dark base */
-  background-color: #0A0A0A;
-  color: var(--ltx);
-  font-family: var(--lfb);
-  font-size: 14px;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
-  overflow-y: auto;
-  position: relative;
-  i
-#sc-land.on {
-  position: static;
-  display: block;
-  min-height: 100vh;
-}
-solation: isolate;
-}
-
-/* L2: gradient mesh — asymmetric, organic
-   3 radials: amber brand heat + optional cool hint + vignette
-*/
-#sc-land::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    /* LARANJA — dominante, top-left, quente e forte */
-    radial-gradient(ellipse 70% 62% at 4% 0%,
-      rgba(240,107,40,0.42) 0%,
-      rgba(240,107,40,0.18) 28%,
-      rgba(240,107,40,0.04) 52%,
-      transparent 68%
-    ),
-    /* BRANCO — centro-direito, claridade fria que contrasta */
-    radial-gradient(ellipse 44% 38% at 72% 18%,
-      rgba(255,255,255,0.055) 0%,
-      rgba(255,255,255,0.012) 45%,
-      transparent 62%
-    ),
-    /* LARANJA secundário — bottom-right, amarra o esquema */
-    radial-gradient(ellipse 50% 44% at 90% 92%,
-      rgba(240,107,40,0.14) 0%,
-      rgba(240,107,40,0.04) 40%,
-      transparent 58%
-    ),
-    /* BRANCO — bottom-left, reflexo sutil */
-    radial-gradient(ellipse 32% 28% at 8% 88%,
-      rgba(255,255,255,0.028) 0%,
-      transparent 55%
-    ),
-    /* PRETO — vignette central → bordas puxam profundidade */
-    radial-gradient(ellipse 100% 100% at 50% 50%,
-      rgba(0,0,0,0.0) 0%,
-      rgba(0,0,0,0.0) 22%,
-      rgba(0,0,0,0.68) 100%
-    ),
-    /* BASE: preto quente */
-    #0A0A0A;
-}
-
-/* L3: animated glow — transform-only, GPU compositor, true 60fps
-   inset:-52px → element larger than viewport, movement never reveals edge
-   25s loop — above perceptual "animation" threshold, feels organic alive
-*/
-#sc-land::after {
-  content: '';
-  position: fixed;
-  inset: -52px;
-  z-index: 0;
-  pointer-events: none;
-  will-change: transform;
-  background:
-    /* LARANJA animado — pulsa lentamente */
-    radial-gradient(ellipse 60% 52% at 10% 6%,
-      rgba(240,107,40,0.28) 0%,
-      rgba(240,107,40,0.06) 40%,
-      transparent 60%
-    ),
-    /* BRANCO animado — desloca junto criando shimmer */
-    radial-gradient(ellipse 35% 30% at 75% 15%,
-      rgba(255,255,255,0.04) 0%,
-      transparent 50%
-    ),
-    /* LARANJA bottom — ancora o calor */
-    radial-gradient(ellipse 42% 38% at 85% 88%,
-      rgba(220,85,14,0.12) 0%,
-      transparent 52%
-    );
-  animation: lp-glow-drift 25s ease-in-out infinite;
-}
-
-@keyframes lp-glow-drift {
-  0%   { transform: translate(0px,   0px)  scale(1);     }
-  18%  { transform: translate(11px, -9px)  scale(1.011); }
-  36%  { transform: translate(-7px,  13px) scale(0.993); }
-  55%  { transform: translate(15px,  5px)  scale(1.007); }
-  74%  { transform: translate(-10px,-12px) scale(1.009); }
-  100% { transform: translate(0px,   0px)  scale(1);     }
-}
-
-/* All LP content above bg layers */
-#sc-land > * { position: relative; z-index: 3; }
-
-/* L4: noise grain — dedicated element (::before/::after occupied)
-   mix-blend-mode overlay: interacts with ambient gradients below
-   3% opacity → invisible isolated, adds analog texture in context
-*/
-.l-noise {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.03;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='192' height='192' filter='url(%23g)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 192px 192px;
-}
-
-/* All LP content above bg layers */
-#sc-land > * { position: relative; z-index: 3; }
-
-/* L4 — Noise grain: separate fixed element via .l-lp-noise class
-   Using JS to inject or directly on a dedicated element
-   mix-blend-mode: overlay interacts with ambient light below
-   opacity 3% — invisible in isolation, adds analog texture in context
-*/
-.l-noise {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.03;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='192' height='192' filter='url(%23g)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 192px 192px;
-}
-#sc-land > * { position: relative; z-index: 3; }
-
-/* ── NAV ── */
-.lnav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 58px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 52px;
-  z-index: 900;
-  transition: background .35s, border-color .35s;
-  border-bottom: 1px solid transparent;
-}
-.lnav.scrolled {
-  background: rgba(5,5,10,.82);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-bottom-color: var(--lline);
-}
-.lnav-brand { display: flex; align-items: center; gap: 9px; }
-.lnav-mark {
-  width: 30px; height: 30px; border-radius: 7px;
-  background: var(--lac);
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 0 18px var(--lac-glow);
-}
-.lnav-mark svg { width: 13px; height: 13px; fill: none; stroke: #fff; stroke-width: 2.5; }
-.lnav-logo { font-family: var(--lfd); font-size: 15px; font-weight: 700; color: var(--ltx); letter-spacing: -.2px; }
-.lnav-logo b { color: var(--lac); }
-.lnav-ctas { display: flex; align-items: center; gap: 8px; }
-.lnav-login {
-  padding: 6px 14px; background: transparent; border: 1px solid var(--lline2);
-  color: var(--ltx2); font-family: var(--lfb); font-size: 12.5px; font-weight: 500;
-  border-radius: 6px; cursor: pointer; transition: all .18s;
-}
-.lnav-login:hover { color: var(--ltx); border-color: rgba(255,255,255,.22); }
-.lnav-cta {
-  padding: 7px 16px; background: var(--lac); color: #fff;
-  font-family: var(--lfd); font-size: 12.5px; font-weight: 600;
-  border: none; border-radius: 6px; cursor: pointer; letter-spacing: -.01em;
-  transition: all .2s; box-shadow: 0 0 0 0 var(--lac-glow);
-}
-.lnav-cta:hover { background: var(--lac2); box-shadow: 0 4px 22px var(--lac-glow); transform: translateY(-1px); }
-
-/* ══════════════════════════════════════
-   HERO — Split layout: text left, demo right
-══════════════════════════════════════ */
-.l-hero {
-  min-height: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
-  padding: 80px 52px 48px;
-  position: relative;
-  overflow: visible;
-  max-width: 1280px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-/* Deep background layers */
-.l-hero-bg {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-}
-.l-hero-bg::before {
-  content: '';
-  position: absolute;
-  top: -20%; left: -10%;
-  width: 70%; height: 80%;
-  background: radial-gradient(ellipse, rgba(240,107,40,.11) 0%, transparent 65%);
-  filter: blur(60px);
-  animation: glow-pulse 8s ease-in-out infinite;
-}
-.l-hero-bg::after {
-  content: '';
-  position: absolute;
-  bottom: -10%; right: -15%;
-  width: 55%; height: 65%;
-  background: radial-gradient(ellipse, rgba(240,107,40,.065) 0%, transparent 65%);
-  filter: blur(80px);
-  animation: glow-pulse 10s ease-in-out 2s infinite reverse;
-}
-@keyframes glow-pulse {
-  0%, 100% { opacity: .7; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.06); }
-}
-
-/* Grid lines on bg */
-.l-hero-grid {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  /* Primary grid lines */
-  background-image:
-    linear-gradient(rgba(240,107,40,0.055) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(240,107,40,0.055) 1px, transparent 1px),
-    /* Secondary finer grid */
-    linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
-  background-size:
-    120px 120px,
-    120px 120px,
-    24px 24px,
-    24px 24px;
-  /* Mask: strong in top-left where amber glow is, fade out elsewhere */
-  mask-image: radial-gradient(
-    ellipse 80% 70% at 15% 10%,
-    rgba(0,0,0,0.9) 0%,
-    rgba(0,0,0,0.5) 35%,
-    rgba(0,0,0,0.12) 60%,
-    transparent 80%
-  );
-  -webkit-mask-image: radial-gradient(
-    ellipse 80% 70% at 15% 10%,
-    rgba(0,0,0,0.9) 0%,
-    rgba(0,0,0,0.5) 35%,
-    rgba(0,0,0,0.12) 60%,
-    transparent 80%
-  );
-}
-
-/* LEFT — copy */
-.l-hero-copy {
-  width: 100%;
-  max-width: 760px;
-  margin: 0 auto;
-  text-align: center;
-  animation: fadeUp .8s var(--ease-e) .1s both;
-}
-.l-hero-kicker {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: var(--lac-dim); border: 1px solid rgba(240,107,40,.22);
-  border-radius: 100px; padding: 5px 13px 5px 8px;
-  font-size: 11px; font-weight: 600; color: var(--lac);
-  letter-spacing: .05em; text-transform: uppercase; margin-bottom: 28px;
-}
-.l-hero-kicker-dot {
-  width: 5px; height: 5px; border-radius: 50%; background: var(--lac);
-  animation: kicker-blink 2s ease-in-out infinite;
-  box-shadow: 0 0 6px var(--lac);
-}
-@keyframes kicker-blink {
-  0%, 100% { opacity: 1; } 50% { opacity: .4; }
-}
-
-.l-hero-h1 {
-  font-family: 'MONR Pro', 'Sora', system-ui, sans-serif;
-  font-size: clamp(42px, 5.5vw, 72px);
-  font-weight: 800;
-  line-height: .95;
-  letter-spacing: -3px;
-  color: var(--ltx);
-  margin-bottom: 20px;
-}
-.l-h1-accent { color: var(--lac); display: block; }
-.l-h1-dim { color: var(--ltx2); font-weight: 300; display: block; }
-
-.l-hero-sub {
-  font-size: 15px; font-weight: 400; color: var(--ltx2);
-  line-height: 1.75; max-width: 560px;
-  margin: 0 auto; margin-bottom: 36px;
-  letter-spacing: .01em;
-}
-
-.l-hero-acts { display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
-  justify-content: center; }
-.l-btn-main {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 13px 24px;
-  background: var(--lac); color: #fff;
-  font-family: var(--lfd); font-size: 13.5px; font-weight: 700;
-  border: none; border-radius: 8px; cursor: pointer;
-  letter-spacing: -.02em;
-  transition: all .22s var(--ease-e);
-  box-shadow: 0 4px 28px var(--lac-glow2), inset 0 1px 0 rgba(255,255,255,.15);
-}
-.l-btn-main:hover {
-  background: var(--lac2); transform: translateY(-2px);
-  box-shadow: 0 8px 40px var(--lac-glow);
-}
-.l-btn-main:active { transform: translateY(0); }
-.l-btn-ghost {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 12px 20px;
-  background: transparent; color: var(--ltx2);
-  font-family: var(--lfb); font-size: 13px; font-weight: 500;
-  border: 1px solid var(--lline2); border-radius: 8px; cursor: pointer;
-  transition: all .18s;
-}
-.l-btn-ghost:hover { color: var(--ltx); border-color: rgba(255,255,255,.24); background: rgba(255,255,255,.03); }
-
-.l-hero-trust {
-  margin-top: 28px;
-  justify-content: center; display: flex; align-items: center; gap: 12px;
-  font-size: 11.5px; color: var(--ltx3);
-}
-.l-hero-trust-dots { display: flex; gap: 3px; }
-.l-hero-trust-dot {
-  width: 6px; height: 6px; border-radius: 50%; background: var(--lac);
-  opacity: .6;
-}
-
-
-/* ── DEMO MOCK — Product replica ── */
-.l-hero-demo {
-  position: relative;
-  width: 100%;
-  animation: fadeUp .9s var(--ease-e) .3s both;
-}
-
-/* Window: flex row — sidebar left, main right */
-.l-demo-window {
-  background: var(--lbg2);
-  border: 1px solid var(--lline2);
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: 0 0 0 1px rgba(255,255,255,.04), 0 32px 100px rgba(0,0,0,.65), 0 0 80px rgba(240,107,40,.08);
-  width: 100%;
-}
-
-/* Sidebar */
-.l-demo-sidebar {
-  width: 170px;
-  flex-shrink: 0;
-  background: var(--lbg3);
-  border-right: 1px solid var(--lline);
-  padding: 16px 0;
-  display: flex;
-  flex-direction: column;
-  pointer-events: none;
-  user-select: none;
-}
-.l-demo-sb-logo {
-  display: flex; align-items: center; gap: 7px;
-  padding: 0 12px 12px;
-  border-bottom: 1px solid var(--lline);
-  margin-bottom: 10px;
-  font-family: var(--lfd); font-size: 13px; font-weight: 700; color: var(--ltx);
-}
-.l-demo-sb-logo b { color: var(--lac); }
-.l-demo-sb-mark {
-  width: 22px; height: 22px; border-radius: 5px;
-  background: var(--lac); display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; box-shadow: 0 0 10px rgba(240,107,40,.3);
-}
-.l-demo-sb-lbl {
-  padding: 0 12px 6px;
-  font-size: 9px; font-weight: 700; color: var(--ltx3);
-  letter-spacing: .1em; text-transform: uppercase;
-}
-.l-demo-nav-item {
-  display: flex; align-items: center; gap: 8px;
-  padding: 9px 14px;
-  font-size: 11.5px; font-weight: 500; color: var(--ltx2);
-  cursor: default; transition: all .15s; border-left: 2px solid transparent;
-  user-select: none;
-}
-.l-demo-nav-item svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2; flex-shrink: 0; }
-.l-demo-nav-item:hover { background: rgba(255,255,255,.04); color: var(--ltx); }
-.l-demo-nav-item.active {
-  background: rgba(240,107,40,.08);
-  color: var(--lac);
-  border-left-color: var(--lac);
-  font-weight: 600;
-}
-
-/* Main area */
-.l-demo-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-.l-demo-topbar {
-  background: var(--lbg3); border-bottom: 1px solid var(--lline);
-  padding: 10px 16px; display: flex; align-items: center; gap: 10px; flex-shrink: 0;
-}
-.l-demo-topbar-title {
-  flex: 1; text-align: center;
-  font-size: 11px; font-weight: 500; color: var(--ltx3); font-family: var(--lfb);
-}
-.l-demo-body { flex: 1; overflow: hidden; }
-
-/* Panels */
-.l-demo-panel { height: 100%; overflow-y: auto; padding: 14px 16px; }
-.l-demo-panel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; height: 100%; }
-.l-demo-panel-left { display: flex; flex-direction: column; gap: 0; }
-.l-demo-panel-right { display: flex; flex-direction: column; gap: 8px; }
-
-/* Format grid */
-.l-demo-sect-lbl {
-  font-size: 9px; font-weight: 700; color: var(--lac);
-  letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px;
-}
-.l-demo-fmt-grid {
-  display: grid; grid-template-columns: repeat(3,1fr); gap: 4px; margin-bottom: 0;
-}
-.l-demo-fmt {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 5px; padding: 8px 6px;
-  background: var(--lbg3); border: 1px solid var(--lline);
-  border-radius: 6px; font-size: 10px; color: var(--ltx2);
-  cursor: pointer; transition: all .15s; text-align: center;
-}
-.l-demo-fmt svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.8; }
-.l-demo-fmt:hover { border-color: rgba(240,107,40,.25); color: var(--ltx); }
-.l-demo-fmt.active { background: rgba(240,107,40,.1); border-color: rgba(240,107,40,.35); color: var(--lac); }
-.l-demo-net-row { display: flex; gap: 4px; flex-wrap: wrap; }
-.l-demo-net {
-  padding: 3px 8px; background: var(--lbg3); border: 1px solid var(--lline);
-  border-radius: 4px; font-size: 9.5px; color: var(--ltx2); cursor: pointer; transition: all .15s;
-}
-.l-demo-net:hover { border-color: rgba(240,107,40,.25); color: var(--ltx); }
-.l-demo-net.active { background: rgba(240,107,40,.1); border-color: rgba(240,107,40,.35); color: var(--lac); }
-
-/* Input */
-.l-demo-input-wrap {
-  background: var(--lbg3); border: 1px solid var(--lline2);
-  border-radius: 8px; padding: 10px 12px; margin-bottom: 8px;
-}
-.l-demo-input-text {
-  font-family: var(--lfb); font-size: 12px; color: var(--ltx); line-height: 1.6; min-height: 40px;
-}
-.l-demo-cursor {
-  display: inline-block; width: 2px; height: 11px; background: var(--lac);
-  margin-left: 1px; vertical-align: middle; animation: dcur .9s step-end infinite;
-}
-@keyframes dcur { 0%,100%{opacity:1} 50%{opacity:0} }
-
-/* Generate button */
-.l-demo-gen-btn-main {
-  width: 100%; padding: 11px 14px;
-  background: var(--lac); color: #fff; border: none; border-radius: 7px;
-  font-family: var(--lfd); font-size: 12px; font-weight: 700;
-  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
-  box-shadow: 0 3px 14px rgba(240,107,40,.22); transition: all .18s;
-  user-select: none;
-}
-.l-demo-gen-btn-main:hover { background: var(--lac2); }
-
-/* Tabs */
-.l-demo-tabs { display: flex; border-bottom: 1px solid var(--lline); margin-bottom: 10px; }
-.l-demo-tab {
-  padding: 7px 12px; font-size: 10.5px; font-weight: 500; color: var(--ltx3);
-  cursor: pointer; border-bottom: 2px solid transparent; transition: all .15s;
-}
-.l-demo-tab.active { color: var(--lac); border-bottom-color: var(--lac); }
-
-/* Loading */
-.l-demo-loading, .l-demo-loading-text {
-  display: none; align-items: center; gap: 8px;
-  font-size: 10px; color: var(--lac); font-weight: 500; margin-bottom: 10px;
-}
-.l-demo-loading.vis, .l-demo-loading-text.vis { display: flex; }
-.l-demo-bar-wrap { flex:1; height:2px; background:var(--lline2); border-radius:2px; overflow:hidden; }
-.l-demo-bar { height:100%; width:0%; background:var(--lac); border-radius:2px; transition:width .4s; box-shadow:0 0 6px var(--lac-glow); }
-
-/* Output */
-.l-demo-output {
-  background: var(--lbg3); border:1px solid var(--lline); border-left:2px solid var(--lac);
-  border-radius:7px; padding:10px 12px; display:none; animation: fadeUp .3s ease both;
-}
-.l-demo-output.vis, .l-demo-output-img.vis { display:block; }
-.l-demo-output-label { font-size:8.5px; font-weight:700; color:var(--lac); letter-spacing:.1em; text-transform:uppercase; margin-bottom:7px; }
-.l-demo-output-text { font-size:11.5px; color:var(--ltx2); line-height:1.75; white-space:pre-line; max-height:200px; overflow-y:auto; }
-.l-demo-output-copy { display:flex; justify-content:flex-end; margin-top:8px; }
-.l-demo-copy-btn { padding:3px 9px; background:rgba(240,107,40,.1); border:1px solid rgba(240,107,40,.2); border-radius:4px; font-size:9.5px; font-weight:600; color:var(--lac); cursor:pointer; }
-
-/* Empty states */
-.l-demo-img-empty, .l-demo-text-empty {
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:8px; min-height:120px; color:var(--ltx3); font-size:10.5px; text-align:center;
-}
-
-/* Text agent panel */
-.l-demo-text-panel { padding:14px 16px; }
-.l-demo-agent-badge {
-  display:inline-flex; align-items:center; gap:6px;
-  background:rgba(240,107,40,.08); border:1px solid rgba(240,107,40,.18);
-  border-radius:100px; padding:3px 10px; font-size:9px; font-weight:700;
-  color:var(--lac); letter-spacing:.06em; text-transform:uppercase; margin-bottom:8px;
-}
-.l-demo-agent-dot { width:5px; height:5px; border-radius:50%; background:var(--lac); animation:dcur 1.8s ease-in-out infinite; box-shadow:0 0 5px var(--lac); }
-.l-demo-agent-title { font-family:var(--lfd); font-size:15px; font-weight:700; color:var(--ltx); letter-spacing:-.3px; margin-bottom:2px; }
-.l-demo-agent-sub { font-size:10.5px; color:var(--lac); font-weight:500; margin-bottom:10px; }
-.l-demo-refine-note {
-  display:flex; align-items:center; gap:7px;
-  background:rgba(240,107,40,.06); border:1px solid rgba(240,107,40,.14);
-  border-radius:6px; padding:7px 10px; font-size:9.5px; color:var(--ltx2);
-  margin-bottom:10px;
-}
-.l-demo-refine-dot { width:5px; height:5px; border-radius:50%; background:var(--lac); flex-shrink:0; }
-.l-demo-text-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.l-demo-text-left, .l-demo-text-right { display:flex; flex-direction:column; }
-.l-demo-select {
-  background:var(--lbg3); border:1px solid var(--lline2); border-radius:7px;
-  padding:7px 10px; font-size:10.5px; color:var(--ltx2); cursor:pointer;
-}
-
-/* Carousel preview */
-.l-demo-carousel-preview {
-  display:flex; gap:5px; overflow-x:auto; overflow-y:hidden; padding-bottom:3px;
-  scrollbar-width:thin; scrollbar-color:rgba(240,107,40,.3) transparent;
-}
-.l-demo-carousel-preview::-webkit-scrollbar { height:3px; }
-.l-demo-carousel-preview::-webkit-scrollbar-thumb { background:rgba(240,107,40,.3); border-radius:2px; }
-.l-demo-carousel-slide {
-  flex-shrink:0; width:72px; height:72px; border-radius:5px; overflow:hidden;
-  border:1px solid rgba(240,107,40,.22); background:#0a0a14;
-  animation:slide-reveal .35s cubic-bezier(.16,1,.3,1) both; cursor:default; transition:border-color .15s, transform .15s;
-}
-.l-demo-carousel-slide:hover { border-color:rgba(240,107,40,.55); transform:scale(1.05); }
-.l-demo-carousel-slide:nth-child(1){animation-delay:.00s}
-.l-demo-carousel-slide:nth-child(2){animation-delay:.10s}
-.l-demo-carousel-slide:nth-child(3){animation-delay:.20s}
-.l-demo-carousel-slide:nth-child(4){animation-delay:.30s}
-.l-demo-carousel-slide:nth-child(5){animation-delay:.40s}
-.l-demo-carousel-slide:nth-child(6){animation-delay:.50s}
-.l-demo-carousel-slide:nth-child(7){animation-delay:.60s}
-.l-demo-carousel-slide svg { width:100%; height:100%; display:block; }
-@keyframes slide-reveal { from{opacity:0;transform:translateY(6px) scale(.94)} to{opacity:1;transform:none} }
-
-/* Floating badges */
-.l-demo-badge { position:absolute; background:var(--lbg2); border:1px solid var(--lline2); border-radius:9px; padding:10px 14px; display:flex; align-items:center; gap:9px; box-shadow:0 8px 32px rgba(0,0,0,.4); animation:float-badge 4s ease-in-out infinite; white-space:nowrap; z-index:2; }
-.l-demo-badge-1 { top:-20px; right:-20px; animation-delay:0s; }
-.l-demo-badge-2 { bottom:-18px; left:-18px; animation-delay:2s; }
-@keyframes float-badge { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
-.l-demo-badge-icon { width:28px; height:28px; border-radius:6px; background:var(--lac-dim); border:1px solid rgba(240,107,40,.2); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.l-demo-badge-icon svg { width:13px; height:13px; fill:none; stroke:var(--lac); stroke-width:2; }
-.l-demo-badge-val { font-family:var(--lfd); font-size:15px; font-weight:700; color:var(--ltx); line-height:1; }
-.l-demo-badge-lbl { font-size:10px; color:var(--ltx2); margin-top:1px; }
-
-
-/* ── STATS STRIP ── */
-.l-stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  background: transparent;
-  position: relative;
-  max-width: 1180px;
-  margin: 0 auto;
-  padding: 0 52px;
-}
-/* top/bottom hairlines spanning full width */
-.l-stats::before,
-.l-stats::after {
-  content: '';
-  position: absolute;
-  left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(240,107,40,.18) 20%,
-    rgba(240,107,40,.35) 50%,
-    rgba(240,107,40,.18) 80%,
-    transparent 100%
-  );
-}
-.l-stats::before { top: 0; }
-.l-stats::after  { bottom: 0; }
-
-.l-stat {
-  padding: 24px 20px;
-  text-align: center;
-  position: relative;
-  cursor: default;
-  transition: transform .22s cubic-bezier(.16,1,.3,1);
-}
-/* vertical dividers between stats */
-.l-stat::after {
-  content: '';
-  position: absolute;
-  right: 0; top: 20%; bottom: 20%;
-  width: 1px;
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    rgba(240,107,40,.2) 40%,
-    rgba(240,107,40,.2) 60%,
-    transparent
-  );
-}
-.l-stat:last-child::after { display: none; }
-.l-stat:hover { transform: translateY(-3px); }
-
-.l-stat-n {
-  font-family: 'MONR Pro', 'Sora', system-ui, sans-serif;
-  font-size: 52px;
-  font-weight: 700;
-  letter-spacing: -3px;
-  line-height: 1;
-  margin-bottom: 8px;
-  /* number = solid amber, suffix = dimmer */
-  color: rgba(240,107,40,.5);
-  /* subtle text shadow for depth */
-  text-shadow: 0 0 40px rgba(240,107,40,.25);
-}
-.l-stat-n em {
-  color: #F06B28;
-  font-style: normal;
-  text-shadow: 0 0 32px rgba(240,107,40,.45);
-}
-.l-stat-l {
-  font-family: 'MONR Pro', 'Inter', system-ui, sans-serif;
-  font-size: 9.5px;
-  color: rgba(242,240,236,.35);
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  font-weight: 500;
-}
-
-/* ── TICKER ── */
-.l-ticker-wrap {
-  overflow: hidden; border-bottom: 1px solid var(--lline);
-  padding: 12px 0; background: var(--lbg);
-}
-.l-ticker {
-  display: flex; width: max-content;
-  animation: ticker 32s linear infinite;
-}
-.l-ticker:hover { animation-play-state: paused; }
-@keyframes ticker {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-.l-ticker-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 0 24px; white-space: nowrap;
-  font-size: 11.5px; font-weight: 600; color: var(--ltx3);
-  font-family: var(--lfd); letter-spacing: .04em; text-transform: uppercase;
-  transition: color .2s; cursor: default;
-}
-.l-ticker-item:hover { color: var(--lac); }
-.l-ticker-hl { display: flex; align-items: center; gap: 10px; }
-.l-ticker-sep {
-  width: 4px; height: 4px; border-radius: 50%;
-  background: var(--lac); opacity: .5; flex-shrink: 0;
-}
-
-/* ── SECTION WRAPPER ── */
-.l-section {
-  max-width: 1180px; margin: 0 auto; padding: 40px 52px;
-}
-.l-section-eyebrow {
-  display: flex; align-items: center; gap: 10px; margin-bottom: 18px;
-}
-.l-section-eyebrow-dot {
-  width: 5px; height: 5px; border-radius: 50%; background: var(--lac); flex-shrink: 0;
-}
-.l-section-eyebrow-txt {
-  font-size: 10.5px; font-weight: 700; color: var(--lac);
-  letter-spacing: .14em; text-transform: uppercase;
-}
-.l-section-h {
-  font-family: var(--lfd);
-  font-size: clamp(30px, 4vw, 50px); font-weight: 800;
-  letter-spacing: -2px; line-height: 1.05; color: var(--ltx); margin-bottom: 16px;
-}
-.l-section-sub {
-  font-size: 14.5px; color: var(--ltx2); line-height: 1.8;
-  max-width: 440px; margin-bottom: 28px;
-}
-
-/* ── HOW IT WORKS ── */
-.l-how {
-  display: grid; grid-template-columns: repeat(4, 1fr);
-  gap: 1px; background: var(--lline);
-  border: 1px solid var(--lline); border-radius: 14px; overflow: hidden;
-}
-.l-how-item {
-  background: var(--lbg2); padding: 28px 22px;
-  transition: background .25s; cursor: default;
-}
-.l-how-item:hover { background: var(--lbg3); }
-.l-how-n {
-  font-family: var(--lfd); font-size: 64px; font-weight: 800;
-  color: rgba(240,107,40,.18); letter-spacing: -4px; line-height: 1;
-  margin-bottom: 18px; transition: color .3s;
-}
-.l-how-item:hover .l-how-n { color: rgba(240,107,40,.32); }
-.l-how-title {
-  font-family: var(--lfd); font-size: 16px; font-weight: 700;
-  color: var(--ltx); margin-bottom: 8px; letter-spacing: -.2px;
-}
-.l-how-desc { font-size: 13px; color: var(--ltx2); line-height: 1.75; }
-
-/* ── AGENTS — ASYMMETRIC BENTO ── */
-.l-agents-bento {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  grid-template-rows: auto auto;
-  gap: 14px;
-}
-.l-agent-card {
-  background: var(--lbg2);
-  border: 1px solid var(--lline);
-  border-radius: 12px;
-  padding: 24px 22px;
-  transition: border-color .22s, transform .22s, background .22s;
-  cursor: default;
-  position: relative;
-  overflow: hidden;
-}
-.l-agent-card::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: radial-gradient(circle at 80% 20%, rgba(240,107,40,.06) 0%, transparent 60%);
-  opacity: 0; transition: opacity .3s;
-}
-.l-agent-card:hover {
-  border-color: rgba(240,107,40,.22);
-  transform: translateY(-3px);
-  background: var(--lbg3);
-}
-.l-agent-card:hover::before { opacity: 1; }
-/* Feature card — spans 2 rows */
-.l-agent-card.feat {
-  grid-row: span 2;
-  padding: 26px 24px;
-  border-color: rgba(240,107,40,.14);
-  background: linear-gradient(140deg, rgba(240,107,40,.07) 0%, var(--lbg2) 55%);
-}
-.l-agent-card.feat:hover { border-color: rgba(240,107,40,.35); }
-.l-agent-n {
-  font-family: var(--lfd); font-size: 11px; font-weight: 700;
-  color: rgba(240,107,40,.55); letter-spacing: .1em; text-transform: uppercase;
-  margin-bottom: 12px;
-}
-.l-agent-name {
-  font-family: var(--lfd); font-size: 15px; font-weight: 700;
-  color: var(--ltx); margin-bottom: 7px; letter-spacing: -.2px;
-}
-.l-agent-card.feat .l-agent-name { font-size: 22px; letter-spacing: -.5px; }
-.l-agent-desc { font-size: 12px; color: var(--ltx2); line-height: 1.7; }
-.l-agent-card.feat .l-agent-desc { font-size: 13.5px; }
-.l-agent-tag {
-  display: inline-flex; margin-top: 14px;
-  background: rgba(240,107,40,.08); border: 1px solid rgba(240,107,40,.18);
-  border-radius: 4px; padding: 3px 8px;
-  font-size: 10px; font-weight: 700; color: var(--lac);
-  letter-spacing: .05em; text-transform: uppercase;
-}
-/* Hover preview tooltip */
-.l-agent-preview {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 0; right: 0;
-  background: var(--lbg4);
-  border: 1px solid rgba(240,107,40,.25);
-  border-radius: 9px;
-  padding: 12px 14px;
-  font-size: 11.5px; color: var(--ltx2); line-height: 1.65;
-  opacity: 0; pointer-events: none;
-  transform: translateY(6px);
-  transition: opacity .22s, transform .22s;
-  z-index: 10;
-  box-shadow: 0 8px 32px rgba(0,0,0,.5);
-}
-.l-agent-card:hover .l-agent-preview {
-  opacity: 1; transform: translateY(0);
-}
-.l-agent-preview-label {
-  font-size: 9px; font-weight: 700; color: var(--lac);
-  letter-spacing: .12em; text-transform: uppercase; margin-bottom: 6px;
-}
-
-/* ── DIVIDER ── */
-.l-divider {
-  height: 1px; background: var(--lline);
-  max-width: 1180px; margin: 0 auto;
-}
-
-/* ── CASES ── */
-.l-cases-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: auto auto;
-  gap: 16px;
-}
-.l-case {
-  background: var(--lbg2);
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 14px;
-  padding: 28px 24px 24px;
-  display: flex; flex-direction: column;
-  transition: border-color .2s, transform .2s;
-  cursor: default;
-}
-.l-case:hover {
-  border-color: rgba(240,107,40,.25);
-  transform: translateY(-2px);
-}
-.l-case:hover { border-color: rgba(240,107,40,.2); transform: translateY(-2px); }
-.l-case-num {
-  font-family: var(--lfd);
-  font-size: 52px;
-  font-weight: 800;
-  color: rgba(240,107,40,.35);
-  letter-spacing: -3px;
-  line-height: 1;
-  margin-bottom: 16px;
-}
-.l-case:hover .l-case-num { color: rgba(240,107,40,.4); }
-.l-case-title {
-  font-family: var(--lfd);
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--ltx);
-  margin-bottom: 10px;
-  letter-spacing: -.3px;
-  line-height: 1.25;
-}
-.l-case-desc {
-  font-size: 13px;
-  color: var(--ltx2);
-  line-height: 1.7;
-  margin-bottom: 16px;
-  flex: 1;
-}
-.l-case-tags {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-top: auto;
-}
-.l-case-tag {
-  background: transparent;
-  border: 1px solid rgba(255,255,255,.14);
-  border-radius: 6px;
-  padding: 4px 10px;
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--ltx2);
-  letter-spacing: .01em;
-}
-
-/* ── PLANS ── */
-.l-plans {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
-}
-.l-plan {
-  background: var(--lbg2); border: 1px solid var(--lline);
-  border-radius: 14px; padding: 28px; position: relative;
-  transition: border-color .22s;
-}
-.l-plan:hover { border-color: var(--lline2); }
-/* Featured plan */
-.l-plan.feat {
-  border-color: rgba(240,107,40,.3);
-  background: linear-gradient(145deg, rgba(240,107,40,.08) 0%, var(--lbg2) 55%);
-  box-shadow: 0 0 40px rgba(240,107,40,.07), inset 0 0 40px rgba(240,107,40,.04);
-}
-.l-plan.feat:hover { border-color: rgba(240,107,40,.5); }
-/* Pulse ring on featured */
-.l-plan.feat::before {
-  content: '';
-  position: absolute; inset: -1px; border-radius: 14px;
-  background: transparent;
-  border: 1px solid rgba(240,107,40,.35);
-  animation: plan-pulse 3.5s ease-in-out infinite;
-}
-@keyframes plan-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0; transform: scale(1.015); }
-}
-.l-plan-badge {
-  position: absolute; top: -1px; right: 20px;
-  background: var(--lac); color: #fff;
-  font-family: var(--lfd); font-size: 9px; font-weight: 700;
-  padding: 4px 10px; border-radius: 0 0 7px 7px;
-  letter-spacing: .06em; text-transform: uppercase;
-  box-shadow: 0 4px 12px var(--lac-glow2);
-}
-.l-plan-name {
-  font-family: var(--lfd); font-size: 12px; font-weight: 700;
-  color: var(--ltx2); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 14px;
-}
-.l-plan-price {
-  font-family: var(--lfd); font-size: 40px; font-weight: 800;
-  letter-spacing: -2.5px; color: var(--ltx); line-height: 1; margin-bottom: 3px;
-}
-.l-plan-price span { font-size: 14px; font-weight: 400; color: var(--ltx2); letter-spacing: 0; }
-.l-plan-quota {
-  font-size: 12px; color: var(--ltx2); margin: 10px 0 18px;
-  padding-bottom: 18px; border-bottom: 1px solid var(--lline);
-}
-.l-plan-social {
-  font-size: 11px; color: var(--lac); margin-bottom: 16px;
-  font-weight: 500; font-style: italic;
-}
-.l-plan-feat {
-  display: flex; align-items: flex-start; gap: 8px;
-  font-size: 12.5px; color: var(--ltx2); margin-bottom: 9px; line-height: 1.5;
-}
-.l-plan-feat-icon { color: var(--lac); flex-shrink: 0; font-size: 14px; }
-.l-plan-btn {
-  width: 100%; margin-top: 22px; padding: 12px;
-  font-family: var(--lfd); font-size: 13px; font-weight: 700;
-  border-radius: 8px; cursor: pointer; letter-spacing: -.01em; transition: all .2s;
-}
-.l-plan-btn-ghost {
-  background: transparent; color: var(--ltx); border: 1px solid var(--lline2);
-}
-.l-plan-btn-ghost:hover { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.2); }
-.l-plan-btn-cta {
-  background: var(--lac); color: #fff; border: none;
-  box-shadow: 0 4px 22px var(--lac-glow2);
-}
-.l-plan-btn-cta:hover { background: var(--lac2); box-shadow: 0 6px 32px var(--lac-glow); transform: translateY(-1px); }
-
-/* ── CTA BANNER ── */
-.l-cta-banner {
-  max-width: 1180px; margin: 0 auto 60px;
-  background: linear-gradient(135deg, rgba(240,107,40,.14) 0%, rgba(240,107,40,.05) 50%, transparent 100%);
-  border: 1px solid rgba(240,107,40,.18);
-  border-radius: 18px; padding: 60px 52px;
-  display: flex; align-items: center; justify-content: space-between; gap: 40px;
-  position: relative; overflow: hidden;
-}
-.l-cta-banner::before {
-  content: '';
-  position: absolute; top: -80px; right: -80px;
-  width: 320px; height: 320px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(240,107,40,.12) 0%, transparent 70%);
-  pointer-events: none;
-}
-.l-cta-h {
-  font-family: var(--lfd); font-size: clamp(24px, 3.2vw, 40px);
-  font-weight: 800; letter-spacing: -1.5px; color: var(--ltx); line-height: 1.05;
-}
-.l-cta-sub { font-size: 13.5px; color: var(--ltx2); margin-top: 10px; max-width: 380px; line-height: 1.7; }
-.l-cta-right { flex-shrink: 0; }
-.l-cta-note { font-size: 11px; color: var(--ltx3); margin-top: 10px; text-align: center; }
-
-/* ── FOOTER ── */
-.l-footer {
-  border-top: 1px solid var(--lline);
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 22px 52px; background: var(--lbg);
-}
-.l-footer-logo {
-  font-family: var(--lfd); font-size: 14px; font-weight: 700;
-  color: var(--ltx2); letter-spacing: -.2px;
-}
-.l-footer-logo b { color: var(--lac); }
-.l-footer-copy { font-size: 11px; color: var(--ltx3); }
-
-/* ── SCROLL HINT ── */
-.l-scroll-hint {
-  position: absolute; bottom: 28px; left: 52px;
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-  color: var(--ltx3); font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase;
-}
-.l-scroll-line {
-  width: 1px; height: 36px;
-  background: linear-gradient(to bottom, transparent, var(--lac));
-  animation: scroll-drop 2.2s ease-in-out infinite;
-}
-@keyframes scroll-drop {
-  0% { transform: scaleY(0); transform-origin: top; opacity: 0; }
-  45% { transform: scaleY(1); transform-origin: top; opacity: 1; }
-  46% { transform-origin: bottom; }
-  100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
-}
-
-/* ── RESPONSIVE ── */
-@media (max-width: 960px) {
-  .lnav { padding: 0 20px; }
-  .l-hero { grid-template-columns: 1fr; padding: 90px 20px 60px; }
-  .l-hero-copy { padding-right: 0; margin-bottom: 40px; }
-  .l-hero-demo { display: none; }
-  .l-stats { grid-template-columns: repeat(2, 1fr); }
-  .l-section { padding: 60px 20px; }
-  .l-how { grid-template-columns: 1fr; }
-  .l-agents-bento { grid-template-columns: 1fr 1fr; }
-  .l-agent-card.feat { grid-row: span 1; }
-  .l-cases-grid, .l-plans { grid-template-columns: 1fr; }
-  .l-cta-banner { flex-direction: column; padding: 36px 24px; margin: 0 20px 60px; }
-  .l-footer { padding: 20px; flex-direction: column; gap: 8px; text-align: center; }
-  .l-scroll-hint { display: none; }
-}
-
-/* ── ALWAYS DARK: LP / Login / Signup ── */
-#sc-land, #sc-login, #sc-signup {
-  --ink-0:#05050A !important; --ink-1:#0A0A12 !important;
-  --ink-2:#0F0F18 !important; --ink-3:#14141E !important;
-  --line-1:rgba(255,255,255,.06) !important;
-  --line-2:rgba(255,255,255,.11) !important;
-  --tx-0:#F2F0EC !important; --tx-1:#7E7D8C !important;
-  --tx-2:#3A3944 !important;
-  --t0:#F2F0EC !important; --t1:#7E7D8C !important;
-  --t2:#3A3944 !important;
-  --bg:#05050A !important; --bg1:#0A0A12 !important;
-  --bg2:#0F0F18 !important; --bg3:#14141E !important;
-  --b1:rgba(255,255,255,.06) !important;
-  --b2:rgba(255,255,255,.11) !important;
-  --a:#F06B28 !important;
-}
-
-
-/* Demo: SVG carousel preview */
-.l-demo-carousel-preview {
-  display: flex;
-  gap: 7px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  margin: 6px 0 2px;
-  padding-bottom: 4px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(240,107,40,.3) transparent;
-}
-.l-demo-carousel-preview::-webkit-scrollbar { height: 3px; }
-.l-demo-carousel-preview::-webkit-scrollbar-track { background: transparent; }
-.l-demo-carousel-preview::-webkit-scrollbar-thumb { background: rgba(240,107,40,.3); border-radius: 2px; }
-.l-demo-carousel-slide {
-  flex-shrink: 0;
-  width: 88px;
-  height: 88px;
-  border-radius: 6px;
-  overflow: hidden;
-  border: 1px solid rgba(240,107,40,.25);
-  background: #0a0a14;
-  animation: slide-reveal .35s cubic-bezier(.16,1,.3,1) both;
-  cursor: default;
-  transition: border-color .15s, transform .15s;
-}
-.l-demo-carousel-slide:hover {
-  border-color: rgba(240,107,40,.6);
-  transform: scale(1.04);
-}
-.l-demo-carousel-slide:nth-child(1){animation-delay:.00s}
-.l-demo-carousel-slide:nth-child(2){animation-delay:.10s}
-.l-demo-carousel-slide:nth-child(3){animation-delay:.20s}
-.l-demo-carousel-slide:nth-child(4){animation-delay:.30s}
-.l-demo-carousel-slide:nth-child(5){animation-delay:.40s}
-.l-demo-carousel-slide:nth-child(6){animation-delay:.50s}
-.l-demo-carousel-slide:nth-child(7){animation-delay:.60s}
-.l-demo-carousel-slide:nth-child(1){animation-delay:.0s}
-.l-demo-carousel-slide:nth-child(2){animation-delay:.18s}
-.l-demo-carousel-slide:nth-child(3){animation-delay:.36s}
-@keyframes slide-reveal {
-  from{opacity:0;transform:translateY(8px) scale(.96)}
-  to  {opacity:1;transform:translateY(0)   scale(1)}
-}
-.l-demo-carousel-slide svg { width:100%; height:100%; display:block; }
-
-
-/* ══════════════════════════════════════════════
-   AUTH SCREENS — Split layout
-══════════════════════════════════════════════ */
+/* ══ AUTH SCREENS ══ */
 #sc-login, #sc-signup {
-  background: var(--ink-0);
+  background: #0D0D0F;
   background-image:
-    radial-gradient(ellipse 60% 50% at 10% 0%, rgba(240,107,40,.07) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 40% at 90% 90%, rgba(240,107,40,.05) 0%, transparent 50%);
+    radial-gradient(ellipse 65% 55% at 8% 0%, rgba(245,197,24,.08) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 40% at 92% 95%, rgba(245,197,24,.05) 0%, transparent 55%);
+  align-items: center; justify-content: center; overflow-y: auto; padding: 40px 20px;
 }
 .auth-split {
   display: grid; grid-template-columns: 1fr 1fr;
@@ -3620,19 +2510,19 @@ solation: isolate;
   border: 1px solid rgba(255,255,255,.07);
 }
 .auth-left {
-  background: var(--ink-1); padding: 48px 44px;
+  background: #111116; padding: 48px 44px;
   display: flex; flex-direction: column; justify-content: space-between;
   position: relative; overflow: hidden;
 }
 .auth-left::before {
   content:''; position:absolute; top:-20%; left:-20%; width:70%; height:70%;
-  background:radial-gradient(ellipse, rgba(240,107,40,.14) 0%, transparent 65%);
+  background:radial-gradient(ellipse, rgba(245,197,24,.12) 0%, transparent 65%);
   filter:blur(50px); pointer-events:none;
   animation:auth-glow 6s ease-in-out infinite;
 }
 .auth-left::after {
   content:''; position:absolute; bottom:-10%; right:-10%; width:55%; height:55%;
-  background:radial-gradient(ellipse, rgba(240,107,40,.08) 0%, transparent 65%);
+  background:radial-gradient(ellipse, rgba(245,197,24,.07) 0%, transparent 65%);
   filter:blur(60px); pointer-events:none;
   animation:auth-glow 8s ease-in-out 2s infinite reverse;
 }
@@ -3640,8 +2530,8 @@ solation: isolate;
 .auth-left-grid {
   position:absolute; inset:0; pointer-events:none;
   background-image:
-    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+    linear-gradient(rgba(245,197,24,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245,197,24,.025) 1px, transparent 1px);
   background-size: 60px 60px;
   mask-image: radial-gradient(ellipse 90% 90% at 20% 30%, black 10%, transparent 70%);
 }
@@ -3649,776 +2539,86 @@ solation: isolate;
 .auth-left-brand { display:flex; align-items:center; gap:10px; margin-bottom:48px; }
 .auth-left-mark {
   width:34px; height:34px; border-radius:8px;
-  background: var(--amber-grd);
+  background: linear-gradient(135deg,#1A1600,#0D0D0F);
+  border: 1.5px solid rgba(245,197,24,.25);
   display:flex; align-items:center; justify-content:center;
-  box-shadow:0 0 20px var(--amber-30); flex-shrink:0;
+  box-shadow:0 0 18px rgba(245,197,24,.2); flex-shrink:0;
 }
-.auth-left-mark svg { width:15px; height:15px; fill:none; stroke:#fff; stroke-width:2.5; }
-.auth-left-logo { font-family:var(--f-display); font-size:17px; font-weight:700; color:var(--tx-0); letter-spacing:-.2px; }
-.auth-left-logo b { color:var(--amber); }
+.auth-left-logo { font-family:'Plus Jakarta Sans',system-ui; font-size:17px; font-weight:700; color:#F5F4F0; letter-spacing:-.2px; }
+.auth-left-logo b { color:#F5C518; }
 .auth-left-headline {
-  font-family:var(--f-display); font-size:clamp(26px,3vw,36px);
-  font-weight:800; line-height:1.05; letter-spacing:-1.5px; color:var(--tx-0); margin-bottom:14px;
+  font-family:'Plus Jakarta Sans',system-ui; font-size:clamp(26px,3vw,36px);
+  font-weight:800; line-height:1.05; letter-spacing:-1.5px; color:#F5F4F0; margin-bottom:14px;
 }
-.auth-left-headline span { color:var(--amber); }
-.auth-left-sub { font-size:13.5px; color:var(--tx-1); line-height:1.75; max-width:320px; }
+.auth-left-headline span { color:#F5C518; }
+.auth-left-sub { font-size:13.5px; color:#9E9C94; line-height:1.75; max-width:320px; }
 .auth-preview {
   position:relative; z-index:1;
   background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09);
   border-radius:12px; padding:18px 18px 14px; margin-top:32px;
 }
-.auth-preview-label { font-size:9px; font-weight:700; color:var(--amber); letter-spacing:.12em; text-transform:uppercase; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
-.auth-preview-dot { width:5px; height:5px; border-radius:50%; background:var(--amber); animation:auth-blink 1.8s ease-in-out infinite; box-shadow:0 0 5px var(--amber-30); }
+.auth-preview-label { font-size:9px; font-weight:700; color:#F5C518; letter-spacing:.12em; text-transform:uppercase; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+.auth-preview-dot { width:5px; height:5px; border-radius:50%; background:#F5C518; animation:auth-blink 1.8s ease-in-out infinite; box-shadow:0 0 5px rgba(245,197,24,.3); }
 @keyframes auth-blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-.auth-preview-text { font-size:12px; color:var(--tx-1); line-height:1.75; min-height:72px; }
-.auth-preview-cursor { display:inline-block; width:2px; height:12px; background:var(--amber); margin-left:1px; vertical-align:middle; animation:auth-cur .9s step-end infinite; }
+.auth-preview-text { font-size:12px; color:#9E9C94; line-height:1.75; min-height:72px; }
+.auth-preview-cursor { display:inline-block; width:2px; height:12px; background:#F5C518; margin-left:1px; vertical-align:middle; animation:auth-cur .9s step-end infinite; }
 @keyframes auth-cur { 0%,100%{opacity:1} 50%{opacity:0} }
 .auth-preview-actions { display:flex; gap:6px; margin-top:12px; }
-.auth-preview-tag { background:rgba(240,107,40,.10); border:1px solid rgba(240,107,40,.2); border-radius:4px; padding:3px 9px; font-size:10px; font-weight:600; color:var(--amber); }
+.auth-preview-tag { background:rgba(245,197,24,.10); border:1px solid rgba(245,197,24,.2); border-radius:4px; padding:3px 9px; font-size:10px; font-weight:600; color:#F5C518; }
 .auth-left-stats { position:relative; z-index:1; display:flex; gap:20px; margin-top:24px; }
-.auth-left-stat-n { font-family:var(--f-display); font-size:22px; font-weight:800; color:rgba(240,107,40,.7); letter-spacing:-1px; line-height:1; }
-.auth-left-stat-l { font-size:10px; color:var(--tx-3); margin-top:2px; }
-.auth-right { background:var(--ink-2); padding:48px 44px; display:flex; flex-direction:column; justify-content:center; }
-.auth-form-title { font-family:var(--f-display); font-size:22px; font-weight:800; letter-spacing:-.8px; color:var(--tx-0); margin-bottom:5px; }
-.auth-form-sub { font-size:12.5px; color:var(--tx-1); margin-bottom:28px; }
+.auth-left-stat-n { font-family:'Plus Jakarta Sans',system-ui; font-size:22px; font-weight:800; color:rgba(245,197,24,.6); letter-spacing:-1px; line-height:1; }
+.auth-left-stat-l { font-size:10px; color:#38362E; margin-top:2px; }
+.auth-right { background:#17171D; padding:48px 44px; display:flex; flex-direction:column; justify-content:center; }
+.auth-form-title { font-family:'Plus Jakarta Sans',system-ui; font-size:22px; font-weight:800; letter-spacing:-.8px; color:#F5F4F0; margin-bottom:5px; }
+.auth-form-sub { font-size:12.5px; color:#9E9C94; margin-bottom:28px; }
 .auth-field { margin-bottom:14px; }
-.auth-field label { display:block; font-size:11px; font-weight:600; color:var(--tx-1); letter-spacing:.06em; text-transform:uppercase; margin-bottom:6px; }
-.auth-field input { width:100%; padding:11px 14px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.09); border-radius:8px; color:var(--tx-0); font-size:13.5px; transition:border-color .18s, box-shadow .18s; outline:none; }
-.auth-field input:focus { border-color:rgba(240,107,40,.5); box-shadow:0 0 0 3px rgba(240,107,40,.1); background:rgba(255,255,255,.07); }
-.auth-field input::placeholder { color:var(--tx-3); }
+.auth-field label { display:block; font-size:11px; font-weight:600; color:#9E9C94; letter-spacing:.06em; text-transform:uppercase; margin-bottom:6px; }
+.auth-field input { width:100%; padding:11px 14px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.09); border-radius:8px; color:#F5F4F0; font-size:13.5px; font-family:'Plus Jakarta Sans',system-ui; transition:border-color .18s, box-shadow .18s; outline:none; }
+.auth-field input:focus { border-color:rgba(245,197,24,.5); box-shadow:0 0 0 3px rgba(245,197,24,.10); background:rgba(255,255,255,.07); }
+.auth-field input::placeholder { color:#38362E; }
 .auth-field-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
-.auth-field-lbl { font-size:11px; font-weight:600; color:var(--tx-1); letter-spacing:.06em; text-transform:uppercase; }
-.auth-forgot { font-size:11px; color:var(--amber); cursor:pointer; font-weight:500; }
+.auth-field-lbl { font-size:11px; font-weight:600; color:#9E9C94; letter-spacing:.06em; text-transform:uppercase; }
+.auth-forgot { font-size:11px; color:#F5C518; cursor:pointer; font-weight:500; }
 .auth-forgot:hover { text-decoration:underline; }
-.auth-btn-main { width:100%; padding:12px; background:var(--amber-grd); color:#fff; font-family:var(--f-display); font-size:13.5px; font-weight:700; border:none; border-radius:8px; cursor:pointer; margin-top:18px; display:flex; align-items:center; justify-content:center; gap:8px; transition:all .2s; box-shadow:0 4px 22px var(--amber-18); }
-.auth-btn-main:hover { background:var(--amber-grd2,linear-gradient(135deg,#F07D3D,#E04E10)); transform:translateY(-1px); box-shadow:0 6px 30px var(--amber-30); }
-.auth-sep { display:flex; align-items:center; gap:10px; font-size:11px; color:var(--tx-3); margin:16px 0; }
+.auth-btn-main { width:100%; padding:12px; background:linear-gradient(135deg,#F5C518,#E6AC00); color:#0D0D0F; font-family:'Plus Jakarta Sans',system-ui; font-size:13.5px; font-weight:800; border:none; border-radius:8px; cursor:pointer; margin-top:18px; display:flex; align-items:center; justify-content:center; gap:8px; transition:all .2s; box-shadow:0 4px 22px rgba(245,197,24,.25); }
+.auth-btn-main:hover { background:linear-gradient(135deg,#FFD740,#F5C518); transform:translateY(-1px); box-shadow:0 6px 30px rgba(245,197,24,.38); }
+.auth-sep { display:flex; align-items:center; gap:10px; font-size:11px; color:#38362E; margin:16px 0; }
 .auth-sep::before, .auth-sep::after { content:''; flex:1; height:1px; background:rgba(255,255,255,.07); }
-.oauth-btn { width:100%; padding:10px; background:rgba(255,255,255,.05); color:var(--tx-1); border:1px solid rgba(255,255,255,.09); border-radius:8px; cursor:pointer; font-size:13px; font-weight:500; display:flex; align-items:center; justify-content:center; gap:9px; transition:all .18s; }
-.oauth-btn:hover { background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.16); color:var(--tx-0); }
-.auth-terms { font-size:11px; color:var(--tx-3); text-align:center; margin-top:14px; }
-.auth-terms a { color:var(--tx-1); cursor:pointer; }
-.auth-foot { font-size:12.5px; color:var(--tx-1); text-align:center; margin-top:20px; }
-.auth-foot a { color:var(--amber); cursor:pointer; font-weight:600; }
-.auth-back { display:flex; align-items:center; gap:5px; font-size:11.5px; color:var(--tx-3); cursor:pointer; justify-content:center; margin-top:14px; transition:color .15s; }
-.auth-back:hover { color:var(--tx-1); }
+.oauth-btn { width:100%; padding:10px; background:rgba(255,255,255,.05); color:#9E9C94; border:1px solid rgba(255,255,255,.09); border-radius:8px; cursor:pointer; font-size:13px; font-weight:500; display:flex; align-items:center; justify-content:center; gap:9px; transition:all .18s; }
+.oauth-btn:hover { background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.16); color:#F5F4F0; }
+.auth-terms { font-size:11px; color:#38362E; text-align:center; margin-top:14px; }
+.auth-foot { font-size:12.5px; color:#9E9C94; text-align:center; margin-top:20px; }
+.auth-foot a { color:#F5C518; cursor:pointer; font-weight:600; }
+.auth-back { display:flex; align-items:center; gap:5px; font-size:11.5px; color:#38362E; cursor:pointer; justify-content:center; margin-top:14px; transition:color .15s; }
+.auth-back:hover { color:#9E9C94; }
+.auth-error { font-size:12px; color:var(--err); margin-top:6px; display:none; }
 @media (max-width: 760px) {
   .auth-split { grid-template-columns:1fr; }
   .auth-left { display:none; }
   .auth-right { padding:36px 24px; }
 }
 
-
-/* ══ ONBOARDING ══ */
-#sc-onboard {
-  background: var(--ink-0);
-  background-image:
-    radial-gradient(ellipse 65% 55% at 8% 0%, rgba(240,107,40,.09) 0%, transparent 60%),
-    radial-gradient(ellipse 45% 40% at 92% 95%, rgba(240,107,40,.05) 0%, transparent 55%);
-  align-items: center;
-  justify-content: center;
-  overflow-y: auto;
-  padding: 40px 20px;
-  position: fixed;
-  inset: 0;
+/* ── CHIPS (tom de voz, redes) ── */
+.chip {
+  display:inline-flex; align-items:center; padding:5px 12px;
+  background:var(--ink-3); border:1px solid var(--line-2);
+  border-radius:100px; font-size:12px; font-weight:500;
+  color:var(--tx-1); cursor:pointer;
+  transition:all var(--t-base,160ms);
+  user-select:none;
 }
-.ob-wrap {
-  width: 100%;
-  max-width: 640px;
-  margin: 0 auto;
-  position: relative;
+.chip:hover { background:var(--ink-4); color:var(--tx-0); border-color:var(--line-3); }
+.chip.on {
+  background:var(--amber-10,rgba(245,197,24,.10));
+  border-color:var(--amber-18,rgba(245,197,24,.18));
+  color:var(--amber,#F5C518); font-weight:600;
 }
-.ob-progress {
-  height: 2px;
-  background: var(--line-1);
-  border-radius: 2px;
-  margin-bottom: 48px;
-  overflow: hidden;
-}
-.ob-progress-bar {
-  height: 100%;
-  background: var(--amber-grd, linear-gradient(90deg, #F06B28, #E04E10));
-  border-radius: 2px;
-  transition: width .5s var(--ease-out, cubic-bezier(.16,1,.3,1));
-  box-shadow: 0 0 8px rgba(240,107,40,.4);
-}
-.ob-logo {
-  display: flex; align-items: center; gap: 9px;
-  margin-bottom: 40px;
-  font-family: var(--f-display, 'Sora', system-ui);
-  font-size: 16px; font-weight: 700; color: var(--tx-0);
-}
-.ob-logo b { color: var(--amber); }
-.ob-logo-mark {
-  width: 32px; height: 32px; border-radius: 8px;
-  background: var(--amber-grd, linear-gradient(135deg,#F06B28,#E04E10));
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 0 16px rgba(240,107,40,.3);
-}
-.ob-step-label {
-  font-size: 10.5px; font-weight: 700; color: var(--amber);
-  letter-spacing: .12em; text-transform: uppercase; margin-bottom: 14px;
-}
-.ob-title {
-  font-family: var(--f-display, 'Sora', system-ui);
-  font-size: clamp(26px, 4vw, 38px);
-  font-weight: 800; letter-spacing: -1.5px; line-height: 1.05;
-  color: var(--tx-0); margin-bottom: 14px;
-}
-.ob-sub {
-  font-size: 14.5px; color: var(--tx-1); line-height: 1.75;
-  max-width: 480px; margin-bottom: 36px;
-}
-
-/* Instagram input */
-.ob-ig-wrap {
-  position: relative; margin-bottom: 10px;
-}
-.ob-ig-at {
-  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-  font-size: 15px; color: var(--tx-2); font-weight: 600; pointer-events: none;
-}
-.ob-ig-icon {
-  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-  pointer-events: none;
-}
-.ob-ig-input {
-  width: 100%; padding: 14px 48px 14px 34px;
-  background: var(--ink-2); border: 1px solid var(--line-2);
-  border-radius: 10px; color: var(--tx-0);
-  font-size: 15px; font-family: var(--f-body);
-  outline: none; transition: border-color .18s, box-shadow .18s;
-}
-.ob-ig-input:focus {
-  border-color: var(--amber);
-  box-shadow: 0 0 0 3px rgba(240,107,40,.12);
-}
-.ob-ig-note {
-  font-size: 11.5px; color: var(--tx-3); margin-bottom: 28px;
-}
-
-/* Buttons */
-.ob-btn-main {
-  width: 100%; padding: 14px;
-  background: var(--amber-grd, linear-gradient(135deg,#F06B28,#E04E10));
-  color: #fff; border: none; border-radius: 10px;
-  font-family: var(--f-display, 'Sora', system-ui);
-  font-size: 14px; font-weight: 700; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  letter-spacing: -.01em; margin-bottom: 12px;
-  box-shadow: 0 4px 22px rgba(240,107,40,.25);
-  transition: all .2s;
-}
-.ob-btn-main:hover { transform: translateY(-1px); box-shadow: 0 6px 30px rgba(240,107,40,.38); }
-.ob-btn-main:disabled { opacity: .6; cursor: not-allowed; transform: none; }
-.ob-btn-skip {
-  width: 100%; padding: 10px;
-  background: transparent; border: 1px solid var(--line-2);
-  color: var(--tx-2); border-radius: 10px;
-  font-size: 13px; font-family: var(--f-body); cursor: pointer;
-  transition: all .18s;
-}
-.ob-btn-skip:hover { background: var(--ink-2); color: var(--tx-0); }
-
-/* Analysis stages */
-.ob-analysis-stages {
-  display: flex; flex-direction: column; gap: 16px;
-  margin: 40px 0;
-}
-.ob-stage {
-  display: flex; align-items: center; gap: 12px;
-  font-size: 13.5px; color: var(--tx-2);
-  transition: color .3s;
-}
-.ob-stage.active { color: var(--amber); }
-.ob-stage.done   { color: var(--ok, #2ECC8A); }
-.ob-stage-icon {
-  width: 28px; height: 28px; border-radius: 50%;
-  background: var(--ink-3); border: 1px solid var(--line-2);
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; color: var(--tx-3); transition: all .3s;
-}
-.ob-stage.active .ob-stage-icon { background: rgba(240,107,40,.12); border-color: rgba(240,107,40,.3); color: var(--amber); }
-.ob-stage.done   .ob-stage-icon { background: rgba(46,204,138,.12); border-color: rgba(46,204,138,.3); color: var(--ok, #2ECC8A); }
-.ob-stage-spin svg { animation: spin .7s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.ob-stage-wait { opacity: .45; }
-
-/* Branding Kit */
-.ob-kit-header {
-  display: flex; align-items: flex-start; justify-content: space-between;
-  gap: 16px; margin-bottom: 28px;
-}
-.ob-kit-badge {
-  background: var(--amber-grd, linear-gradient(135deg,#F06B28,#E04E10));
-  color: #fff; padding: 5px 11px; border-radius: 6px;
-  font-size: 11px; font-weight: 800; letter-spacing: .08em;
-  flex-shrink: 0;
-  box-shadow: 0 0 12px rgba(240,107,40,.3);
-}
-.ob-kit-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;
-}
-.ob-kit-card {
-  background: var(--ink-2); border: 1px solid var(--line-1);
-  border-radius: 12px; padding: 18px;
-  transition: border-color .2s;
-}
-.ob-kit-card:hover { border-color: var(--line-2); }
-.ob-kit-card-label {
-  font-size: 9.5px; font-weight: 700; color: var(--amber);
-  letter-spacing: .12em; text-transform: uppercase; margin-bottom: 14px;
-}
-/* Colors */
-.ob-kit-colors { display: flex; gap: 8px; margin-bottom: 8px; }
-.ob-kit-color-swatch {
-  width: 32px; height: 32px; border-radius: 8px;
-  border: 1px solid rgba(255,255,255,.1);
-  transition: transform .15s; cursor: default;
-}
-.ob-kit-color-swatch:hover { transform: scale(1.1); }
-.ob-kit-color-codes { display: flex; gap: 8px; flex-wrap: wrap; }
-.ob-kit-color-codes span {
-  font-family: var(--f-mono, monospace); font-size: 10px; color: var(--tx-2);
-}
-/* Tags */
-.ob-kit-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
-.ob-kit-tag {
-  background: rgba(240,107,40,.1); border: 1px solid rgba(240,107,40,.2);
-  border-radius: 5px; padding: 3px 9px;
-  font-size: 11px; font-weight: 600; color: var(--amber);
-}
-.ob-kit-desc { font-size: 12px; color: var(--tx-2); line-height: 1.65; }
-/* Fonts */
-.ob-kit-fonts { display: flex; flex-direction: column; gap: 10px; }
-.ob-kit-font { display: flex; align-items: center; justify-content: space-between; }
-.ob-kit-font-name {
-  font-family: var(--f-display, 'Sora', system-ui);
-  font-size: 15px; font-weight: 700; color: var(--tx-0); letter-spacing: -.2px;
-}
-.ob-kit-font-role { font-size: 10.5px; color: var(--tx-3); }
-/* Style */
-.ob-kit-style-name {
-  font-family: var(--f-display, 'Sora', system-ui);
-  font-size: 18px; font-weight: 800; color: var(--tx-0);
-  letter-spacing: -.5px; margin-bottom: 8px;
-}
-
-/* Post preview */
-.ob-kit-preview-section { margin-bottom: 32px; }
-.ob-kit-preview-label {
-  display: flex; align-items: center; gap: 7px;
-  font-size: 10.5px; font-weight: 700; color: var(--amber);
-  letter-spacing: .1em; text-transform: uppercase; margin-bottom: 14px;
-}
-.ob-post-preview {
-  background: var(--ink-2); border: 1px solid var(--line-1);
-  border-radius: 12px; overflow: hidden;
-  display: flex; gap: 12px; padding: 4px;
-}
-.ob-post-preview svg { border-radius: 9px; }
-.ob-kit-actions { display: flex; flex-direction: column; gap: 0; }
-
 </style>
 </head>
 <body>
 
-<!-- ══ LANDING ══ -->
-<div class="sc on" id="sc-land">
-  <div class="l-noise" aria-hidden="true"></div>
-
-  <!-- Background layers (fixed) -->
-  <div class="l-hero-bg" aria-hidden="true"></div>
-  <div class="l-hero-grid" aria-hidden="true"></div>
-
-  <!-- NAV -->
-  <nav class="lnav" id="lnav">
-    <div class="lnav-brand">
-      <div class="lnav-mark">
-        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px">
-          <defs><linearGradient id="alg" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#E6AC00"/><stop offset="100%" stop-color="#FFD740"/></linearGradient></defs>
-          <rect x="8" y="22" width="62" height="62" rx="14" fill="none" stroke="url(#alg)" stroke-width="10"/>
-          <line x1="18" y1="48" x2="58" y2="48" stroke="url(#alg)" stroke-width="9" stroke-linecap="round"/>
-          <line x1="18" y1="64" x2="46" y2="64" stroke="url(#alg)" stroke-width="9" stroke-linecap="round"/>
-          <polygon points="56,8 92,8 92,44" fill="url(#alg)"/>
-          <line x1="56" y1="44" x2="88" y2="12" stroke="url(#alg)" stroke-width="10" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div class="lnav-logo">Auto<b>Postt</b></div>
-    </div>
-    <div class="lnav-ctas">
-      <button class="lnav-login" onclick="go('login')">Entrar</button>
-      <button class="lnav-cta" onclick="go('signup')">Começar grátis</button>
-    </div>
-  </nav>
-
-  <!-- HERO -->
-  <section id="land-hero" style="max-width:1280px;margin:0 auto;padding:0 52px;width:100%">
-    <div class="l-hero">
-
-      <!-- LEFT: Copy -->
-      <div class="l-hero-copy">
-        
-        <h1 class="l-hero-h1">
-          <span class="l-h1-dim">Pare de improvisar.</span>
-          <span class="l-h1-accent">Publique com sistema.</span>
-        </h1>
-        <p class="l-hero-sub">Descreva sua ideia. A IA aplica sua identidade de marca e gera posts, roteiros, carrosseis e anúncios prontos para publicar — em segundos.</p>
-        <div class="l-hero-acts">
-          <button class="l-btn-main" onclick="go('signup')">
-            Criar conta grátis
-            <svg style="width:15px;height:15px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </button>
-          <button class="l-btn-ghost" onclick="go('login')">Já tenho conta</button>
-        </div>
-        <div class="l-hero-trust">
-          <div class="l-hero-trust-dots">
-            <div class="l-hero-trust-dot"></div>
-            <div class="l-hero-trust-dot" style="opacity:.4"></div>
-            <div class="l-hero-trust-dot" style="opacity:.2"></div>
-          </div>
-          Sem cartão de crédito · Cancele quando quiser
-        </div>
-        <div class="l-scroll-hint" aria-hidden="true">
-          <div class="l-scroll-line"></div>
-          <span>scroll</span>
-        </div>
-      </div>
-
-      <!-- RIGHT: Fake product demo -->
-      <div class="l-hero-demo">
-        <!-- floating badges -->
-        <div class="l-demo-badge l-demo-badge-1">
-          <div class="l-demo-badge-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
-          <div><div class="l-demo-badge-val">94%</div><div class="l-demo-badge-lbl">Taxa de aprovação</div></div>
-        </div>
-        <div class="l-demo-badge l-demo-badge-2">
-          <div class="l-demo-badge-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
-          <div><div class="l-demo-badge-val">38k</div><div class="l-demo-badge-lbl">Conteúdos gerados</div></div>
-        </div>
-
-        <div class="l-demo-window" style="display:flex;flex-direction:row;min-height:620px;overflow:hidden">
-          <!-- Sidebar nav (like real app) -->
-          <div class="l-demo-sidebar">
-            <div class="l-demo-sb-logo">
-              <div class="l-demo-sb-mark"><svg viewBox="0 0 24 24" style="width:11px;height:11px;fill:none;stroke:#fff;stroke-width:2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
-              <span>Auto<b>Postt</b></span>
-            </div>
-            <div class="l-demo-sb-lbl">Agentes</div>
-            <div class="l-demo-nav-item active" id="dnav-imagem">
-              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-              Agente de Imagem
-            </div>
-            <div class="l-demo-nav-item" id="dnav-legenda">
-              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-              Legenda
-            </div>
-            <div class="l-demo-nav-item" id="dnav-reels">
-              <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg>
-              Roteiro Reels
-            </div>
-            <div class="l-demo-nav-item" id="dnav-linkedin">
-              <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-              Post LinkedIn
-            </div>
-            <div class="l-demo-nav-item" id="dnav-story">
-              <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/></svg>
-              Ideias Story
-            </div>
-            <div class="l-demo-nav-item" id="dnav-tiktok">
-              <svg viewBox="0 0 24 24"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
-              Roteiro TikTok
-            </div>
-            <div class="l-demo-nav-item" id="dnav-yt">
-              <svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
-              Roteiro YouTube
-            </div>
-          </div>
-
-          <!-- Main content area -->
-          <div class="l-demo-main">
-            <div class="l-demo-topbar">
-              <div class="l-demo-dots"><div class="l-demo-dot"></div><div class="l-demo-dot"></div><div class="l-demo-dot"></div></div>
-              <div class="l-demo-topbar-title" id="demo-topbar-title">AutoPostt Studio — Agente de Imagem</div>
-            </div>
-            <div class="l-demo-body" id="demo-body-wrap">
-
-              <!-- AGENT: IMAGEM (image generator layout) -->
-              <div class="l-demo-panel" id="dpanel-imagem">
-                <div class="l-demo-panel-grid">
-                  <div class="l-demo-panel-left">
-                    <div class="l-demo-sect-lbl">Formato</div>
-                    <div class="l-demo-fmt-grid">
-                      <div class="l-demo-fmt active">
-                        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                        Post único
-                      </div>
-                      <div class="l-demo-fmt">
-                        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="7" height="18" rx="1"/><rect x="9" y="3" width="7" height="18" rx="1"/></svg>
-                        Carrossel
-                      </div>
-                      <div class="l-demo-fmt">
-                        <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M9 10l3 3 3-3"/></svg>
-                        Anúncio
-                      </div>
-                      <div class="l-demo-fmt">
-                        <svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/></svg>
-                        Story
-                      </div>
-                      <div class="l-demo-fmt">
-                        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="1"/><circle cx="8" cy="9" r="2"/></svg>
-                        Thumbnail
-                      </div>
-                      <div class="l-demo-fmt">
-                        <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="10" rx="1"/></svg>
-                        Banner
-                      </div>
-                    </div>
-                    <div class="l-demo-sect-lbl" style="margin-top:10px">Rede social</div>
-                    <div class="l-demo-net-row">
-                      <div class="l-demo-net active">Instagram</div>
-                      <div class="l-demo-net">LinkedIn</div>
-                      <div class="l-demo-net">YouTube</div>
-                      <div class="l-demo-net">TikTok</div>
-                    </div>
-                    <div class="l-demo-sect-lbl" style="margin-top:10px">Sua ideia</div>
-                    <div class="l-demo-input-wrap" style="margin-bottom:8px">
-                      <div class="l-demo-input-text" id="demo-input-text"><span class="l-demo-cursor"></span></div>
-                    </div>
-                    <div class="l-demo-gen-btn-main" id="demo-gen-btn">
-                      <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:none;stroke:#fff;stroke-width:2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                      Gerar conteúdo com IA
-                    </div>
-                  </div>
-                  <div class="l-demo-panel-right">
-                    <div class="l-demo-tabs">
-                      <div class="l-demo-tab active">Conceitos</div>
-                      <div class="l-demo-tab">Imagem gerada</div>
-                    </div>
-                    <div class="l-demo-loading" id="demo-loading">
-                      <span id="demo-loading-txt">Analisando identidade visual...</span>
-                      <div class="l-demo-bar-wrap"><div class="l-demo-bar" id="demo-bar"></div></div>
-                    </div>
-                    <div class="l-demo-output l-demo-output-img" id="demo-output-img" style="display:none">
-                      <div class="l-demo-output-label">Imagem gerada pela IA</div>
-                      <div class="l-demo-carousel-preview" id="demo-carousel-preview"></div>
-                      <div class="l-demo-output-copy"><div class="l-demo-copy-btn">Baixar JPG ↓</div></div>
-                    </div>
-                    <div class="l-demo-img-empty" id="demo-img-empty">
-                      <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:var(--ltx3);stroke-width:1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                      <span>Descreva sua ideia e clique em Gerar</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- AGENT: TEXT panels (legenda, reels, linkedin, story, tiktok, yt) -->
-              <div class="l-demo-panel l-demo-text-panel" id="dpanel-legenda" style="display:none">
-                <div class="l-demo-agent-badge"><span class="l-demo-agent-dot"></span>Agente IA</div>
-                <div class="l-demo-agent-title" id="dtitle-legenda">Gerador de Legenda</div>
-                <div class="l-demo-agent-sub" id="dsub-legenda">Cria legendas otimizadas para engajamento com CTAs, hashtags e emojis estratégicos.</div>
-                <div class="l-demo-refine-note"><span class="l-demo-refine-dot"></span>Seu input passa pelo agente refinador antes de ser processado</div>
-                <div class="l-demo-text-grid">
-                  <div class="l-demo-text-left">
-                    <div class="l-demo-sect-lbl">Sua ideia ou contexto</div>
-                    <div class="l-demo-input-wrap">
-                      <div class="l-demo-input-text l-demo-text-input" id="demo-text-input"><span class="l-demo-cursor"></span></div>
-                    </div>
-                    <div class="l-demo-sect-lbl" style="margin-top:8px">Tom de voz</div>
-                    <div class="l-demo-select">Usar perfil de marca ▾</div>
-                    <div class="l-demo-gen-btn-main" style="margin-top:10px" id="demo-gen-btn-text">
-                      <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:none;stroke:#fff;stroke-width:2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                      <span id="demo-gen-btn-label">Gerar Legenda</span>
-                    </div>
-                  </div>
-                  <div class="l-demo-text-right">
-                    <div class="l-demo-sect-lbl">Resultado</div>
-                    <div class="l-demo-loading l-demo-loading-text" id="demo-loading-text">
-                      <span id="demo-loading-txt-text">Refinando prompt...</span>
-                      <div class="l-demo-bar-wrap"><div class="l-demo-bar" id="demo-bar-text"></div></div>
-                    </div>
-                    <div class="l-demo-output" id="demo-output" style="display:none">
-                      <div class="l-demo-output-label">Gerado pela IA</div>
-                      <div class="l-demo-output-text" id="demo-output-text"></div>
-                      <div class="l-demo-output-copy"><div class="l-demo-copy-btn">Copiar ✓</div></div>
-                    </div>
-                    <div class="l-demo-text-empty" id="demo-text-empty">
-                      <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:var(--ltx3);stroke-width:1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                      <span>Descreva sua ideia e clique em Gerar</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- STATS -->
-  <div class="l-stats" id="land-stats">
-    <div class="l-stat"><div class="l-stat-n"><em>2.4</em>k</div><div class="l-stat-l">Criadores ativos</div></div>
-    <div class="l-stat"><div class="l-stat-n"><em>38</em>k</div><div class="l-stat-l">Conteúdos gerados</div></div>
-    <div class="l-stat"><div class="l-stat-n"><em>94</em>%</div><div class="l-stat-l">Taxa de aprovação</div></div>
-    <div class="l-stat"><div class="l-stat-n"><em>8</em></div><div class="l-stat-l">Agentes especializados</div></div>
-  </div>
-
-  <!-- TICKER -->
-  <div class="l-ticker-wrap">
-    <div class="l-ticker">
-      <div class="l-ticker-item"><div class="l-ticker-hl">Legenda<div class="l-ticker-sep"></div></div></div>
-      <div class="l-ticker-item"><div class="l-ticker-hl">Roteiro YouTube<div class="l-ticker-sep"></div></div></div>
-      <div class="l-ticker-item"><div class="l-ticker-hl">Roteiro Reels<div class="l-ticker-sep"></div></div></div>
-      <div class="l-ticker-item"><div class="l-ticker-hl">Ideias Story<div class="l-ticker-sep"></div></div></div>
-      <div class="l-ticker-item"><div class="l-ticker-hl">Post LinkedIn<div class="l-ticker-sep"></div></div></div>
-      <div class="l-ticker-item"><div class="l-ticker-hl">Roteiro TikTok<div class="l-ticker-sep"></div></div></div>
-      <div class="l-ticker-item"><div class="l-ticker-hl">Thumbnail YT<div class="l-ticker-sep"></div></div></div>
-      <div class="l-ticker-item"><div class="l-ticker-hl">Capa Reels/TikTok<div class="l-ticker-sep"></div></div></div>
-      <div class="l-ticker-item"><div class="l-ticker-hl">Legenda<div class="l-ticker-sep"></div></div></div>
-      <div class="l-ticker-item"><div class="l-ticker-hl">Roteiro YouTube<div class="l-ticker-sep"></div></div></div>
-      <div class="l-ticker-item"><div class="l-ticker-hl">Roteiro Reels<div class="l-ticker-sep"></div></div></div>
-      <div class="l-ticker-item"><div class="l-ticker-hl">Ideias Story<div class="l-ticker-sep"></div></div></div>
-      <div class="l-ticker-item"><div class="l-ticker-hl">Post LinkedIn<div class="l-ticker-sep"></div></div></div>
-      <div class="l-ticker-item"><div class="l-ticker-hl">Roteiro TikTok<div class="l-ticker-sep"></div></div></div>
-      <div class="l-ticker-item"><div class="l-ticker-hl">Thumbnail YT<div class="l-ticker-sep"></div></div></div>
-      <div class="l-ticker-item"><div class="l-ticker-hl">Capa Reels/TikTok<div class="l-ticker-sep"></div></div></div>
-    </div>
-  </div>
-
-  <!-- HOW IT WORKS -->
-  <div class="l-section">
-    <div class="l-section-eyebrow"><div class="l-section-eyebrow-dot"></div><div class="l-section-eyebrow-txt">Como funciona</div></div>
-    <h2 class="l-section-h">Quatro passos.<br>Conteúdo pronto.</h2>
-    <p class="l-section-sub">Sem designer. Sem agência. A IA aprende sua identidade e entrega conteúdo com a sua cara.</p>
-    <div class="l-how">
-      <div class="l-how-item"><div class="l-how-n">01</div><div class="l-how-title">Conecte seu Instagram</div><div class="l-how-desc">O agente lê seu perfil, analisa seu posicionamento atual e define automaticamente o branding de marca ideal para você.</div></div>
-      <div class="l-how-item"><div class="l-how-n">02</div><div class="l-how-title">Configure sua identidade</div><div class="l-how-desc">Revise e ajuste as cores, tom de voz, nicho e público definidos pela IA. Tudo aplicado automaticamente em cada geração.</div></div>
-      <div class="l-how-item"><div class="l-how-n">03</div><div class="l-how-title">Descreva sua ideia</div><div class="l-how-desc">Escreva um briefing simples ou fale pelo microfone. O agente refina e transforma em conteúdo profissional em segundos.</div></div>
-      <div class="l-how-item"><div class="l-how-n">04</div><div class="l-how-title">Publique com confiança</div><div class="l-how-desc">Copie, adapte e publique. Cada geração é otimizada para engajamento no formato e rede escolhidos.</div></div>
-    </div>
-  </div>
-
-  <div class="l-divider"></div>
-
-  <!-- AGENTS — BENTO ASSIMÉTRICO -->
-  <div class="l-section" id="land-produto">
-    <div class="l-section-eyebrow"><div class="l-section-eyebrow-dot"></div><div class="l-section-eyebrow-txt">Os agentes</div></div>
-    <h2 class="l-section-h">Uma plataforma.<br>Sete especialistas.</h2>
-    <p class="l-section-sub">Cada agente domina um formato. Todos compartilham seu perfil de marca — cores, tom e identidade, aplicados automaticamente.</p>
-    <div class="l-agents-bento">
-      <!-- Featured: Agente de Imagem — spans 2 rows -->
-      <div class="l-agent-card feat">
-        <div class="l-agent-n">01</div>
-        <div class="l-agent-name">Agente de Imagem</div>
-        <div class="l-agent-desc">O agente mais completo da plataforma para criação de conteúdo visual. Produza peças com identidade de marca aplicada de forma consistente e automatizada em todos os formatos.<br><br>
-          <strong style="color:var(--ltx);font-size:12px">Formatos:</strong> Post único · Carrossel · Anúncio · Story · Thumbnail · Banner<br>
-          <strong style="color:var(--ltx);font-size:12px">Plataformas:</strong> Instagram · TikTok · YouTube · LinkedIn<br><br>
-          <strong style="color:var(--ltx);font-size:12px">Diferenciais:</strong><br>
-          • Otimização inteligente de prompts<br>
-          • Referências visuais estratégicas<br>
-          • Integração de imagens diretamente no layout<br><br>
-          <em style="color:var(--ltx2);font-size:11.5px">Crie com consistência, publique com impacto e escale com eficiência.</em>
-        </div>
-        <span class="l-agent-tag" style="letter-spacing:.04em">POST · CARROSSEL · ANÚNCIO · STORY · THUMBNAIL · BANNER</span>
-        <div class="l-agent-preview">
-          <div class="l-agent-preview-label">Preview gerado</div>
-          "Post com fundo escuro, texto em laranja e logo da marca. Layout assimétrico com hierarquia visual clara — exatamente no estilo configurado no seu perfil."
-        </div>
-      </div>
-      <div class="l-agent-card">
-        <div class="l-agent-n">02</div>
-        <div class="l-agent-name">Legenda</div>
-        <div class="l-agent-desc">Copy com CTA, hashtags e estrutura de engajamento prontos para postar.</div>
-        <span class="l-agent-tag">Instagram</span>
-        <div class="l-agent-preview"><div class="l-agent-preview-label">Preview gerado</div>"Você não precisa de sorte. Precisa de sistema. 3 erros que destroem vendedores antes dos 90 dias..."</div>
-      </div>
-      <div class="l-agent-card">
-        <div class="l-agent-n">03</div>
-        <div class="l-agent-name">Roteiro YouTube</div>
-        <div class="l-agent-desc">Hook, desenvolvimento e CTA para vídeos longos de alta retenção.</div>
-        <span class="l-agent-tag">YouTube</span>
-        <div class="l-agent-preview"><div class="l-agent-preview-label">Preview gerado</div>"[0:00] Hook: Essa é a técnica que vendedores de topo usam e nunca ensinam em treinamentos..."</div>
-      </div>
-      <div class="l-agent-card">
-        <div class="l-agent-n">04</div>
-        <div class="l-agent-name">Roteiro Reels</div>
-        <div class="l-agent-desc">Script de 60s com gancho nos 3 primeiros segundos para máximo alcance.</div>
-        <span class="l-agent-tag">Instagram · TikTok</span>
-        <div class="l-agent-preview"><div class="l-agent-preview-label">Preview gerado</div>"Abre câmera: [olha para câmera] Se você errou esse passo, perdeu a venda..."</div>
-      </div>
-      <div class="l-agent-card">
-        <div class="l-agent-n">05</div>
-        <div class="l-agent-name">Post LinkedIn</div>
-        <div class="l-agent-desc">Hook antes do "ver mais" que gera leads B2B qualificados e comentários.</div>
-        <span class="l-agent-tag">LinkedIn</span>
-        <div class="l-agent-preview"><div class="l-agent-preview-label">Preview gerado</div>"Contratei 12 vendedores em 2 anos. Só 3 passaram dos 6 meses. O padrão dos que ficaram me surpreendeu..."</div>
-      </div>
-      <div class="l-agent-card">
-        <div class="l-agent-n">06</div>
-        <div class="l-agent-name">Ideias Story</div>
-        <div class="l-agent-desc">Sequência de 7 stories com narrativa, enquete e CTA integrado.</div>
-        <span class="l-agent-tag">Stories</span>
-        <div class="l-agent-preview"><div class="l-agent-preview-label">Preview gerado</div>"Story 1: Pergunta. Story 2: Enquete. Story 3: Revelação. Story 4–6: Prova. Story 7: CTA."</div>
-      </div>
-      <div class="l-agent-card">
-        <div class="l-agent-n">07</div>
-        <div class="l-agent-name">Roteiro TikTok</div>
-        <div class="l-agent-desc">Script viral de 30–60s com trend hook e transições sugeridas por IA.</div>
-        <span class="l-agent-tag">TikTok</span>
-        <div class="l-agent-preview"><div class="l-agent-preview-label">Preview gerado</div>"[Áudio trending] POV: você descobriu que seu concorrente usa IA e você ainda improvisa..."</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="l-divider"></div>
-
-  <!-- CASOS -->
-  <div style="max-width:1180px;margin:0 auto;padding:40px 52px;">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
-      <div style="width:5px;height:5px;border-radius:50%;background:#F06B28;flex-shrink:0;"></div>
-      <div style="font-size:10.5px;font-weight:700;color:#F06B28;letter-spacing:.14em;text-transform:uppercase;">Para quem é</div>
-    </div>
-    <h2 style="font-family:'Sora',system-ui,sans-serif;font-size:clamp(30px,4vw,50px);font-weight:800;letter-spacing:-2px;line-height:1.05;color:#F2F0EC;margin-bottom:12px;">Feito para quem<br>vende com conteúdo.</h2>
-    <p style="font-size:14.5px;color:#7E7D8C;line-height:1.8;max-width:440px;margin-bottom:32px;">Do mentor ao gestor comercial — o AutoPostt adapta o conteúdo ao seu nicho automaticamente.</p>
-
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
-
-      <div style="background:#111116;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:28px 24px 24px;display:flex;flex-direction:column;">
-        <div style="font-family:'Sora',system-ui,sans-serif;font-size:52px;font-weight:800;color:rgba(240,107,40,.35);letter-spacing:-3px;line-height:1;margin-bottom:16px;">01</div>
-        <div style="font-family:'Sora',system-ui,sans-serif;font-size:16px;font-weight:700;color:#F2F0EC;margin-bottom:10px;letter-spacing:-.3px;">Mentores e Coaches</div>
-        <div style="font-size:13px;color:#7E7D8C;line-height:1.7;margin-bottom:16px;flex:1;">Roteiros de autoridade, posts que geram DMs e legendas que vendem sua metodologia sem parecer genérico.</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <span style="border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:4px 10px;font-size:11px;color:#7E7D8C;">Legenda</span>
-          <span style="border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:4px 10px;font-size:11px;color:#7E7D8C;">Reels</span>
-          <span style="border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:4px 10px;font-size:11px;color:#7E7D8C;">Story</span>
-        </div>
-      </div>
-
-      <div style="background:#111116;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:28px 24px 24px;display:flex;flex-direction:column;">
-        <div style="font-family:'Sora',system-ui,sans-serif;font-size:52px;font-weight:800;color:rgba(240,107,40,.35);letter-spacing:-3px;line-height:1;margin-bottom:16px;">02</div>
-        <div style="font-family:'Sora',system-ui,sans-serif;font-size:16px;font-weight:700;color:#F2F0EC;margin-bottom:10px;letter-spacing:-.3px;">Gestores Comerciais</div>
-        <div style="font-size:13px;color:#7E7D8C;line-height:1.7;margin-bottom:16px;flex:1;">Posts LinkedIn que geram leads B2B, vídeos de autoridade e criativos com copy de alta conversão.</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <span style="border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:4px 10px;font-size:11px;color:#7E7D8C;">LinkedIn</span>
-          <span style="border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:4px 10px;font-size:11px;color:#7E7D8C;">YouTube</span>
-        </div>
-      </div>
-
-      <div style="background:#111116;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:28px 24px 24px;display:flex;flex-direction:column;">
-        <div style="font-family:'Sora',system-ui,sans-serif;font-size:52px;font-weight:800;color:rgba(240,107,40,.35);letter-spacing:-3px;line-height:1;margin-bottom:16px;">03</div>
-        <div style="font-family:'Sora',system-ui,sans-serif;font-size:16px;font-weight:700;color:#F2F0EC;margin-bottom:10px;letter-spacing:-.3px;">Criadores de Conteúdo</div>
-        <div style="font-size:13px;color:#7E7D8C;line-height:1.7;margin-bottom:16px;flex:1;">Roteiros, capas e legendas em minutos. Consistência visual entre todos os canais sem designer.</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <span style="border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:4px 10px;font-size:11px;color:#7E7D8C;">TikTok</span>
-          <span style="border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:4px 10px;font-size:11px;color:#7E7D8C;">Reels</span>
-          <span style="border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:4px 10px;font-size:11px;color:#7E7D8C;">Capa</span>
-        </div>
-      </div>
-
-      <div style="background:#111116;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:28px 24px 24px;display:flex;flex-direction:column;">
-        <div style="font-family:'Sora',system-ui,sans-serif;font-size:52px;font-weight:800;color:rgba(240,107,40,.35);letter-spacing:-3px;line-height:1;margin-bottom:16px;">04</div>
-        <div style="font-family:'Sora',system-ui,sans-serif;font-size:16px;font-weight:700;color:#F2F0EC;margin-bottom:10px;letter-spacing:-.3px;">Psicólogos e Profissionais de Saúde</div>
-        <div style="font-size:13px;color:#7E7D8C;line-height:1.7;margin-bottom:16px;flex:1;">Conteúdo educativo que gera confiança, atrai pacientes e posiciona autoridade de forma ética.</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <span style="border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:4px 10px;font-size:11px;color:#7E7D8C;">Legenda</span>
-          <span style="border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:4px 10px;font-size:11px;color:#7E7D8C;">Story</span>
-        </div>
-      </div>
-
-      <div style="background:#111116;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:28px 24px 24px;display:flex;flex-direction:column;">
-        <div style="font-family:'Sora',system-ui,sans-serif;font-size:52px;font-weight:800;color:rgba(240,107,40,.35);letter-spacing:-3px;line-height:1;margin-bottom:16px;">05</div>
-        <div style="font-family:'Sora',system-ui,sans-serif;font-size:16px;font-weight:700;color:#F2F0EC;margin-bottom:10px;letter-spacing:-.3px;">E-commerce e Infoprodutos</div>
-        <div style="font-size:13px;color:#7E7D8C;line-height:1.7;margin-bottom:16px;flex:1;">Criativos de anúncio com alta CTR, stories de produto e thumbnails que aumentam alcance orgânico.</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <span style="border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:4px 10px;font-size:11px;color:#7E7D8C;">Anúncio</span>
-          <span style="border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:4px 10px;font-size:11px;color:#7E7D8C;">Thumbnail</span>
-        </div>
-      </div>
-
-      <div style="background:#111116;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:28px 24px 24px;display:flex;flex-direction:column;">
-        <div style="font-family:'Sora',system-ui,sans-serif;font-size:52px;font-weight:800;color:rgba(240,107,40,.35);letter-spacing:-3px;line-height:1;margin-bottom:16px;">06</div>
-        <div style="font-family:'Sora',system-ui,sans-serif;font-size:16px;font-weight:700;color:#F2F0EC;margin-bottom:10px;letter-spacing:-.3px;">Qualquer profissional liberal</div>
-        <div style="font-size:13px;color:#7E7D8C;line-height:1.7;margin-bottom:16px;flex:1;">Médicos, advogados, arquitetos, contadores — o AutoPostt adapta tom e formato ao seu nicho automaticamente.</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <span style="border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:4px 10px;font-size:11px;color:#7E7D8C;">LinkedIn</span>
-          <span style="border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:4px 10px;font-size:11px;color:#7E7D8C;">Legenda</span>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <div style="height:1px;background:rgba(255,255,255,.06);max-width:1180px;margin:0 auto;"></div>
-
-    <!-- PLANOS -->
-  <div class="l-section" id="land-precos" style="padding-top:0">
-    <div class="l-section-eyebrow"><div class="l-section-eyebrow-dot"></div><div class="l-section-eyebrow-txt">Planos</div></div>
-    <h2 class="l-section-h">Quanto custa continuar<br><span style="color:var(--lac)">fazendo isso manualmente?</span></h2>
-    <p class="l-section-sub">Tempo também é custo. E você está pagando todo dia. Cancele quando quiser.</p>
-    <div class="l-plans" id="land-plans-grid">
-      <div class="l-plan">
-        <div class="l-plan-name">Free</div>
-        <div class="l-plan-price">Grátis</div>
-        <div class="l-plan-quota">10 gerações por mês</div>
-        <div class="l-plan-feat"><span class="l-plan-feat-icon">→</span>Post e Story</div>
-        <div class="l-plan-feat"><span class="l-plan-feat-icon">→</span>Perfil de marca básico</div>
-        <div class="l-plan-feat"><span class="l-plan-feat-icon">→</span>Agente refinador de prompt</div>
-        <button class="l-plan-btn l-plan-btn-ghost" onclick="go('signup')">Começar grátis</button>
-      </div>
-      <div class="l-plan feat">
-        <div class="l-plan-badge">MAIS ESCOLHIDO</div>
-        <div class="l-plan-name">Pro</div>
-        <div class="l-plan-price">R$47<span>/mês</span></div>
-        <div class="l-plan-quota">100 gerações por mês</div>
-        <div class="l-plan-social">Mais escolhido por criadores de conteúdo</div>
-        <div class="l-plan-feat"><span class="l-plan-feat-icon">→</span>Todos os 8 agentes</div>
-        <div class="l-plan-feat"><span class="l-plan-feat-icon">→</span>Geração de imagem com IA</div>
-        <div class="l-plan-feat"><span class="l-plan-feat-icon">→</span>Histórico ilimitado</div>
-        <div class="l-plan-feat"><span class="l-plan-feat-icon">→</span>Perfil de marca completo</div>
-        <button class="l-plan-btn l-plan-btn-cta" onclick="go('signup')">Assinar Pro →</button>
-      </div>
-      <div class="l-plan">
-        <div class="l-plan-name">Elite</div>
-        <div class="l-plan-price">R$97<span>/mês</span></div>
-        <div class="l-plan-quota">500 gerações por mês</div>
-        <div class="l-plan-feat"><span class="l-plan-feat-icon">→</span>Tudo do Pro</div>
-        <div class="l-plan-feat"><span class="l-plan-feat-icon">→</span>API access</div>
-        <div class="l-plan-feat"><span class="l-plan-feat-icon">→</span>Suporte prioritário</div>
-        <div class="l-plan-feat"><span class="l-plan-feat-icon">→</span>Múltiplos perfis de marca</div>
-        <button class="l-plan-btn l-plan-btn-ghost" onclick="go('signup')">Assinar Elite</button>
-      </div>
-    </div>
-    <p style="text-align:center;font-size:11px;color:var(--ltx3);margin-top:18px">Pagamento via cartão ou Pix · Cancelamento imediato · Sem multa</p>
-  </div>
-
-  <!-- CTA BANNER -->
-  <div class="l-cta-banner">
-    <div>
-      <div class="l-cta-h">Enquanto você lê isso,<br>seu concorrente já publicou.</div>
-      <p class="l-cta-sub">Ele criou legenda, roteiro e post para 3 redes — em menos de 5 minutos. Sua conta grátis está a 2 cliques.</p>
-    </div>
-    <div class="l-cta-right">
-      <button class="l-btn-main" onclick="go('signup')" style="font-size:14px;padding:15px 28px">
-        Criar conta grátis
-        <svg style="width:15px;height:15px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </button>
-      <p class="l-cta-note">Grátis para sempre · Upgrade quando quiser</p>
-    </div>
-  </div>
-
-  <!-- FOOTER -->
-  <div class="l-footer">
-    <div class="l-footer-logo">Auto<b>Postt</b></div>
-    <div class="l-footer-copy">© 2025 AutoPostt · Todos os direitos reservados</div>
-  </div>
-
-</div>
-
 <!-- ══ LOGIN ══ -->
-<div class="sc" id="sc-login">
+<div class="sc on" id="sc-login">
   <div class="auth-split">
 
     <!-- LEFT: Brand + Live preview -->
@@ -5107,7 +3307,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                 <div class="img-preview-thumb" id="img-preview-thumb" onclick="openImgModal()">
                   <!-- SVG/Canvas renderizado aqui -->
                 </div>
-                <div style="display:flex;gap:7px;margin-top:2px">
+                <div style="display:flex;gap:7px;margin-top:2px;flex-wrap:wrap">
                   <button class="btn btn-p btn-sm" style="flex:1" onclick="openImgModal()">
                     <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                     Ver em tela cheia
@@ -5118,6 +3318,10 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                   </button>
                   <button class="btn btn-s btn-sm btn-icon" onclick="gerarImagem()" title="Regerar imagem">
                     <svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
+                  </button>
+                  <button class="btn btn-s btn-sm" onclick="saveImageToMemoryBank()" title="Salvar no banco de memória visual" style="background:var(--amber-10);border-color:var(--amber-18);color:var(--amber)">
+                    <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                    Salvar no banco
                   </button>
                 </div>
               </div>
@@ -5197,16 +3401,48 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
             <div class="pb-title">Identidade visual</div>
             <div class="form-row"><label>Cores da marca</label>
               <div class="c-dots" style="margin-bottom:14px" id="prof-color-dots">
-                <div class="c-dot" id="prof-c1" style="background:#F36B2A;border-color:rgba(243,107,42,.4)" onclick="editColorDot(this)" title="Clique para editar"></div>
+                <div class="c-dot" id="prof-c1" style="background:#F5C518;border-color:rgba(245,197,24,.4)" onclick="editColorDot(this)" title="Clique para editar"></div>
                 <div class="c-dot" id="prof-c2" style="background:#0F1113" onclick="editColorDot(this)" title="Clique para editar"></div>
                 <div class="c-dot c-dot-add" onclick="addColorDot()" title="Adicionar cor">+</div>
               </div>
             </div>
             <div class="form-row"><label>Estilo visual</label><select id="prof-estilo"><option value="Dark Luxury">Dark Luxury</option><option value="Minimalista">Minimalista</option><option value="Editorial">Editorial</option><option value="Futurista">Futurista</option></select></div>
-            <div class="form-row"><label>Redes ativas</label>
-              <div class="chips" id="prof-redes">
-                <div class="chip" onclick="tc(this)">Instagram</div><div class="chip" onclick="tc(this)">LinkedIn</div>
-                <div class="chip" onclick="tc(this)">YouTube</div><div class="chip" onclick="tc(this)">TikTok</div>
+            <div class="form-row"><label>Redes integradas</label>
+              <div id="prof-redes-integrations">
+                <!-- populated by loadProfile() -->
+                <div style="font-size:12px;color:var(--tx-2);margin-bottom:10px">
+                  Conecte suas redes para publicar diretamente pela plataforma.
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px" id="redes-status-list">
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--ink-3);border:1px solid var(--line-1);border-radius:8px">
+                    <div style="display:flex;align-items:center;gap:8px">
+                      <svg style="width:14px;height:14px;fill:none;stroke:var(--tx-2);stroke-width:1.8" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                      <span style="font-size:12.5px;color:var(--tx-1)">Instagram</span>
+                    </div>
+                    <button class="btn btn-s btn-sm" onclick="nav('settings')" style="font-size:11px">Integrar →</button>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--ink-3);border:1px solid var(--line-1);border-radius:8px">
+                    <div style="display:flex;align-items:center;gap:8px">
+                      <svg style="width:14px;height:14px;fill:none;stroke:var(--tx-2);stroke-width:1.8" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                      <span style="font-size:12.5px;color:var(--tx-1)">LinkedIn</span>
+                    </div>
+                    <button class="btn btn-s btn-sm" onclick="nav('settings')" style="font-size:11px">Integrar →</button>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--ink-3);border:1px solid var(--line-1);border-radius:8px">
+                    <div style="display:flex;align-items:center;gap:8px">
+                      <svg style="width:14px;height:14px;fill:none;stroke:var(--tx-2);stroke-width:1.8" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
+                      <span style="font-size:12.5px;color:var(--tx-1)">YouTube</span>
+                    </div>
+                    <button class="btn btn-s btn-sm" onclick="nav('settings')" style="font-size:11px">Integrar →</button>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--ink-3);border:1px solid var(--line-1);border-radius:8px">
+                    <div style="display:flex;align-items:center;gap:8px">
+                      <svg style="width:14px;height:14px;fill:none;stroke:var(--tx-2);stroke-width:1.8" viewBox="0 0 24 24"><path d="M9 12a3 3 0 1 0 6 0 3 3 0 0 0-6 0M15 8h.01M19 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/></svg>
+                      <span style="font-size:12.5px;color:var(--tx-1)">TikTok</span>
+                    </div>
+                    <button class="btn btn-s btn-sm" onclick="nav('settings')" style="font-size:11px">Integrar →</button>
+                  </div>
+                </div>
               </div>
             </div>
             <button class="btn btn-p btn-sm" style="margin-top:4px" onclick="saveProfile()">Salvar</button>
@@ -5896,7 +4132,12 @@ function go(s) {
 // APP BOOT — restore session on page load
 // ─────────────────────────────────────────────────
 (async () => {
-  if (!token) return; // no token → landing stays visible
+  // Handle ?screen= from LP
+  const _lpScreen = new URLSearchParams(window.location.search).get('screen');
+  if (_lpScreen && document.getElementById('sc-' + _lpScreen)) {
+    go(_lpScreen);
+  }
+  if (!token) return;
   try {
     const data = await api('GET', '/api/auth/me');
     me = data.user;
@@ -6877,7 +5118,9 @@ async function runAgent(slug, tipo, rede) {
   document.getElementById('ag-' + slug + '-sk').classList.add('vis');
   try {
     const mediaFiles = (window._agentMedia[slug] || []).slice(0, 3); // max 3 files
-    const body = { agent: slug, input, tom, tipo, rede };
+    const _vmData = localStorage.getItem('autopostt_visual_memory');
+    const _vmNotes = _vmData ? (JSON.parse(_vmData).notes || '') : '';
+    body = { agent: slug, input, tom, tipo, rede, visualMemoryNotes: _vmNotes };
     if (mediaFiles.length) body.mediaFiles = mediaFiles;
     const res = await api('POST', '/api/user/generate-content', body);
     document.getElementById('ag-' + slug + '-sk').classList.remove('vis');
@@ -7444,7 +5687,7 @@ function addColorDot() {
   const dots = document.getElementById('prof-color-dots');
   if (!dots) return;
   const addBtn = dots.querySelector('.c-dot-add');
-  const color = '#F36B2A';
+  const color = '#F5C518';
   const wrap = document.createElement('div');
   wrap.style.cssText = 'position:relative;display:inline-flex';
   const newDot = document.createElement('div');
@@ -7472,7 +5715,7 @@ function editColorDot(dot) {
   popup.style.cssText = 'position:absolute;z-index:200;background:var(--bg2);border:1px solid var(--b2);border-radius:var(--r2);padding:6px;display:flex;gap:4px;box-shadow:0 4px 16px rgba(0,0,0,.4)';
   const input = document.createElement('input');
   input.type = 'color';
-  input.value = dot.style.background.startsWith('#') ? dot.style.background : '#F36B2A';
+  input.value = dot.style.background.startsWith('#') ? dot.style.background : '#F5C518';
   input.style.cssText = 'width:32px;height:32px;border:none;border-radius:4px;cursor:pointer;background:none;padding:0';
   input.title = 'Alterar cor';
   const delBtn = document.createElement('button');
@@ -7750,6 +5993,49 @@ function saveVisualMemory() {
   localStorage.setItem('autopostt_visual_memory', JSON.stringify({notes}));
   toast('Memória visual salva! A IA aplicará nas próximas gerações.','ok');
 }
+function saveImageToMemoryBank() {
+  const svgData = window._currentSVG;
+  if (!svgData) { toast('Gere uma imagem primeiro', 'err'); return; }
+  // Convert SVG to data URL for memory bank
+  const blob = new Blob([svgData], {type:'image/svg+xml'});
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  const canvas = document.createElement('canvas');
+  canvas.width = 200; canvas.height = 200;
+  img.onload = function() {
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, 200, 200);
+    URL.revokeObjectURL(url);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+    // Add to memory refs
+    window._memoryRefs = window._memoryRefs || [];
+    window._memoryRefs.push(dataUrl);
+    // Save to localStorage
+    const existing = JSON.parse(localStorage.getItem('autopostt_visual_memory') || '{"notes":"","refs":[]}');
+    existing.refs = existing.refs || [];
+    existing.refs.push(dataUrl);
+    if (existing.refs.length > 12) existing.refs = existing.refs.slice(-12);
+    localStorage.setItem('autopostt_visual_memory', JSON.stringify(existing));
+    // Update memory bank thumbs
+    const thumbs = document.getElementById('mem-thumbs');
+    if (thumbs) {
+      const imgEl = document.createElement('img');
+      imgEl.src = dataUrl;
+      imgEl.style.cssText = 'width:60px;height:60px;object-fit:cover;border-radius:6px;border:1.5px solid var(--amber-18)';
+      thumbs.prepend(imgEl);
+    }
+    toast('Salvo no banco de memória visual! A IA usará nas próximas gerações.', 'ok');
+  };
+  img.onerror = function() {
+    // Fallback: save SVG directly as note
+    const existing = JSON.parse(localStorage.getItem('autopostt_visual_memory') || '{"notes":""}');
+    existing.svgRef = svgData.slice(0, 500);
+    localStorage.setItem('autopostt_visual_memory', JSON.stringify(existing));
+    toast('Estilo salvo no banco de memória!', 'ok');
+  };
+  img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+}
+
 function clearVisualMemory() {
   window._memoryRefs = [];
   window._visualMemory = null;
@@ -7763,6 +6049,15 @@ function clearVisualMemory() {
 
 // ─── RESTORE SAVED DATA ON BOOT ───
 function restoreSavedData() {
+  // Restore visual memory refs
+  try {
+    const vmData = localStorage.getItem('autopostt_visual_memory');
+    if (vmData) {
+      const parsed = JSON.parse(vmData);
+      window._memoryRefs = parsed.refs || [];
+      if (parsed.notes) window._visualMemory = { notes: parsed.notes };
+    }
+  } catch(e) {}
   const logo = localStorage.getItem('autopostt_logo');
   if (logo) {
     window._logoData = logo;
