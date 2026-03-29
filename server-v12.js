@@ -1099,8 +1099,21 @@ route('GET', '/admin', async (req, res) => {
 });
 
 route('GET', '/', async (req, res) => {
-  const file = path.join(__dirname, 'gerai-v3.html');
-  if (!fs.existsSync(file)) { ok(res, { status: 'AutoPostt API running', version: '1.0.0' }); return; }
+  // Try landing.html first, then app, then JSON fallback
+  const landing = path.join(__dirname, 'landing.html');
+  const appFile = path.join(__dirname, 'autopostt-app.html');
+  const legacy  = path.join(__dirname, 'gerai-v3.html');
+  const file = fs.existsSync(landing) ? landing : fs.existsSync(appFile) ? appFile : fs.existsSync(legacy) ? legacy : null;
+  if (!file) { ok(res, { status: 'AutoPostt API running', version: '1.0.0' }); return; }
+  res.writeHead(200, { 'Content-Type': 'text/html' });
+  fs.createReadStream(file).pipe(res);
+});
+
+route('GET', '/app', async (req, res) => {
+  const appFile = path.join(__dirname, 'autopostt-app.html');
+  const legacy  = path.join(__dirname, 'gerai-v3.html');
+  const file = fs.existsSync(appFile) ? appFile : fs.existsSync(legacy) ? legacy : null;
+  if (!file) { err(res, 'App não encontrado', 404); return; }
   res.writeHead(200, { 'Content-Type': 'text/html' });
   fs.createReadStream(file).pipe(res);
 });
