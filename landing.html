@@ -706,6 +706,24 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opa
 }
 
 
+
+/* ── DEMO TABS v2 ── */
+.l-demo-tab { cursor:pointer; transition:all .15s; }
+.l-demo-tab.on { color:var(--gold); border-bottom-color:var(--gold); font-weight:600; }
+#demo-templates-grid svg { display:block; }
+.demo-tpl {
+  background:var(--bg3); border:1.5px solid var(--line);
+  border-radius:8px; overflow:hidden; cursor:pointer;
+  transition:border-color .15s, transform .15s;
+  position:relative;
+}
+.demo-tpl:hover { border-color:rgba(245,197,24,.4); transform:scale(1.02); }
+.demo-tpl.selected { border-color:var(--gold); box-shadow:0 0 12px rgba(245,197,24,.2); }
+.demo-tpl-label {
+  font-size:9px; font-weight:700; color:var(--t2);
+  padding:4px 6px; letter-spacing:.05em; text-align:center;
+  background:var(--bg4); border-top:1px solid var(--line);
+}
 </style>
 </head>
 <body>
@@ -713,8 +731,15 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opa
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-brand">
-    <div class="nav-mark">
-      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="14" height="12" rx="2"/><path d="M17 9l4-3v10l-4-3"/><line x1="7" y1="9" x2="13" y2="9"/><line x1="7" y1="12" x2="11" y2="12"/></svg>
+    <div class="nav-mark" style="background:linear-gradient(135deg,#1A1600,#0D0D0F)">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px">
+        <defs><linearGradient id="lg" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#E6AC00"/><stop offset="100%" stop-color="#FFD740"/></linearGradient></defs>
+        <rect x="8" y="22" width="62" height="62" rx="14" fill="none" stroke="url(#lg)" stroke-width="10"/>
+        <line x1="18" y1="48" x2="58" y2="48" stroke="url(#lg)" stroke-width="9" stroke-linecap="round"/>
+        <line x1="18" y1="64" x2="46" y2="64" stroke="url(#lg)" stroke-width="9" stroke-linecap="round"/>
+        <polygon points="56,8 92,8 92,44" fill="url(#lg)"/>
+        <line x1="56" y1="44" x2="88" y2="12" stroke="url(#lg)" stroke-width="10" stroke-linecap="round"/>
+      </svg>
     </div>
     <div class="nav-name">Auto<b>Postt</b></div>
   </div>
@@ -777,7 +802,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opa
           <!-- Sidebar nav (like real app) -->
           <div class="l-demo-sidebar">
             <div class="l-demo-sb-logo">
-              <div class="l-demo-sb-mark"><svg viewBox="0 0 24 24" style="width:11px;height:11px;fill:none;stroke:#0D0D0F;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"><rect x="3" y="5" width="14" height="12" rx="2"/><path d="M17 9l4-3v10l-4-3"/><line x1="7" y1="9" x2="13" y2="9"/><line x1="7" y1="12" x2="11" y2="12"/></svg></div>
+              <div class="l-demo-sb-mark"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px"><defs><linearGradient id="dlg" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#E6AC00"/><stop offset="100%" stop-color="#FFD740"/></linearGradient></defs><rect x="8" y="22" width="62" height="62" rx="14" fill="none" stroke="url(#dlg)" stroke-width="10"/><line x1="18" y1="48" x2="58" y2="48" stroke="url(#dlg)" stroke-width="9" stroke-linecap="round"/><line x1="18" y1="64" x2="46" y2="64" stroke="url(#dlg)" stroke-width="9" stroke-linecap="round"/><polygon points="56,8 92,8 92,44" fill="url(#dlg)"/><line x1="56" y1="44" x2="88" y2="12" stroke="url(#dlg)" stroke-width="10" stroke-linecap="round"/></svg></div>
               <span>Auto<b>Postt</b></span>
             </div>
             <div class="l-demo-sb-lbl">Agentes</div>
@@ -867,22 +892,29 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opa
                     </div>
                   </div>
                   <div class="l-demo-panel-right">
+                    <!-- TABS -->
                     <div class="l-demo-tabs">
-                      <div class="l-demo-tab active">Conceitos</div>
-                      <div class="l-demo-tab">Imagem gerada</div>
+                      <div class="l-demo-tab on" id="dtab-concepts" onclick="switchDemoTab('concepts')">Modelos</div>
+                      <div class="l-demo-tab" id="dtab-result" onclick="switchDemoTab('result')">Imagem gerada</div>
                     </div>
-                    <div class="l-demo-loading" id="demo-loading">
+
+                    <!-- LOADING -->
+                    <div class="l-demo-loading" id="demo-loading" style="display:none">
                       <span id="demo-loading-txt">Analisando identidade visual...</span>
                       <div class="l-demo-bar-wrap"><div class="l-demo-bar" id="demo-bar"></div></div>
                     </div>
-                    <div class="l-demo-output l-demo-output-img" id="demo-output-img" style="display:none">
-                      <div class="l-demo-output-label">Imagem gerada pela IA</div>
-                      <div class="l-demo-carousel-preview" id="demo-carousel-preview"></div>
-                      <div class="l-demo-output-copy"><div class="l-demo-copy-btn">Baixar JPG ↓</div></div>
+
+                    <!-- TAB: 10 TEMPLATE MODELS -->
+                    <div id="dtab-concepts-panel" style="overflow-y:auto;max-height:400px;padding:8px">
+                      <div style="font-size:9.5px;font-weight:700;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;opacity:.7">Escolha um modelo</div>
+                      <div id="demo-templates-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
                     </div>
-                    <div class="l-demo-img-empty" id="demo-img-empty">
-                      <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:var(--ltx3);stroke-width:1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                      <span>Descreva sua ideia e clique em Gerar</span>
+
+                    <!-- TAB: GENERATED CAROUSEL -->
+                    <div id="dtab-result-panel" style="display:none;padding:8px">
+                      <div class="l-demo-output-label" style="margin-bottom:8px">Gerado com seu branding</div>
+                      <div class="l-demo-carousel-preview" id="demo-carousel-preview" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px"></div>
+                      <div class="l-demo-output-copy" style="margin-top:8px"><div class="l-demo-copy-btn">Baixar JPG ↓</div></div>
                     </div>
                   </div>
                 </div>
@@ -1153,7 +1185,14 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opa
 <footer class="footer">
   <div class="footer-brand">
     <div class="footer-mark">
-      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="14" height="12" rx="2"/><path d="M17 9l4-3v10l-4-3"/><line x1="7" y1="9" x2="13" y2="9"/><line x1="7" y1="12" x2="11" y2="12"/></svg>
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px">
+        <defs><linearGradient id="lg" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#E6AC00"/><stop offset="100%" stop-color="#FFD740"/></linearGradient></defs>
+        <rect x="8" y="22" width="62" height="62" rx="14" fill="none" stroke="url(#lg)" stroke-width="10"/>
+        <line x1="18" y1="48" x2="58" y2="48" stroke="url(#lg)" stroke-width="9" stroke-linecap="round"/>
+        <line x1="18" y1="64" x2="46" y2="64" stroke="url(#lg)" stroke-width="9" stroke-linecap="round"/>
+        <polygon points="56,8 92,8 92,44" fill="url(#lg)"/>
+        <line x1="56" y1="44" x2="88" y2="12" stroke="url(#lg)" stroke-width="10" stroke-linecap="round"/>
+      </svg>
     </div>
     <span>© 2025 AutoPostt · Todos os direitos reservados</span>
   </div>
@@ -1254,398 +1293,405 @@ loadLandingPlans();
 
   // ── DEMO AGENT CONFIG ──
   var DEMO_AGENTS = {
-    imagem:  [
-      { input:'Post sobre os 3 maiores erros de gestão comercial', fmt:'Post único',    stages:['Analisando identidade visual...','Construindo layout...','Aplicando marca...'],  imageMode:true, fmtIdx:0 },
-      { input:'Carrossel com os 5 erros que impedem vendedores',   fmt:'Carrossel',     stages:['Estruturando slides...','Aplicando grid...','Renderizando...'],                   imageMode:true, fmtIdx:1 },
-      { input:'Anúncio de alta conversão para curso de vendas',    fmt:'Anúncio',       stages:['Analisando copy...','Definindo hierarquia...','Gerando criativo...'],             imageMode:true, fmtIdx:2 },
-      { input:'Story de autoridade para coach de negócios',        fmt:'Story',         stages:['Criando sequência...','Aplicando cor da marca...','Finalizando...'],              imageMode:true, fmtIdx:3 },
-      { input:'Thumbnail de impacto para vídeo sobre vendas',      fmt:'Thumbnail',     stages:['Analisando CTR...','Construindo composição...','Refinando...'],                  imageMode:true, fmtIdx:4 },
-      { input:'Banner LinkedIn para profissional de vendas',       fmt:'Banner',        stages:['Definindo proporção...','Aplicando identidade...','Renderizando banner...'],      imageMode:true, fmtIdx:5 },
-    ],
-    legenda: { label:'Gerador de Legenda', sub:'Cria legendas otimizadas para engajamento com CTAs, hashtags e emojis estratégicos.', btnLabel:'Gerar Legenda' },
-    reels:   { label:'Roteiro para Reels', sub:'Scripts de 30–90s com gancho nos primeiros 3 segundos para máximo alcance.', btnLabel:'Gerar Roteiro Reels' },
-    linkedin:{ label:'Post LinkedIn',      sub:'Posts estruturados com autoridade e CTA para gerar leads B2B qualificados.', btnLabel:'Gerar Post LinkedIn' },
-    story:   { label:'Ideias para Story',  sub:'Sequências de stories com narrativa, enquetes e interação para aumentar alcance.', btnLabel:'Gerar Ideias de Story' },
-    tiktok:  { label:'Roteiro TikTok',     sub:'Scripts virais de 30–60s com trend hook e call-to-action de alto impacto.', btnLabel:'Gerar Roteiro TikTok' },
-    yt:      { label:'Roteiro YouTube',    sub:'Roteiros completos com hook, desenvolvimento e CTA para vídeos de alta retenção.', btnLabel:'Gerar Roteiro YouTube' },
+    imagem:   { label:'Agente de Imagem',    topbar:'GerAI Studio — Agente de Imagem' },
+    legenda:  { label:'Legenda',             topbar:'GerAI Studio — Agente de Legenda' },
+    reels:    { label:'Roteiro Reels',       topbar:'GerAI Studio — Roteiro Reels' },
+    linkedin: { label:'Post LinkedIn',       topbar:'GerAI Studio — Post LinkedIn' },
+    story:    { label:'Story',               topbar:'GerAI Studio — Story Sequence' },
+    tiktok:   { label:'TikTok Script',       topbar:'GerAI Studio — TikTok Script' },
+    yt:       { label:'Roteiro YouTube',     topbar:'GerAI Studio — Roteiro YouTube' }
   };
 
-  var DEMO_SEQUENCES = {
-    imagem:  { input:'Carrossel sobre os 5 erros que impedem vendedores de bater meta', stages:['Analisando identidade visual...','Construindo composição...','Renderizando slides...'], imageMode:true },
-    legenda: { input:'Post sobre os 3 maiores erros de gestão comercial que custam vendas', stages:['Analisando contexto...','Aplicando tom de voz...','Estruturando CTA...'], output:'Você não precisa de mais leads.\nPrecisa parar de perder os que já tem.\n\n→ Erro 1: Pitch antes do diagnóstico\n→ Erro 2: Follow-up sem gatilho real\n→ Erro 3: Falta de cadência sistêmica\n\nQual está custando mais na sua operação?\n\n#gestãocomercial #vendas #liderança' },
-    reels:   { input:'Reels mostrando como estruturar uma rotina comercial de alta performance', stages:['Criando hook de 3s...','Estruturando script...','Adicionando CTAs...'], output:'[Abre câmera — olha direto]\n\nSe você não tem uma rotina, você não tem um negócio — você tem sorte. E sorte acaba.\n\n[Corte] Os 3 blocos que vendedores top protegem:\n\n✦ Prospecção ativa — todos os dias\n✦ Follow-up com gatilho\n✦ Revisão de pipeline — 15min\n\n[CTA] Salva esse roteiro.' },
-    linkedin:{ input:'Post sobre liderança comercial e construção de time de alta performance', stages:['Gerando hook B2B...','Estruturando narrativa...','Otimizando engajamento...'], output:'Contratei 12 vendedores em 2 anos.\n\nSó 3 passaram dos 6 meses.\n\nO padrão dos que ficaram me surpreendeu — não era o mais extrovertido nem o mais experiente.\n\nEra o que revisava o próprio pipeline toda sexta.\n\nLiderança comercial não é motivar. É criar hábitos que scalem.' },
-    story:   { input:'Stories para lançamento de mentoria de gestão comercial', stages:['Criando sequência...','Adicionando enquetes...','Estruturando arco...'], output:'Story 1 → Pergunta polêmica\nStory 2 → Enquete estratégica\nStory 3 → Revelação inesperada\nStory 4 → Prova social\nStory 5 → Bastidor real\nStory 6 → Objeção + quebra\nStory 7 → CTA com urgência' },
-    tiktok:  { input:'Vídeo sobre como fechei R$50k em vendas usando apenas o WhatsApp', stages:['Identificando trend hook...','Criando script viral...','Otimizando retenção...'], output:'[Áudio trending]\n\nPOV: você descobriu que dá pra fechar R$50k no WhatsApp sem cold call\n\n→ Mudei o timing do follow-up\n→ Criei sequência de 5 mensagens\n→ Parei de vender, comecei a diagnosticar\n\nResultado: R$52k em 23 dias.' },
-    yt:      { input:'Vídeo completo sobre como estruturar equipe comercial de alta performance', stages:['Criando hook de abertura...','Desenvolvendo estrutura...','Escrevendo CTA final...'], output:'[0:00–0:15] HOOK\n"Essa é a técnica que consultores cobram R$30k para ensinar."\n\n[0:15–2:00] SETUP\nContexto + Problema\n\n[2:00–12:00] CONTEÚDO\nPasso 1: Diagnóstico\nPasso 2: Cadência\nPasso 3: Métricas\n\n[12:00–13:00] CTA\n"Comenta sua maior dificuldade."' },
-  };
-
-  var _demoAgent = 'imagem';
-  var _demoAutoTimer = null;
   var _demoOrder = ['imagem','legenda','reels','linkedin','story','tiktok','yt'];
-  var _demoIdx = 0;
-  var _demoImgFmtIdx = 0;
-  var _demoRunning = false;
+  var _demoIdx   = 0;
+  var _selectedTpl = 0;
 
-  function demoNav(agent, el) {
-    // Update sidebar active state
-    document.querySelectorAll('.l-demo-nav-item').forEach(function(n){ n.classList.remove('active'); });
-    if (el) el.classList.add('active');
+  var ac  = '#F5C518';
+  var bg  = '#0D0D0F';
+  var bg2 = '#111116';
+  var bg3 = '#17171D';
+  var tx  = '#F5F4F0';
+  var tx2 = '#9E9C94';
 
-    // Update topbar
-    var cfg = DEMO_AGENTS[agent];
-    var tt = document.getElementById('demo-topbar-title');
-    if (tt && cfg) tt.textContent = 'AutoPostt Studio — ' + cfg.label;
-
-    // Show/hide panels
-    var imgPanel  = document.getElementById('dpanel-imagem');
-    var textPanel = document.getElementById('dpanel-legenda');
-    if (imgPanel)  imgPanel.style.display  = agent === 'imagem' ? 'block' : 'none';
-    if (textPanel) textPanel.style.display = agent !== 'imagem' ? 'block' : 'none';
-
-    // Update text panel content for current agent
-    if (agent !== 'imagem' && cfg) {
-      var titleEl = document.getElementById('dtitle-legenda');
-      var subEl   = document.getElementById('dsub-legenda');
-      var btnEl   = document.getElementById('demo-gen-btn-label');
-      if (titleEl) titleEl.textContent = cfg.label;
-      if (subEl)   subEl.textContent   = cfg.sub || '';
-      if (btnEl)   btnEl.textContent   = cfg.btnLabel || 'Gerar';
-    }
-
-    // Reset outputs
-    resetDemoOutputs();
-
-    _demoAgent = agent;
-    _demoIdx = _demoOrder.indexOf(agent);
-
-    // Clear auto timer and restart with this agent
-    if (_demoAutoTimer) clearTimeout(_demoAutoTimer);
-    _demoAutoTimer = setTimeout(function(){ runDemoSeq(agent); }, 800);
-  }
-
-  function resetDemoOutputs() {
-    var els = ['demo-loading','demo-loading-text','demo-output','demo-output-img','demo-text-empty','demo-img-empty'];
-    els.forEach(function(id){
-      var el = document.getElementById(id);
-      if (!el) return;
-      el.classList.remove('vis');
-      el.style.display = '';
-    });
-    var barEls = ['demo-bar','demo-bar-text'];
-    barEls.forEach(function(id){ var el=document.getElementById(id); if(el) el.style.width='0%'; });
-    var empty1 = document.getElementById('demo-img-empty');
-    var empty2 = document.getElementById('demo-text-empty');
-    if (empty1) empty1.style.display = 'flex';
-    if (empty2) empty2.style.display = 'flex';
-  }
-
-  function runDemoSeq(agent) {
-    if (!agent) agent = _demoAgent;
-    var seqData = DEMO_SEQUENCES[agent];
-    var seq = Array.isArray(seqData) ? seqData[_demoImgFmtIdx % seqData.length] : seqData;
-    if (!seq) return;
-    if (Array.isArray(seqData)) {
-      // update active format btn
-      var fmtBtns = document.querySelectorAll('.l-demo-fmt');
-      fmtBtns.forEach(function(b,i){ b.classList.toggle('active', i === (seq.fmtIdx||0)); });
-    }
-    if (!seq) return;
-    var cfg = DEMO_AGENTS[agent];
-
-    resetDemoOutputs();
-
-    // Type input
-    var inputEl = document.getElementById(agent === 'imagem' ? 'demo-input-text' : 'demo-text-input');
-    if (!inputEl) return;
-    inputEl.innerHTML = '<span class="l-demo-cursor"></span>';
-    var txt = seq.input, i = 0;
-    var typeTimer = setInterval(function() {
-      if (i >= txt.length) {
-        clearInterval(typeTimer);
-        startDemoLoading(agent, seq, cfg);
-        return;
+  // ── 10 TEMPLATE MODELS ──
+  var TEMPLATES = [
+    { name:'Dark Bold',    desc:'Fundo escuro, texto impactante, acento dourado',
+      svg: function(i) {
+        return '<svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'
+          + '<rect width="160" height="200" fill="#0D0D0F"/>'
+          + '<rect x="0" y="0" width="160" height="3" fill="#F5C518"/>'
+          + '<rect x="12" y="40" width="80" height="6" rx="3" fill="#F5C518"/>'
+          + '<rect x="12" y="54" width="136" height="28" rx="4" fill="rgba(245,197,24,.08)"/>'
+          + '<text x="12" y="72" font-family="system-ui" font-size="10" font-weight="800" fill="#F5F4F0">3 ERROS QUE</text>'
+          + '<text x="12" y="84" font-family="system-ui" font-size="10" font-weight="800" fill="#F5C518">DESTROEM VENDAS</text>'
+          + '<rect x="12" y="96" width="100" height="3" rx="1" fill="rgba(245,197,24,.2)"/>'
+          + '<rect x="12" y="105" width="136" height="4" rx="2" fill="rgba(255,255,255,.07)"/>'
+          + '<rect x="12" y="113" width="120" height="4" rx="2" fill="rgba(255,255,255,.07)"/>'
+          + '<rect x="12" y="121" width="100" height="4" rx="2" fill="rgba(255,255,255,.07)"/>'
+          + '<rect x="12" y="150" width="60" height="20" rx="4" fill="#F5C518"/>'
+          + '<text x="42" y="164" font-family="system-ui" font-size="8" font-weight="700" fill="#0D0D0F" text-anchor="middle">SAIBA MAIS</text>'
+          + '</svg>';
       }
-      inputEl.innerHTML = txt.slice(0,++i) + '<span class="l-demo-cursor"></span>';
-    }, 24);
-  }
-
-  function startDemoLoading(agent, seq, cfg) {
-    var loadId   = agent === 'imagem' ? 'demo-loading'      : 'demo-loading-text';
-    var loadTxt  = agent === 'imagem' ? 'demo-loading-txt'  : 'demo-loading-txt-text';
-    var barId    = agent === 'imagem' ? 'demo-bar'          : 'demo-bar-text';
-    var emptyId  = agent === 'imagem' ? 'demo-img-empty'    : 'demo-text-empty';
-
-    var loadEl  = document.getElementById(loadId);
-    var loadTEl = document.getElementById(loadTxt);
-    var barEl   = document.getElementById(barId);
-    var emptyEl = document.getElementById(emptyId);
-
-    if (emptyEl) emptyEl.style.display = 'none';
-    if (loadEl)  loadEl.classList.add('vis');
-
-    var si = 0;
-    var stageTimer = setInterval(function(){
-      if (loadTEl && si < seq.stages.length) loadTEl.textContent = seq.stages[si++];
-    }, 700);
-    var bw = 0;
-    var barTimer = setInterval(function(){
-      bw += 2.2;
-      if (barEl) barEl.style.width = Math.min(bw,92)+'%';
-      if (bw >= 92) clearInterval(barTimer);
-    }, 55);
-
-    setTimeout(function(){
-      clearInterval(stageTimer); clearInterval(barTimer);
-      if (barEl) barEl.style.width = '100%';
-      if (loadEl) loadEl.classList.remove('vis');
-
-      if (seq.imageMode) {
-        // Render SVG carousel
-        var imgOut  = document.getElementById('demo-output-img');
-        var preview = document.getElementById('demo-carousel-preview');
-        if (imgOut) { imgOut.style.display = 'block'; imgOut.classList.add('vis'); }
-        if (preview) {
-          preview.innerHTML = '';
-          buildCarouselSVGs().forEach(function(svg,i){
-            var d = document.createElement('div');
-            d.className = 'l-demo-carousel-slide';
-            d.innerHTML = svg;
-            d.style.animationDelay = (i*.1)+'s';
-            preview.appendChild(d);
-          });
-        }
-      } else {
-        // Render text output
-        var outWrap = document.getElementById('demo-output');
-        var outEl   = document.getElementById('demo-output-text');
-        if (outWrap) { outWrap.style.display = 'block'; outWrap.classList.add('vis'); }
-        if (outEl) {
-          outEl.textContent = '';
-          var o = seq.output || '', j = 0;
-          var printTimer = setInterval(function(){
-            if (j >= o.length){ clearInterval(printTimer); scheduleNextDemo(); return; }
-            outEl.textContent = o.slice(0,++j);
-          }, 9);
-          return;
-        }
+    },
+    { name:'Minimalista',  desc:'Muito espaço negativo, tipografia limpa',
+      svg: function(i) {
+        return '<svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'
+          + '<rect width="160" height="200" fill="#FAFAF9"/>'
+          + '<rect x="12" y="20" width="30" height="3" rx="1" fill="#F5C518"/>'
+          + '<text x="12" y="80" font-family="system-ui" font-size="13" font-weight="900" fill="#0D0D0F" letter-spacing="-1">Vender</text>'
+          + '<text x="12" y="96" font-family="system-ui" font-size="13" font-weight="900" fill="#F5C518" letter-spacing="-1">é sistema.</text>'
+          + '<rect x="12" y="108" width="136" height="1" fill="rgba(0,0,0,.08)"/>'
+          + '<rect x="12" y="116" width="120" height="3" rx="1" fill="rgba(0,0,0,.1)"/>'
+          + '<rect x="12" y="123" width="100" height="3" rx="1" fill="rgba(0,0,0,.1)"/>'
+          + '<rect x="12" y="130" width="80" height="3" rx="1" fill="rgba(0,0,0,.1)"/>'
+          + '<circle cx="20" cy="170" r="6" fill="#F5C518"/>'
+          + '<rect x="30" y="166" width="80" height="3" rx="1" fill="rgba(0,0,0,.1)"/>'
+          + '<rect x="30" y="173" width="60" height="3" rx="1" fill="rgba(0,0,0,.08)"/>'
+          + '</svg>';
       }
-      scheduleNextDemo();
-    }, 2800);
-  }
-
-  function scheduleNextDemo() {
-    // If imagem and still has formats, cycle format
-    if (_demoAgent === 'imagem' && Array.isArray(DEMO_SEQUENCES['imagem'])) {
-      _demoImgFmtIdx++;
-      if (_demoImgFmtIdx < DEMO_SEQUENCES['imagem'].length) {
-        _demoAutoTimer = setTimeout(function(){ runDemoSeq('imagem'); }, 2500);
-        return;
-      } else {
-        _demoImgFmtIdx = 0;
+    },
+    { name:'Gradient Hero', desc:'Gradiente vibrante, energia máxima',
+      svg: function(i) {
+        return '<svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'
+          + '<defs><linearGradient id="gh" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1A1600"/><stop offset="100%" stop-color="#0D0D0F"/></linearGradient></defs>'
+          + '<rect width="160" height="200" fill="url(#gh)"/>'
+          + '<ellipse cx="80" cy="60" rx="90" ry="55" fill="rgba(245,197,24,.12)"/>'
+          + '<text x="80" y="55" font-family="system-ui" font-size="11" font-weight="900" fill="#F5C518" text-anchor="middle" letter-spacing="-0.5">94%</text>'
+          + '<text x="80" y="70" font-family="system-ui" font-size="7" fill="#9E9C94" text-anchor="middle">dos gestores erram nisso</text>'
+          + '<rect x="16" y="90" width="128" height="1" fill="rgba(245,197,24,.15)"/>'
+          + '<text x="16" y="112" font-family="system-ui" font-size="9" font-weight="700" fill="#F5F4F0">O erro que custa</text>'
+          + '<text x="16" y="124" font-family="system-ui" font-size="9" font-weight="700" fill="#F5C518">30% das suas vendas</text>'
+          + '<rect x="16" y="136" width="112" height="3" rx="1" fill="rgba(255,255,255,.08)"/>'
+          + '<rect x="16" y="143" width="90" height="3" rx="1" fill="rgba(255,255,255,.08)"/>'
+          + '<rect x="16" y="170" width="128" height="18" rx="4" fill="rgba(245,197,24,.12)" stroke="#F5C518" stroke-width="1"/>'
+          + '<text x="80" y="182" font-family="system-ui" font-size="8" font-weight="600" fill="#F5C518" text-anchor="middle">Ver mais →</text>'
+          + '</svg>';
+      }
+    },
+    { name:'Split Layout',  desc:'Dois painéis: texto esquerda, visual direita',
+      svg: function(i) {
+        return '<svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'
+          + '<rect width="160" height="200" fill="#111116"/>'
+          + '<rect x="0" y="0" width="72" height="200" fill="#17171D"/>'
+          + '<rect x="0" y="0" width="3" height="200" fill="#F5C518"/>'
+          + '<text x="10" y="50" font-family="system-ui" font-size="7" font-weight="800" fill="#F5C518" letter-spacing="1">GESTÃO</text>'
+          + '<text x="10" y="80" font-family="system-ui" font-size="9" font-weight="900" fill="#F5F4F0" letter-spacing="-0.5">Lidere</text>'
+          + '<text x="10" y="93" font-family="system-ui" font-size="9" font-weight="900" fill="#F5F4F0">com</text>'
+          + '<text x="10" y="106" font-family="system-ui" font-size="9" font-weight="900" fill="#F5C518">dados.</text>'
+          + '<rect x="10" y="118" width="52" height="2" rx="1" fill="rgba(245,197,24,.3)"/>'
+          + '<rect x="84" y="30" width="64" height="64" rx="8" fill="rgba(245,197,24,.1)"/>'
+          + '<rect x="88" y="34" width="56" height="56" rx="6" fill="rgba(245,197,24,.08)"/>'
+          + '<text x="116" y="68" font-family="system-ui" font-size="18" font-weight="900" fill="#F5C518" text-anchor="middle">3x</text>'
+          + '<text x="116" y="80" font-family="system-ui" font-size="6" fill="#9E9C94" text-anchor="middle">mais resultado</text>'
+          + '<rect x="84" y="108" width="64" height="4" rx="2" fill="rgba(255,255,255,.08)"/>'
+          + '<rect x="84" y="116" width="50" height="4" rx="2" fill="rgba(255,255,255,.06)"/>'
+          + '</svg>';
+      }
+    },
+    { name:'Card Numerado', desc:'Cards com números grandes, didático',
+      svg: function(i) {
+        return '<svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'
+          + '<rect width="160" height="200" fill="#111116"/>'
+          + '<text x="12" y="52" font-family="system-ui" font-size="36" font-weight="900" fill="rgba(245,197,24,.15)" letter-spacing="-3">01</text>'
+          + '<rect x="12" y="56" width="136" height="1" fill="rgba(245,197,24,.12)"/>'
+          + '<text x="12" y="74" font-family="system-ui" font-size="9" font-weight="800" fill="#F5F4F0">Defina sua oferta</text>'
+          + '<text x="12" y="86" font-family="system-ui" font-size="9" font-weight="800" fill="#F5C518">antes de qualquer post</text>'
+          + '<rect x="12" y="96" width="136" height="3" rx="1" fill="rgba(255,255,255,.07)"/>'
+          + '<rect x="12" y="103" width="100" height="3" rx="1" fill="rgba(255,255,255,.07)"/>'
+          + '<rect x="12" y="130" width="136" height="1" fill="rgba(255,255,255,.05)"/>'
+          + '<text x="12" y="147" font-family="system-ui" font-size="7" fill="#9E9C94">AutoPostt · 1/5</text>'
+          + '</svg>';
+      }
+    },
+    { name:'Slab Serif',    desc:'Tipografia editorial, fontes serifadas',
+      svg: function(i) {
+        return '<svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'
+          + '<rect width="160" height="200" fill="#F7F5F0"/>'
+          + '<rect x="0" y="0" width="160" height="4" fill="#1A1600"/>'
+          + '<text x="12" y="28" font-family="Georgia,serif" font-size="7" fill="#9E9C94" letter-spacing="2">VENDAS · 2025</text>'
+          + '<rect x="12" y="34" width="136" height="1" fill="rgba(0,0,0,.12)"/>'
+          + '<text x="12" y="66" font-family="Georgia,serif" font-size="14" font-weight="700" fill="#0D0D0F">Processo</text>'
+          + '<text x="12" y="82" font-family="Georgia,serif" font-size="14" font-weight="700" fill="#0D0D0F">bate talento.</text>'
+          + '<text x="12" y="94" font-family="Georgia,serif" font-size="14" font-weight="700" fill="#F5C518">Sempre.</text>'
+          + '<rect x="12" y="106" width="40" height="3" rx="1" fill="#F5C518"/>'
+          + '<rect x="12" y="116" width="136" height="3" rx="1" fill="rgba(0,0,0,.08)"/>'
+          + '<rect x="12" y="123" width="110" height="3" rx="1" fill="rgba(0,0,0,.08)"/>'
+          + '<rect x="12" y="130" width="120" height="3" rx="1" fill="rgba(0,0,0,.08)"/>'
+          + '<rect x="12" y="165" width="136" height="1" fill="rgba(0,0,0,.1)"/>'
+          + '<text x="12" y="178" font-family="Georgia,serif" font-size="6" fill="#9E9C94">@autopostt</text>'
+          + '</svg>';
+      }
+    },
+    { name:'Storytelling',  desc:'Narrativa visual, foto + texto sobrepostos',
+      svg: function(i) {
+        return '<svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'
+          + '<rect width="160" height="200" fill="#1A1600"/>'
+          + '<rect width="160" height="200" fill="rgba(0,0,0,.5)"/>'
+          + '<defs><linearGradient id="st" x1="0%" y1="60%" x2="0%" y2="100%"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="#0D0D0F"/></linearGradient></defs>'
+          + '<rect width="160" height="200" fill="url(#st)"/>'
+          + '<rect x="16" y="16" width="24" height="3" rx="1" fill="#F5C518"/>'
+          + '<text x="16" y="155" font-family="system-ui" font-size="11" font-weight="900" fill="#F5F4F0" letter-spacing="-0.5">Comecei do</text>'
+          + '<text x="16" y="169" font-family="system-ui" font-size="11" font-weight="900" fill="#F5C518">zero. Duas vezes.</text>'
+          + '<rect x="16" y="178" width="80" height="3" rx="1" fill="rgba(255,255,255,.3)"/>'
+          + '<text x="16" y="192" font-family="system-ui" font-size="7" fill="rgba(255,255,255,.5)">Segue pra saber como →</text>'
+          + '</svg>';
+      }
+    },
+    { name:'Data Visual',   desc:'Gráficos e números, autoridade por dados',
+      svg: function(i) {
+        return '<svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'
+          + '<rect width="160" height="200" fill="#111116"/>'
+          + '<text x="12" y="28" font-family="system-ui" font-size="7" font-weight="600" fill="#9E9C94" letter-spacing="1">RELATÓRIO DE VENDAS</text>'
+          + '<rect x="12" y="36" width="136" height="1" fill="rgba(245,197,24,.15)"/>'
+          + '<rect x="12" y="48" width="20" height="80" rx="3" fill="rgba(245,197,24,.2)"/>'
+          + '<rect x="36" y="68" width="20" height="60" rx="3" fill="rgba(245,197,24,.35)"/>'
+          + '<rect x="60" y="58" width="20" height="70" rx="3" fill="rgba(245,197,24,.5)"/>'
+          + '<rect x="84" y="38" width="20" height="90" rx="3" fill="#F5C518"/>'
+          + '<rect x="108" y="48" width="20" height="80" rx="3" fill="rgba(245,197,24,.6)"/>'
+          + '<rect x="132" y="58" width="16" height="70" rx="3" fill="rgba(245,197,24,.4)"/>'
+          + '<rect x="12" y="132" width="136" height="1" fill="rgba(255,255,255,.06)"/>'
+          + '<text x="12" y="148" font-family="system-ui" font-size="9" font-weight="800" fill="#F5C518">+240%</text>'
+          + '<text x="12" y="160" font-family="system-ui" font-size="8" fill="#F5F4F0">em 90 dias com</text>'
+          + '<text x="12" y="172" font-family="system-ui" font-size="8" fill="#F5F4F0">conteúdo consistente</text>'
+          + '</svg>';
+      }
+    },
+    { name:'Citação',       desc:'Quote impactante, design editorial',
+      svg: function(i) {
+        return '<svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'
+          + '<rect width="160" height="200" fill="#17171D"/>'
+          + '<text x="12" y="52" font-family="Georgia,serif" font-size="40" fill="rgba(245,197,24,.15)" font-weight="900">"</text>'
+          + '<text x="16" y="90" font-family="Georgia,serif" font-size="9" font-style="italic" fill="#F5F4F0">Vender bem não é</text>'
+          + '<text x="16" y="103" font-family="Georgia,serif" font-size="9" font-style="italic" fill="#F5F4F0">sorte. É método.</text>'
+          + '<rect x="16" y="116" width="30" height="2" rx="1" fill="#F5C518"/>'
+          + '<text x="16" y="134" font-family="system-ui" font-size="8" font-weight="600" fill="#9E9C94">Pedro Alves · Mentor</text>'
+          + '<text x="16" y="146" font-family="system-ui" font-size="7" fill="#5E5C54">@pedroalves.mentor</text>'
+          + '<rect x="0" y="0" width="3" height="200" fill="rgba(245,197,24,.3)"/>'
+          + '</svg>';
+      }
+    },
+    { name:'Neon Urban',    desc:'Estilo urbano, alto contraste',
+      svg: function(i) {
+        return '<svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'
+          + '<rect width="160" height="200" fill="#080808"/>'
+          + '<rect x="8" y="8" width="144" height="184" rx="4" fill="none" stroke="rgba(245,197,24,.15)" stroke-width="1"/>'
+          + '<text x="80" y="75" font-family="system-ui" font-size="28" font-weight="900" fill="#F5C518" text-anchor="middle" letter-spacing="-2" filter="url(#neon)">5K</text>'
+          + '<text x="80" y="92" font-family="system-ui" font-size="7" fill="#9E9C94" text-anchor="middle" letter-spacing="2">SEGUIDORES EM</text>'
+          + '<text x="80" y="104" font-family="system-ui" font-size="7" fill="#9E9C94" text-anchor="middle" letter-spacing="2">30 DIAS</text>'
+          + '<rect x="24" y="120" width="112" height="1" fill="rgba(245,197,24,.2)"/>'
+          + '<rect x="24" y="130" width="112" height="4" rx="2" fill="rgba(255,255,255,.06)"/>'
+          + '<rect x="24" y="138" width="90" height="4" rx="2" fill="rgba(255,255,255,.06)"/>'
+          + '<rect x="24" y="162" width="112" height="20" rx="4" fill="#F5C518"/>'
+          + '<text x="80" y="176" font-family="system-ui" font-size="8" font-weight="800" fill="#080808" text-anchor="middle" letter-spacing="1">QUERO SABER COMO</text>'
+          + '</svg>';
       }
     }
-    _demoAutoTimer = setTimeout(function(){
-      _demoIdx = (_demoIdx + 1) % _demoOrder.length;
-      var nextAgent = _demoOrder[_demoIdx];
-      var navEl = document.getElementById('dnav-' + nextAgent);
-      demoNav(nextAgent, navEl);
-    }, 4000);
-  }
+  ];
 
-  // ── BUILD CAROUSEL SVGs ──
-
-  function buildCarouselSVGs() {
-    var ac  = '#F5C518';   // amber
-    var bg  = '#09090E';   // dark base
-    var bg2 = '#0D0D15';   // slide bg
-    var tx  = '#F2F0EC';   // white text
-    var tx2 = 'rgba(242,240,236,.5)'; // muted text
-
-    function base(content, idx) {
-      return '<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">'
-        + '<rect width="400" height="400" fill="' + bg2 + '"/>'
-        + '<defs><linearGradient id="gb' + idx + '" x1="0%" y1="0%" x2="100%" y2="100%">'
-        + '<stop offset="0%" stop-color="' + ac + '" stop-opacity=".12"/>'
-        + '<stop offset="100%" stop-color="transparent" stop-opacity="0"/>'
-        + '</linearGradient></defs>'
-        + '<rect width="400" height="400" fill="url(#gb' + idx + ')"/>'
-        + '<rect x="0" y="0" width="400" height="3" fill="' + ac + '"/>'
-        + content
-        + '<text x="360" y="390" font-family="system-ui,sans-serif" font-size="9" fill="rgba(242,240,236,.25)" text-anchor="middle" letter-spacing=".1em">'
-        + (idx) + '/7</text>'
-        + '</svg>';
-    }
-
-    function numBig(n) {
-      return '<text x="24" y="95" font-family="system-ui,sans-serif" font-size="72" font-weight="800" fill="' + ac + '" opacity=".13" letter-spacing="-4">'
-        + (n < 10 ? '0' + n : n) + '</text>';
-    }
-
-    function slideTitle(line1, line2) {
-      return '<text x="24" y="176" font-family="system-ui,sans-serif" font-size="17" font-weight="700" fill="' + tx + '" letter-spacing="-.4">' + line1 + '</text>'
-        + '<text x="24" y="198" font-family="system-ui,sans-serif" font-size="17" font-weight="700" fill="' + ac + '" letter-spacing="-.4">' + line2 + '</text>';
-    }
-
-    function slideDesc(line1, line2) {
-      return '<text x="24" y="232" font-family="system-ui,sans-serif" font-size="11" fill="' + tx2 + '">' + line1 + '</text>'
-        + (line2 ? '<text x="24" y="249" font-family="system-ui,sans-serif" font-size="11" fill="' + tx2 + '">' + line2 + '</text>' : '')
-        + '<line x1="24" y1="290" x2="110" y2="290" stroke="rgba(245,197,24,.28)" stroke-width="1"/>';
-    }
-
-    function badge(label) {
-      return '<text x="24" y="314" font-family="system-ui,sans-serif" font-size="9" fill="rgba(242,240,236,.28)" letter-spacing=".1em">' + label + '</text>';
-    }
-
-    var slides = [
-
-      // S1 — CAPA
-      base(
-        '<rect x="24" y="155" width="3" height="70" fill="' + ac + '" rx="2"/>'
-        + '<text x="38" y="190" font-family="system-ui,sans-serif" font-size="20" font-weight="800" fill="' + tx + '" letter-spacing="-1">5 erros que</text>'
-        + '<text x="38" y="214" font-family="system-ui,sans-serif" font-size="20" font-weight="800" fill="' + ac + '" letter-spacing="-1">destroem</text>'
-        + '<text x="38" y="238" font-family="system-ui,sans-serif" font-size="20" font-weight="800" fill="' + ac + '" letter-spacing="-1">vendedores</text>'
-        + '<text x="38" y="262" font-family="system-ui,sans-serif" font-size="12" fill="' + tx2 + '" font-weight="400">antes dos 90 dias</text>'
-        + '<rect x="24" y="316" width="60" height="1" fill="rgba(245,197,24,.3)"/>'
-        + '<text x="24" y="334" font-family="system-ui,sans-serif" font-size="9" fill="rgba(242,240,236,.3)" letter-spacing=".1em">CONTINUE DESLIZANDO →</text>',
-        1
-      ),
-
-      // S2 — Erro 01
-      base(numBig(1)
-        + slideTitle('Pitch antes', 'do diagnóstico')
-        + slideDesc('Você vende antes de entender', 'qual é o problema real.')
-        + badge('ERRO 1 DE 5'),
-        2
-      ),
-
-      // S3 — Erro 02
-      base(numBig(2)
-        + slideTitle('Follow-up', 'sem gatilho real')
-        + slideDesc('Cadência sem contexto', 'é só spam com agenda.')
-        + badge('ERRO 2 DE 5'),
-        3
-      ),
-
-      // S4 — Erro 03
-      base(numBig(3)
-        + slideTitle('Sem cadência', 'definida')
-        + slideDesc('Improviso não escala.', 'Você precisa de um sistema.')
-        + badge('ERRO 3 DE 5'),
-        4
-      ),
-
-      // S5 — Erro 04
-      base(numBig(4)
-        + slideTitle('Pipeline', 'desatualizado')
-        + slideDesc('Dado velho = decisão errada.', 'Revise pipeline toda sexta.')
-        + badge('ERRO 4 DE 5'),
-        5
-      ),
-
-      // S6 — Erro 05
-      base(numBig(5)
-        + slideTitle('Vender', 'para todo mundo')
-        + slideDesc('Sem ICP definido,', 'energia vai pro lugar errado.')
-        + badge('ERRO 5 DE 5'),
-        6
-      ),
-
-      // S7 — CTA
-      base(
-        '<text x="24" y="170" font-family="system-ui,sans-serif" font-size="15" font-weight="700" fill="' + tx + '" letter-spacing="-.3">Qual desses está</text>'
-        + '<text x="24" y="192" font-family="system-ui,sans-serif" font-size="15" font-weight="700" fill="' + tx + '" letter-spacing="-.3">acontecendo na</text>'
-        + '<text x="24" y="214" font-family="system-ui,sans-serif" font-size="15" font-weight="700" fill="' + ac + '" letter-spacing="-.3">sua operação?</text>'
-        + '<text x="24" y="248" font-family="system-ui,sans-serif" font-size="11" fill="' + tx2 + '">Comenta aqui embaixo 👇</text>'
-        + '<rect x="24" y="275" width="120" height="26" rx="5" fill="' + ac + '"/>'
-        + '<text x="84" y="293" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">Comentar agora</text>',
-        7
-      ),
+  // ── CAROUSEL SVGs ──
+  function buildCarouselSVGs(tplIdx) {
+    var tpl = tplIdx || 0;
+    var slides = [];
+    var titles = [
+      ['Capa','O sistema que'],
+      ['Erro 1','Vender sem'],
+      ['Erro 2','Ignorar o'],
+      ['Erro 3','Não ter'],
+      ['CTA','Quer aplicar']
     ];
-
+    var subtitles = ['triplicou minhas vendas','processo definido','follow-up','funil claro','isso no seu negócio?'];
+    for (var k = 0; k < 5; k++) {
+      slides.push('<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="width:90px;height:90px;flex-shrink:0;border-radius:6px">'
+        + '<rect width="200" height="200" fill="' + bg2 + '"/>'
+        + '<rect x="0" y="0" width="200" height="3" fill="' + ac + '"/>'
+        + '<text x="16" y="65" font-family="system-ui" font-size="40" font-weight="900" fill="rgba(245,197,24,.12)" letter-spacing="-3">0' + (k+1) + '</text>'
+        + '<text x="16" y="108" font-family="system-ui" font-size="11" font-weight="800" fill="' + tx + '">' + titles[k][0] + '</text>'
+        + '<text x="16" y="122" font-family="system-ui" font-size="11" font-weight="800" fill="' + ac + '">' + titles[k][1] + '</text>'
+        + '<rect x="16" y="132" width="90" height="2" rx="1" fill="rgba(245,197,24,.2)"/>'
+        + '<rect x="16" y="140" width="168" height="3" rx="1" fill="rgba(255,255,255,.07)"/>'
+        + '<rect x="16" y="147" width="140" height="3" rx="1" fill="rgba(255,255,255,.07)"/>'
+        + '<text x="184" y="192" font-family="system-ui" font-size="7" fill="rgba(245,197,24,.3)" text-anchor="end">' + (k+1) + '/5</text>'
+        + '</svg>');
+    }
     return slides;
   }
-  function runSeq() {
-    var s = SEQUENCES[seq % SEQUENCES.length];
 
-    // Reset
-    if (outputWrap) { outputWrap.classList.remove('vis'); }
-    if (loadingEl) { loadingEl.classList.remove('vis'); }
-    if (barEl) { barEl.style.width = '0%'; }
-    if (genBtn) { genBtn.style.opacity = '1'; }
-    inputEl.innerHTML = '<span class="l-demo-cursor"></span>';
+  // ── RENDER TEMPLATES ──
+  function renderTemplates(selectedIdx) {
+    var grid = document.getElementById('demo-templates-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    TEMPLATES.forEach(function(t, i) {
+      var div = document.createElement('div');
+      div.className = 'demo-tpl' + (i === (selectedIdx || 0) ? ' selected' : '');
+      div.innerHTML = t.svg(i) + '<div class="demo-tpl-label">' + t.name + '</div>';
+      div.onclick = function() {
+        // Mark selected
+        grid.querySelectorAll('.demo-tpl').forEach(function(d){ d.classList.remove('selected'); });
+        div.classList.add('selected');
+        _selectedTpl = i;
+        // Switch to result tab with carousel
+        setTimeout(function() { showCarouselResult(i); }, 300);
+      };
+      grid.appendChild(div);
+    });
+  }
 
-    setActiveAgent(s.agent, s.label);
+  function showCarouselResult(tplIdx) {
+    switchDemoTab('result');
+    var preview = document.getElementById('demo-carousel-preview');
+    if (!preview) return;
+    preview.innerHTML = '';
+    buildCarouselSVGs(tplIdx).forEach(function(svg) {
+      var d = document.createElement('div');
+      d.innerHTML = svg;
+      preview.appendChild(d.firstChild);
+    });
+  }
 
-    // Type input
+  // ── SWITCH TABS ──
+  window.switchDemoTab = function(tab) {
+    var cp = document.getElementById('dtab-concepts-panel');
+    var rp = document.getElementById('dtab-result-panel');
+    var tc = document.getElementById('dtab-concepts');
+    var tr = document.getElementById('dtab-result');
+    if (!cp || !rp) return;
+    if (tab === 'concepts') {
+      cp.style.display = ''; rp.style.display = 'none';
+      if (tc) { tc.classList.add('on'); } if (tr) { tr.classList.remove('on'); }
+    } else {
+      cp.style.display = 'none'; rp.style.display = '';
+      if (tr) { tr.classList.add('on'); } if (tc) { tc.classList.remove('on'); }
+    }
+  };
+
+  // ── AGENT SWITCHING ──
+  function setActiveAgent(agent, label) {
+    var cfg = DEMO_AGENTS[agent];
+    var tb = document.getElementById('demo-topbar-title');
+    if (tb && cfg) tb.textContent = cfg.topbar || ('AutoPostt — ' + label);
+  }
+
+  function demoNav(agent, el) {
+    document.querySelectorAll('.l-demo-nav-item').forEach(function(n){ n.classList.remove('active'); });
+    if (el) el.classList.add('active');
+    var cfg = DEMO_AGENTS[agent];
+    if (!cfg) return;
+    setActiveAgent(agent, cfg.label);
+    // Show/hide panels
+    ['imagem','legenda','reels','linkedin','story','tiktok','yt'].forEach(function(a) {
+      var p = document.getElementById('dpanel-' + a);
+      if (p) p.style.display = (a === agent) ? '' : 'none';
+    });
+    if (agent === 'imagem') {
+      switchDemoTab('concepts');
+      renderTemplates(_selectedTpl);
+    }
+  }
+
+  // ── TEXT AGENT CYCLE ──
+  var TEXT_AGENTS = ['legenda','reels','linkedin','story','tiktok','yt'];
+  var TEXT_INPUTS = [
+    '3 erros fatais de gestão comercial que ninguém fala abertamente',
+    'Como dobrei minha taxa de fechamento em 30 dias',
+    'O único KPI que importa para um gestor de alta performance',
+    '5 verdades sobre vendas que descobri da pior forma possível',
+    'Seu concorrente já usa IA — e você ainda improvisa'
+  ];
+  var TEXT_OUTPUTS = [
+    'Você não precisa de mais leads.\nPrecisa parar de perder os que já tem.\n\nOs 3 erros que destroem gestores comerciais...',
+    '[HOOK — 0s]\nAbro a câmera e mostro meu funil antes e depois.\n\n[3-15s]\nEm janeiro, fechava 1 em cada 8 leads...',
+    'Contratei 12 vendedores em 2 anos.\nSó 3 passaram dos 6 meses.\n\nO problema nunca foi o vendedor.',
+    'STORY 1 — ABERTURA\nVocê sabia que 73% das perdas de venda acontecem no follow-up?\n\nSTORY 2 — CONTEXTO\nA maioria dos vendedores some depois do primeiro não.',
+    '[0-2s] Você não precisa de script viral.\nPrecisa de um processo.\n\n[2-10s] Trabalho com vendas há 8 anos...'
+  ];
+
+  var _txtIdx = 0;
+  var _demoRunning = false;
+
+  function typeText(el, text, speed, cb) {
+    var i = 0;
+    el.innerHTML = '<span class="l-demo-cursor"></span>';
+    var t = setInterval(function() {
+      if (i >= text.length) { clearInterval(t); if (cb) cb(); return; }
+      var cur = el.querySelector('.l-demo-cursor');
+      var node = document.createTextNode(text[i++]);
+      el.insertBefore(node, cur);
+    }, speed);
+  }
+
+  function printText(el, text, speed, cb) {
+    el.style.whiteSpace = 'pre-wrap';
+    el.textContent = '';
+    var i = 0;
+    var t = setInterval(function() {
+      if (i >= text.length) { clearInterval(t); if (cb) cb(); return; }
+      el.textContent += text[i++];
+    }, speed);
+  }
+
+  function runTextAgent() {
+    var agent = TEXT_AGENTS[_txtIdx % TEXT_AGENTS.length];
+    var input = TEXT_INPUTS[_txtIdx % TEXT_INPUTS.length];
+    var output = TEXT_OUTPUTS[_txtIdx % TEXT_OUTPUTS.length];
+    _txtIdx++;
+
+    // Switch sidebar to this agent
+    var navEl = document.getElementById('dnav-' + agent);
+    demoNav(agent, navEl);
+
+    var inputEl  = document.getElementById('dtinput-' + agent);
+    var loadEl   = document.getElementById('demo-loading-text');
+    var loadTxt  = document.getElementById('demo-loading-txt-text');
+    var barEl    = document.getElementById('demo-bar-text');
+    var outputEl = document.getElementById('demo-output-text');
+    var outWrap  = document.getElementById('demo-output-wrap-text');
+    var emptyEl  = document.getElementById('demo-text-empty');
+
+    if (!inputEl) { setTimeout(runTextAgent, 2000); return; }
+    if (outWrap)  outWrap.style.display = 'none';
+    if (loadEl)   loadEl.style.display = 'none';
+    if (emptyEl)  emptyEl.style.display = '';
+    if (outputEl) outputEl.textContent = '';
+
     setTimeout(function() {
-      typeText(inputEl, s.input, 28, function() {
-        // Show loading
+      typeText(inputEl, input, 30, function() {
+        if (emptyEl) emptyEl.style.display = 'none';
+        if (loadEl)  { loadEl.style.display = ''; }
+        var barW = 0;
+        var barTimer = setInterval(function() {
+          barW += 3; if (barEl) barEl.style.width = Math.min(barW, 95) + '%';
+          if (barW >= 95) clearInterval(barTimer);
+        }, 80);
         setTimeout(function() {
-          if (genBtn) genBtn.style.opacity = '.6';
-          if (loadingEl) loadingEl.classList.add('vis');
-
-          var stageI = 0;
-          var stageTimer = setInterval(function() {
-            if (!loadingTxt) return;
-            if (stageI < STAGES.length) { loadingTxt.textContent = STAGES[stageI++]; }
-          }, 700);
-
-          // Animate bar
-          var barW = 0;
-          var barTimer = setInterval(function() {
-            barW += 2.2;
-            if (barEl) barEl.style.width = Math.min(barW, 92) + '%';
-            if (barW >= 92) clearInterval(barTimer);
-          }, 60);
-
-          setTimeout(function() {
-            clearInterval(stageTimer);
-            clearInterval(barTimer);
-            if (barEl) barEl.style.width = '100%';
-            if (loadingEl) loadingEl.classList.remove('vis');
-            if (genBtn) genBtn.style.opacity = '1';
-
-            if (s.imageMode) {
-              // Image mode: render SVG carousel slides
-              var imgOut = document.getElementById('demo-output-img');
-              var preview = document.getElementById('demo-carousel-preview');
-              if (outputWrap) outputWrap.style.display = 'none';
-              if (imgOut) { imgOut.style.display = 'block'; imgOut.classList.add('vis'); }
-              if (preview) {
-                preview.innerHTML = '';
-                var slides = buildCarouselSVGs();
-                slides.forEach(function(svgHtml, i) {
-                  var div = document.createElement('div');
-                  div.className = 'l-demo-carousel-slide';
-                  div.innerHTML = svgHtml;
-                  div.style.animationDelay = (i * 0.18) + 's';
-                  preview.appendChild(div);
-                });
-              }
-              setTimeout(function() {
-                if (imgOut) { imgOut.style.display = 'none'; imgOut.classList.remove('vis'); }
-                if (outputWrap) outputWrap.style.display = '';
-                seq++;
-                setTimeout(runSeq, 1000);
-              }, 5000);
-            } else {
-              if (outputWrap) outputWrap.classList.add('vis');
-              printText(outputEl, s.output, 8, function() {
-                seq++;
-                setTimeout(runSeq, 4500);
-              });
-            }
-          }, 3000);
-        }, 500);
+          clearInterval(barTimer);
+          if (barEl) barEl.style.width = '100%';
+          if (loadEl) loadEl.style.display = 'none';
+          if (outWrap) outWrap.style.display = '';
+          if (outputEl) printText(outputEl, output, 10, function() {
+            setTimeout(runTextAgent, 4000);
+          });
+        }, 2800);
       });
     }, 600);
   }
 
-  // Start auto-loop
-  setTimeout(function() {
+  // ── INIT ──
+  function init() {
+    // Render 10 template models
+    renderTemplates(0);
+    // Show imagem agent first
     demoNav('imagem', document.getElementById('dnav-imagem'));
-  }, 800);
+    // After 5s, start cycling text agents
+    setTimeout(function() {
+      // Show first carousel result after 3s
+      setTimeout(function() { showCarouselResult(0); }, 3000);
+      // Then cycle through text agents after 8s
+      setTimeout(runTextAgent, 8000);
+    }, 1000);
+  }
+
+  setTimeout(init, 800);
 
 })();
 

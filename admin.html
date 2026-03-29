@@ -44,7 +44,7 @@ html,body { height:100%; background:var(--bg); color:var(--tx0); font-family:var
 }
 .auth-mark {
   width:34px; height:34px; border-radius:8px;
-  background:var(--org); display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg,#1A1600,#17170D); display:flex; align-items:center; justify-content:center;
   box-shadow:0 0 16px rgba(245,197,24,.35);
 }
 .auth-mark svg { width:15px; height:15px; }
@@ -56,7 +56,7 @@ html,body { height:100%; background:var(--bg); color:var(--tx0); font-family:var
 .auth-field label { display:block; font-size:10.5px; font-weight:700; color:var(--tx1); letter-spacing:.07em; text-transform:uppercase; margin-bottom:6px; }
 .auth-field input { width:100%; padding:10px 13px; background:var(--bg3); border:1px solid var(--line2); border-radius:8px; color:var(--tx0); font-size:13.5px; font-family:var(--f); outline:none; transition:border-color .18s,box-shadow .18s; }
 .auth-field input:focus { border-color:var(--or); box-shadow:0 0 0 3px rgba(237,106,17,.12); }
-.auth-btn { width:100%; padding:12px; background:var(--org); color:#fff; border:none; border-radius:8px; font-size:13.5px; font-weight:700; cursor:pointer; margin-top:8px; transition:all .2s; box-shadow:0 4px 16px rgba(237,106,17,.25); }
+.auth-btn { width:100%; padding:12px; background:linear-gradient(135deg,#1A1600,#17170D); color:#fff; border:none; border-radius:8px; font-size:13.5px; font-weight:700; cursor:pointer; margin-top:8px; transition:all .2s; box-shadow:0 4px 16px rgba(237,106,17,.25); }
 .auth-btn:hover { transform:translateY(-1px); box-shadow:0 6px 24px rgba(237,106,17,.38); }
 .auth-err { font-size:12px; color:var(--err); margin-top:8px; display:none; padding:8px 12px; background:rgba(240,64,64,.08); border:1px solid rgba(240,64,64,.2); border-radius:6px; }
 
@@ -66,7 +66,7 @@ html,body { height:100%; background:var(--bg); color:var(--tx0); font-family:var
 /* ── SIDEBAR ── */
 .sb { width:220px; flex-shrink:0; background:var(--bg2); border-right:1px solid var(--line); display:flex; flex-direction:column; height:100vh; overflow-y:auto; }
 .sb-top { padding:20px 16px 16px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:10px; }
-.sb-mark { width:30px; height:30px; border-radius:7px; background:var(--org); display:flex; align-items:center; justify-content:center; box-shadow:0 0 12px rgba(237,106,17,.3); flex-shrink:0; }
+.sb-mark { width:30px; height:30px; border-radius:7px; background:linear-gradient(135deg,#1A1600,#17170D); display:flex; align-items:center; justify-content:center; box-shadow:0 0 12px rgba(237,106,17,.3); flex-shrink:0; }
 .sb-mark svg { width:13px; height:13px; fill:none; stroke:#fff; stroke-width:2.5; }
 .sb-name { font-size:14px; font-weight:700; }
 .sb-name b { color:var(--or); }
@@ -77,11 +77,11 @@ html,body { height:100%; background:var(--bg); color:var(--tx0); font-family:var
 .ni svg { width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:1.8; flex-shrink:0; opacity:.7; }
 .ni:hover { background:var(--bg3); color:var(--tx0); }
 .ni.on { background:rgba(237,106,17,.10); color:var(--or); font-weight:600; border-color:rgba(237,106,17,.18); }
-.ni.on::before { content:''; position:absolute; left:-1px; top:50%; transform:translateY(-50%); width:3px; height:16px; background:var(--org); border-radius:0 2px 2px 0; box-shadow:0 0 6px rgba(237,106,17,.4); }
+.ni.on::before { content:''; position:absolute; left:-1px; top:50%; transform:translateY(-50%); width:3px; height:16px; background:linear-gradient(135deg,#1A1600,#17170D); border-radius:0 2px 2px 0; box-shadow:0 0 6px rgba(237,106,17,.4); }
 .ni.on svg { opacity:1; }
 .sb-bot { padding:12px 16px; border-top:1px solid var(--line); }
 .sb-user { display:flex; align-items:center; gap:10px; }
-.sb-av { width:30px; height:30px; border-radius:50%; background:var(--org); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; flex-shrink:0; }
+.sb-av { width:30px; height:30px; border-radius:50%; background:linear-gradient(135deg,#1A1600,#17170D); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; flex-shrink:0; }
 .sb-uname { font-size:12px; font-weight:600; }
 .sb-umail { font-size:10.5px; color:var(--tx2); }
 
@@ -101,7 +101,7 @@ html,body { height:100%; background:var(--bg); color:var(--tx0); font-family:var
 /* ── KPI CARDS ── */
 .kpi-row { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:24px; }
 .kpi { background:var(--bg2); border:1px solid var(--line); border-radius:var(--r); padding:18px; position:relative; overflow:hidden; transition:border-color .2s; cursor:default; }
-.kpi::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--org); opacity:0; transition:opacity .2s; }
+.kpi::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(135deg,#1A1600,#17170D); opacity:0; transition:opacity .2s; }
 .kpi:hover { border-color:rgba(237,106,17,.25); }
 .kpi:hover::before { opacity:1; }
 .kpi-ico { width:34px; height:34px; border-radius:8px; background:rgba(237,106,17,.12); border:1px solid rgba(237,106,17,.2); display:flex; align-items:center; justify-content:center; margin-bottom:14px; }
@@ -148,13 +148,13 @@ html,body { height:100%; background:var(--bg); color:var(--tx0); font-family:var
 .prog-row { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
 .prog-lbl { font-size:12px; color:var(--tx1); flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .prog-bar { flex:2; height:6px; background:var(--bg4); border-radius:3px; overflow:hidden; }
-.prog-fill { height:100%; background:var(--org); border-radius:3px; box-shadow:0 0 6px rgba(237,106,17,.3); transition:width .6s ease; }
+.prog-fill { height:100%; background:linear-gradient(135deg,#1A1600,#17170D); border-radius:3px; box-shadow:0 0 6px rgba(237,106,17,.3); transition:width .6s ease; }
 .prog-val { font-size:11px; color:var(--tx2); font-family:monospace; width:44px; text-align:right; flex-shrink:0; }
 
 /* ── AVATAR LIST ── */
 .av-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.04); }
 .av-row:last-child { border-bottom:none; }
-.av { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; flex-shrink:0; background:var(--org); }
+.av { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; flex-shrink:0; background:linear-gradient(135deg,#1A1600,#17170D); }
 .av-name { font-size:12.5px; font-weight:500; }
 .av-role { font-size:11px; color:var(--tx2); }
 .av-right { margin-left:auto; display:flex; align-items:center; gap:6px; }
@@ -163,7 +163,7 @@ html,body { height:100%; background:var(--bg); color:var(--tx0); font-family:var
 .task-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.04); }
 .task-row:last-child { border-bottom:none; }
 .task-check { width:16px; height:16px; border-radius:4px; border:1.5px solid var(--line2); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; cursor:default; }
-.task-check.done { background:var(--org); border-color:var(--or); }
+.task-check.done { background:linear-gradient(135deg,#1A1600,#17170D); border-color:var(--or); }
 .task-check.done svg { display:block; }
 .task-check svg { display:none; width:9px; height:9px; fill:none; stroke:#fff; stroke-width:3; }
 .task-lbl { font-size:12.5px; color:var(--tx1); }
@@ -174,7 +174,7 @@ html,body { height:100%; background:var(--bg); color:var(--tx0); font-family:var
 .bar-chart { display:flex; align-items:flex-end; gap:5px; height:60px; }
 .bar-item { flex:1; border-radius:3px 3px 0 0; background:rgba(237,106,17,.35); transition:background .15s; cursor:default; }
 .bar-item:hover { background:var(--or); }
-.bar-item.hi { background:var(--org); }
+.bar-item.hi { background:linear-gradient(135deg,#1A1600,#17170D); }
 
 /* ── PIE CHART ── */
 .pie-wrap { display:flex; align-items:center; gap:18px; }
@@ -188,7 +188,7 @@ html,body { height:100%; background:var(--bg); color:var(--tx0); font-family:var
 .search-row input:focus { border-color:var(--or); }
 .btn { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:7px; font-size:12.5px; font-weight:600; cursor:pointer; border:1px solid transparent; transition:all .15s; }
 .btn svg { width:13px; height:13px; fill:none; stroke:currentColor; stroke-width:2; }
-.btn-p { background:var(--org); color:#fff; box-shadow:0 2px 8px rgba(237,106,17,.25); }
+.btn-p { background:linear-gradient(135deg,#1A1600,#17170D); color:#fff; box-shadow:0 2px 8px rgba(237,106,17,.25); }
 .btn-p:hover { transform:translateY(-1px); box-shadow:0 4px 14px rgba(237,106,17,.4); }
 .btn-g { background:var(--bg3); border-color:var(--line2); color:var(--tx0); }
 .btn-g:hover { background:var(--bg4); }
@@ -254,7 +254,7 @@ html,body { height:100%; background:var(--bg); color:var(--tx0); font-family:var
   <div class="auth-box">
     <div class="auth-logo">
       <div class="auth-mark">
-        <svg viewBox="0 0 24 24" style="fill:none;stroke:#0D0D0F;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"><rect x="3" y="5" width="14" height="12" rx="2"/><path d="M17 9l4-3v10l-4-3"/><line x1="7" y1="9" x2="13" y2="9"/><line x1="7" y1="12" x2="11" y2="12"/></svg>
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px"><defs><linearGradient id="adlg" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#E6AC00"/><stop offset="100%" stop-color="#FFD740"/></linearGradient></defs><rect x="8" y="22" width="62" height="62" rx="14" fill="none" stroke="url(#adlg)" stroke-width="10"/><line x1="18" y1="48" x2="58" y2="48" stroke="url(#adlg)" stroke-width="9" stroke-linecap="round"/><line x1="18" y1="64" x2="46" y2="64" stroke="url(#adlg)" stroke-width="9" stroke-linecap="round"/><polygon points="56,8 92,8 92,44" fill="url(#adlg)"/><line x1="56" y1="44" x2="88" y2="12" stroke="url(#adlg)" stroke-width="10" stroke-linecap="round"/></svg>
       </div>
       <div>
         <div class="auth-wordmark">Auto<b>Postt</b></div>
@@ -283,7 +283,7 @@ html,body { height:100%; background:var(--bg); color:var(--tx0); font-family:var
   <nav class="sb">
     <div class="sb-top">
       <div class="sb-mark">
-        <svg viewBox="0 0 24 24" style="fill:none;stroke:#0D0D0F;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"><rect x="3" y="5" width="14" height="12" rx="2"/><path d="M17 9l4-3v10l-4-3"/><line x1="7" y1="9" x2="13" y2="9"/><line x1="7" y1="12" x2="11" y2="12"/></svg>
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px"><defs><linearGradient id="adlg" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#E6AC00"/><stop offset="100%" stop-color="#FFD740"/></linearGradient></defs><rect x="8" y="22" width="62" height="62" rx="14" fill="none" stroke="url(#adlg)" stroke-width="10"/><line x1="18" y1="48" x2="58" y2="48" stroke="url(#adlg)" stroke-width="9" stroke-linecap="round"/><line x1="18" y1="64" x2="46" y2="64" stroke="url(#adlg)" stroke-width="9" stroke-linecap="round"/><polygon points="56,8 92,8 92,44" fill="url(#adlg)"/><line x1="56" y1="44" x2="88" y2="12" stroke="url(#adlg)" stroke-width="10" stroke-linecap="round"/></svg>
       </div>
       <div>
         <div class="sb-name">Auto<b>Postt</b></div>
