@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AutoPostt — Automação de Conteúdo Social com IA</title>
+<meta name="description" content="Conecte seu Instagram. A IA analisa seu perfil, cria seu branding e gera posts, carrosseis, legendas e reels — no piloto automático.">
+<meta property="og:title" content="AutoPostt — Automação de Conteúdo Social">
+<meta property="og:description" content="Gere conteúdo com IA treinada no seu nicho. Poste sem esforço.">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:    #0D0D0F;
+  --bg2:   #111116;
+  --bg3:   #17171D;
+  --bg4:   #1E1E26;
+  --line:  rgba(255,255,255,.07);
+  --line2: rgba(255,255,255,.12);
+  --gold:  #F5C518;
+  --gold2: #FFD740;
+  --gold3: #E6AC00;
+  --grd:   linear-gradient(135deg,#F5C518 0%,#E6AC00 100%);
+  --grd2:  linear-gradient(135deg,#FFD740 0%,#F5C518 100%);
+  --glow:  rgba(245,197,24,.18);
+  --glow2: rgba(245,197,24,.30);
+  --t0:    #F5F4F0;
+  --t1:    #9E9C94;
+  --t2:    #5E5C54;
+  --t3:    #38362E;
+  --ok:    #22D37A;
+  --f:     'Plus Jakarta Sans',system-ui,sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--t0);font-family:var(--f);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+
+/* GRAIN */
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.025;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='192' height='192' filter='url(%23g)'/%3E%3C/svg%3E");background-repeat:repeat;background-size:192px}
+
+/* ══ NAV ══ */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 52px;height:60px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:rgba(13,13,15,.85);backdrop-filter:blur(20px)}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-mark{width:32px;height:32px;border-radius:8px;background:var(--grd);display:flex;align-items:center;justify-content:center;box-shadow:0 0 18px var(--glow2);flex-shrink:0}
+.nav-mark svg{width:16px;height:16px;fill:none;stroke:#0D0D0F;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.nav-name{font-size:16px;font-weight:800;letter-spacing:-.4px}
+.nav-name b{color:var(--gold)}
+.nav-links{display:flex;align-items:center;gap:28px;font-size:13.5px;color:var(--t1)}
+.nav-links a:hover{color:var(--t0)}
+.nav-ctas{display:flex;align-items:center;gap:10px}
+.btn-ghost{padding:7px 18px;border:1px solid var(--line2);border-radius:8px;font-size:13px;font-weight:600;color:var(--t0);cursor:pointer;transition:all .15s;background:transparent}
+.btn-ghost:hover{background:var(--bg3);border-color:var(--line2)}
+.btn-main{padding:8px 20px;background:var(--grd);border:none;border-radius:8px;font-size:13px;font-weight:700;color:#0D0D0F;cursor:pointer;transition:all .18s;box-shadow:0 2px 12px var(--glow)}
+.btn-main:hover{background:var(--grd2);transform:translateY(-1px);box-shadow:0 4px 20px var(--glow2)}
+
+/* ══ HERO ══ */
+.hero{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 52px 80px;overflow:hidden}
+.hero-bg{position:absolute;inset:0;z-index:0;pointer-events:none}
+.hero-bg::before{content:'';position:absolute;top:-20%;left:50%;transform:translateX(-50%);width:80%;height:70%;background:radial-gradient(ellipse,rgba(245,197,24,.10) 0%,transparent 65%);filter:blur(80px)}
+.hero-bg::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background-image:linear-gradient(rgba(245,197,24,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(245,197,24,.025) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse 80% 80% at 50% 30%,black 10%,transparent 70%)}
+.hero-kicker{display:inline-flex;align-items:center;gap:8px;background:rgba(245,197,24,.08);border:1px solid rgba(245,197,24,.2);border-radius:100px;padding:5px 14px;font-size:11.5px;font-weight:700;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;margin-bottom:28px;position:relative;z-index:1}
+.hero-kicker-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--glow2);animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 6px var(--glow)}50%{box-shadow:0 0 14px var(--glow2)}}
+.hero-h1{font-size:clamp(40px,6vw,80px);font-weight:900;letter-spacing:-3px;line-height:1.0;color:var(--t0);margin-bottom:22px;position:relative;z-index:1;max-width:900px}
+.hero-h1 span{color:var(--gold)}
+.hero-sub{font-size:clamp(15px,2vw,18px);color:var(--t1);line-height:1.75;max-width:560px;margin:0 auto 40px;position:relative;z-index:1}
+.hero-acts{display:flex;align-items:center;justify-content:center;gap:14px;position:relative;z-index:1;flex-wrap:wrap}
+.cta-main{padding:14px 32px;background:var(--grd);border:none;border-radius:10px;font-size:15px;font-weight:800;color:#0D0D0F;cursor:pointer;transition:all .2s;box-shadow:0 4px 24px var(--glow);letter-spacing:-.2px}
+.cta-main:hover{background:var(--grd2);transform:translateY(-2px);box-shadow:0 8px 36px var(--glow2)}
+.cta-sec{padding:14px 28px;background:transparent;border:1px solid var(--line2);border-radius:10px;font-size:15px;font-weight:600;color:var(--t0);cursor:pointer;transition:all .2s}
+.cta-sec:hover{background:var(--bg3);border-color:var(--line2)}
+.hero-trust{display:flex;align-items:center;gap:10px;margin-top:32px;position:relative;z-index:1;color:var(--t2);font-size:12.5px}
+.hero-trust-acs{display:flex}
+.hero-trust-ac{width:26px;height:26px;border-radius:50%;background:var(--grd);border:2px solid var(--bg);margin-left:-6px;font-size:10px;font-weight:700;color:#0D0D0F;display:flex;align-items:center;justify-content:center}
+.hero-trust-ac:first-child{margin-left:0}
+
+/* ══ STATS STRIP ══ */
+.stats{display:flex;justify-content:center;gap:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg2);position:relative;z-index:1}
+.stat{padding:28px 52px;text-align:center;border-right:1px solid var(--line);flex:1;max-width:220px}
+.stat:last-child{border-right:none}
+.stat-n{font-size:36px;font-weight:900;letter-spacing:-2px;color:var(--gold);line-height:1}
+.stat-l{font-size:11.5px;color:var(--t2);margin-top:4px;letter-spacing:.03em}
+
+/* ══ SECTION ══ */
+.section{max-width:1180px;margin:0 auto;padding:80px 52px}
+.eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.eyebrow-dot{width:5px;height:5px;border-radius:50%;background:var(--gold);flex-shrink:0;box-shadow:0 0 6px var(--glow)}
+.eyebrow-txt{font-size:10.5px;font-weight:700;color:var(--gold);letter-spacing:.14em;text-transform:uppercase}
+.sec-h{font-size:clamp(28px,4vw,48px);font-weight:800;letter-spacing:-2px;line-height:1.05;color:var(--t0);margin-bottom:14px}
+.sec-sub{font-size:15px;color:var(--t1);line-height:1.8;max-width:440px;margin-bottom:48px}
+.divider{height:1px;background:var(--line);max-width:1180px;margin:0 auto}
+
+/* ══ HOW IT WORKS ══ */
+.how-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.how-item{background:var(--bg2);padding:32px 24px}
+.how-num{font-size:40px;font-weight:900;color:rgba(245,197,24,.2);letter-spacing:-2px;line-height:1;margin-bottom:16px;font-family:var(--f)}
+.how-title{font-size:15px;font-weight:700;color:var(--t0);margin-bottom:8px}
+.how-desc{font-size:12.5px;color:var(--t1);line-height:1.7}
+
+/* ══ PROBLEM/SOLUTION SPLIT ══ */
+.ps-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.ps-card{border-radius:14px;padding:32px}
+.ps-card.before{background:var(--bg2);border:1px solid var(--line)}
+.ps-card.after{background:linear-gradient(135deg,rgba(245,197,24,.08),var(--bg2));border:1px solid rgba(245,197,24,.18);position:relative;overflow:hidden}
+.ps-card.after::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grd)}
+.ps-card-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:18px;padding:4px 10px;border-radius:4px;display:inline-block}
+.ps-card.before .ps-card-label{background:rgba(255,255,255,.05);color:var(--t2)}
+.ps-card.after .ps-card-label{background:rgba(245,197,24,.1);color:var(--gold)}
+.ps-card-title{font-size:22px;font-weight:800;letter-spacing:-.5px;color:var(--t0);margin-bottom:20px;line-height:1.2}
+.ps-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;font-size:13px}
+.ps-row-icon{width:20px;height:20px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center}
+.ps-row-icon.x{color:#FF4444}
+.ps-row-icon.check{color:var(--ok)}
+.ps-row.text-t1{color:var(--t1)}
+
+/* ══ CASES ══ */
+.cases-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.case{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:28px 24px;display:flex;flex-direction:column;transition:border-color .2s,transform .2s}
+.case:hover{border-color:rgba(245,197,24,.25);transform:translateY(-2px)}
+.case-num{font-size:52px;font-weight:900;color:rgba(245,197,24,.25);letter-spacing:-3px;line-height:1;margin-bottom:16px}
+.case-title{font-size:16px;font-weight:700;color:var(--t0);margin-bottom:10px;letter-spacing:-.2px}
+.case-desc{font-size:13px;color:var(--t1);line-height:1.7;margin-bottom:16px;flex:1}
+.case-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto}
+.case-tag{border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--t2)}
+
+/* ══ PLANS ══ */
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px}
+.plan{background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:32px;position:relative;overflow:hidden}
+.plan.feat{border:2px solid rgba(245,197,24,.4);background:linear-gradient(145deg,rgba(245,197,24,.07) 0%,var(--bg2) 60%)}
+.plan.feat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grd)}
+.plan-popular{position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--grd);color:#0D0D0F;font-size:10px;font-weight:800;padding:5px 16px;border-radius:0 0 8px 8px;letter-spacing:.06em;white-space:nowrap}
+.plan-name{font-size:14px;font-weight:700;color:var(--t1);letter-spacing:.04em;text-transform:uppercase;margin-bottom:14px}
+.plan-price{font-size:48px;font-weight:900;letter-spacing:-3px;color:var(--t0);line-height:1;margin-bottom:4px}
+.plan-price span{font-size:16px;font-weight:400;color:var(--t2);letter-spacing:0}
+.plan-tagline{font-size:13px;color:var(--t2);margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.plan-feat-row{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--t1);margin-bottom:10px}
+.plan-feat-check{color:var(--gold);flex-shrink:0;font-weight:700;font-size:14px}
+.plan-btn{width:100%;margin-top:24px;padding:12px;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;font-family:var(--f);letter-spacing:-.1px}
+.plan-btn.primary{background:var(--grd);color:#0D0D0F;border:none;box-shadow:0 4px 18px var(--glow)}
+.plan-btn.primary:hover{background:var(--grd2);transform:translateY(-1px);box-shadow:0 6px 26px var(--glow2)}
+.plan-btn.outline{background:transparent;color:var(--t0);border:1px solid var(--line2)}
+.plan-btn.outline:hover{background:var(--bg3);border-color:var(--line2)}
+.plans-note{text-align:center;font-size:12.5px;color:var(--t2);margin-top:16px}
+.plans-note a{color:var(--t1)}
+
+/* ══ CTA BANNER ══ */
+.cta-banner{background:linear-gradient(135deg,rgba(245,197,24,.10) 0%,var(--bg3) 100%);border:1px solid rgba(245,197,24,.15);border-radius:20px;padding:64px 52px;text-align:center;position:relative;overflow:hidden;margin:0 auto 60px;max-width:1180px}
+.cta-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grd)}
+.cta-banner-eyebrow{font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;margin-bottom:18px}
+.cta-banner-h{font-size:clamp(28px,4vw,46px);font-weight:900;letter-spacing:-2px;line-height:1.05;color:var(--t0);margin-bottom:12px}
+.cta-banner-h span{color:var(--gold)}
+.cta-banner-sub{font-size:15px;color:var(--t1);margin-bottom:32px;line-height:1.7}
+
+/* ══ FOOTER ══ */
+.footer{border-top:1px solid var(--line);padding:24px 52px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--t2)}
+.footer-brand{display:flex;align-items:center;gap:8px}
+.footer-mark{width:24px;height:24px;border-radius:6px;background:var(--grd);display:flex;align-items:center;justify-content:center}
+.footer-mark svg{width:11px;height:11px;fill:none;stroke:#0D0D0F;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+/* ══ SCROLL HINT ══ */
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+.scroll-hint{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--t3);font-size:11px;z-index:1;animation:bob 2.4s ease-in-out infinite}
+.scroll-hint svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2}
+
+/* ══ TICKER ══ */
+.ticker-wrap{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg2);padding:14px 0}
+.ticker-track{display:flex;gap:0;animation:ticker 30s linear infinite;white-space:nowrap}
+.ticker-track:hover{animation-play-state:paused}
+.ticker-item{display:flex;align-items:center;gap:10px;padding:0 32px;font-size:11.5px;font-weight:600;color:var(--t3);flex-shrink:0}
+.ticker-hl{font-weight:800;color:var(--gold)}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+@media(max-width:768px){
+  .nav{padding:0 20px}
+  .nav-links{display:none}
+  .hero{padding:100px 24px 60px}
+  .hero-h1{letter-spacing:-2px}
+  .section{padding:60px 24px}
+  .how-grid{grid-template-columns:1fr 1fr}
+  .ps-grid{grid-template-columns:1fr}
+  .cases-grid{grid-template-columns:1fr}
+  .plans-grid{grid-template-columns:1fr}
+  .stats{flex-wrap:wrap}
+  .stat{min-width:50%;border-right:none;border-bottom:1px solid var(--line)}
+  .cta-banner{padding:40px 24px}
+  .footer{flex-direction:column;gap:12px;text-align:center;padding:24px}
+}
+
+
+/* ── HERO & DEMO ── */
+.l-hero {
+  min-height: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding: 80px 52px 48px;
+  position: relative;
+  overflow: visible;
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Deep background layers */
+.l-hero-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.l-hero-bg::before {
+  content: '';
+  position: absolute;
+  top: -20%; left: -10%;
+  width: 70%; height: 80%;
+  background: radial-gradient(ellipse, rgba(245,197,24,.11) 0%, transparent 65%);
+  filter: blur(60px);
+  animation: glow-pulse 8s ease-in-out infinite;
+}
+.l-hero-bg::after {
+  content: '';
+  position: absolute;
+  bottom: -10%; right: -15%;
+  width: 55%; height: 65%;
+  background: radial-gradient(ellipse, rgba(245,197,24,.065) 0%, transparent 65%);
+  filter: blur(80px);
+  animation: glow-pulse 10s ease-in-out 2s infinite reverse;
+}
+@keyframes glow-pulse {
+  0%, 100% { opacity: .7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.06); }
+}
+
+/* Grid lines on bg */
+.l-hero-grid {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  /* Primary grid lines */
+  background-image:
+    linear-gradient(rgba(245,197,24,0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245,197,24,0.055) 1px, transparent 1px),
+    /* Secondary finer grid */
+    linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+  background-size:
+    120px 120px,
+    120px 120px,
+    24px 24px,
+    24px 24px;
+  /* Mask: strong in top-left where amber glow is, fade out elsewhere */
+  mask-image: radial-gradient(
+    ellipse 80% 70% at 15% 10%,
+    rgba(0,0,0,0.9) 0%,
+    rgba(0,0,0,0.5) 35%,
+    rgba(0,0,0,0.12) 60%,
+    transparent 80%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 80% 70% at 15% 10%,
+    rgba(0,0,0,0.9) 0%,
+    rgba(0,0,0,0.5) 35%,
+    rgba(0,0,0,0.12) 60%,
+    transparent 80%
+  );
+}
+
+/* LEFT — copy */
+.l-hero-copy {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
+  animation: fadeUp .8s var(--ease-e) .1s both;
+}
+.l-hero-kicker {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(245,197,24,.10); border: 1px solid rgba(245,197,24,.22);
+  border-radius: 100px; padding: 5px 13px 5px 8px;
+  font-size: 11px; font-weight: 600; color: var(--gold);
+  letter-spacing: .05em; text-transform: uppercase; margin-bottom: 28px;
+}
+.l-hero-kicker-dot {
+  width: 5px; height: 5px; border-radius: 50%; background: var(--gold);
+  animation: kicker-blink 2s ease-in-out infinite;
+  box-shadow: 0 0 6px var(--gold);
+}
+@keyframes kicker-blink {
+  0%, 100% { opacity: 1; } 50% { opacity: .4; }
+}
+
+.l-hero-h1 {
+  font-family: 'MONR Pro', 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: clamp(42px, 5.5vw, 72px);
+  font-weight: 800;
+  line-height: .95;
+  letter-spacing: -3px;
+  color: var(--t0);
+  margin-bottom: 20px;
+}
+.l-h1-accent { color: var(--gold); display: block; }
+.l-h1-dim { color: var(--t1); font-weight: 300; display: block; }
+
+.l-hero-sub {
+  font-size: 15px; font-weight: 400; color: var(--t1);
+  line-height: 1.75; max-width: 560px;
+  margin: 0 auto; margin-bottom: 36px;
+  letter-spacing: .01em;
+}
+
+.l-hero-acts { display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+  justify-content: center; }
+.l-btn-main {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 24px;
+  background: var(--gold); color: #fff;
+  font-family: var(--f); font-size: 13.5px; font-weight: 700;
+  border: none; border-radius: 8px; cursor: pointer;
+  letter-spacing: -.02em;
+  transition: all .22s var(--ease-e);
+  box-shadow: 0 4px 28px var(--glow2), inset 0 1px 0 rgba(255,255,255,.15);
+}
+.l-btn-main:hover {
+  background: var(--gold2); transform: translateY(-2px);
+  box-shadow: 0 8px 40px var(--glow);
+}
+.l-btn-main:active { transform: translateY(0); }
+.l-btn-ghost {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 12px 20px;
+  background: transparent; color: var(--t1);
+  font-family: var(--f); font-size: 13px; font-weight: 500;
+  border: 1px solid var(--line2); border-radius: 8px; cursor: pointer;
+  transition: all .18s;
+}
+.l-btn-ghost:hover { color: var(--t0); border-color: rgba(255,255,255,.24); background: rgba(255,255,255,.03); }
+
+.l-hero-trust {
+  margin-top: 28px;
+  justify-content: center; display: flex; align-items: center; gap: 12px;
+  font-size: 11.5px; color: var(--t2);
+}
+.l-hero-trust-dots { display: flex; gap: 3px; }
+.l-hero-trust-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--gold);
+  opacity: .6;
+}
+
+
+/* ── DEMO MOCK — Product replica ── */
+.l-hero-demo {
+  position: relative;
+  width: 100%;
+  animation: fadeUp .9s var(--ease-e) .3s both;
+}
+
+/* Window: flex row — sidebar left, main right */
+.l-demo-window {
+  background: var(--bg2);
+  border: 1px solid var(--line2);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.04), 0 32px 100px rgba(0,0,0,.65), 0 0 80px rgba(245,197,24,.08);
+  width: 100%;
+}
+
+/* Sidebar */
+.l-demo-sidebar {
+  width: 170px;
+  flex-shrink: 0;
+  background: var(--bg3);
+  border-right: 1px solid var(--line);
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+  user-select: none;
+}
+.l-demo-sb-logo {
+  display: flex; align-items: center; gap: 7px;
+  padding: 0 12px 12px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 10px;
+  font-family: var(--f); font-size: 13px; font-weight: 700; color: var(--t0);
+}
+.l-demo-sb-logo b { color: var(--gold); }
+.l-demo-sb-mark {
+  width: 22px; height: 22px; border-radius: 5px;
+  background: var(--gold); display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; box-shadow: 0 0 10px rgba(245,197,24,.3);
+}
+.l-demo-sb-lbl {
+  padding: 0 12px 6px;
+  font-size: 9px; font-weight: 700; color: var(--t2);
+  letter-spacing: .1em; text-transform: uppercase;
+}
+.l-demo-nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 14px;
+  font-size: 11.5px; font-weight: 500; color: var(--t1);
+  cursor: default; transition: all .15s; border-left: 2px solid transparent;
+  user-select: none;
+}
+.l-demo-nav-item svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2; flex-shrink: 0; }
+.l-demo-nav-item:hover { background: rgba(255,255,255,.04); color: var(--t0); }
+.l-demo-nav-item.active {
+  background: rgba(245,197,24,.08);
+  color: var(--gold);
+  border-left-color: var(--gold);
+  font-weight: 600;
+}
+
+/* Main area */
+.l-demo-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.l-demo-topbar {
+  background: var(--bg3); border-bottom: 1px solid var(--line);
+  padding: 10px 16px; display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+}
+.l-demo-topbar-title {
+  flex: 1; text-align: center;
+  font-size: 11px; font-weight: 500; color: var(--t2); font-family: var(--f);
+}
+.l-demo-body { flex: 1; overflow: hidden; }
+
+/* Panels */
+.l-demo-panel { height: 100%; overflow-y: auto; padding: 14px 16px; }
+.l-demo-panel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; height: 100%; }
+.l-demo-panel-left { display: flex; flex-direction: column; gap: 0; }
+.l-demo-panel-right { display: flex; flex-direction: column; gap: 8px; }
+
+/* Format grid */
+.l-demo-sect-lbl {
+  font-size: 9px; font-weight: 700; color: var(--gold);
+  letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px;
+}
+.l-demo-fmt-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 4px; margin-bottom: 0;
+}
+.l-demo-fmt {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 5px; padding: 8px 6px;
+  background: var(--bg3); border: 1px solid var(--line);
+  border-radius: 6px; font-size: 10px; color: var(--t1);
+  cursor: pointer; transition: all .15s; text-align: center;
+}
+.l-demo-fmt svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.l-demo-fmt:hover { border-color: rgba(245,197,24,.25); color: var(--t0); }
+.l-demo-fmt.active { background: rgba(245,197,24,.1); border-color: rgba(245,197,24,.35); color: var(--gold); }
+.l-demo-net-row { display: flex; gap: 4px; flex-wrap: wrap; }
+.l-demo-net {
+  padding: 3px 8px; background: var(--bg3); border: 1px solid var(--line);
+  border-radius: 4px; font-size: 9.5px; color: var(--t1); cursor: pointer; transition: all .15s;
+}
+.l-demo-net:hover { border-color: rgba(245,197,24,.25); color: var(--t0); }
+.l-demo-net.active { background: rgba(245,197,24,.1); border-color: rgba(245,197,24,.35); color: var(--gold); }
+
+/* Input */
+.l-demo-input-wrap {
+  background: var(--bg3); border: 1px solid var(--line2);
+  border-radius: 8px; padding: 10px 12px; margin-bottom: 8px;
+}
+.l-demo-input-text {
+  font-family: var(--f); font-size: 12px; color: var(--t0); line-height: 1.6; min-height: 40px;
+}
+.l-demo-cursor {
+  display: inline-block; width: 2px; height: 11px; background: var(--gold);
+  margin-left: 1px; vertical-align: middle; animation: dcur .9s step-end infinite;
+}
+@keyframes dcur { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* Generate button */
+.l-demo-gen-btn-main {
+  width: 100%; padding: 11px 14px;
+  background: var(--gold); color: #fff; border: none; border-radius: 7px;
+  font-family: var(--f); font-size: 12px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+  box-shadow: 0 3px 14px rgba(245,197,24,.22); transition: all .18s;
+  user-select: none;
+}
+.l-demo-gen-btn-main:hover { background: var(--gold2); }
+
+/* Tabs */
+.l-demo-tabs { display: flex; border-bottom: 1px solid var(--line); margin-bottom: 10px; }
+.l-demo-tab {
+  padding: 7px 12px; font-size: 10.5px; font-weight: 500; color: var(--t2);
+  cursor: pointer; border-bottom: 2px solid transparent; transition: all .15s;
+}
+.l-demo-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* Loading */
+.l-demo-loading, .l-demo-loading-text {
+  display: none; align-items: center; gap: 8px;
+  font-size: 10px; color: var(--gold); font-weight: 500; margin-bottom: 10px;
+}
+.l-demo-loading.vis, .l-demo-loading-text.vis { display: flex; }
+.l-demo-bar-wrap { flex:1; height:2px; background:var(--line2); border-radius:2px; overflow:hidden; }
+.l-demo-bar { height:100%; width:0%; background:var(--gold); border-radius:2px; transition:width .4s; box-shadow:0 0 6px var(--glow); }
+
+/* Output */
+.l-demo-output {
+  background: var(--bg3); border:1px solid var(--line); border-left:2px solid var(--gold);
+  border-radius:7px; padding:10px 12px; display:none; animation: fadeUp .3s ease both;
+}
+.l-demo-output.vis, .l-demo-output-img.vis { display:block; }
+.l-demo-output-label { font-size:8.5px; font-weight:700; color:var(--gold); letter-spacing:.1em; text-transform:uppercase; margin-bottom:7px; }
+.l-demo-output-text { font-size:11.5px; color:var(--t1); line-height:1.75; white-space:pre-line; max-height:200px; overflow-y:auto; }
+.l-demo-output-copy { display:flex; justify-content:flex-end; margin-top:8px; }
+.l-demo-copy-btn { padding:3px 9px; background:rgba(245,197,24,.1); border:1px solid rgba(245,197,24,.2); border-radius:4px; font-size:9.5px; font-weight:600; color:var(--gold); cursor:pointer; }
+
+/* Empty states */
+.l-demo-img-empty, .l-demo-text-empty {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:8px; min-height:120px; color:var(--t2); font-size:10.5px; text-align:center;
+}
+
+/* Text agent panel */
+.l-demo-text-panel { padding:14px 16px; }
+.l-demo-agent-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(245,197,24,.08); border:1px solid rgba(245,197,24,.18);
+  border-radius:100px; padding:3px 10px; font-size:9px; font-weight:700;
+  color:var(--gold); letter-spacing:.06em; text-transform:uppercase; margin-bottom:8px;
+}
+.l-demo-agent-dot { width:5px; height:5px; border-radius:50%; background:var(--gold); animation:dcur 1.8s ease-in-out infinite; box-shadow:0 0 5px var(--gold); }
+.l-demo-agent-title { font-family:var(--f); font-size:15px; font-weight:700; color:var(--t0); letter-spacing:-.3px; margin-bottom:2px; }
+.l-demo-agent-sub { font-size:10.5px; color:var(--gold); font-weight:500; margin-bottom:10px; }
+.l-demo-refine-note {
+  display:flex; align-items:center; gap:7px;
+  background:rgba(245,197,24,.06); border:1px solid rgba(245,197,24,.14);
+  border-radius:6px; padding:7px 10px; font-size:9.5px; color:var(--t1);
+  margin-bottom:10px;
+}
+.l-demo-refine-dot { width:5px; height:5px; border-radius:50%; background:var(--gold); flex-shrink:0; }
+.l-demo-text-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.l-demo-text-left, .l-demo-text-right { display:flex; flex-direction:column; }
+.l-demo-select {
+  background:var(--bg3); border:1px solid var(--line2); border-radius:7px;
+  padding:7px 10px; font-size:10.5px; color:var(--t1); cursor:pointer;
+}
+
+/* Carousel preview */
+.l-demo-carousel-preview {
+  display:flex; gap:5px; overflow-x:auto; overflow-y:hidden; padding-bottom:3px;
+  scrollbar-width:thin; scrollbar-color:rgba(245,197,24,.3) transparent;
+}
+.l-demo-carousel-preview::-webkit-scrollbar { height:3px; }
+.l-demo-carousel-preview::-webkit-scrollbar-thumb { background:rgba(245,197,24,.3); border-radius:2px; }
+.l-demo-carousel-slide {
+  flex-shrink:0; width:72px; height:72px; border-radius:5px; overflow:hidden;
+  border:1px solid rgba(245,197,24,.22); background:#0a0a14;
+  animation:slide-reveal .35s cubic-bezier(.16,1,.3,1) both; cursor:default; transition:border-color .15s, transform .15s;
+}
+.l-demo-carousel-slide:hover { border-color:rgba(245,197,24,.55); transform:scale(1.05); }
+.l-demo-carousel-slide:nth-child(1){animation-delay:.00s}
+.l-demo-carousel-slide:nth-child(2){animation-delay:.10s}
+.l-demo-carousel-slide:nth-child(3){animation-delay:.20s}
+.l-demo-carousel-slide:nth-child(4){animation-delay:.30s}
+.l-demo-carousel-slide:nth-child(5){animation-delay:.40s}
+.l-demo-carousel-slide:nth-child(6){animation-delay:.50s}
+.l-demo-carousel-slide:nth-child(7){animation-delay:.60s}
+.l-demo-carousel-slide svg { width:100%; height:100%; display:block; }
+@keyframes slide-reveal { from{opacity:0;transform:translateY(6px) scale(.94)} to{opacity:1;transform:none} }
+
+/* Floating badges */
+.l-demo-badge { position:absolute; background:var(--bg2); border:1px solid var(--line2); border-radius:9px; padding:10px 14px; display:flex; align-items:center; gap:9px; box-shadow:0 8px 32px rgba(0,0,0,.4); animation:float-badge 4s ease-in-out infinite; white-space:nowrap; z-index:2; }
+.l-demo-badge-1 { top:-20px; right:-20px; animation-delay:0s; }
+.l-demo-badge-2 { bottom:-18px; left:-18px; animation-delay:2s; }
+@keyframes float-badge { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+.l-demo-badge-icon { width:28px; height:28px; border-radius:6px; background:rgba(245,197,24,.10); border:1px solid rgba(245,197,24,.2); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.l-demo-badge-icon svg { width:13px; height:13px; fill:none; stroke:var(--gold); stroke-width:2; }
+.l-demo-badge-val { font-family:var(--f); font-size:15px; font-weight:700; color:var(--t0); line-height:1; }
+.l-demo-badge-lbl { font-size:10px; color:var(--t1); margin-top:1px; }
+
+
+/* ── STATS STRIP ── */
+.l-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: transparent;
+  position: relative;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 52px;
+}
+/* top/bottom hairlines spanning full width */
+.l-stats::before,
+.l-stats::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(245,197,24,.18) 20%,
+    rgba(245,197,24,.35) 50%,
+    rgba(245,197,24,.18) 80%,
+    transparent 100%
+  );
+}
+.l-stats::before { top: 0; }
+.l-stats::after  { bottom: 0; }
+
+.l-stat {
+  padding: 24px 20px;
+  text-align: center;
+  position: relative;
+  cursor: default;
+  transition: transform .22s cubic-bezier(.16,1,.3,1);
+}
+/* vertical dividers between stats */
+.l-stat::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 20%; bottom: 20%;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(245,197,24,.2) 40%,
+    rgba(245,197,24,.2) 60%,
+    transparent
+  );
+}
+.l-stat:last-child::after { display: none; }
+.l-stat:hover { transform: translateY(-3px); }
+
+.l-stat-n {
+  font-family: 'MONR Pro', 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 52px;
+  font-weight: 700;
+  letter-spacing: -3px;
+  line-height: 1;
+  margin-bottom: 8px;
+  /* number = solid amber, suffix = dimmer */
+  color: rgba(245,197,24,.5);
+  /* subtle text shadow for depth */
+  text-shadow: 0 0 40px rgba(245,197,24,.25);
+}
+.l-stat-n em {
+  color: #F5C518;
+  font-style: normal;
+  text-shadow: 0 0 32px rgba(245,197,24,.45);
+}
+.l-stat-l {
+  font-family: 'MONR Pro', 'Inter', system-ui, sans-serif;
+  font-size: 9.5px;
+  color: rgba(242,240,236,.35);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* ── TICKER ── */
+.l-ticker-wrap {
+  overflow: hidden; border-bottom: 1px solid var(--line);
+  padding: 12px 0; background: var(--bg);
+}
+.l-ticker {
+  display: flex; width: max-content;
+  animation: ticker 32s linear infinite;
+}
+.l-ticker:hover { animation-play-state: paused; }
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.l-ticker-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 24px; white-space: nowrap;
+  font-size: 11.5px; font-weight: 600; color: var(--t2);
+  font-family: var(--f); letter-spacing: .04em; text-transform: uppercase;
+  transition: color .2s; cursor: default;
+}
+.l-ticker-item:hover { color: var(--gold); }
+.l-ticker-hl { display: flex; align-items: center; gap: 10px; }
+.l-ticker-sep {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--gold); opacity: .5; flex-shrink: 0;
+}
+
+/* ── SECTION WRAPPER ── */
+.l-section {
+  max-width: 1180px; margin: 0 auto; padding: 40px 52px;
+}
+.l-section-eyebrow {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 18px;
+}
+.l-section-eyebrow-dot {
+  width: 5px; height: 5px; border-radius: 50%; background: var(--gold); flex-shrink: 0;
+}
+.l-section-eyebrow-txt {
+  font-size: 10.5px; font-weight: 700; color: var(--gold);
+  letter-spacing: .14em; text-transform: uppercase;
+}
+.l-section-h {
+  font-family: var(--f);
+  font-size: clamp(30px, 4vw, 50px); font-weight: 800;
+  letter-spacing: -2px; line-height: 1.05; color: var(--t0); margin-bottom: 16px;
+}
+.l-section-sub {
+  font-size: 14.5px; color: var(--t1); line-height: 1.8;
+  max-width: 440px; margin-bottom: 28px;
+}
+
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-brand">
+    <div class="nav-mark">
+      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="14" height="12" rx="2"/><path d="M17 9l4-3v10l-4-3"/><line x1="7" y1="9" x2="13" y2="9"/><line x1="7" y1="12" x2="11" y2="12"/></svg>
+    </div>
+    <div class="nav-name">Auto<b>Postt</b></div>
+  </div>
+  <div class="nav-links">
+    <a href="#como-funciona">Como funciona</a>
+    <a href="#para-quem">Para quem</a>
+    <a href="#planos">Planos</a>
+  </div>
+  <div class="nav-ctas">
+    <button class="btn-main" onclick="go('signup')">Gerar meu post grátis</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+  <section id="land-hero" style="max-width:1280px;margin:0 auto;padding:0 52px;width:100%">
+    <div class="l-hero">
+
+      <!-- LEFT: Copy -->
+      <div class="l-hero-copy">
+        
+        <h1 class="l-hero-h1">
+          <span class="l-h1-dim">Pare de improvisar.</span>
+          <span class="l-h1-accent">Publique com sistema.</span>
+        </h1>
+        <p class="l-hero-sub">Descreva sua ideia. A IA aplica sua identidade de marca e gera posts, roteiros, carrosseis e anúncios prontos para publicar — em segundos.</p>
+        <div class="l-hero-acts">
+          <button class="l-btn-main" onclick="go('signup')">
+            Gerar meu post grátis
+            <svg style="width:15px;height:15px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+          <button class="l-btn-ghost" onclick="go('login')">Já tenho conta</button>
+        </div>
+        <div class="l-hero-trust">
+          <div class="l-hero-trust-dots">
+            <div class="l-hero-trust-dot"></div>
+            <div class="l-hero-trust-dot" style="opacity:.4"></div>
+            <div class="l-hero-trust-dot" style="opacity:.2"></div>
+          </div>
+          Sem cartão de crédito · Cancele quando quiser
+        </div>
+        <div class="l-scroll-hint" aria-hidden="true">
+          <div class="l-scroll-line"></div>
+          <span>scroll</span>
+        </div>
+      </div>
+
+      <!-- RIGHT: Fake product demo -->
+      <div class="l-hero-demo">
+        <!-- floating badges -->
+        <div class="l-demo-badge l-demo-badge-1">
+          <div class="l-demo-badge-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+          <div><div class="l-demo-badge-val">94%</div><div class="l-demo-badge-lbl">Taxa de aprovação</div></div>
+        </div>
+        <div class="l-demo-badge l-demo-badge-2">
+          <div class="l-demo-badge-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+          <div><div class="l-demo-badge-val">38k</div><div class="l-demo-badge-lbl">Conteúdos gerados</div></div>
+        </div>
+
+        <div class="l-demo-window" style="display:flex;flex-direction:row;min-height:620px;overflow:hidden">
+          <!-- Sidebar nav (like real app) -->
+          <div class="l-demo-sidebar">
+            <div class="l-demo-sb-logo">
+              <div class="l-demo-sb-mark"><svg viewBox="0 0 24 24" style="width:11px;height:11px;fill:none;stroke:#0D0D0F;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"><rect x="3" y="5" width="14" height="12" rx="2"/><path d="M17 9l4-3v10l-4-3"/><line x1="7" y1="9" x2="13" y2="9"/><line x1="7" y1="12" x2="11" y2="12"/></svg></div>
+              <span>Auto<b>Postt</b></span>
+            </div>
+            <div class="l-demo-sb-lbl">Agentes</div>
+            <div class="l-demo-nav-item active" id="dnav-imagem">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              Agente de Imagem
+            </div>
+            <div class="l-demo-nav-item" id="dnav-legenda">
+              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              Legenda
+            </div>
+            <div class="l-demo-nav-item" id="dnav-reels">
+              <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg>
+              Roteiro Reels
+            </div>
+            <div class="l-demo-nav-item" id="dnav-linkedin">
+              <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+              Post LinkedIn
+            </div>
+            <div class="l-demo-nav-item" id="dnav-story">
+              <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/></svg>
+              Ideias Story
+            </div>
+            <div class="l-demo-nav-item" id="dnav-tiktok">
+              <svg viewBox="0 0 24 24"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
+              Roteiro TikTok
+            </div>
+            <div class="l-demo-nav-item" id="dnav-yt">
+              <svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
+              Roteiro YouTube
+            </div>
+          </div>
+
+          <!-- Main content area -->
+          <div class="l-demo-main">
+            <div class="l-demo-topbar">
+              <div class="l-demo-dots"><div class="l-demo-dot"></div><div class="l-demo-dot"></div><div class="l-demo-dot"></div></div>
+              <div class="l-demo-topbar-title" id="demo-topbar-title">AutoPostt Studio — Agente de Imagem</div>
+            </div>
+            <div class="l-demo-body" id="demo-body-wrap">
+
+              <!-- AGENT: IMAGEM (image generator layout) -->
+              <div class="l-demo-panel" id="dpanel-imagem">
+                <div class="l-demo-panel-grid">
+                  <div class="l-demo-panel-left">
+                    <div class="l-demo-sect-lbl">Formato</div>
+                    <div class="l-demo-fmt-grid">
+                      <div class="l-demo-fmt active">
+                        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        Post único
+                      </div>
+                      <div class="l-demo-fmt">
+                        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="7" height="18" rx="1"/><rect x="9" y="3" width="7" height="18" rx="1"/></svg>
+                        Carrossel
+                      </div>
+                      <div class="l-demo-fmt">
+                        <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M9 10l3 3 3-3"/></svg>
+                        Anúncio
+                      </div>
+                      <div class="l-demo-fmt">
+                        <svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/></svg>
+                        Story
+                      </div>
+                      <div class="l-demo-fmt">
+                        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="1"/><circle cx="8" cy="9" r="2"/></svg>
+                        Thumbnail
+                      </div>
+                      <div class="l-demo-fmt">
+                        <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="10" rx="1"/></svg>
+                        Banner
+                      </div>
+                    </div>
+                    <div class="l-demo-sect-lbl" style="margin-top:10px">Rede social</div>
+                    <div class="l-demo-net-row">
+                      <div class="l-demo-net active">Instagram</div>
+                      <div class="l-demo-net">LinkedIn</div>
+                      <div class="l-demo-net">YouTube</div>
+                      <div class="l-demo-net">TikTok</div>
+                    </div>
+                    <div class="l-demo-sect-lbl" style="margin-top:10px">Sua ideia</div>
+                    <div class="l-demo-input-wrap" style="margin-bottom:8px">
+                      <div class="l-demo-input-text" id="demo-input-text"><span class="l-demo-cursor"></span></div>
+                    </div>
+                    <div class="l-demo-gen-btn-main" id="demo-gen-btn">
+                      <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:none;stroke:#fff;stroke-width:2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      Gerar conteúdo com IA
+                    </div>
+                  </div>
+                  <div class="l-demo-panel-right">
+                    <div class="l-demo-tabs">
+                      <div class="l-demo-tab active">Conceitos</div>
+                      <div class="l-demo-tab">Imagem gerada</div>
+                    </div>
+                    <div class="l-demo-loading" id="demo-loading">
+                      <span id="demo-loading-txt">Analisando identidade visual...</span>
+                      <div class="l-demo-bar-wrap"><div class="l-demo-bar" id="demo-bar"></div></div>
+                    </div>
+                    <div class="l-demo-output l-demo-output-img" id="demo-output-img" style="display:none">
+                      <div class="l-demo-output-label">Imagem gerada pela IA</div>
+                      <div class="l-demo-carousel-preview" id="demo-carousel-preview"></div>
+                      <div class="l-demo-output-copy"><div class="l-demo-copy-btn">Baixar JPG ↓</div></div>
+                    </div>
+                    <div class="l-demo-img-empty" id="demo-img-empty">
+                      <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:var(--ltx3);stroke-width:1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                      <span>Descreva sua ideia e clique em Gerar</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- AGENT: TEXT panels (legenda, reels, linkedin, story, tiktok, yt) -->
+              <div class="l-demo-panel l-demo-text-panel" id="dpanel-legenda" style="display:none">
+                <div class="l-demo-agent-badge"><span class="l-demo-agent-dot"></span>Agente IA</div>
+                <div class="l-demo-agent-title" id="dtitle-legenda">Gerador de Legenda</div>
+                <div class="l-demo-agent-sub" id="dsub-legenda">Cria legendas otimizadas para engajamento com CTAs, hashtags e emojis estratégicos.</div>
+                <div class="l-demo-refine-note"><span class="l-demo-refine-dot"></span>Seu input passa pelo agente refinador antes de ser processado</div>
+                <div class="l-demo-text-grid">
+                  <div class="l-demo-text-left">
+                    <div class="l-demo-sect-lbl">Sua ideia ou contexto</div>
+                    <div class="l-demo-input-wrap">
+                      <div class="l-demo-input-text l-demo-text-input" id="demo-text-input"><span class="l-demo-cursor"></span></div>
+                    </div>
+                    <div class="l-demo-sect-lbl" style="margin-top:8px">Tom de voz</div>
+                    <div class="l-demo-select">Usar perfil de marca ▾</div>
+                    <div class="l-demo-gen-btn-main" style="margin-top:10px" id="demo-gen-btn-text">
+                      <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:none;stroke:#fff;stroke-width:2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <span id="demo-gen-btn-label">Gerar Legenda</span>
+                    </div>
+                  </div>
+                  <div class="l-demo-text-right">
+                    <div class="l-demo-sect-lbl">Resultado</div>
+                    <div class="l-demo-loading l-demo-loading-text" id="demo-loading-text">
+                      <span id="demo-loading-txt-text">Refinando prompt...</span>
+                      <div class="l-demo-bar-wrap"><div class="l-demo-bar" id="demo-bar-text"></div></div>
+                    </div>
+                    <div class="l-demo-output" id="demo-output" style="display:none">
+                      <div class="l-demo-output-label">Gerado pela IA</div>
+                      <div class="l-demo-output-text" id="demo-output-text"></div>
+                      <div class="l-demo-output-copy"><div class="l-demo-copy-btn">Copiar ✓</div></div>
+                    </div>
+                    <div class="l-demo-text-empty" id="demo-text-empty">
+                      <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:var(--ltx3);stroke-width:1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <span>Descreva sua ideia e clique em Gerar</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat"><div class="stat-n">7</div><div class="stat-l">agentes de IA especializados</div></div>
+  <div class="stat"><div class="stat-n">6</div><div class="stat-l">formatos de conteúdo</div></div>
+  <div class="stat"><div class="stat-n">5min</div><div class="stat-l">do zero ao post publicado</div></div>
+  <div class="stat"><div class="stat-n">100%</div><div class="stat-l">adaptado ao seu nicho</div></div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <span class="ticker-item"><span class="ticker-hl">Legenda</span> · Instagram</span>
+    <span class="ticker-item"><span class="ticker-hl">Carrossel</span> · LinkedIn</span>
+    <span class="ticker-item"><span class="ticker-hl">Roteiro</span> · Reels</span>
+    <span class="ticker-item"><span class="ticker-hl">Story</span> · Sequência 7 slides</span>
+    <span class="ticker-item"><span class="ticker-hl">Thumbnail</span> · YouTube</span>
+    <span class="ticker-item"><span class="ticker-hl">Script</span> · TikTok viral</span>
+    <span class="ticker-item"><span class="ticker-hl">Post</span> · LinkedIn B2B</span>
+    <span class="ticker-item"><span class="ticker-hl">Banner</span> · Anúncio</span>
+    <!-- duplicate for seamless loop -->
+    <span class="ticker-item"><span class="ticker-hl">Legenda</span> · Instagram</span>
+    <span class="ticker-item"><span class="ticker-hl">Carrossel</span> · LinkedIn</span>
+    <span class="ticker-item"><span class="ticker-hl">Roteiro</span> · Reels</span>
+    <span class="ticker-item"><span class="ticker-hl">Story</span> · Sequência 7 slides</span>
+    <span class="ticker-item"><span class="ticker-hl">Thumbnail</span> · YouTube</span>
+    <span class="ticker-item"><span class="ticker-hl">Script</span> · TikTok viral</span>
+    <span class="ticker-item"><span class="ticker-hl">Post</span> · LinkedIn B2B</span>
+    <span class="ticker-item"><span class="ticker-hl">Banner</span> · Anúncio</span>
+  </div>
+</div>
+
+<!-- PROBLEMA / SOLUÇÃO -->
+<div class="section">
+  <div class="eyebrow"><div class="eyebrow-dot"></div><div class="eyebrow-txt">O problema que resolvemos</div></div>
+  <div class="ps-grid">
+    <div class="ps-card before">
+      <div class="ps-card-label">Sem AutoPostt</div>
+      <div class="ps-card-title">Criar conteúdo consome seu dia inteiro</div>
+      <div class="ps-row text-t1">
+        <div class="ps-row-icon x"><svg style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+        <div>Horas gastas por semana pensando em pauta</div>
+      </div>
+      <div class="ps-row text-t1">
+        <div class="ps-row-icon x"><svg style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+        <div>Copy genérica que não converte no seu nicho</div>
+      </div>
+      <div class="ps-row text-t1">
+        <div class="ps-row-icon x"><svg style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+        <div>Identidade visual inconsistente entre posts</div>
+      </div>
+      <div class="ps-row text-t1">
+        <div class="ps-row-icon x"><svg style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+        <div>Frequência irregular — perde alcance e relevância</div>
+      </div>
+    </div>
+    <div class="ps-card after">
+      <div class="ps-card-label">Com AutoPostt</div>
+      <div class="ps-card-title">Conteúdo profissional em 5 minutos</div>
+      <div class="ps-row text-t1">
+        <div class="ps-row-icon check"><svg style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div>IA treinada no seu nicho, tom de voz e branding</div>
+      </div>
+      <div class="ps-row text-t1">
+        <div class="ps-row-icon check"><svg style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div>7 agentes especializados: legenda, roteiro, imagem, story</div>
+      </div>
+      <div class="ps-row text-t1">
+        <div class="ps-row-icon check"><svg style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div>Branding automático aplicado em todos os formatos</div>
+      </div>
+      <div class="ps-row text-t1">
+        <div class="ps-row-icon check"><svg style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div>Consistência visual e de voz em 100% dos posts</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- HOW IT WORKS -->
+<div class="section" id="como-funciona">
+  <div class="eyebrow"><div class="eyebrow-dot"></div><div class="eyebrow-txt">Como funciona</div></div>
+  <h2 class="sec-h">4 passos.<br>Do zero ao post.</h2>
+  <p class="sec-sub">Sem curva de aprendizado. Sem configuração complexa. Funciona no primeiro uso.</p>
+  <div class="how-grid">
+    <div class="how-item">
+      <div class="how-num">01</div>
+      <div class="how-title">Conecte seu Instagram</div>
+      <div class="how-desc">A IA lê seu perfil público e define automaticamente seu posicionamento, nicho e branding visual.</div>
+    </div>
+    <div class="how-item">
+      <div class="how-num">02</div>
+      <div class="how-title">Revise seu branding kit</div>
+      <div class="how-desc">Confira cores, tom de voz e estilo gerados pela IA. Ajuste o que quiser em segundos.</div>
+    </div>
+    <div class="how-item">
+      <div class="how-num">03</div>
+      <div class="how-title">Descreva sua ideia</div>
+      <div class="how-desc">Uma frase é suficiente. Escolha o agente certo — legenda, roteiro, imagem ou story.</div>
+    </div>
+    <div class="how-item">
+      <div class="how-num">04</div>
+      <div class="how-title">Publique com confiança</div>
+      <div class="how-desc">Conteúdo pronto, com sua voz e identidade visual. Copie, baixe ou publique direto.</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PARA QUEM É -->
+<div class="section" id="para-quem">
+  <div class="eyebrow"><div class="eyebrow-dot"></div><div class="eyebrow-txt">Para quem é</div></div>
+  <h2 class="sec-h">Feito para quem<br>vende com conteúdo.</h2>
+  <p class="sec-sub">Do mentor ao gestor comercial — o AutoPostt adapta o conteúdo ao seu nicho automaticamente.</p>
+  <div class="cases-grid" id="cases-grid">
+    <div class="case">
+      <div class="case-num">01</div>
+      <div class="case-title">Mentores e Coaches</div>
+      <div class="case-desc">Roteiros de autoridade, posts que geram DMs e legendas que vendem sua metodologia sem parecer genérico.</div>
+      <div class="case-tags"><span class="case-tag">Legenda</span><span class="case-tag">Reels</span><span class="case-tag">Story</span></div>
+    </div>
+    <div class="case">
+      <div class="case-num">02</div>
+      <div class="case-title">Gestores Comerciais</div>
+      <div class="case-desc">Posts LinkedIn que geram leads B2B, vídeos de autoridade e criativos com copy de alta conversão.</div>
+      <div class="case-tags"><span class="case-tag">LinkedIn</span><span class="case-tag">YouTube</span></div>
+    </div>
+    <div class="case">
+      <div class="case-num">03</div>
+      <div class="case-title">Criadores de Conteúdo</div>
+      <div class="case-desc">Roteiros, capas e legendas em minutos. Consistência visual entre todos os canais sem designer.</div>
+      <div class="case-tags"><span class="case-tag">TikTok</span><span class="case-tag">Reels</span><span class="case-tag">Capa</span></div>
+    </div>
+    <div class="case">
+      <div class="case-num">04</div>
+      <div class="case-title">Psicólogos e Profissionais de Saúde</div>
+      <div class="case-desc">Conteúdo educativo que gera confiança, atrai pacientes e posiciona autoridade de forma ética.</div>
+      <div class="case-tags"><span class="case-tag">Legenda</span><span class="case-tag">Story</span></div>
+    </div>
+    <div class="case">
+      <div class="case-num">05</div>
+      <div class="case-title">E-commerce e Infoprodutos</div>
+      <div class="case-desc">Criativos de anúncio com alta CTR, stories de produto e thumbnails que aumentam alcance orgânico.</div>
+      <div class="case-tags"><span class="case-tag">Anúncio</span><span class="case-tag">Thumbnail</span></div>
+    </div>
+    <div class="case">
+      <div class="case-num">06</div>
+      <div class="case-title">Qualquer profissional liberal</div>
+      <div class="case-desc">Médicos, advogados, arquitetos, contadores — o AutoPostt adapta tom e formato ao seu nicho automaticamente.</div>
+      <div class="case-tags"><span class="case-tag">LinkedIn</span><span class="case-tag">Legenda</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PLANOS -->
+<div class="section" id="planos">
+  <div class="eyebrow"><div class="eyebrow-dot"></div><div class="eyebrow-txt">Planos</div></div>
+  <h2 class="sec-h">Quanto custa continuar<br><span style="color:var(--gold)">fazendo isso manualmente?</span></h2>
+  <p class="sec-sub" style="margin-bottom:40px">Tempo também é custo. E você está pagando todo dia. Cancele quando quiser.</p>
+  <div class="plans-grid" id="land-plans-grid">
+    <!-- rendered by JS from /api/plans -->
+    <div class="plan">
+      <div class="plan-name">Starter</div>
+      <div class="plan-price">R$47<span>/mês</span></div>
+      <div class="plan-tagline">Para quem quer começar a postar sem esforço.</div>
+      <div class="plan-feat-row"><span class="plan-feat-check">✓</span>30 posts gerados por mês</div>
+      <div class="plan-feat-row"><span class="plan-feat-check">✓</span>Criação automática de copy</div>
+      <div class="plan-feat-row"><span class="plan-feat-check">✓</span>Publicação automática</div>
+      <div class="plan-feat-row"><span class="plan-feat-check">✓</span>1 conta conectada</div>
+      <div class="plan-feat-row"><span class="plan-feat-check">✓</span>Suporte por email</div>
+      <button class="plan-btn outline" onclick="go('signup')">Começar agora</button>
+    </div>
+    <div class="plan feat">
+      <div class="plan-popular">Mais popular</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price">R$97<span>/mês</span></div>
+      <div class="plan-tagline">Para quem quer crescer de verdade.</div>
+      <div class="plan-feat-row"><span class="plan-feat-check">✓</span>Posts ilimitados</div>
+      <div class="plan-feat-row"><span class="plan-feat-check">✓</span>Criativo gerado automaticamente</div>
+      <div class="plan-feat-row"><span class="plan-feat-check">✓</span>Carrossel estruturado</div>
+      <div class="plan-feat-row"><span class="plan-feat-check">✓</span>Múltiplas contas</div>
+      <div class="plan-feat-row"><span class="plan-feat-check">✓</span>Prioridade de geração</div>
+      <div class="plan-feat-row"><span class="plan-feat-check">✓</span>Suporte prioritário</div>
+      <button class="plan-btn primary" onclick="go('signup')">Quero o Pro →</button>
+    </div>
+    <div class="plan">
+      <div class="plan-name">Business</div>
+      <div class="plan-price">R$197<span>/mês</span></div>
+      <div class="plan-tagline">Para operação e volume.</div>
+      <div class="plan-feat-row"><span class="plan-feat-check">✓</span>Tudo do Pro</div>
+      <div class="plan-feat-row"><span class="plan-feat-check">✓</span>Contas ilimitadas</div>
+      <div class="plan-feat-row"><span class="plan-feat-check">✓</span>Dashboard de controle</div>
+      <div class="plan-feat-row"><span class="plan-feat-check">✓</span>Relatório de desempenho</div>
+      <div class="plan-feat-row"><span class="plan-feat-check">✓</span>Suporte VIP</div>
+      <div class="plan-feat-row"><span class="plan-feat-check">✓</span>Onboarding dedicado</div>
+      <button class="plan-btn outline" onclick="go('signup')">Falar com vendas</button>
+    </div>
+  </div>
+  <div class="plans-note">Sem cartão de crédito para começar. Cancele quando quiser. <a href="#" onclick="go('signup');return false">Trial grátis com 5 gerações.</a></div>
+</div>
+
+<!-- CTA BANNER -->
+<div class="cta-banner">
+  <div class="cta-banner-eyebrow">Comece agora</div>
+  <div class="cta-banner-h">Enquanto você lê isso,<br><span>seu concorrente já publicou.</span></div>
+  <div class="cta-banner-sub">Ele criou legenda, roteiro e post para 3 redes — em menos de 5 minutos.</div>
+  <button class="cta-main" onclick="go('signup')">Criar conta grátis — 5 gerações</button>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-brand">
+    <div class="footer-mark">
+      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="14" height="12" rx="2"/><path d="M17 9l4-3v10l-4-3"/><line x1="7" y1="9" x2="13" y2="9"/><line x1="7" y1="12" x2="11" y2="12"/></svg>
+    </div>
+    <span>© 2025 AutoPostt · Todos os direitos reservados</span>
+  </div>
+  <div style="display:flex;gap:20px">
+    <a href="#" style="color:var(--t2)">Privacidade</a>
+    <a href="#" style="color:var(--t2)">Termos</a>
+    <a href="#" onclick="go('login');return false" style="color:var(--t2)">Entrar</a>
+  </div>
+</footer>
+
+<script>
+// APP_URL — where the app (autopostt-app.html) is served
+const APP_URL = '';  // same origin: ''; different domain: 'https://app.autopostt.com.br'
+
+function go(screen) {
+  // Redirect to app with screen param
+  if (APP_URL) {
+    window.location.href = APP_URL + '?screen=' + screen;
+  } else {
+    // Same origin — app is at /app
+    window.location.href = '/app?screen=' + screen;
+  }
+}
+
+// Load plans dynamically from API
+async function loadPlans() {
+  try {
+    const data = await fetch('/api/plans').then(r => r.json()).catch(() => null);
+    if (!data || !data.plans?.length) return;
+    const plans = data.plans;
+    const grid = document.getElementById('land-plans-grid');
+    if (!grid) return;
+
+    const taglines = {
+      free: 'Trial gratuito — sem cartão.',
+      starter: 'Para quem quer começar a postar sem esforço.',
+      pro: 'Para quem quer crescer de verdade.',
+      elite: 'Para operação e volume.',
+      business: 'Para operação e volume.'
+    };
+    const btnLabels = { free: 'Começar grátis', starter: 'Começar agora', pro: 'Quero o Pro →', elite: 'Falar com vendas', business: 'Falar com vendas' };
+    const isFeaturedId = { pro: true };
+
+    grid.innerHTML = plans.map((p, i) => {
+      const isFeat = isFeaturedId[p.id] || (i === 1 && plans.length >= 3);
+      const price = p.price === 0 ? 'Grátis' : 'R$' + Math.floor(p.price / 100);
+      const priceSuffix = p.price === 0 ? '' : '<span>/mês</span>';
+      const tagline = taglines[p.id] || taglines[p.name?.toLowerCase()] || '';
+      const btnLabel = btnLabels[p.id] || ('Assinar ' + p.name);
+      return `
+        <div class="plan${isFeat ? ' feat' : ''}">
+          ${isFeat ? '<div class="plan-popular">Mais popular</div>' : ''}
+          <div class="plan-name">${p.name}</div>
+          <div class="plan-price">${price}${priceSuffix}</div>
+          <div class="plan-tagline">${tagline}</div>
+          ${(p.features || []).map(f => `<div class="plan-feat-row"><span class="plan-feat-check">✓</span>${f}</div>`).join('')}
+          <button class="plan-btn ${isFeat ? 'primary' : 'outline'}" onclick="go('signup')">${btnLabel}</button>
+        </div>`;
+    }).join('');
+  } catch {}
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+async function loadLandingPlans() {
+  try {
+    const data = await fetch('/api/plans').then(r => r.json()).catch(() => null);
+    if (!data) return;
+    const plans = data.plans || [];
+    const packages = (data.packages || []).filter(p => p.active);
+
+    // Update LP plan grid if it exists
+    const lpGrid = document.getElementById('land-plans-grid');
+    if (lpGrid && plans.length) {
+      lpGrid.innerHTML = plans.map((p, i) => {
+        const isFeatured = p.id === 'pro' || (i === 1 && plans.length >= 3);
+        const price = p.price === 0 ? 'Grátis' : 'R$' + Math.floor(p.price/100);
+        const priceDetail = p.price === 0 ? '' : '<span>/mês</span>';
+        return `
+        <div style="background:var(--bg2);border:${isFeatured ? '2px solid var(--gold)' : '1px solid var(--line)'};border-radius:12px;padding:28px;position:relative;overflow:hidden;${isFeatured ? 'background:linear-gradient(145deg,rgba(255,92,26,.07) 0%,var(--bg2) 55%)' : ''}">
+          ${isFeatured ? '<div style="position:absolute;top:0;right:20px;background:var(--gold);color:#fff;font-size:10px;font-weight:700;padding:4px 12px;border-radius:0 0 8px 8px;letter-spacing:.06em">MAIS POPULAR</div>' : ''}
+          <div style="font-family:Syne,sans-serif;font-size:14px;font-weight:700;color:var(--t1);letter-spacing:.04em;text-transform:uppercase;margin-bottom:12px">${esc(p.name)}</div>
+          <div style="font-family:Syne,sans-serif;font-size:40px;font-weight:800;letter-spacing:-2px;color:var(--t0);line-height:1;margin-bottom:3px">${price}${priceDetail ? '<span style="font-size:14px;font-weight:400;color:var(--t2)">/mês</span>' : ''}</div>
+          <div style="font-size:12px;color:var(--t2);margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--line)">${p.quota.toLocaleString()} gerações / mês</div>
+          ${(p.features||[]).map(f => `<div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--t1);margin-bottom:8px"><span style="color:var(--gold);margin-top:1px">→</span>${esc(f)}</div>`).join('')}
+          <button style="width:100%;margin-top:20px;padding:12px;font-family:Syne,sans-serif;font-size:13px;font-weight:700;border-radius:7px;cursor:pointer;${isFeatured ? 'background:var(--gold);color:#fff;border:none' : 'background:transparent;color:var(--t0);border:1px solid var(--line2)'}" onclick="go('signup')">${p.price === 0 ? 'Começar grátis' : 'Assinar ' + esc(p.name)}</button>
+        </div>`;
+      }).join('');
+    }
+  } catch {}
+}
+
+
+loadPlans();
+loadLandingPlans();
+
+(function() {
+
+  // ── DEMO AGENT CONFIG ──
+  var DEMO_AGENTS = {
+    imagem:  [
+      { input:'Post sobre os 3 maiores erros de gestão comercial', fmt:'Post único',    stages:['Analisando identidade visual...','Construindo layout...','Aplicando marca...'],  imageMode:true, fmtIdx:0 },
+      { input:'Carrossel com os 5 erros que impedem vendedores',   fmt:'Carrossel',     stages:['Estruturando slides...','Aplicando grid...','Renderizando...'],                   imageMode:true, fmtIdx:1 },
+      { input:'Anúncio de alta conversão para curso de vendas',    fmt:'Anúncio',       stages:['Analisando copy...','Definindo hierarquia...','Gerando criativo...'],             imageMode:true, fmtIdx:2 },
+      { input:'Story de autoridade para coach de negócios',        fmt:'Story',         stages:['Criando sequência...','Aplicando cor da marca...','Finalizando...'],              imageMode:true, fmtIdx:3 },
+      { input:'Thumbnail de impacto para vídeo sobre vendas',      fmt:'Thumbnail',     stages:['Analisando CTR...','Construindo composição...','Refinando...'],                  imageMode:true, fmtIdx:4 },
+      { input:'Banner LinkedIn para profissional de vendas',       fmt:'Banner',        stages:['Definindo proporção...','Aplicando identidade...','Renderizando banner...'],      imageMode:true, fmtIdx:5 },
+    ],
+    legenda: { label:'Gerador de Legenda', sub:'Cria legendas otimizadas para engajamento com CTAs, hashtags e emojis estratégicos.', btnLabel:'Gerar Legenda' },
+    reels:   { label:'Roteiro para Reels', sub:'Scripts de 30–90s com gancho nos primeiros 3 segundos para máximo alcance.', btnLabel:'Gerar Roteiro Reels' },
+    linkedin:{ label:'Post LinkedIn',      sub:'Posts estruturados com autoridade e CTA para gerar leads B2B qualificados.', btnLabel:'Gerar Post LinkedIn' },
+    story:   { label:'Ideias para Story',  sub:'Sequências de stories com narrativa, enquetes e interação para aumentar alcance.', btnLabel:'Gerar Ideias de Story' },
+    tiktok:  { label:'Roteiro TikTok',     sub:'Scripts virais de 30–60s com trend hook e call-to-action de alto impacto.', btnLabel:'Gerar Roteiro TikTok' },
+    yt:      { label:'Roteiro YouTube',    sub:'Roteiros completos com hook, desenvolvimento e CTA para vídeos de alta retenção.', btnLabel:'Gerar Roteiro YouTube' },
+  };
+
+  var DEMO_SEQUENCES = {
+    imagem:  { input:'Carrossel sobre os 5 erros que impedem vendedores de bater meta', stages:['Analisando identidade visual...','Construindo composição...','Renderizando slides...'], imageMode:true },
+    legenda: { input:'Post sobre os 3 maiores erros de gestão comercial que custam vendas', stages:['Analisando contexto...','Aplicando tom de voz...','Estruturando CTA...'], output:'Você não precisa de mais leads.\nPrecisa parar de perder os que já tem.\n\n→ Erro 1: Pitch antes do diagnóstico\n→ Erro 2: Follow-up sem gatilho real\n→ Erro 3: Falta de cadência sistêmica\n\nQual está custando mais na sua operação?\n\n#gestãocomercial #vendas #liderança' },
+    reels:   { input:'Reels mostrando como estruturar uma rotina comercial de alta performance', stages:['Criando hook de 3s...','Estruturando script...','Adicionando CTAs...'], output:'[Abre câmera — olha direto]\n\nSe você não tem uma rotina, você não tem um negócio — você tem sorte. E sorte acaba.\n\n[Corte] Os 3 blocos que vendedores top protegem:\n\n✦ Prospecção ativa — todos os dias\n✦ Follow-up com gatilho\n✦ Revisão de pipeline — 15min\n\n[CTA] Salva esse roteiro.' },
+    linkedin:{ input:'Post sobre liderança comercial e construção de time de alta performance', stages:['Gerando hook B2B...','Estruturando narrativa...','Otimizando engajamento...'], output:'Contratei 12 vendedores em 2 anos.\n\nSó 3 passaram dos 6 meses.\n\nO padrão dos que ficaram me surpreendeu — não era o mais extrovertido nem o mais experiente.\n\nEra o que revisava o próprio pipeline toda sexta.\n\nLiderança comercial não é motivar. É criar hábitos que scalem.' },
+    story:   { input:'Stories para lançamento de mentoria de gestão comercial', stages:['Criando sequência...','Adicionando enquetes...','Estruturando arco...'], output:'Story 1 → Pergunta polêmica\nStory 2 → Enquete estratégica\nStory 3 → Revelação inesperada\nStory 4 → Prova social\nStory 5 → Bastidor real\nStory 6 → Objeção + quebra\nStory 7 → CTA com urgência' },
+    tiktok:  { input:'Vídeo sobre como fechei R$50k em vendas usando apenas o WhatsApp', stages:['Identificando trend hook...','Criando script viral...','Otimizando retenção...'], output:'[Áudio trending]\n\nPOV: você descobriu que dá pra fechar R$50k no WhatsApp sem cold call\n\n→ Mudei o timing do follow-up\n→ Criei sequência de 5 mensagens\n→ Parei de vender, comecei a diagnosticar\n\nResultado: R$52k em 23 dias.' },
+    yt:      { input:'Vídeo completo sobre como estruturar equipe comercial de alta performance', stages:['Criando hook de abertura...','Desenvolvendo estrutura...','Escrevendo CTA final...'], output:'[0:00–0:15] HOOK\n"Essa é a técnica que consultores cobram R$30k para ensinar."\n\n[0:15–2:00] SETUP\nContexto + Problema\n\n[2:00–12:00] CONTEÚDO\nPasso 1: Diagnóstico\nPasso 2: Cadência\nPasso 3: Métricas\n\n[12:00–13:00] CTA\n"Comenta sua maior dificuldade."' },
+  };
+
+  var _demoAgent = 'imagem';
+  var _demoAutoTimer = null;
+  var _demoOrder = ['imagem','legenda','reels','linkedin','story','tiktok','yt'];
+  var _demoIdx = 0;
+  var _demoImgFmtIdx = 0;
+  var _demoRunning = false;
+
+  function demoNav(agent, el) {
+    // Update sidebar active state
+    document.querySelectorAll('.l-demo-nav-item').forEach(function(n){ n.classList.remove('active'); });
+    if (el) el.classList.add('active');
+
+    // Update topbar
+    var cfg = DEMO_AGENTS[agent];
+    var tt = document.getElementById('demo-topbar-title');
+    if (tt && cfg) tt.textContent = 'AutoPostt Studio — ' + cfg.label;
+
+    // Show/hide panels
+    var imgPanel  = document.getElementById('dpanel-imagem');
+    var textPanel = document.getElementById('dpanel-legenda');
+    if (imgPanel)  imgPanel.style.display  = agent === 'imagem' ? 'block' : 'none';
+    if (textPanel) textPanel.style.display = agent !== 'imagem' ? 'block' : 'none';
+
+    // Update text panel content for current agent
+    if (agent !== 'imagem' && cfg) {
+      var titleEl = document.getElementById('dtitle-legenda');
+      var subEl   = document.getElementById('dsub-legenda');
+      var btnEl   = document.getElementById('demo-gen-btn-label');
+      if (titleEl) titleEl.textContent = cfg.label;
+      if (subEl)   subEl.textContent   = cfg.sub || '';
+      if (btnEl)   btnEl.textContent   = cfg.btnLabel || 'Gerar';
+    }
+
+    // Reset outputs
+    resetDemoOutputs();
+
+    _demoAgent = agent;
+    _demoIdx = _demoOrder.indexOf(agent);
+
+    // Clear auto timer and restart with this agent
+    if (_demoAutoTimer) clearTimeout(_demoAutoTimer);
+    _demoAutoTimer = setTimeout(function(){ runDemoSeq(agent); }, 800);
+  }
+
+  function resetDemoOutputs() {
+    var els = ['demo-loading','demo-loading-text','demo-output','demo-output-img','demo-text-empty','demo-img-empty'];
+    els.forEach(function(id){
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove('vis');
+      el.style.display = '';
+    });
+    var barEls = ['demo-bar','demo-bar-text'];
+    barEls.forEach(function(id){ var el=document.getElementById(id); if(el) el.style.width='0%'; });
+    var empty1 = document.getElementById('demo-img-empty');
+    var empty2 = document.getElementById('demo-text-empty');
+    if (empty1) empty1.style.display = 'flex';
+    if (empty2) empty2.style.display = 'flex';
+  }
+
+  function runDemoSeq(agent) {
+    if (!agent) agent = _demoAgent;
+    var seqData = DEMO_SEQUENCES[agent];
+    var seq = Array.isArray(seqData) ? seqData[_demoImgFmtIdx % seqData.length] : seqData;
+    if (!seq) return;
+    if (Array.isArray(seqData)) {
+      // update active format btn
+      var fmtBtns = document.querySelectorAll('.l-demo-fmt');
+      fmtBtns.forEach(function(b,i){ b.classList.toggle('active', i === (seq.fmtIdx||0)); });
+    }
+    if (!seq) return;
+    var cfg = DEMO_AGENTS[agent];
+
+    resetDemoOutputs();
+
+    // Type input
+    var inputEl = document.getElementById(agent === 'imagem' ? 'demo-input-text' : 'demo-text-input');
+    if (!inputEl) return;
+    inputEl.innerHTML = '<span class="l-demo-cursor"></span>';
+    var txt = seq.input, i = 0;
+    var typeTimer = setInterval(function() {
+      if (i >= txt.length) {
+        clearInterval(typeTimer);
+        startDemoLoading(agent, seq, cfg);
+        return;
+      }
+      inputEl.innerHTML = txt.slice(0,++i) + '<span class="l-demo-cursor"></span>';
+    }, 24);
+  }
+
+  function startDemoLoading(agent, seq, cfg) {
+    var loadId   = agent === 'imagem' ? 'demo-loading'      : 'demo-loading-text';
+    var loadTxt  = agent === 'imagem' ? 'demo-loading-txt'  : 'demo-loading-txt-text';
+    var barId    = agent === 'imagem' ? 'demo-bar'          : 'demo-bar-text';
+    var emptyId  = agent === 'imagem' ? 'demo-img-empty'    : 'demo-text-empty';
+
+    var loadEl  = document.getElementById(loadId);
+    var loadTEl = document.getElementById(loadTxt);
+    var barEl   = document.getElementById(barId);
+    var emptyEl = document.getElementById(emptyId);
+
+    if (emptyEl) emptyEl.style.display = 'none';
+    if (loadEl)  loadEl.classList.add('vis');
+
+    var si = 0;
+    var stageTimer = setInterval(function(){
+      if (loadTEl && si < seq.stages.length) loadTEl.textContent = seq.stages[si++];
+    }, 700);
+    var bw = 0;
+    var barTimer = setInterval(function(){
+      bw += 2.2;
+      if (barEl) barEl.style.width = Math.min(bw,92)+'%';
+      if (bw >= 92) clearInterval(barTimer);
+    }, 55);
+
+    setTimeout(function(){
+      clearInterval(stageTimer); clearInterval(barTimer);
+      if (barEl) barEl.style.width = '100%';
+      if (loadEl) loadEl.classList.remove('vis');
+
+      if (seq.imageMode) {
+        // Render SVG carousel
+        var imgOut  = document.getElementById('demo-output-img');
+        var preview = document.getElementById('demo-carousel-preview');
+        if (imgOut) { imgOut.style.display = 'block'; imgOut.classList.add('vis'); }
+        if (preview) {
+          preview.innerHTML = '';
+          buildCarouselSVGs().forEach(function(svg,i){
+            var d = document.createElement('div');
+            d.className = 'l-demo-carousel-slide';
+            d.innerHTML = svg;
+            d.style.animationDelay = (i*.1)+'s';
+            preview.appendChild(d);
+          });
+        }
+      } else {
+        // Render text output
+        var outWrap = document.getElementById('demo-output');
+        var outEl   = document.getElementById('demo-output-text');
+        if (outWrap) { outWrap.style.display = 'block'; outWrap.classList.add('vis'); }
+        if (outEl) {
+          outEl.textContent = '';
+          var o = seq.output || '', j = 0;
+          var printTimer = setInterval(function(){
+            if (j >= o.length){ clearInterval(printTimer); scheduleNextDemo(); return; }
+            outEl.textContent = o.slice(0,++j);
+          }, 9);
+          return;
+        }
+      }
+      scheduleNextDemo();
+    }, 2800);
+  }
+
+  function scheduleNextDemo() {
+    // If imagem and still has formats, cycle format
+    if (_demoAgent === 'imagem' && Array.isArray(DEMO_SEQUENCES['imagem'])) {
+      _demoImgFmtIdx++;
+      if (_demoImgFmtIdx < DEMO_SEQUENCES['imagem'].length) {
+        _demoAutoTimer = setTimeout(function(){ runDemoSeq('imagem'); }, 2500);
+        return;
+      } else {
+        _demoImgFmtIdx = 0;
+      }
+    }
+    _demoAutoTimer = setTimeout(function(){
+      _demoIdx = (_demoIdx + 1) % _demoOrder.length;
+      var nextAgent = _demoOrder[_demoIdx];
+      var navEl = document.getElementById('dnav-' + nextAgent);
+      demoNav(nextAgent, navEl);
+    }, 4000);
+  }
+
+  // ── BUILD CAROUSEL SVGs ──
+
+  function buildCarouselSVGs() {
+    var ac  = '#F5C518';   // amber
+    var bg  = '#09090E';   // dark base
+    var bg2 = '#0D0D15';   // slide bg
+    var tx  = '#F2F0EC';   // white text
+    var tx2 = 'rgba(242,240,236,.5)'; // muted text
+
+    function base(content, idx) {
+      return '<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">'
+        + '<rect width="400" height="400" fill="' + bg2 + '"/>'
+        + '<defs><linearGradient id="gb' + idx + '" x1="0%" y1="0%" x2="100%" y2="100%">'
+        + '<stop offset="0%" stop-color="' + ac + '" stop-opacity=".12"/>'
+        + '<stop offset="100%" stop-color="transparent" stop-opacity="0"/>'
+        + '</linearGradient></defs>'
+        + '<rect width="400" height="400" fill="url(#gb' + idx + ')"/>'
+        + '<rect x="0" y="0" width="400" height="3" fill="' + ac + '"/>'
+        + content
+        + '<text x="360" y="390" font-family="system-ui,sans-serif" font-size="9" fill="rgba(242,240,236,.25)" text-anchor="middle" letter-spacing=".1em">'
+        + (idx) + '/7</text>'
+        + '</svg>';
+    }
+
+    function numBig(n) {
+      return '<text x="24" y="95" font-family="system-ui,sans-serif" font-size="72" font-weight="800" fill="' + ac + '" opacity=".13" letter-spacing="-4">'
+        + (n < 10 ? '0' + n : n) + '</text>';
+    }
+
+    function slideTitle(line1, line2) {
+      return '<text x="24" y="176" font-family="system-ui,sans-serif" font-size="17" font-weight="700" fill="' + tx + '" letter-spacing="-.4">' + line1 + '</text>'
+        + '<text x="24" y="198" font-family="system-ui,sans-serif" font-size="17" font-weight="700" fill="' + ac + '" letter-spacing="-.4">' + line2 + '</text>';
+    }
+
+    function slideDesc(line1, line2) {
+      return '<text x="24" y="232" font-family="system-ui,sans-serif" font-size="11" fill="' + tx2 + '">' + line1 + '</text>'
+        + (line2 ? '<text x="24" y="249" font-family="system-ui,sans-serif" font-size="11" fill="' + tx2 + '">' + line2 + '</text>' : '')
+        + '<line x1="24" y1="290" x2="110" y2="290" stroke="rgba(245,197,24,.28)" stroke-width="1"/>';
+    }
+
+    function badge(label) {
+      return '<text x="24" y="314" font-family="system-ui,sans-serif" font-size="9" fill="rgba(242,240,236,.28)" letter-spacing=".1em">' + label + '</text>';
+    }
+
+    var slides = [
+
+      // S1 — CAPA
+      base(
+        '<rect x="24" y="155" width="3" height="70" fill="' + ac + '" rx="2"/>'
+        + '<text x="38" y="190" font-family="system-ui,sans-serif" font-size="20" font-weight="800" fill="' + tx + '" letter-spacing="-1">5 erros que</text>'
+        + '<text x="38" y="214" font-family="system-ui,sans-serif" font-size="20" font-weight="800" fill="' + ac + '" letter-spacing="-1">destroem</text>'
+        + '<text x="38" y="238" font-family="system-ui,sans-serif" font-size="20" font-weight="800" fill="' + ac + '" letter-spacing="-1">vendedores</text>'
+        + '<text x="38" y="262" font-family="system-ui,sans-serif" font-size="12" fill="' + tx2 + '" font-weight="400">antes dos 90 dias</text>'
+        + '<rect x="24" y="316" width="60" height="1" fill="rgba(245,197,24,.3)"/>'
+        + '<text x="24" y="334" font-family="system-ui,sans-serif" font-size="9" fill="rgba(242,240,236,.3)" letter-spacing=".1em">CONTINUE DESLIZANDO →</text>',
+        1
+      ),
+
+      // S2 — Erro 01
+      base(numBig(1)
+        + slideTitle('Pitch antes', 'do diagnóstico')
+        + slideDesc('Você vende antes de entender', 'qual é o problema real.')
+        + badge('ERRO 1 DE 5'),
+        2
+      ),
+
+      // S3 — Erro 02
+      base(numBig(2)
+        + slideTitle('Follow-up', 'sem gatilho real')
+        + slideDesc('Cadência sem contexto', 'é só spam com agenda.')
+        + badge('ERRO 2 DE 5'),
+        3
+      ),
+
+      // S4 — Erro 03
+      base(numBig(3)
+        + slideTitle('Sem cadência', 'definida')
+        + slideDesc('Improviso não escala.', 'Você precisa de um sistema.')
+        + badge('ERRO 3 DE 5'),
+        4
+      ),
+
+      // S5 — Erro 04
+      base(numBig(4)
+        + slideTitle('Pipeline', 'desatualizado')
+        + slideDesc('Dado velho = decisão errada.', 'Revise pipeline toda sexta.')
+        + badge('ERRO 4 DE 5'),
+        5
+      ),
+
+      // S6 — Erro 05
+      base(numBig(5)
+        + slideTitle('Vender', 'para todo mundo')
+        + slideDesc('Sem ICP definido,', 'energia vai pro lugar errado.')
+        + badge('ERRO 5 DE 5'),
+        6
+      ),
+
+      // S7 — CTA
+      base(
+        '<text x="24" y="170" font-family="system-ui,sans-serif" font-size="15" font-weight="700" fill="' + tx + '" letter-spacing="-.3">Qual desses está</text>'
+        + '<text x="24" y="192" font-family="system-ui,sans-serif" font-size="15" font-weight="700" fill="' + tx + '" letter-spacing="-.3">acontecendo na</text>'
+        + '<text x="24" y="214" font-family="system-ui,sans-serif" font-size="15" font-weight="700" fill="' + ac + '" letter-spacing="-.3">sua operação?</text>'
+        + '<text x="24" y="248" font-family="system-ui,sans-serif" font-size="11" fill="' + tx2 + '">Comenta aqui embaixo 👇</text>'
+        + '<rect x="24" y="275" width="120" height="26" rx="5" fill="' + ac + '"/>'
+        + '<text x="84" y="293" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">Comentar agora</text>',
+        7
+      ),
+    ];
+
+    return slides;
+  }
+  function runSeq() {
+    var s = SEQUENCES[seq % SEQUENCES.length];
+
+    // Reset
+    if (outputWrap) { outputWrap.classList.remove('vis'); }
+    if (loadingEl) { loadingEl.classList.remove('vis'); }
+    if (barEl) { barEl.style.width = '0%'; }
+    if (genBtn) { genBtn.style.opacity = '1'; }
+    inputEl.innerHTML = '<span class="l-demo-cursor"></span>';
+
+    setActiveAgent(s.agent, s.label);
+
+    // Type input
+    setTimeout(function() {
+      typeText(inputEl, s.input, 28, function() {
+        // Show loading
+        setTimeout(function() {
+          if (genBtn) genBtn.style.opacity = '.6';
+          if (loadingEl) loadingEl.classList.add('vis');
+
+          var stageI = 0;
+          var stageTimer = setInterval(function() {
+            if (!loadingTxt) return;
+            if (stageI < STAGES.length) { loadingTxt.textContent = STAGES[stageI++]; }
+          }, 700);
+
+          // Animate bar
+          var barW = 0;
+          var barTimer = setInterval(function() {
+            barW += 2.2;
+            if (barEl) barEl.style.width = Math.min(barW, 92) + '%';
+            if (barW >= 92) clearInterval(barTimer);
+          }, 60);
+
+          setTimeout(function() {
+            clearInterval(stageTimer);
+            clearInterval(barTimer);
+            if (barEl) barEl.style.width = '100%';
+            if (loadingEl) loadingEl.classList.remove('vis');
+            if (genBtn) genBtn.style.opacity = '1';
+
+            if (s.imageMode) {
+              // Image mode: render SVG carousel slides
+              var imgOut = document.getElementById('demo-output-img');
+              var preview = document.getElementById('demo-carousel-preview');
+              if (outputWrap) outputWrap.style.display = 'none';
+              if (imgOut) { imgOut.style.display = 'block'; imgOut.classList.add('vis'); }
+              if (preview) {
+                preview.innerHTML = '';
+                var slides = buildCarouselSVGs();
+                slides.forEach(function(svgHtml, i) {
+                  var div = document.createElement('div');
+                  div.className = 'l-demo-carousel-slide';
+                  div.innerHTML = svgHtml;
+                  div.style.animationDelay = (i * 0.18) + 's';
+                  preview.appendChild(div);
+                });
+              }
+              setTimeout(function() {
+                if (imgOut) { imgOut.style.display = 'none'; imgOut.classList.remove('vis'); }
+                if (outputWrap) outputWrap.style.display = '';
+                seq++;
+                setTimeout(runSeq, 1000);
+              }, 5000);
+            } else {
+              if (outputWrap) outputWrap.classList.add('vis');
+              printText(outputEl, s.output, 8, function() {
+                seq++;
+                setTimeout(runSeq, 4500);
+              });
+            }
+          }, 3000);
+        }, 500);
+      });
+    }, 600);
+  }
+
+  // Start auto-loop
+  setTimeout(function() {
+    demoNav('imagem', document.getElementById('dnav-imagem'));
+  }, 800);
+
+})();
+
+
+// ── AUTH PREVIEW ──
+// ── AUTH SCREEN LIVE PREVIEW ──
+(function() {
+  var AUTH_PREVIEWS = [
+    { tag: 'Legenda', text: 'Você não precisa de mais leads.\nPrecisa parar de perder os que já tem.\n\n→ 3 erros que destroem equipes comerciais antes dos 90 dias...\n\n#gestãocomercial #vendas' },
+    { tag: 'Roteiro Reels', text: '[Abre câmera — olha direto pro viewer]\n\nSe você não tem uma rotina de vendas, você não tem um negócio — você tem sorte.\n\nE sorte acaba.' },
+    { tag: 'Post LinkedIn', text: 'Contratei 12 vendedores em 2 anos.\nSó 3 passaram dos 6 meses.\n\nO padrão dos que ficaram me surpreendeu...' },
+  ];
+  var AUTH_SIGNUP_PREVIEWS = [
+    { tag: 'Roteiro TikTok', text: '[Áudio trending]\n\nPOV: você descobriu que seu concorrente usa IA pra criar conteúdo e você ainda tá no improviso...' },
+    { tag: 'Ideias Story', text: 'Story 1: Pergunta polêmica ✦\nStory 2: Enquete estratégica\nStory 3: Revelação\nStory 4–6: Prova social\nStory 7: CTA irresistível' },
+    { tag: 'Thumbnail YT', text: 'Conceito A: Rosto surpreso + número grande em laranja\nConceito B: Contraste preto/laranja + seta\nConceito C: Minimalista + pergunta direta' },
+  ];
+
+  function runAuthPreview(previewElId, tagElId, sequences) {
+    var previewEl = document.getElementById(previewElId);
+    var tagEl = document.getElementById(tagElId);
+    if (!previewEl || !tagEl) return;
+    var idx = 0;
+    function next() {
+      var s = sequences[idx % sequences.length];
+      tagEl.textContent = s.tag;
+      previewEl.innerHTML = '<span class="auth-preview-cursor"></span>';
+      var i = 0;
+      var timer = setInterval(function() {
+        if (i >= s.text.length) {
+          clearInterval(timer);
+          setTimeout(function() { idx++; next(); }, 3500);
+          return;
+        }
+        previewEl.innerHTML = s.text.slice(0, i + 1).replace(/\n/g, '<br>') + '<span class="auth-preview-cursor"></span>';
+        i++;
+      }, 22);
+    }
+    next();
+  }
+
+  // Only start when screen is visible
+  function watchAndStart(screenId, previewId, tagId, seqs) {
+    var screen = document.getElementById(screenId);
+    if (!screen) return;
+    var started = false;
+    var observer = new MutationObserver(function() {
+      if (screen.classList.contains('on') && !started) {
+        started = true;
+        setTimeout(function() { runAuthPreview(previewId, tagId, seqs); }, 400);
+      }
+    });
+    observer.observe(screen, { attributes: true, attributeFilter: ['class'] });
+  }
+
+  watchAndStart('sc-login',  'auth-login-preview',  'auth-login-tag',  AUTH_PREVIEWS);
+  watchAndStart('sc-signup', 'auth-signup-preview', 'auth-signup-tag', AUTH_SIGNUP_PREVIEWS);
+})();
+</script>
+</body>
+</html>
