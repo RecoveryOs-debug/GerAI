@@ -731,16 +731,27 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opa
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-brand">
-    <div class="nav-mark" style="background:linear-gradient(135deg,#1A1600,#0D0D0F)">
-      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px">
-        <defs><linearGradient id="lg" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#E6AC00"/><stop offset="100%" stop-color="#FFD740"/></linearGradient></defs>
-        <rect x="8" y="22" width="62" height="62" rx="14" fill="none" stroke="url(#lg)" stroke-width="10"/>
-        <line x1="18" y1="48" x2="58" y2="48" stroke="url(#lg)" stroke-width="9" stroke-linecap="round"/>
-        <line x1="18" y1="64" x2="46" y2="64" stroke="url(#lg)" stroke-width="9" stroke-linecap="round"/>
-        <polygon points="56,8 92,8 92,44" fill="url(#lg)"/>
-        <line x1="56" y1="44" x2="88" y2="12" stroke="url(#lg)" stroke-width="10" stroke-linecap="round"/>
-      </svg>
-    </div>
+    <div class="nav-mark" style="background:transparent;box-shadow:none;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center"><svg width="26" height="26" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <defs>
+    <linearGradient id="lgi" x1="0%" y1="100%" x2="80%" y2="0%">
+      <stop offset="0%" stop-color="#E8A800"/>
+      <stop offset="100%" stop-color="#FFD000"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded square body (C-shape, open top-right) -->
+  <path d="M320,55 L190,55 Q95,55 95,150 L95,350 Q95,445 190,445 L320,445 Q415,445 415,350 L415,295"
+    fill="none" stroke="url(#lgi)" stroke-width="52" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Two inner horizontal lines -->
+  <line x1="155" y1="225" x2="320" y2="225" stroke="url(#lgi)" stroke-width="46" stroke-linecap="round"/>
+  <line x1="155" y1="305" x2="260" y2="305" stroke="url(#lgi)" stroke-width="46" stroke-linecap="round"/>
+  <!-- Arrow: horizontal + diagonal shaft -->
+  <line x1="320" y1="80"  x2="450" y2="80"  stroke="url(#lgi)" stroke-width="46" stroke-linecap="round"/>
+  <line x1="450" y1="80"  x2="450" y2="210" stroke="url(#lgi)" stroke-width="46" stroke-linecap="round"/>
+  <!-- Arrow diagonal line from body corner to tip -->
+  <line x1="330" y1="170" x2="435" y2="75"  stroke="url(#lgi)" stroke-width="46" stroke-linecap="round"/>
+  <!-- Arrow head (triangle) -->
+  <polygon points="445,48 500,80 468,130" fill="url(#lgi)"/>
+</svg></div>
     <div class="nav-name">Auto<b>Postt</b></div>
   </div>
   <div class="nav-links">
@@ -802,35 +813,55 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opa
           <!-- Sidebar nav (like real app) -->
           <div class="l-demo-sidebar">
             <div class="l-demo-sb-logo">
-              <div class="l-demo-sb-mark"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px"><defs><linearGradient id="dlg" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#E6AC00"/><stop offset="100%" stop-color="#FFD740"/></linearGradient></defs><rect x="8" y="22" width="62" height="62" rx="14" fill="none" stroke="url(#dlg)" stroke-width="10"/><line x1="18" y1="48" x2="58" y2="48" stroke="url(#dlg)" stroke-width="9" stroke-linecap="round"/><line x1="18" y1="64" x2="46" y2="64" stroke="url(#dlg)" stroke-width="9" stroke-linecap="round"/><polygon points="56,8 92,8 92,44" fill="url(#dlg)"/><line x1="56" y1="44" x2="88" y2="12" stroke="url(#dlg)" stroke-width="10" stroke-linecap="round"/></svg></div>
+              <div class="l-demo-sb-mark" style="background:transparent;width:18px;height:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <defs>
+    <linearGradient id="lgi" x1="0%" y1="100%" x2="80%" y2="0%">
+      <stop offset="0%" stop-color="#E8A800"/>
+      <stop offset="100%" stop-color="#FFD000"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded square body (C-shape, open top-right) -->
+  <path d="M320,55 L190,55 Q95,55 95,150 L95,350 Q95,445 190,445 L320,445 Q415,445 415,350 L415,295"
+    fill="none" stroke="url(#lgi)" stroke-width="52" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Two inner horizontal lines -->
+  <line x1="155" y1="225" x2="320" y2="225" stroke="url(#lgi)" stroke-width="46" stroke-linecap="round"/>
+  <line x1="155" y1="305" x2="260" y2="305" stroke="url(#lgi)" stroke-width="46" stroke-linecap="round"/>
+  <!-- Arrow: horizontal + diagonal shaft -->
+  <line x1="320" y1="80"  x2="450" y2="80"  stroke="url(#lgi)" stroke-width="46" stroke-linecap="round"/>
+  <line x1="450" y1="80"  x2="450" y2="210" stroke="url(#lgi)" stroke-width="46" stroke-linecap="round"/>
+  <!-- Arrow diagonal line from body corner to tip -->
+  <line x1="330" y1="170" x2="435" y2="75"  stroke="url(#lgi)" stroke-width="46" stroke-linecap="round"/>
+  <!-- Arrow head (triangle) -->
+  <polygon points="445,48 500,80 468,130" fill="url(#lgi)"/>
+</svg></div>
               <span>Auto<b>Postt</b></span>
             </div>
             <div class="l-demo-sb-lbl">Agentes</div>
-            <div class="l-demo-nav-item active" id="dnav-imagem">
+            <div class="l-demo-nav-item active" id="dnav-imagem" onclick="demoNav('imagem', this)" style="cursor:pointer">
               <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
               Agente de Imagem
             </div>
-            <div class="l-demo-nav-item" id="dnav-legenda">
+            <div class="l-demo-nav-item" id="dnav-legenda" onclick="demoNav('legenda', this)" style="cursor:pointer">
               <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
               Legenda
             </div>
-            <div class="l-demo-nav-item" id="dnav-reels">
+            <div class="l-demo-nav-item" id="dnav-reels" onclick="demoNav('reels', this)" style="cursor:pointer">
               <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg>
               Roteiro Reels
             </div>
-            <div class="l-demo-nav-item" id="dnav-linkedin">
+            <div class="l-demo-nav-item" id="dnav-linkedin" onclick="demoNav('linkedin', this)" style="cursor:pointer">
               <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
               Post LinkedIn
             </div>
-            <div class="l-demo-nav-item" id="dnav-story">
+            <div class="l-demo-nav-item" id="dnav-story" onclick="demoNav('story', this)" style="cursor:pointer">
               <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/></svg>
               Ideias Story
             </div>
-            <div class="l-demo-nav-item" id="dnav-tiktok">
+            <div class="l-demo-nav-item" id="dnav-tiktok" onclick="demoNav('tiktok', this)" style="cursor:pointer">
               <svg viewBox="0 0 24 24"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
               Roteiro TikTok
             </div>
-            <div class="l-demo-nav-item" id="dnav-yt">
+            <div class="l-demo-nav-item" id="dnav-yt" onclick="demoNav('yt', this)" style="cursor:pointer">
               <svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
               Roteiro YouTube
             </div>
@@ -956,7 +987,197 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opa
                     </div>
                   </div>
                 </div>
+  
+              <!-- AGENT: REELS -->
+              <div class="l-demo-panel l-demo-text-panel" id="dpanel-reels" style="display:none">
+                <div class="l-demo-agent-badge"><span class="l-demo-agent-dot"></span>Agente IA</div>
+                <div class="l-demo-agent-title" id="dtitle-reels">Roteiro Reels</div>
+                <div class="l-demo-agent-sub" id="dsub-reels">Roteiros de Reels de 60s com estrutura viral, hooks fortes e CTAs que retêm o espectador.</div>
+                <div class="l-demo-refine-note"><span class="l-demo-refine-dot"></span>Seu input passa pelo agente refinador antes de ser processado</div>
+                <div class="l-demo-text-grid">
+                  <div class="l-demo-text-left">
+                    <div class="l-demo-sect-lbl">Sua ideia ou contexto</div>
+                    <div class="l-demo-input-wrap">
+                      <div class="l-demo-input-text l-demo-text-input" id="demo-text-input-reels"><span class="l-demo-cursor"></span></div>
+                    </div>
+                    <div class="l-demo-sect-lbl" style="margin-top:8px">Tom de voz</div>
+                    <div class="l-demo-select">Usar perfil de marca ▾</div>
+                    <div class="l-demo-gen-btn-main" style="margin-top:10px" id="demo-gen-btn-reels">
+                      <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:none;stroke:#fff;stroke-width:2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <span>Gerar Roteiro Reels</span>
+                    </div>
+                  </div>
+                  <div class="l-demo-text-right">
+                    <div class="l-demo-sect-lbl">Resultado</div>
+                    <div class="l-demo-loading l-demo-loading-text" id="demo-loading-reels" style="display:none">
+                      <span id="demo-loading-txt-reels">Gerando conteúdo...</span>
+                      <div class="l-demo-bar-wrap"><div class="l-demo-bar" id="demo-bar-reels"></div></div>
+                    </div>
+                    <div class="l-demo-output" id="demo-output-wrap-reels" style="display:none">
+                      <div class="l-demo-output-label">Gerado pela IA</div>
+                      <div class="l-demo-output-text agent-result-content" id="demo-output-reels"></div>
+                      <div class="l-demo-output-copy"><div class="l-demo-copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('demo-output-reels').textContent)">Copiar ↗</div></div>
+                    </div>
+                    <div class="l-demo-text-empty" id="demo-text-empty-reels">
+                      <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:var(--t2);stroke-width:1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                      <span>Descreva sua ideia e clique em Gerar</span>
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              <!-- AGENT: LINKEDIN -->
+              <div class="l-demo-panel l-demo-text-panel" id="dpanel-linkedin" style="display:none">
+                <div class="l-demo-agent-badge"><span class="l-demo-agent-dot"></span>Agente IA</div>
+                <div class="l-demo-agent-title" id="dtitle-linkedin">Post LinkedIn</div>
+                <div class="l-demo-agent-sub" id="dsub-linkedin">Posts LinkedIn de alto alcance orgânico com hook, desenvolvimento e CTA que geram comentários.</div>
+                <div class="l-demo-refine-note"><span class="l-demo-refine-dot"></span>Seu input passa pelo agente refinador antes de ser processado</div>
+                <div class="l-demo-text-grid">
+                  <div class="l-demo-text-left">
+                    <div class="l-demo-sect-lbl">Sua ideia ou contexto</div>
+                    <div class="l-demo-input-wrap">
+                      <div class="l-demo-input-text l-demo-text-input" id="demo-text-input-linkedin"><span class="l-demo-cursor"></span></div>
+                    </div>
+                    <div class="l-demo-sect-lbl" style="margin-top:8px">Tom de voz</div>
+                    <div class="l-demo-select">Usar perfil de marca ▾</div>
+                    <div class="l-demo-gen-btn-main" style="margin-top:10px" id="demo-gen-btn-linkedin">
+                      <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:none;stroke:#fff;stroke-width:2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <span>Gerar Post LinkedIn</span>
+                    </div>
+                  </div>
+                  <div class="l-demo-text-right">
+                    <div class="l-demo-sect-lbl">Resultado</div>
+                    <div class="l-demo-loading l-demo-loading-text" id="demo-loading-linkedin" style="display:none">
+                      <span id="demo-loading-txt-linkedin">Gerando conteúdo...</span>
+                      <div class="l-demo-bar-wrap"><div class="l-demo-bar" id="demo-bar-linkedin"></div></div>
+                    </div>
+                    <div class="l-demo-output" id="demo-output-wrap-linkedin" style="display:none">
+                      <div class="l-demo-output-label">Gerado pela IA</div>
+                      <div class="l-demo-output-text agent-result-content" id="demo-output-linkedin"></div>
+                      <div class="l-demo-output-copy"><div class="l-demo-copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('demo-output-linkedin').textContent)">Copiar ↗</div></div>
+                    </div>
+                    <div class="l-demo-text-empty" id="demo-text-empty-linkedin">
+                      <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:var(--t2);stroke-width:1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                      <span>Descreva sua ideia e clique em Gerar</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- AGENT: STORY -->
+              <div class="l-demo-panel l-demo-text-panel" id="dpanel-story" style="display:none">
+                <div class="l-demo-agent-badge"><span class="l-demo-agent-dot"></span>Agente IA</div>
+                <div class="l-demo-agent-title" id="dtitle-story">Ideias Story</div>
+                <div class="l-demo-agent-sub" id="dsub-story">Sequência de 7 stories com narrativa progressiva, enquetes e CTA integrado.</div>
+                <div class="l-demo-refine-note"><span class="l-demo-refine-dot"></span>Seu input passa pelo agente refinador antes de ser processado</div>
+                <div class="l-demo-text-grid">
+                  <div class="l-demo-text-left">
+                    <div class="l-demo-sect-lbl">Sua ideia ou contexto</div>
+                    <div class="l-demo-input-wrap">
+                      <div class="l-demo-input-text l-demo-text-input" id="demo-text-input-story"><span class="l-demo-cursor"></span></div>
+                    </div>
+                    <div class="l-demo-sect-lbl" style="margin-top:8px">Tom de voz</div>
+                    <div class="l-demo-select">Usar perfil de marca ▾</div>
+                    <div class="l-demo-gen-btn-main" style="margin-top:10px" id="demo-gen-btn-story">
+                      <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:none;stroke:#fff;stroke-width:2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <span>Gerar Ideias Story</span>
+                    </div>
+                  </div>
+                  <div class="l-demo-text-right">
+                    <div class="l-demo-sect-lbl">Resultado</div>
+                    <div class="l-demo-loading l-demo-loading-text" id="demo-loading-story" style="display:none">
+                      <span id="demo-loading-txt-story">Gerando conteúdo...</span>
+                      <div class="l-demo-bar-wrap"><div class="l-demo-bar" id="demo-bar-story"></div></div>
+                    </div>
+                    <div class="l-demo-output" id="demo-output-wrap-story" style="display:none">
+                      <div class="l-demo-output-label">Gerado pela IA</div>
+                      <div class="l-demo-output-text agent-result-content" id="demo-output-story"></div>
+                      <div class="l-demo-output-copy"><div class="l-demo-copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('demo-output-story').textContent)">Copiar ↗</div></div>
+                    </div>
+                    <div class="l-demo-text-empty" id="demo-text-empty-story">
+                      <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:var(--t2);stroke-width:1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                      <span>Descreva sua ideia e clique em Gerar</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- AGENT: TIKTOK -->
+              <div class="l-demo-panel l-demo-text-panel" id="dpanel-tiktok" style="display:none">
+                <div class="l-demo-agent-badge"><span class="l-demo-agent-dot"></span>Agente IA</div>
+                <div class="l-demo-agent-title" id="dtitle-tiktok">Roteiro TikTok</div>
+                <div class="l-demo-agent-sub" id="dsub-tiktok">Script TikTok viral (30–60s) com hook verbal explosivo, punchline e CTA de retenção.</div>
+                <div class="l-demo-refine-note"><span class="l-demo-refine-dot"></span>Seu input passa pelo agente refinador antes de ser processado</div>
+                <div class="l-demo-text-grid">
+                  <div class="l-demo-text-left">
+                    <div class="l-demo-sect-lbl">Sua ideia ou contexto</div>
+                    <div class="l-demo-input-wrap">
+                      <div class="l-demo-input-text l-demo-text-input" id="demo-text-input-tiktok"><span class="l-demo-cursor"></span></div>
+                    </div>
+                    <div class="l-demo-sect-lbl" style="margin-top:8px">Tom de voz</div>
+                    <div class="l-demo-select">Usar perfil de marca ▾</div>
+                    <div class="l-demo-gen-btn-main" style="margin-top:10px" id="demo-gen-btn-tiktok">
+                      <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:none;stroke:#fff;stroke-width:2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <span>Gerar Roteiro TikTok</span>
+                    </div>
+                  </div>
+                  <div class="l-demo-text-right">
+                    <div class="l-demo-sect-lbl">Resultado</div>
+                    <div class="l-demo-loading l-demo-loading-text" id="demo-loading-tiktok" style="display:none">
+                      <span id="demo-loading-txt-tiktok">Gerando conteúdo...</span>
+                      <div class="l-demo-bar-wrap"><div class="l-demo-bar" id="demo-bar-tiktok"></div></div>
+                    </div>
+                    <div class="l-demo-output" id="demo-output-wrap-tiktok" style="display:none">
+                      <div class="l-demo-output-label">Gerado pela IA</div>
+                      <div class="l-demo-output-text agent-result-content" id="demo-output-tiktok"></div>
+                      <div class="l-demo-output-copy"><div class="l-demo-copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('demo-output-tiktok').textContent)">Copiar ↗</div></div>
+                    </div>
+                    <div class="l-demo-text-empty" id="demo-text-empty-tiktok">
+                      <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:var(--t2);stroke-width:1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                      <span>Descreva sua ideia e clique em Gerar</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- AGENT: YT -->
+              <div class="l-demo-panel l-demo-text-panel" id="dpanel-yt" style="display:none">
+                <div class="l-demo-agent-badge"><span class="l-demo-agent-dot"></span>Agente IA</div>
+                <div class="l-demo-agent-title" id="dtitle-yt">Roteiro YouTube</div>
+                <div class="l-demo-agent-sub" id="dsub-yt">Roteiro completo para YouTube (10–15 min) com blocos, B-roll e CTA final.</div>
+                <div class="l-demo-refine-note"><span class="l-demo-refine-dot"></span>Seu input passa pelo agente refinador antes de ser processado</div>
+                <div class="l-demo-text-grid">
+                  <div class="l-demo-text-left">
+                    <div class="l-demo-sect-lbl">Sua ideia ou contexto</div>
+                    <div class="l-demo-input-wrap">
+                      <div class="l-demo-input-text l-demo-text-input" id="demo-text-input-yt"><span class="l-demo-cursor"></span></div>
+                    </div>
+                    <div class="l-demo-sect-lbl" style="margin-top:8px">Tom de voz</div>
+                    <div class="l-demo-select">Usar perfil de marca ▾</div>
+                    <div class="l-demo-gen-btn-main" style="margin-top:10px" id="demo-gen-btn-yt">
+                      <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:none;stroke:#fff;stroke-width:2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <span>Gerar Roteiro YouTube</span>
+                    </div>
+                  </div>
+                  <div class="l-demo-text-right">
+                    <div class="l-demo-sect-lbl">Resultado</div>
+                    <div class="l-demo-loading l-demo-loading-text" id="demo-loading-yt" style="display:none">
+                      <span id="demo-loading-txt-yt">Gerando conteúdo...</span>
+                      <div class="l-demo-bar-wrap"><div class="l-demo-bar" id="demo-bar-yt"></div></div>
+                    </div>
+                    <div class="l-demo-output" id="demo-output-wrap-yt" style="display:none">
+                      <div class="l-demo-output-label">Gerado pela IA</div>
+                      <div class="l-demo-output-text agent-result-content" id="demo-output-yt"></div>
+                      <div class="l-demo-output-copy"><div class="l-demo-copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('demo-output-yt').textContent)">Copiar ↗</div></div>
+                    </div>
+                    <div class="l-demo-text-empty" id="demo-text-empty-yt">
+                      <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:var(--t2);stroke-width:1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                      <span>Descreva sua ideia e clique em Gerar</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             </div>
           </div>
@@ -1184,16 +1405,27 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opa
 <!-- FOOTER -->
 <footer class="footer">
   <div class="footer-brand">
-    <div class="footer-mark">
-      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px">
-        <defs><linearGradient id="lg" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#E6AC00"/><stop offset="100%" stop-color="#FFD740"/></linearGradient></defs>
-        <rect x="8" y="22" width="62" height="62" rx="14" fill="none" stroke="url(#lg)" stroke-width="10"/>
-        <line x1="18" y1="48" x2="58" y2="48" stroke="url(#lg)" stroke-width="9" stroke-linecap="round"/>
-        <line x1="18" y1="64" x2="46" y2="64" stroke="url(#lg)" stroke-width="9" stroke-linecap="round"/>
-        <polygon points="56,8 92,8 92,44" fill="url(#lg)"/>
-        <line x1="56" y1="44" x2="88" y2="12" stroke="url(#lg)" stroke-width="10" stroke-linecap="round"/>
-      </svg>
-    </div>
+    <div class="footer-mark" style="background:transparent;width:24px;height:24px;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <defs>
+    <linearGradient id="lgi" x1="0%" y1="100%" x2="80%" y2="0%">
+      <stop offset="0%" stop-color="#E8A800"/>
+      <stop offset="100%" stop-color="#FFD000"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded square body (C-shape, open top-right) -->
+  <path d="M320,55 L190,55 Q95,55 95,150 L95,350 Q95,445 190,445 L320,445 Q415,445 415,350 L415,295"
+    fill="none" stroke="url(#lgi)" stroke-width="52" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Two inner horizontal lines -->
+  <line x1="155" y1="225" x2="320" y2="225" stroke="url(#lgi)" stroke-width="46" stroke-linecap="round"/>
+  <line x1="155" y1="305" x2="260" y2="305" stroke="url(#lgi)" stroke-width="46" stroke-linecap="round"/>
+  <!-- Arrow: horizontal + diagonal shaft -->
+  <line x1="320" y1="80"  x2="450" y2="80"  stroke="url(#lgi)" stroke-width="46" stroke-linecap="round"/>
+  <line x1="450" y1="80"  x2="450" y2="210" stroke="url(#lgi)" stroke-width="46" stroke-linecap="round"/>
+  <!-- Arrow diagonal line from body corner to tip -->
+  <line x1="330" y1="170" x2="435" y2="75"  stroke="url(#lgi)" stroke-width="46" stroke-linecap="round"/>
+  <!-- Arrow head (triangle) -->
+  <polygon points="445,48 500,80 468,130" fill="url(#lgi)"/>
+</svg></div>
     <span>© 2025 AutoPostt · Todos os direitos reservados</span>
   </div>
   <div style="display:flex;gap:20px">
@@ -1204,348 +1436,342 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opa
 </footer>
 
 <script>
-// APP_URL — where the app (autopostt-app.html) is served
-const APP_URL = '';  // same origin: ''; different domain: 'https://app.autopostt.com.br'
+// APP URL — same origin
+const APP_URL = '';
 
 function go(screen) {
   const base = APP_URL || '/app';
   window.location.href = base + '?screen=' + screen;
 }
 
-// Load plans dynamically from API
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Load plans from API
 async function loadPlans() {
   try {
     const data = await fetch('/api/plans').then(r => r.json()).catch(() => null);
-    if (!data || !data.plans?.length) return;
-    const plans = data.plans;
+    if (!data || !data.plans || !data.plans.length) return;
     const grid = document.getElementById('land-plans-grid');
     if (!grid) return;
-
     const taglines = {
-      free: 'Trial gratuito — sem cartão.',
-      starter: 'Para quem quer começar a postar sem esforço.',
-      pro: 'Para quem quer crescer de verdade.',
-      elite: 'Para operação e volume.',
-      business: 'Para operação e volume.'
+      free:'Trial gratuito — sem cartão.',
+      starter:'Para quem quer começar a postar sem esforço.',
+      pro:'Para quem quer crescer de verdade.',
+      elite:'Para operação e volume.',
+      business:'Para operação e volume.'
     };
-    const btnLabels = { free: 'Começar grátis', starter: 'Começar agora', pro: 'Quero o Pro →', elite: 'Falar com vendas', business: 'Falar com vendas' };
-    const isFeaturedId = { pro: true };
-
-    grid.innerHTML = plans.map((p, i) => {
-      const isFeat = isFeaturedId[p.id] || (i === 1 && plans.length >= 3);
-      const price = p.price === 0 ? 'Grátis' : 'R$' + Math.floor(p.price / 100);
-      const priceSuffix = p.price === 0 ? '' : '<span>/mês</span>';
-      const tagline = taglines[p.id] || taglines[p.name?.toLowerCase()] || '';
-      const btnLabel = btnLabels[p.id] || ('Assinar ' + p.name);
-      return `
-        <div class="plan${isFeat ? ' feat' : ''}">
-          ${isFeat ? '<div class="plan-popular">Mais popular</div>' : ''}
-          <div class="plan-name">${p.name}</div>
-          <div class="plan-price">${price}${priceSuffix}</div>
-          <div class="plan-tagline">${tagline}</div>
-          ${(p.features || []).map(f => `<div class="plan-feat-row"><span class="plan-feat-check">✓</span>${f}</div>`).join('')}
-          <button class="plan-btn ${isFeat ? 'primary' : 'outline'}" onclick="go('signup')">${btnLabel}</button>
-        </div>`;
+    const btnLabels = {
+      free:'Começar grátis', starter:'Começar agora',
+      pro:'Quero o Pro →', elite:'Falar com vendas', business:'Falar com vendas'
+    };
+    grid.innerHTML = data.plans.map(function(p, i) {
+      const isFeat = p.id === 'pro' || (i === 1 && data.plans.length >= 3);
+      const price  = p.price === 0 ? 'Grátis' : 'R$' + Math.floor(p.price / 100);
+      const suffix = p.price === 0 ? '' : '<span>/mês</span>';
+      const tl     = taglines[p.id] || '';
+      const btn    = btnLabels[p.id] || ('Assinar ' + p.name);
+      return '<div class="plan' + (isFeat ? ' feat' : '') + '">'
+        + (isFeat ? '<div class="plan-popular">Mais popular</div>' : '')
+        + '<div class="plan-name">' + esc(p.name) + '</div>'
+        + '<div class="plan-price">' + price + suffix + '</div>'
+        + '<div class="plan-tagline">' + tl + '</div>'
+        + (p.features || []).map(function(f){
+            return '<div class="plan-feat-row"><span class="plan-feat-check">✓</span>' + esc(f) + '</div>';
+          }).join('')
+        + '<button class="plan-btn ' + (isFeat ? 'primary' : 'outline') + '" onclick="go(\'signup\')">' + btn + '</button>'
+        + '</div>';
     }).join('');
-  } catch {}
+  } catch(e) {}
 }
-
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-
-async function loadLandingPlans() {
-  try {
-    const data = await fetch('/api/plans').then(r => r.json()).catch(() => null);
-    if (!data) return;
-    const plans = data.plans || [];
-    const packages = (data.packages || []).filter(p => p.active);
-
-    // Update LP plan grid if it exists
-    const lpGrid = document.getElementById('land-plans-grid');
-    if (lpGrid && plans.length) {
-      lpGrid.innerHTML = plans.map((p, i) => {
-        const isFeatured = p.id === 'pro' || (i === 1 && plans.length >= 3);
-        const price = p.price === 0 ? 'Grátis' : 'R$' + Math.floor(p.price/100);
-        const priceDetail = p.price === 0 ? '' : '<span>/mês</span>';
-        return `
-        <div style="background:var(--bg2);border:${isFeatured ? '2px solid var(--gold)' : '1px solid var(--line)'};border-radius:12px;padding:28px;position:relative;overflow:hidden;${isFeatured ? 'background:linear-gradient(145deg,rgba(255,92,26,.07) 0%,var(--bg2) 55%)' : ''}">
-          ${isFeatured ? '<div style="position:absolute;top:0;right:20px;background:var(--gold);color:#fff;font-size:10px;font-weight:700;padding:4px 12px;border-radius:0 0 8px 8px;letter-spacing:.06em">MAIS POPULAR</div>' : ''}
-          <div style="font-family:Syne,sans-serif;font-size:14px;font-weight:700;color:var(--t1);letter-spacing:.04em;text-transform:uppercase;margin-bottom:12px">${esc(p.name)}</div>
-          <div style="font-family:Syne,sans-serif;font-size:40px;font-weight:800;letter-spacing:-2px;color:var(--t0);line-height:1;margin-bottom:3px">${price}${priceDetail ? '<span style="font-size:14px;font-weight:400;color:var(--t2)">/mês</span>' : ''}</div>
-          <div style="font-size:12px;color:var(--t2);margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--line)">${p.quota.toLocaleString()} gerações / mês</div>
-          ${(p.features||[]).map(f => `<div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--t1);margin-bottom:8px"><span style="color:var(--gold);margin-top:1px">→</span>${esc(f)}</div>`).join('')}
-          <button style="width:100%;margin-top:20px;padding:12px;font-family:Syne,sans-serif;font-size:13px;font-weight:700;border-radius:7px;cursor:pointer;${isFeatured ? 'background:var(--gold);color:#fff;border:none' : 'background:transparent;color:var(--t0);border:1px solid var(--line2)'}" onclick="go('signup')">${p.price === 0 ? 'Começar grátis' : 'Assinar ' + esc(p.name)}</button>
-        </div>`;
-      }).join('');
-    }
-  } catch {}
-}
-
 
 loadPlans();
-loadLandingPlans();
 
+// ── DEMO MOCK ──────────────────────────────────────────────────────────────────
 (function() {
 
-  // ── DEMO AGENT CONFIG ──
-  var DEMO_AGENTS = {
-    imagem:   { label:'Agente de Imagem',    topbar:'GerAI Studio — Agente de Imagem' },
-    legenda:  { label:'Legenda',             topbar:'GerAI Studio — Agente de Legenda' },
-    reels:    { label:'Roteiro Reels',       topbar:'GerAI Studio — Roteiro Reels' },
-    linkedin: { label:'Post LinkedIn',       topbar:'GerAI Studio — Post LinkedIn' },
-    story:    { label:'Story',               topbar:'GerAI Studio — Story Sequence' },
-    tiktok:   { label:'TikTok Script',       topbar:'GerAI Studio — TikTok Script' },
-    yt:       { label:'Roteiro YouTube',     topbar:'GerAI Studio — Roteiro YouTube' }
-  };
-
-  var _demoOrder = ['imagem','legenda','reels','linkedin','story','tiktok','yt'];
-  var _demoIdx   = 0;
-  var _selectedTpl = 0;
-
   var ac  = '#F5C518';
-  var bg  = '#0D0D0F';
   var bg2 = '#111116';
   var bg3 = '#17171D';
   var tx  = '#F5F4F0';
   var tx2 = '#9E9C94';
 
-  // ── 10 TEMPLATE MODELS ──
+  // Agent configs
+  var AGENTS = {
+    imagem:   { label: 'Agente de Imagem',    title: 'AutoPostt Studio — Agente de Imagem' },
+    legenda:  { label: 'Legenda',             title: 'AutoPostt Studio — Legenda' },
+    reels:    { label: 'Roteiro Reels',       title: 'AutoPostt Studio — Roteiro Reels' },
+    linkedin: { label: 'Post LinkedIn',       title: 'AutoPostt Studio — Post LinkedIn' },
+    story:    { label: 'Ideias Story',        title: 'AutoPostt Studio — Ideias Story' },
+    tiktok:   { label: 'Roteiro TikTok',      title: 'AutoPostt Studio — Roteiro TikTok' },
+    yt:       { label: 'Roteiro YouTube',     title: 'AutoPostt Studio — Roteiro YouTube' }
+  };
+
+  // Text agent content
+  var TEXT_DATA = {
+    legenda: {
+      input:  '3 erros fatais de gestão comercial que ninguém fala',
+      output: 'Você não precisa de mais leads.\nPrecisa parar de perder os que já tem.\n\nOs 3 erros que destroem equipes comerciais antes dos 90 dias:\n\n→ 1. Não ter um processo definido\n→ 2. Ignorar o follow-up sistemático\n→ 3. Medir atividade, não resultado\n\nQual desses você ainda comete?\n\n#gestaocomercial #vendas #liderança',
+      stages: ['Analisando seu perfil de marca...', 'Refinando o prompt...', 'Gerando legenda...']
+    },
+    reels: {
+      input:  'Como dobrei minha taxa de fechamento em 30 dias',
+      output: '[HOOK — 0s]\nAbre câmera. Olha direto pro viewer.\n\n"Em janeiro, fechava 1 em cada 8 leads. Em março, 1 em cada 3. Um ajuste mudou tudo."\n\n[DESENVOLVIMENTO — 5s]\nMostro o print do CRM.\n\n"Parei de vender na primeira conversa. Comecei a qualificar primeiro."\n\n[VIRADA — 20s]\n"A pergunta que mudou tudo: O que impede você de resolver isso agora?"\n\n[CTA — 55s]\n"Salva esse vídeo. Você vai precisar."',
+      stages: ['Estruturando roteiro...', 'Aplicando framework viral...', 'Otimizando retenção...']
+    },
+    linkedin: {
+      input:  'Lição mais cara que aprendi contratando vendedores',
+      output: 'Contratei 12 vendedores em 2 anos.\nSó 3 passaram dos 6 meses.\n\nO problema nunca foi o vendedor.\n\nFoi a ausência de processo.\n\nVendedor sem playbook é como piloto sem mapa.\nPode até chegar — mas vai gastar 3x mais combustível.\n\nO que mudou quando criei o playbook:\n→ Ramp time caiu de 90 para 40 dias\n→ Churn de vendedor caiu 60%\n→ Previsibilidade de receita subiu\n\nSe você ainda contrata na esperança de que o talento resolve tudo, esse post é pra você.\n\nQual é o primeiro documento que você entrega para um vendedor novo?',
+      stages: ['Analisando tom LinkedIn...', 'Estruturando narrativa B2B...', 'Otimizando alcance orgânico...']
+    },
+    story: {
+      input:  'Sequência de stories sobre processo de vendas',
+      output: 'STORY 1 — ABERTURA (Enquete)\n"Você tem um processo de vendas ou improvisa?"\n[ Tenho processo ] [ Improviso ]\n\nSTORY 2 — CONTEXTO\n"73% das perdas acontecem no follow-up."\nFonte: HubSpot 2024\n\nSTORY 3 — PROBLEMA\n"A maioria some depois do primeiro NÃO."\nGIF reação\n\nSTORY 4 — SOLUÇÃO\n"3 mensagens de follow-up que funcionam:"\n→ Desliza →\n\nSTORY 5 — VALOR\nTemplate de cadência 7 dias\n\nSTORY 6 — PROVA\nPrint de resultado do aluno\n\nSTORY 7 — CTA\n"Responde esse story com PROCESSO que mando o template completo."',
+      stages: ['Criando sequência narrativa...', 'Adicionando CTAs estratégicos...', 'Finalizando stories...']
+    },
+    tiktok: {
+      input:  'Por que vendedores talentosos não batem meta',
+      output: '[0-2s — HOOK VERBAL]\n"Seu melhor vendedor não bate meta por falta de talento. É culpa sua."\n\n[2-8s — TENSÃO]\nCorte rápido. Música trending low.\n"Eu sei que dói. Mas é a verdade."\n\n[8-20s — DESENVOLVIMENTO]\n"Talento sem processo é motor sem combustível. Já treinei 200 vendedores. Os que batem meta têm uma coisa em comum: ritual diário."\n\n[20-28s — PROVA]\nMostrar CRM com números.\n"Essa equipe aumentou conversão 40% em 60 dias. Sem contratar ninguém novo."\n\n[28-30s — CTA]\n"Segue pra ver o ritual completo amanhã."',
+      stages: ['Gerando hook viral...', 'Estruturando script TikTok...', 'Otimizando retenção...']
+    },
+    yt: {
+      input:  'Como montar um time de vendas do zero',
+      output: 'TÍTULO: Como montei um time de vendas do zero (e faturamos 7 dígitos)\n\n[INTRO — 0:00-0:45]\nHook: "Em 18 meses, construí um time de 8 vendedores que fatura consistentemente acima da meta. Nesse vídeo, mostro exatamente como."\n\n[BLOCO 1 — 1:00-4:00]\nO erro que todo gestor comete na primeira contratação\n→ B-roll: tela do CRM, reunião de equipe\n\n[BLOCO 2 — 4:00-8:00]\nComo criar o playbook de vendas em 1 semana\n→ Tela gravada: template do Notion\n\n[BLOCO 3 — 8:00-12:00]\nO ritual diário que mantém o time performando\n→ Entrevista rápida com vendedor top\n\n[CTA FINAL — 12:00-13:00]\n"Link do template gratuito na descrição. Se inscreve para a parte 2."',
+      stages: ['Estruturando roteiro longo...', 'Criando blocos de conteúdo...', 'Otimizando retenção YouTube...']
+    }
+  };
+
+  // ── 10 TEMPLATES ──
   var TEMPLATES = [
-    { name:'Dark Bold',    desc:'Fundo escuro, texto impactante, acento dourado',
-      svg: function(i) {
+    { name: 'Dark Bold',
+      render: function() {
         return '<svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'
           + '<rect width="160" height="200" fill="#0D0D0F"/>'
-          + '<rect x="0" y="0" width="160" height="3" fill="#F5C518"/>'
-          + '<rect x="12" y="40" width="80" height="6" rx="3" fill="#F5C518"/>'
-          + '<rect x="12" y="54" width="136" height="28" rx="4" fill="rgba(245,197,24,.08)"/>'
-          + '<text x="12" y="72" font-family="system-ui" font-size="10" font-weight="800" fill="#F5F4F0">3 ERROS QUE</text>'
-          + '<text x="12" y="84" font-family="system-ui" font-size="10" font-weight="800" fill="#F5C518">DESTROEM VENDAS</text>'
-          + '<rect x="12" y="96" width="100" height="3" rx="1" fill="rgba(245,197,24,.2)"/>'
-          + '<rect x="12" y="105" width="136" height="4" rx="2" fill="rgba(255,255,255,.07)"/>'
-          + '<rect x="12" y="113" width="120" height="4" rx="2" fill="rgba(255,255,255,.07)"/>'
-          + '<rect x="12" y="121" width="100" height="4" rx="2" fill="rgba(255,255,255,.07)"/>'
-          + '<rect x="12" y="150" width="60" height="20" rx="4" fill="#F5C518"/>'
-          + '<text x="42" y="164" font-family="system-ui" font-size="8" font-weight="700" fill="#0D0D0F" text-anchor="middle">SAIBA MAIS</text>'
+          + '<rect width="160" height="3" fill="#F5C518"/>'
+          + '<text x="12" y="52" font-family="system-ui" font-size="9" font-weight="700" fill="rgba(245,197,24,.2)" letter-spacing="2">GESTÃO COMERCIAL</text>'
+          + '<text x="12" y="82" font-family="system-ui" font-size="13" font-weight="900" fill="#F5F4F0" letter-spacing="-0.5">3 ERROS QUE</text>'
+          + '<text x="12" y="98" font-family="system-ui" font-size="13" font-weight="900" fill="#F5C518" letter-spacing="-0.5">DESTROEM VENDAS</text>'
+          + '<rect x="12" y="108" width="50" height="2" rx="1" fill="rgba(245,197,24,.3)"/>'
+          + '<rect x="12" y="118" width="136" height="3" rx="1" fill="rgba(255,255,255,.07)"/>'
+          + '<rect x="12" y="125" width="110" height="3" rx="1" fill="rgba(255,255,255,.07)"/>'
+          + '<rect x="12" y="132" width="120" height="3" rx="1" fill="rgba(255,255,255,.07)"/>'
+          + '<rect x="12" y="162" width="60" height="20" rx="4" fill="#F5C518"/>'
+          + '<text x="42" y="176" font-family="system-ui" font-size="8" font-weight="700" fill="#0D0D0F" text-anchor="middle">SAIBA MAIS</text>'
           + '</svg>';
       }
     },
-    { name:'Minimalista',  desc:'Muito espaço negativo, tipografia limpa',
-      svg: function(i) {
+    { name: 'Minimalista',
+      render: function() {
         return '<svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'
           + '<rect width="160" height="200" fill="#FAFAF9"/>'
           + '<rect x="12" y="20" width="30" height="3" rx="1" fill="#F5C518"/>'
-          + '<text x="12" y="80" font-family="system-ui" font-size="13" font-weight="900" fill="#0D0D0F" letter-spacing="-1">Vender</text>'
-          + '<text x="12" y="96" font-family="system-ui" font-size="13" font-weight="900" fill="#F5C518" letter-spacing="-1">é sistema.</text>'
+          + '<text x="12" y="78" font-family="Georgia,serif" font-size="15" font-weight="900" fill="#0D0D0F" letter-spacing="-1">Vender</text>'
+          + '<text x="12" y="96" font-family="Georgia,serif" font-size="15" font-weight="900" fill="#F5C518" letter-spacing="-1">é sistema.</text>'
           + '<rect x="12" y="108" width="136" height="1" fill="rgba(0,0,0,.08)"/>'
           + '<rect x="12" y="116" width="120" height="3" rx="1" fill="rgba(0,0,0,.1)"/>'
           + '<rect x="12" y="123" width="100" height="3" rx="1" fill="rgba(0,0,0,.1)"/>'
           + '<rect x="12" y="130" width="80" height="3" rx="1" fill="rgba(0,0,0,.1)"/>'
-          + '<circle cx="20" cy="170" r="6" fill="#F5C518"/>'
-          + '<rect x="30" y="166" width="80" height="3" rx="1" fill="rgba(0,0,0,.1)"/>'
-          + '<rect x="30" y="173" width="60" height="3" rx="1" fill="rgba(0,0,0,.08)"/>'
+          + '<circle cx="20" cy="168" r="6" fill="#F5C518"/>'
+          + '<rect x="30" y="164" width="80" height="3" rx="1" fill="rgba(0,0,0,.1)"/>'
+          + '<rect x="30" y="171" width="60" height="3" rx="1" fill="rgba(0,0,0,.08)"/>'
           + '</svg>';
       }
     },
-    { name:'Gradient Hero', desc:'Gradiente vibrante, energia máxima',
-      svg: function(i) {
+    { name: 'Gradient Hero',
+      render: function() {
         return '<svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'
-          + '<defs><linearGradient id="gh" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1A1600"/><stop offset="100%" stop-color="#0D0D0F"/></linearGradient></defs>'
-          + '<rect width="160" height="200" fill="url(#gh)"/>'
-          + '<ellipse cx="80" cy="60" rx="90" ry="55" fill="rgba(245,197,24,.12)"/>'
-          + '<text x="80" y="55" font-family="system-ui" font-size="11" font-weight="900" fill="#F5C518" text-anchor="middle" letter-spacing="-0.5">94%</text>'
-          + '<text x="80" y="70" font-family="system-ui" font-size="7" fill="#9E9C94" text-anchor="middle">dos gestores erram nisso</text>'
-          + '<rect x="16" y="90" width="128" height="1" fill="rgba(245,197,24,.15)"/>'
-          + '<text x="16" y="112" font-family="system-ui" font-size="9" font-weight="700" fill="#F5F4F0">O erro que custa</text>'
-          + '<text x="16" y="124" font-family="system-ui" font-size="9" font-weight="700" fill="#F5C518">30% das suas vendas</text>'
-          + '<rect x="16" y="136" width="112" height="3" rx="1" fill="rgba(255,255,255,.08)"/>'
-          + '<rect x="16" y="143" width="90" height="3" rx="1" fill="rgba(255,255,255,.08)"/>'
-          + '<rect x="16" y="170" width="128" height="18" rx="4" fill="rgba(245,197,24,.12)" stroke="#F5C518" stroke-width="1"/>'
-          + '<text x="80" y="182" font-family="system-ui" font-size="8" font-weight="600" fill="#F5C518" text-anchor="middle">Ver mais →</text>'
+          + '<defs><radialGradient id="rg1" cx="50%" cy="30%" r="60%"><stop offset="0%" stop-color="rgba(245,197,24,.15)"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs>'
+          + '<rect width="160" height="200" fill="#0D0D0F"/>'
+          + '<rect width="160" height="200" fill="url(#rg1)"/>'
+          + '<text x="80" y="55" font-family="system-ui" font-size="32" font-weight="900" fill="#F5C518" text-anchor="middle" letter-spacing="-2">94%</text>'
+          + '<text x="80" y="68" font-family="system-ui" font-size="7" fill="#9E9C94" text-anchor="middle">dos gestores erram nisso</text>'
+          + '<rect x="16" y="80" width="128" height="1" fill="rgba(245,197,24,.15)"/>'
+          + '<text x="16" y="100" font-family="system-ui" font-size="9" font-weight="700" fill="#F5F4F0">O erro que custa</text>'
+          + '<text x="16" y="113" font-family="system-ui" font-size="9" font-weight="700" fill="#F5C518">30% das suas vendas</text>'
+          + '<rect x="16" y="124" width="112" height="3" rx="1" fill="rgba(255,255,255,.08)"/>'
+          + '<rect x="16" y="131" width="90" height="3" rx="1" fill="rgba(255,255,255,.08)"/>'
+          + '<rect x="16" y="165" width="128" height="18" rx="4" fill="rgba(245,197,24,.1)" stroke="#F5C518" stroke-width="1"/>'
+          + '<text x="80" y="178" font-family="system-ui" font-size="8" font-weight="600" fill="#F5C518" text-anchor="middle">Ver mais</text>'
           + '</svg>';
       }
     },
-    { name:'Split Layout',  desc:'Dois painéis: texto esquerda, visual direita',
-      svg: function(i) {
-        return '<svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'
-          + '<rect width="160" height="200" fill="#111116"/>'
-          + '<rect x="0" y="0" width="72" height="200" fill="#17171D"/>'
-          + '<rect x="0" y="0" width="3" height="200" fill="#F5C518"/>'
-          + '<text x="10" y="50" font-family="system-ui" font-size="7" font-weight="800" fill="#F5C518" letter-spacing="1">GESTÃO</text>'
-          + '<text x="10" y="80" font-family="system-ui" font-size="9" font-weight="900" fill="#F5F4F0" letter-spacing="-0.5">Lidere</text>'
-          + '<text x="10" y="93" font-family="system-ui" font-size="9" font-weight="900" fill="#F5F4F0">com</text>'
-          + '<text x="10" y="106" font-family="system-ui" font-size="9" font-weight="900" fill="#F5C518">dados.</text>'
-          + '<rect x="10" y="118" width="52" height="2" rx="1" fill="rgba(245,197,24,.3)"/>'
-          + '<rect x="84" y="30" width="64" height="64" rx="8" fill="rgba(245,197,24,.1)"/>'
-          + '<rect x="88" y="34" width="56" height="56" rx="6" fill="rgba(245,197,24,.08)"/>'
-          + '<text x="116" y="68" font-family="system-ui" font-size="18" font-weight="900" fill="#F5C518" text-anchor="middle">3x</text>'
-          + '<text x="116" y="80" font-family="system-ui" font-size="6" fill="#9E9C94" text-anchor="middle">mais resultado</text>'
-          + '<rect x="84" y="108" width="64" height="4" rx="2" fill="rgba(255,255,255,.08)"/>'
-          + '<rect x="84" y="116" width="50" height="4" rx="2" fill="rgba(255,255,255,.06)"/>'
-          + '</svg>';
-      }
-    },
-    { name:'Card Numerado', desc:'Cards com números grandes, didático',
-      svg: function(i) {
+    { name: 'Split Layout',
+      render: function() {
         return '<svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'
           + '<rect width="160" height="200" fill="#111116"/>'
-          + '<text x="12" y="52" font-family="system-ui" font-size="36" font-weight="900" fill="rgba(245,197,24,.15)" letter-spacing="-3">01</text>'
-          + '<rect x="12" y="56" width="136" height="1" fill="rgba(245,197,24,.12)"/>'
-          + '<text x="12" y="74" font-family="system-ui" font-size="9" font-weight="800" fill="#F5F4F0">Defina sua oferta</text>'
-          + '<text x="12" y="86" font-family="system-ui" font-size="9" font-weight="800" fill="#F5C518">antes de qualquer post</text>'
-          + '<rect x="12" y="96" width="136" height="3" rx="1" fill="rgba(255,255,255,.07)"/>'
-          + '<rect x="12" y="103" width="100" height="3" rx="1" fill="rgba(255,255,255,.07)"/>'
-          + '<rect x="12" y="130" width="136" height="1" fill="rgba(255,255,255,.05)"/>'
-          + '<text x="12" y="147" font-family="system-ui" font-size="7" fill="#9E9C94">AutoPostt · 1/5</text>'
+          + '<rect width="70" height="200" fill="#17171D"/>'
+          + '<rect width="3" height="200" fill="#F5C518"/>'
+          + '<text x="10" y="48" font-family="system-ui" font-size="7" font-weight="800" fill="#F5C518" letter-spacing="1">GESTÃO</text>'
+          + '<text x="10" y="76" font-family="system-ui" font-size="10" font-weight="900" fill="#F5F4F0" letter-spacing="-0.5">Lidere</text>'
+          + '<text x="10" y="89" font-family="system-ui" font-size="10" font-weight="900" fill="#F5F4F0">com</text>'
+          + '<text x="10" y="102" font-family="system-ui" font-size="10" font-weight="900" fill="#F5C518">dados.</text>'
+          + '<rect x="10" y="114" width="50" height="2" rx="1" fill="rgba(245,197,24,.3)"/>'
+          + '<rect x="80" y="28" width="68" height="68" rx="8" fill="rgba(245,197,24,.08)"/>'
+          + '<text x="114" y="68" font-family="system-ui" font-size="22" font-weight="900" fill="#F5C518" text-anchor="middle">3x</text>'
+          + '<text x="114" y="80" font-family="system-ui" font-size="6" fill="#9E9C94" text-anchor="middle">mais resultado</text>'
+          + '<rect x="80" y="108" width="68" height="4" rx="2" fill="rgba(255,255,255,.08)"/>'
+          + '<rect x="80" y="116" width="50" height="4" rx="2" fill="rgba(255,255,255,.06)"/>'
           + '</svg>';
       }
     },
-    { name:'Slab Serif',    desc:'Tipografia editorial, fontes serifadas',
-      svg: function(i) {
+    { name: 'Card Numerado',
+      render: function() {
+        return '<svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'
+          + '<rect width="160" height="200" fill="#111116"/>'
+          + '<text x="12" y="55" font-family="system-ui" font-size="42" font-weight="900" fill="rgba(245,197,24,.12)" letter-spacing="-3">01</text>'
+          + '<rect x="12" y="58" width="136" height="1" fill="rgba(245,197,24,.1)"/>'
+          + '<text x="12" y="76" font-family="system-ui" font-size="9" font-weight="800" fill="#F5F4F0">Defina sua oferta</text>'
+          + '<text x="12" y="89" font-family="system-ui" font-size="9" font-weight="800" fill="#F5C518">antes de qualquer post</text>'
+          + '<rect x="12" y="99" width="136" height="3" rx="1" fill="rgba(255,255,255,.07)"/>'
+          + '<rect x="12" y="106" width="100" height="3" rx="1" fill="rgba(255,255,255,.07)"/>'
+          + '<rect x="12" y="140" width="136" height="1" fill="rgba(255,255,255,.05)"/>'
+          + '<text x="12" y="155" font-family="system-ui" font-size="7" fill="#9E9C94">AutoPostt · 1/5</text>'
+          + '</svg>';
+      }
+    },
+    { name: 'Slab Serif',
+      render: function() {
         return '<svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'
           + '<rect width="160" height="200" fill="#F7F5F0"/>'
-          + '<rect x="0" y="0" width="160" height="4" fill="#1A1600"/>'
-          + '<text x="12" y="28" font-family="Georgia,serif" font-size="7" fill="#9E9C94" letter-spacing="2">VENDAS · 2025</text>'
-          + '<rect x="12" y="34" width="136" height="1" fill="rgba(0,0,0,.12)"/>'
-          + '<text x="12" y="66" font-family="Georgia,serif" font-size="14" font-weight="700" fill="#0D0D0F">Processo</text>'
-          + '<text x="12" y="82" font-family="Georgia,serif" font-size="14" font-weight="700" fill="#0D0D0F">bate talento.</text>'
-          + '<text x="12" y="94" font-family="Georgia,serif" font-size="14" font-weight="700" fill="#F5C518">Sempre.</text>'
+          + '<rect width="160" height="4" fill="#1A1600"/>'
+          + '<text x="12" y="26" font-family="Georgia,serif" font-size="7" fill="#9E9C94" letter-spacing="2">VENDAS · 2025</text>'
+          + '<rect x="12" y="32" width="136" height="1" fill="rgba(0,0,0,.12)"/>'
+          + '<text x="12" y="64" font-family="Georgia,serif" font-size="14" font-weight="700" fill="#0D0D0F">Processo</text>'
+          + '<text x="12" y="80" font-family="Georgia,serif" font-size="14" font-weight="700" fill="#0D0D0F">bate talento.</text>'
+          + '<text x="12" y="96" font-family="Georgia,serif" font-size="14" font-weight="700" fill="#F5C518">Sempre.</text>'
           + '<rect x="12" y="106" width="40" height="3" rx="1" fill="#F5C518"/>'
           + '<rect x="12" y="116" width="136" height="3" rx="1" fill="rgba(0,0,0,.08)"/>'
           + '<rect x="12" y="123" width="110" height="3" rx="1" fill="rgba(0,0,0,.08)"/>'
-          + '<rect x="12" y="130" width="120" height="3" rx="1" fill="rgba(0,0,0,.08)"/>'
-          + '<rect x="12" y="165" width="136" height="1" fill="rgba(0,0,0,.1)"/>'
-          + '<text x="12" y="178" font-family="Georgia,serif" font-size="6" fill="#9E9C94">@autopostt</text>'
+          + '<rect x="12" y="168" width="136" height="1" fill="rgba(0,0,0,.1)"/>'
+          + '<text x="12" y="180" font-family="Georgia,serif" font-size="6" fill="#9E9C94">@autopostt</text>'
           + '</svg>';
       }
     },
-    { name:'Storytelling',  desc:'Narrativa visual, foto + texto sobrepostos',
-      svg: function(i) {
+    { name: 'Storytelling',
+      render: function() {
         return '<svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'
+          + '<defs><linearGradient id="stg" x1="0%" y1="50%" x2="0%" y2="100%"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="#0D0D0F"/></linearGradient></defs>'
           + '<rect width="160" height="200" fill="#1A1600"/>'
-          + '<rect width="160" height="200" fill="rgba(0,0,0,.5)"/>'
-          + '<defs><linearGradient id="st" x1="0%" y1="60%" x2="0%" y2="100%"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="#0D0D0F"/></linearGradient></defs>'
-          + '<rect width="160" height="200" fill="url(#st)"/>'
+          + '<rect width="160" height="200" fill="rgba(0,0,0,.4)"/>'
+          + '<rect width="160" height="200" fill="url(#stg)"/>'
           + '<rect x="16" y="16" width="24" height="3" rx="1" fill="#F5C518"/>'
-          + '<text x="16" y="155" font-family="system-ui" font-size="11" font-weight="900" fill="#F5F4F0" letter-spacing="-0.5">Comecei do</text>'
-          + '<text x="16" y="169" font-family="system-ui" font-size="11" font-weight="900" fill="#F5C518">zero. Duas vezes.</text>'
-          + '<rect x="16" y="178" width="80" height="3" rx="1" fill="rgba(255,255,255,.3)"/>'
-          + '<text x="16" y="192" font-family="system-ui" font-size="7" fill="rgba(255,255,255,.5)">Segue pra saber como →</text>'
+          + '<text x="16" y="152" font-family="system-ui" font-size="12" font-weight="900" fill="#F5F4F0" letter-spacing="-0.5">Comecei do</text>'
+          + '<text x="16" y="167" font-family="system-ui" font-size="12" font-weight="900" fill="#F5C518">zero. Duas vezes.</text>'
+          + '<rect x="16" y="176" width="80" height="2" rx="1" fill="rgba(255,255,255,.3)"/>'
+          + '<text x="16" y="190" font-family="system-ui" font-size="7" fill="rgba(255,255,255,.5)">Segue pra saber como</text>'
           + '</svg>';
       }
     },
-    { name:'Data Visual',   desc:'Gráficos e números, autoridade por dados',
-      svg: function(i) {
+    { name: 'Data Visual',
+      render: function() {
         return '<svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'
           + '<rect width="160" height="200" fill="#111116"/>'
-          + '<text x="12" y="28" font-family="system-ui" font-size="7" font-weight="600" fill="#9E9C94" letter-spacing="1">RELATÓRIO DE VENDAS</text>'
-          + '<rect x="12" y="36" width="136" height="1" fill="rgba(245,197,24,.15)"/>'
-          + '<rect x="12" y="48" width="20" height="80" rx="3" fill="rgba(245,197,24,.2)"/>'
-          + '<rect x="36" y="68" width="20" height="60" rx="3" fill="rgba(245,197,24,.35)"/>'
-          + '<rect x="60" y="58" width="20" height="70" rx="3" fill="rgba(245,197,24,.5)"/>'
-          + '<rect x="84" y="38" width="20" height="90" rx="3" fill="#F5C518"/>'
-          + '<rect x="108" y="48" width="20" height="80" rx="3" fill="rgba(245,197,24,.6)"/>'
-          + '<rect x="132" y="58" width="16" height="70" rx="3" fill="rgba(245,197,24,.4)"/>'
-          + '<rect x="12" y="132" width="136" height="1" fill="rgba(255,255,255,.06)"/>'
-          + '<text x="12" y="148" font-family="system-ui" font-size="9" font-weight="800" fill="#F5C518">+240%</text>'
-          + '<text x="12" y="160" font-family="system-ui" font-size="8" fill="#F5F4F0">em 90 dias com</text>'
-          + '<text x="12" y="172" font-family="system-ui" font-size="8" fill="#F5F4F0">conteúdo consistente</text>'
+          + '<text x="12" y="26" font-family="system-ui" font-size="7" font-weight="600" fill="#9E9C94" letter-spacing="1">RELATÓRIO DE VENDAS</text>'
+          + '<rect x="12" y="32" width="136" height="1" fill="rgba(245,197,24,.15)"/>'
+          + '<rect x="12" y="46" width="18" height="72" rx="3" fill="rgba(245,197,24,.2)"/>'
+          + '<rect x="34" y="60" width="18" height="58" rx="3" fill="rgba(245,197,24,.35)"/>'
+          + '<rect x="56" y="50" width="18" height="68" rx="3" fill="rgba(245,197,24,.5)"/>'
+          + '<rect x="78" y="34" width="18" height="84" rx="3" fill="#F5C518"/>'
+          + '<rect x="100" y="44" width="18" height="74" rx="3" fill="rgba(245,197,24,.6)"/>'
+          + '<rect x="122" y="54" width="16" height="64" rx="3" fill="rgba(245,197,24,.4)"/>'
+          + '<rect x="12" y="124" width="136" height="1" fill="rgba(255,255,255,.06)"/>'
+          + '<text x="12" y="140" font-family="system-ui" font-size="10" font-weight="800" fill="#F5C518">+240%</text>'
+          + '<text x="12" y="154" font-family="system-ui" font-size="8" fill="#F5F4F0">em 90 dias com</text>'
+          + '<text x="12" y="166" font-family="system-ui" font-size="8" fill="#F5F4F0">conteúdo consistente</text>'
           + '</svg>';
       }
     },
-    { name:'Citação',       desc:'Quote impactante, design editorial',
-      svg: function(i) {
+    { name: 'Citação',
+      render: function() {
         return '<svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'
           + '<rect width="160" height="200" fill="#17171D"/>'
-          + '<text x="12" y="52" font-family="Georgia,serif" font-size="40" fill="rgba(245,197,24,.15)" font-weight="900">"</text>'
-          + '<text x="16" y="90" font-family="Georgia,serif" font-size="9" font-style="italic" fill="#F5F4F0">Vender bem não é</text>'
-          + '<text x="16" y="103" font-family="Georgia,serif" font-size="9" font-style="italic" fill="#F5F4F0">sorte. É método.</text>'
-          + '<rect x="16" y="116" width="30" height="2" rx="1" fill="#F5C518"/>'
-          + '<text x="16" y="134" font-family="system-ui" font-size="8" font-weight="600" fill="#9E9C94">Pedro Alves · Mentor</text>'
-          + '<text x="16" y="146" font-family="system-ui" font-size="7" fill="#5E5C54">@pedroalves.mentor</text>'
-          + '<rect x="0" y="0" width="3" height="200" fill="rgba(245,197,24,.3)"/>'
+          + '<rect width="3" height="200" fill="rgba(245,197,24,.25)"/>'
+          + '<text x="12" y="55" font-family="Georgia,serif" font-size="44" fill="rgba(245,197,24,.12)" font-weight="900">"</text>'
+          + '<text x="16" y="88" font-family="Georgia,serif" font-size="10" font-style="italic" fill="#F5F4F0">Vender bem não é</text>'
+          + '<text x="16" y="102" font-family="Georgia,serif" font-size="10" font-style="italic" fill="#F5F4F0">sorte. É método.</text>'
+          + '<rect x="16" y="114" width="30" height="2" rx="1" fill="#F5C518"/>'
+          + '<text x="16" y="132" font-family="system-ui" font-size="8" font-weight="600" fill="#9E9C94">Pedro Alves · Mentor</text>'
+          + '<text x="16" y="144" font-family="system-ui" font-size="7" fill="#5E5C54">@pedroalves.mentor</text>'
           + '</svg>';
       }
     },
-    { name:'Neon Urban',    desc:'Estilo urbano, alto contraste',
-      svg: function(i) {
+    { name: 'Neon Urban',
+      render: function() {
         return '<svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'
           + '<rect width="160" height="200" fill="#080808"/>'
-          + '<rect x="8" y="8" width="144" height="184" rx="4" fill="none" stroke="rgba(245,197,24,.15)" stroke-width="1"/>'
-          + '<text x="80" y="75" font-family="system-ui" font-size="28" font-weight="900" fill="#F5C518" text-anchor="middle" letter-spacing="-2" filter="url(#neon)">5K</text>'
-          + '<text x="80" y="92" font-family="system-ui" font-size="7" fill="#9E9C94" text-anchor="middle" letter-spacing="2">SEGUIDORES EM</text>'
-          + '<text x="80" y="104" font-family="system-ui" font-size="7" fill="#9E9C94" text-anchor="middle" letter-spacing="2">30 DIAS</text>'
-          + '<rect x="24" y="120" width="112" height="1" fill="rgba(245,197,24,.2)"/>'
-          + '<rect x="24" y="130" width="112" height="4" rx="2" fill="rgba(255,255,255,.06)"/>'
-          + '<rect x="24" y="138" width="90" height="4" rx="2" fill="rgba(255,255,255,.06)"/>'
-          + '<rect x="24" y="162" width="112" height="20" rx="4" fill="#F5C518"/>'
-          + '<text x="80" y="176" font-family="system-ui" font-size="8" font-weight="800" fill="#080808" text-anchor="middle" letter-spacing="1">QUERO SABER COMO</text>'
+          + '<rect x="6" y="6" width="148" height="188" rx="4" fill="none" stroke="rgba(245,197,24,.12)" stroke-width="1"/>'
+          + '<text x="80" y="72" font-family="system-ui" font-size="32" font-weight="900" fill="#F5C518" text-anchor="middle" letter-spacing="-2">5K</text>'
+          + '<text x="80" y="86" font-family="system-ui" font-size="7" fill="#9E9C94" text-anchor="middle" letter-spacing="2">SEGUIDORES EM 30 DIAS</text>'
+          + '<rect x="24" y="104" width="112" height="1" fill="rgba(245,197,24,.2)"/>'
+          + '<rect x="24" y="114" width="112" height="4" rx="2" fill="rgba(255,255,255,.06)"/>'
+          + '<rect x="24" y="122" width="90" height="4" rx="2" fill="rgba(255,255,255,.06)"/>'
+          + '<rect x="24" y="158" width="112" height="22" rx="4" fill="#F5C518"/>'
+          + '<text x="80" y="173" font-family="system-ui" font-size="8" font-weight="800" fill="#080808" text-anchor="middle" letter-spacing="1">QUERO SABER COMO</text>'
           + '</svg>';
       }
     }
   ];
 
-  // ── CAROUSEL SVGs ──
-  function buildCarouselSVGs(tplIdx) {
-    var tpl = tplIdx || 0;
-    var slides = [];
-    var titles = [
-      ['Capa','O sistema que'],
-      ['Erro 1','Vender sem'],
-      ['Erro 2','Ignorar o'],
-      ['Erro 3','Não ter'],
-      ['CTA','Quer aplicar']
+  // ── CAROUSEL SLIDES ──
+  function buildCarousel() {
+    var slides = [
+      ['Capa', 'O sistema que'],
+      ['Erro 1', 'Vender sem'],
+      ['Erro 2', 'Ignorar o'],
+      ['Erro 3', 'Não ter'],
+      ['CTA', 'Quer aplicar']
     ];
-    var subtitles = ['triplicou minhas vendas','processo definido','follow-up','funil claro','isso no seu negócio?'];
-    for (var k = 0; k < 5; k++) {
-      slides.push('<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="width:90px;height:90px;flex-shrink:0;border-radius:6px">'
+    return slides.map(function(s, k) {
+      return '<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="width:88px;height:88px;flex-shrink:0;border-radius:6px">'
         + '<rect width="200" height="200" fill="' + bg2 + '"/>'
-        + '<rect x="0" y="0" width="200" height="3" fill="' + ac + '"/>'
-        + '<text x="16" y="65" font-family="system-ui" font-size="40" font-weight="900" fill="rgba(245,197,24,.12)" letter-spacing="-3">0' + (k+1) + '</text>'
-        + '<text x="16" y="108" font-family="system-ui" font-size="11" font-weight="800" fill="' + tx + '">' + titles[k][0] + '</text>'
-        + '<text x="16" y="122" font-family="system-ui" font-size="11" font-weight="800" fill="' + ac + '">' + titles[k][1] + '</text>'
+        + '<rect width="200" height="3" fill="' + ac + '"/>'
+        + '<text x="16" y="62" font-family="system-ui" font-size="42" font-weight="900" fill="rgba(245,197,24,.1)" letter-spacing="-3">0' + (k+1) + '</text>'
+        + '<text x="16" y="106" font-family="system-ui" font-size="12" font-weight="800" fill="' + tx + '">' + s[0] + '</text>'
+        + '<text x="16" y="122" font-family="system-ui" font-size="12" font-weight="800" fill="' + ac + '">' + s[1] + '</text>'
         + '<rect x="16" y="132" width="90" height="2" rx="1" fill="rgba(245,197,24,.2)"/>'
         + '<rect x="16" y="140" width="168" height="3" rx="1" fill="rgba(255,255,255,.07)"/>'
         + '<rect x="16" y="147" width="140" height="3" rx="1" fill="rgba(255,255,255,.07)"/>'
-        + '<text x="184" y="192" font-family="system-ui" font-size="7" fill="rgba(245,197,24,.3)" text-anchor="end">' + (k+1) + '/5</text>'
-        + '</svg>');
-    }
-    return slides;
+        + '<text x="184" y="190" font-family="system-ui" font-size="7" fill="rgba(245,197,24,.3)" text-anchor="end">' + (k+1) + '/5</text>'
+        + '</svg>';
+    });
   }
 
-  // ── RENDER TEMPLATES ──
-  function renderTemplates(selectedIdx) {
+  // ── RENDER TEMPLATES GRID ──
+  function renderTemplates(selected) {
     var grid = document.getElementById('demo-templates-grid');
     if (!grid) return;
     grid.innerHTML = '';
     TEMPLATES.forEach(function(t, i) {
       var div = document.createElement('div');
-      div.className = 'demo-tpl' + (i === (selectedIdx || 0) ? ' selected' : '');
-      div.innerHTML = t.svg(i) + '<div class="demo-tpl-label">' + t.name + '</div>';
-      div.onclick = function() {
-        // Mark selected
-        grid.querySelectorAll('.demo-tpl').forEach(function(d){ d.classList.remove('selected'); });
-        div.classList.add('selected');
-        _selectedTpl = i;
-        // Switch to result tab with carousel
-        setTimeout(function() { showCarouselResult(i); }, 300);
-      };
+      div.className = 'demo-tpl' + (i === selected ? ' selected' : '');
+      div.innerHTML = t.render() + '<div class="demo-tpl-label">' + t.name + '</div>';
+      div.onclick = (function(idx) {
+        return function() {
+          grid.querySelectorAll('.demo-tpl').forEach(function(d){ d.classList.remove('selected'); });
+          div.classList.add('selected');
+          setTimeout(function(){ showCarousel(idx); }, 200);
+        };
+      })(i);
       grid.appendChild(div);
     });
   }
 
-  function showCarouselResult(tplIdx) {
-    switchDemoTab('result');
+  function showCarousel(tplIdx) {
+    switchTab('result');
     var preview = document.getElementById('demo-carousel-preview');
     if (!preview) return;
     preview.innerHTML = '';
-    buildCarouselSVGs(tplIdx).forEach(function(svg) {
+    buildCarousel().forEach(function(svg) {
       var d = document.createElement('div');
       d.innerHTML = svg;
-      preview.appendChild(d.firstChild);
+      if (d.firstChild) preview.appendChild(d.firstChild);
     });
   }
 
-  // ── SWITCH TABS ──
-  window.switchDemoTab = function(tab) {
+  // ── TAB SWITCHER ──
+  window.switchDemoTab = function(tab) { switchTab(tab); };
+  function switchTab(tab) {
     var cp = document.getElementById('dtab-concepts-panel');
     var rp = document.getElementById('dtab-result-panel');
     var tc = document.getElementById('dtab-concepts');
@@ -1553,198 +1779,140 @@ loadLandingPlans();
     if (!cp || !rp) return;
     if (tab === 'concepts') {
       cp.style.display = ''; rp.style.display = 'none';
-      if (tc) { tc.classList.add('on'); } if (tr) { tr.classList.remove('on'); }
+      if (tc) tc.classList.add('on'); if (tr) tr.classList.remove('on');
     } else {
       cp.style.display = 'none'; rp.style.display = '';
-      if (tr) { tr.classList.add('on'); } if (tc) { tc.classList.remove('on'); }
+      if (tr) tr.classList.add('on'); if (tc) tc.classList.remove('on');
     }
-  };
-
-  // ── AGENT SWITCHING ──
-  function setActiveAgent(agent, label) {
-    var cfg = DEMO_AGENTS[agent];
-    var tb = document.getElementById('demo-topbar-title');
-    if (tb && cfg) tb.textContent = cfg.topbar || ('AutoPostt — ' + label);
   }
 
-  function demoNav(agent, el) {
+  // ── AGENT NAVIGATION (also called by onclick on nav items) ──
+  window.demoNav = function(agent, el) {
+    // Update sidebar active
     document.querySelectorAll('.l-demo-nav-item').forEach(function(n){ n.classList.remove('active'); });
     if (el) el.classList.add('active');
-    var cfg = DEMO_AGENTS[agent];
-    if (!cfg) return;
-    setActiveAgent(agent, cfg.label);
+    // Update topbar
+    var tb = document.getElementById('demo-topbar-title');
+    if (tb && AGENTS[agent]) tb.textContent = AGENTS[agent].title;
     // Show/hide panels
     ['imagem','legenda','reels','linkedin','story','tiktok','yt'].forEach(function(a) {
       var p = document.getElementById('dpanel-' + a);
-      if (p) p.style.display = (a === agent) ? '' : 'none';
+      if (p) p.style.display = a === agent ? '' : 'none';
     });
     if (agent === 'imagem') {
-      switchDemoTab('concepts');
-      renderTemplates(_selectedTpl);
+      switchTab('concepts');
+      renderTemplates(0);
+    } else {
+      // Reset text panel
+      var empty = document.getElementById('demo-text-empty-' + agent);
+      var load  = document.getElementById('demo-loading-' + agent);
+      var out   = document.getElementById('demo-output-wrap-' + agent);
+      var inp   = document.getElementById('demo-text-input-' + agent);
+      if (empty) empty.style.display = '';
+      if (load)  load.style.display  = 'none';
+      if (out)   out.style.display   = 'none';
+      if (inp)   inp.innerHTML = '<span class="l-demo-cursor"></span>';
     }
-  }
+  };
 
-  // ── TEXT AGENT CYCLE ──
-  var TEXT_AGENTS = ['legenda','reels','linkedin','story','tiktok','yt'];
-  var TEXT_INPUTS = [
-    '3 erros fatais de gestão comercial que ninguém fala abertamente',
-    'Como dobrei minha taxa de fechamento em 30 dias',
-    'O único KPI que importa para um gestor de alta performance',
-    '5 verdades sobre vendas que descobri da pior forma possível',
-    'Seu concorrente já usa IA — e você ainda improvisa'
-  ];
-  var TEXT_OUTPUTS = [
-    'Você não precisa de mais leads.\nPrecisa parar de perder os que já tem.\n\nOs 3 erros que destroem gestores comerciais...',
-    '[HOOK — 0s]\nAbro a câmera e mostro meu funil antes e depois.\n\n[3-15s]\nEm janeiro, fechava 1 em cada 8 leads...',
-    'Contratei 12 vendedores em 2 anos.\nSó 3 passaram dos 6 meses.\n\nO problema nunca foi o vendedor.',
-    'STORY 1 — ABERTURA\nVocê sabia que 73% das perdas de venda acontecem no follow-up?\n\nSTORY 2 — CONTEXTO\nA maioria dos vendedores some depois do primeiro não.',
-    '[0-2s] Você não precisa de script viral.\nPrecisa de um processo.\n\n[2-10s] Trabalho com vendas há 8 anos...'
-  ];
-
-  var _txtIdx = 0;
-  var _demoRunning = false;
-
+  // ── TEXT HELPERS ──
   function typeText(el, text, speed, cb) {
+    if (!el) { if (cb) cb(); return; }
     var i = 0;
     el.innerHTML = '<span class="l-demo-cursor"></span>';
     var t = setInterval(function() {
-      if (i >= text.length) { clearInterval(t); if (cb) cb(); return; }
+      if (i >= text.length) { clearInterval(t); if (cb) setTimeout(cb, 200); return; }
       var cur = el.querySelector('.l-demo-cursor');
-      var node = document.createTextNode(text[i++]);
-      el.insertBefore(node, cur);
+      el.insertBefore(document.createTextNode(text[i++]), cur);
     }, speed);
   }
 
   function printText(el, text, speed, cb) {
+    if (!el) { if (cb) cb(); return; }
     el.style.whiteSpace = 'pre-wrap';
     el.textContent = '';
     var i = 0;
     var t = setInterval(function() {
-      if (i >= text.length) { clearInterval(t); if (cb) cb(); return; }
+      if (i >= text.length) { clearInterval(t); if (cb) setTimeout(cb, 200); return; }
       el.textContent += text[i++];
     }, speed);
   }
 
-  function runTextAgent() {
-    var agent = TEXT_AGENTS[_txtIdx % TEXT_AGENTS.length];
-    var input = TEXT_INPUTS[_txtIdx % TEXT_INPUTS.length];
-    var output = TEXT_OUTPUTS[_txtIdx % TEXT_OUTPUTS.length];
-    _txtIdx++;
+  // ── RUN TEXT AGENT DEMO ──
+  var _agentOrder = ['legenda','reels','linkedin','story','tiktok','yt'];
+  var _agentIdx   = 0;
+  var _running    = false;
 
-    // Switch sidebar to this agent
-    var navEl = document.getElementById('dnav-' + agent);
-    demoNav(agent, navEl);
+  function runAgent() {
+    if (_running) return;
+    _running = true;
+    var agent  = _agentOrder[_agentIdx % _agentOrder.length];
+    var data   = TEXT_DATA[agent];
+    _agentIdx++;
 
-    var inputEl  = document.getElementById('dtinput-' + agent);
-    var loadEl   = document.getElementById('demo-loading-text');
-    var loadTxt  = document.getElementById('demo-loading-txt-text');
-    var barEl    = document.getElementById('demo-bar-text');
-    var outputEl = document.getElementById('demo-output-text');
-    var outWrap  = document.getElementById('demo-output-wrap-text');
-    var emptyEl  = document.getElementById('demo-text-empty');
+    var navEl  = document.getElementById('dnav-' + agent);
+    window.demoNav(agent, navEl);
 
-    if (!inputEl) { setTimeout(runTextAgent, 2000); return; }
-    if (outWrap)  outWrap.style.display = 'none';
-    if (loadEl)   loadEl.style.display = 'none';
-    if (emptyEl)  emptyEl.style.display = '';
-    if (outputEl) outputEl.textContent = '';
+    var inpEl  = document.getElementById('demo-text-input-' + agent);
+    var loadEl = document.getElementById('demo-loading-' + agent);
+    var barEl  = document.getElementById('demo-bar-' + agent);
+    var txtEl  = document.getElementById('demo-loading-txt-' + agent);
+    var outWrp = document.getElementById('demo-output-wrap-' + agent);
+    var outEl  = document.getElementById('demo-output-' + agent);
+    var emptyEl= document.getElementById('demo-text-empty-' + agent);
+
+    if (!inpEl) { _running = false; setTimeout(runAgent, 2000); return; }
+
+    // Reset
+    if (emptyEl) emptyEl.style.display = '';
+    if (loadEl)  loadEl.style.display  = 'none';
+    if (outWrp)  outWrp.style.display  = 'none';
+    if (outEl)   outEl.textContent     = '';
 
     setTimeout(function() {
-      typeText(inputEl, input, 30, function() {
+      typeText(inpEl, data.input, 32, function() {
         if (emptyEl) emptyEl.style.display = 'none';
-        if (loadEl)  { loadEl.style.display = ''; }
+        if (loadEl)  loadEl.style.display  = '';
+        var stageI = 0;
+        var stageT = setInterval(function() {
+          if (txtEl && stageI < data.stages.length) txtEl.textContent = data.stages[stageI++];
+          if (stageI >= data.stages.length) clearInterval(stageT);
+        }, 700);
         var barW = 0;
-        var barTimer = setInterval(function() {
-          barW += 3; if (barEl) barEl.style.width = Math.min(barW, 95) + '%';
-          if (barW >= 95) clearInterval(barTimer);
+        var barT = setInterval(function() {
+          barW += 2.5;
+          if (barEl) barEl.style.width = Math.min(barW, 95) + '%';
+          if (barW >= 95) clearInterval(barT);
         }, 80);
         setTimeout(function() {
-          clearInterval(barTimer);
+          clearInterval(stageT); clearInterval(barT);
           if (barEl) barEl.style.width = '100%';
-          if (loadEl) loadEl.style.display = 'none';
-          if (outWrap) outWrap.style.display = '';
-          if (outputEl) printText(outputEl, output, 10, function() {
-            setTimeout(runTextAgent, 4000);
-          });
-        }, 2800);
+          setTimeout(function() {
+            if (loadEl)  loadEl.style.display = 'none';
+            if (outWrp)  outWrp.style.display = '';
+            printText(outEl, data.output, 9, function() {
+              _running = false;
+              setTimeout(runAgent, 5000);
+            });
+          }, 300);
+        }, 3000);
       });
     }, 600);
   }
 
   // ── INIT ──
   function init() {
-    // Render 10 template models
     renderTemplates(0);
-    // Show imagem agent first
-    demoNav('imagem', document.getElementById('dnav-imagem'));
-    // After 5s, start cycling text agents
-    setTimeout(function() {
-      // Show first carousel result after 3s
-      setTimeout(function() { showCarouselResult(0); }, 3000);
-      // Then cycle through text agents after 8s
-      setTimeout(runTextAgent, 8000);
-    }, 1000);
+    window.demoNav('imagem', document.getElementById('dnav-imagem'));
+    // Show carousel after 3s, then start cycling text agents
+    setTimeout(function() { showCarousel(0); }, 3000);
+    setTimeout(runAgent, 7000);
   }
 
   setTimeout(init, 800);
 
 })();
 
-
-// ── AUTH PREVIEW ──
-// ── AUTH SCREEN LIVE PREVIEW ──
-(function() {
-  var AUTH_PREVIEWS = [
-    { tag: 'Legenda', text: 'Você não precisa de mais leads.\nPrecisa parar de perder os que já tem.\n\n→ 3 erros que destroem equipes comerciais antes dos 90 dias...\n\n#gestãocomercial #vendas' },
-    { tag: 'Roteiro Reels', text: '[Abre câmera — olha direto pro viewer]\n\nSe você não tem uma rotina de vendas, você não tem um negócio — você tem sorte.\n\nE sorte acaba.' },
-    { tag: 'Post LinkedIn', text: 'Contratei 12 vendedores em 2 anos.\nSó 3 passaram dos 6 meses.\n\nO padrão dos que ficaram me surpreendeu...' },
-  ];
-  var AUTH_SIGNUP_PREVIEWS = [
-    { tag: 'Roteiro TikTok', text: '[Áudio trending]\n\nPOV: você descobriu que seu concorrente usa IA pra criar conteúdo e você ainda tá no improviso...' },
-    { tag: 'Ideias Story', text: 'Story 1: Pergunta polêmica ✦\nStory 2: Enquete estratégica\nStory 3: Revelação\nStory 4–6: Prova social\nStory 7: CTA irresistível' },
-    { tag: 'Thumbnail YT', text: 'Conceito A: Rosto surpreso + número grande em laranja\nConceito B: Contraste preto/laranja + seta\nConceito C: Minimalista + pergunta direta' },
-  ];
-
-  function runAuthPreview(previewElId, tagElId, sequences) {
-    var previewEl = document.getElementById(previewElId);
-    var tagEl = document.getElementById(tagElId);
-    if (!previewEl || !tagEl) return;
-    var idx = 0;
-    function next() {
-      var s = sequences[idx % sequences.length];
-      tagEl.textContent = s.tag;
-      previewEl.innerHTML = '<span class="auth-preview-cursor"></span>';
-      var i = 0;
-      var timer = setInterval(function() {
-        if (i >= s.text.length) {
-          clearInterval(timer);
-          setTimeout(function() { idx++; next(); }, 3500);
-          return;
-        }
-        previewEl.innerHTML = s.text.slice(0, i + 1).replace(/\n/g, '<br>') + '<span class="auth-preview-cursor"></span>';
-        i++;
-      }, 22);
-    }
-    next();
-  }
-
-  // Only start when screen is visible
-  function watchAndStart(screenId, previewId, tagId, seqs) {
-    var screen = document.getElementById(screenId);
-    if (!screen) return;
-    var started = false;
-    var observer = new MutationObserver(function() {
-      if (screen.classList.contains('on') && !started) {
-        started = true;
-        setTimeout(function() { runAuthPreview(previewId, tagId, seqs); }, 400);
-      }
-    });
-    observer.observe(screen, { attributes: true, attributeFilter: ['class'] });
-  }
-
-  watchAndStart('sc-login',  'auth-login-preview',  'auth-login-tag',  AUTH_PREVIEWS);
-  watchAndStart('sc-signup', 'auth-signup-preview', 'auth-signup-tag', AUTH_SIGNUP_PREVIEWS);
-})();
 </script>
 </body>
 </html>
