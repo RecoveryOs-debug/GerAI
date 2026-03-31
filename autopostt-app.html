@@ -3364,13 +3364,72 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
         <div>
           <div class="pb" style="margin-bottom:12px">
             <div class="pb-title">Identidade visual</div>
-            <div class="form-row"><label>Cores da marca</label>
-              <div class="c-dots" style="margin-bottom:14px" id="prof-color-dots">
-                <div class="c-dot" id="prof-c1" style="background:#F5C518;border-color:rgba(245,197,24,.4)" onclick="editColorDot(this)" title="Clique para editar"></div>
-                <div class="c-dot" id="prof-c2" style="background:#0F1113" onclick="editColorDot(this)" title="Clique para editar"></div>
-                <div class="c-dot c-dot-add" onclick="addColorDot()" title="Adicionar cor">+</div>
+            <!-- ── COLOR PICKERS COMPLETOS ── -->
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px">
+
+              <div>
+                <label style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px">Cor Primária</label>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div id="brand-c1-swatch" style="width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);cursor:pointer;position:relative;overflow:hidden;flex-shrink:0">
+                    <input type="color" id="brand-c1" value="#F5C518" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
+                    <div id="brand-c1-fill" style="position:absolute;inset:0;background:#F5C518;pointer-events:none"></div>
+                  </div>
+                  <div>
+                    <div id="brand-c1-hex" style="font-size:12px;font-weight:700;color:var(--t1);font-family:monospace">#F5C518</div>
+                    <div style="font-size:10px;color:var(--t3)">Destaque</div>
+                  </div>
+                </div>
               </div>
+
+              <div>
+                <label style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px">Cor de Fundo</label>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div id="brand-c2-swatch" style="width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);cursor:pointer;position:relative;overflow:hidden;flex-shrink:0">
+                    <input type="color" id="brand-c2" value="#0D0D0F" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
+                    <div id="brand-c2-fill" style="position:absolute;inset:0;background:#0D0D0F;pointer-events:none"></div>
+                  </div>
+                  <div>
+                    <div id="brand-c2-hex" style="font-size:12px;font-weight:700;color:var(--t1);font-family:monospace">#0D0D0F</div>
+                    <div style="font-size:10px;color:var(--t3)">Background</div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px">Cor de Texto</label>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div id="brand-c3-swatch" style="width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);cursor:pointer;position:relative;overflow:hidden;flex-shrink:0">
+                    <input type="color" id="brand-c3" value="#F5F4F0" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
+                    <div id="brand-c3-fill" style="position:absolute;inset:0;background:#F5F4F0;pointer-events:none"></div>
+                  </div>
+                  <div>
+                    <div id="brand-c3-hex" style="font-size:12px;font-weight:700;color:var(--t1);font-family:monospace">#F5F4F0</div>
+                    <div style="font-size:10px;color:var(--t3)">Texto</div>
+                  </div>
+                </div>
+              </div>
+
             </div>
+
+            <!-- Preview ao vivo -->
+            <div style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+              <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:none;stroke:var(--amber);stroke-width:2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              Preview ao vivo — seus modelos nas suas cores
+            </div>
+            <div id="brand-model-previews" style="display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;margin-bottom:20px"></div>
+
+            <!-- Paletas rápidas -->
+            <div style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Paletas rápidas</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
+              <button class="btn btn-g btn-sm" onclick="applyPreset('#F5C518','#0D0D0F','#F5F4F0')">AutoPostt</button>
+              <button class="btn btn-g btn-sm" onclick="applyPreset('#E8302A','#0A0A0A','#F5F5F5')">Sangue Frio</button>
+              <button class="btn btn-g btn-sm" onclick="applyPreset('#00A86B','#0D1117','#F0FFF4')">Matrix Verde</button>
+              <button class="btn btn-g btn-sm" onclick="applyPreset('#8B5CF6','#0F0A1E','#FAF5FF')">Neon Violeta</button>
+              <button class="btn btn-g btn-sm" onclick="applyPreset('#F97316','#1C1C1E','#FAFAFA')">Laranja Obsessão</button>
+              <button class="btn btn-g btn-sm" onclick="applyPreset('#06B6D4','#030712','#F0F9FF')">Gelo Cibernético</button>
+              <button class="btn btn-g btn-sm" onclick="applyPreset('#EC4899','#1A0010','#FFF0F7')">Rosa Brutalista</button>
+            </div>
+
             <div class="form-row"><label>Estilo visual</label><select id="prof-estilo"><option value="Dark Luxury">Dark Luxury</option><option value="Minimalista">Minimalista</option><option value="Editorial">Editorial</option><option value="Futurista">Futurista</option></select></div>
             <div class="form-row"><label>Redes integradas</label>
               <div id="prof-redes-integrations">
@@ -3526,82 +3585,17 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
       </div>
 
 
-      <!-- PANEL: MARCA -->
+      <!-- PANEL: MARCA — consolidado no Perfil de Marca -->
       <div class="sett-panel" id="sett-panel-marca">
         <div class="sb-content">
-
           <div class="set-sec-title">Identidade de Marca</div>
-          <div class="set-sec-desc">Suas cores são aplicadas automaticamente em todos os posts gerados</div>
-
-          <!-- Color pickers -->
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:18px 0 24px">
-
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px">Cor Primária</label>
-              <div style="display:flex;align-items:center;gap:10px">
-                <div id="brand-c1-swatch" style="width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);cursor:pointer;position:relative;overflow:hidden;flex-shrink:0">
-                  <input type="color" id="brand-c1" value="#F5C518" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
-                  <div id="brand-c1-fill" style="position:absolute;inset:0;background:#F5C518;pointer-events:none"></div>
-                </div>
-                <div>
-                  <div id="brand-c1-hex" style="font-size:12px;font-weight:700;color:var(--t1);font-family:monospace">#F5C518</div>
-                  <div style="font-size:10px;color:var(--t3)">Destaque</div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px">Cor de Fundo</label>
-              <div style="display:flex;align-items:center;gap:10px">
-                <div id="brand-c2-swatch" style="width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);cursor:pointer;position:relative;overflow:hidden;flex-shrink:0">
-                  <input type="color" id="brand-c2" value="#0D0D0F" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
-                  <div id="brand-c2-fill" style="position:absolute;inset:0;background:#0D0D0F;pointer-events:none"></div>
-                </div>
-                <div>
-                  <div id="brand-c2-hex" style="font-size:12px;font-weight:700;color:var(--t1);font-family:monospace">#0D0D0F</div>
-                  <div style="font-size:10px;color:var(--t3)">Background</div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px">Cor de Texto</label>
-              <div style="display:flex;align-items:center;gap:10px">
-                <div id="brand-c3-swatch" style="width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);cursor:pointer;position:relative;overflow:hidden;flex-shrink:0">
-                  <input type="color" id="brand-c3" value="#F5F4F0" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
-                  <div id="brand-c3-fill" style="position:absolute;inset:0;background:#F5F4F0;pointer-events:none"></div>
-                </div>
-                <div>
-                  <div id="brand-c3-hex" style="font-size:12px;font-weight:700;color:var(--t1);font-family:monospace">#F5F4F0</div>
-                  <div style="font-size:10px;color:var(--t3)">Texto</div>
-                </div>
-              </div>
-            </div>
-
+          <div class="set-sec-desc">Gerencie sua identidade visual no <a onclick="navP('profile')" style="color:var(--a);cursor:pointer;text-decoration:underline">Perfil de Marca</a></div>
+          <div style="margin-top:16px">
+            <button class="btn btn-p btn-sm" onclick="navP('profile')">
+              <svg class="ico ico-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              Ir para Perfil de Marca →
+            </button>
           </div>
-
-          <!-- Live preview label -->
-          <div style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;gap:6px">
-            <svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:none;stroke:var(--amber);stroke-width:2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            Preview ao vivo — seus modelos nas suas cores
-          </div>
-
-          <!-- Model previews (3 models tokenized) -->
-          <div id="brand-model-previews" style="display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;margin-bottom:20px"></div>
-
-          <!-- Preset palettes -->
-          <div style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Paletas rápidas</div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">
-            <button class="btn btn-g btn-sm" onclick="applyPreset('#F5C518','#0D0D0F','#F5F4F0')">AutoPostt</button>
-            <button class="btn btn-g btn-sm" onclick="applyPreset('#003DA5','#FFFFFF','#1A1A1A')">WEG Azul</button>
-            <button class="btn btn-g btn-sm" onclick="applyPreset('#E8302A','#0A0A0A','#F5F5F5')">Vermelho Premium</button>
-            <button class="btn btn-g btn-sm" onclick="applyPreset('#00A86B','#0D1117','#F0FFF4')">Verde Tech</button>
-            <button class="btn btn-g btn-sm" onclick="applyPreset('#8B5CF6','#0F0A1E','#FAF5FF')">Roxo Digital</button>
-            <button class="btn btn-g btn-sm" onclick="applyPreset('#F97316','#1C1C1E','#FAFAFA')">Laranja Bold</button>
-          </div>
-
-          <button class="btn btn-p btn-sm" onclick="saveBrandSettings()">Salvar identidade de marca</button>
-
         </div>
       </div>
 
