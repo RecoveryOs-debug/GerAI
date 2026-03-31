@@ -3217,7 +3217,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
               <!-- ── MODELO PICKER ── -->
               <div id="modelo-picker-section" style="margin-bottom:14px">
                 <div style="font-size:10px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">Escolha um modelo</div>
-                <div id="modelo-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:400px;overflow-y:auto;padding-right:2px;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent"></div>
+                <div id="modelo-grid" style="display:flex;flex-direction:column;gap:10px;max-height:520px;overflow-y:auto;padding-right:4px;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent"></div>
                 <div id="modelo-selected-info" style="display:none;margin-top:8px;padding:7px 10px;background:var(--ink-3);border:1px solid var(--amber-18);border-radius:6px">
                   <div style="font-size:10px;color:var(--t2)">Modelo selecionado</div>
                   <div style="font-size:12px;font-weight:700;color:var(--a)" id="modelo-selected-name">—</div>
@@ -4916,6 +4916,7 @@ async function gerarImagem() {
   const rawInput = (document.getElementById('gen-in')?.value || '').trim();
   const prompt = refinedPrompt || rawInput;
   if (!prompt) { toast('Refine o prompt primeiro clicando em "Gerar conteúdo com IA"','err'); return; }
+  if (!window._selectedModel) { toast('Escolha um modelo antes de gerar a imagem','err'); return; }
   
   const imgMode = document.querySelector('input[name="img-mode"]:checked')?.value || 'reference';
   
@@ -4931,8 +4932,9 @@ async function gerarImagem() {
   
   try {
     const _modelCtx = window._selectedModel
-      ? '\n\nMODELO DE LAYOUT: ' + window._selectedModel.n + ' — ' + window._selectedModel.name +
-        '. Replique a estrutura de composição, tipografia e hierarquia visual deste modelo como base do design.'
+      ? '\n\nMODELO DE LAYOUT SELECIONADO: ' + window._selectedModel.n + ' — ' + window._selectedModel.name + '\n' +
+        'INSTRUÇÃO CRÍTICA: Replique EXATAMENTE a estrutura deste SVG de referência — mesma composição, posicionamento, pesos tipográficos, hierarquia visual e estilo. Substitua apenas os textos pelo conteúdo do prompt. Preserve cores, fontes, geometria e layout.\n' +
+        'SVG DE REFERÊNCIA:\n' + window._selectedModel.svg
       : '';
     const rawInput = (document.getElementById('gen-in')?.value || '').trim();
     const fullPrompt = [
@@ -7579,20 +7581,51 @@ function renderModelGrid() {
   if (!grid || typeof models === 'undefined') return;
   grid.innerHTML = models.map((m, i) => `
     <div onclick="selectModel(${i})" data-idx="${i}" style="
-      position:relative;cursor:pointer;border-radius:8px;overflow:hidden;
-      border:2px solid ${i===0?'var(--amber)':'var(--line-1)'};
-      transition:border-color .15s;aspect-ratio:0.8/1;background:var(--ink-3);
+      position:relative;cursor:pointer;border-radius:10px;overflow:hidden;
+      border:2px solid var(--line-1);
+      transition:border-color .15s,box-shadow .15s;
+      background:var(--ink-3);
+      display:flex;align-items:stretch;min-height:110px;
     ">
-      <div style="width:100%;height:100%;overflow:hidden;pointer-events:none">${m.svg}</div>
-      <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,.88) 0%,transparent 100%);padding:8px 7px 6px">
-        <div style="font-size:9px;font-weight:700;color:var(--amber);letter-spacing:.06em">${m.n}</div>
-        <div style="font-size:10px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.name}</div>
+      <div style="flex-shrink:0;width:90px;height:110px;overflow:hidden;pointer-events:none;background:var(--bg)">
+        <div style="width:300%;height:300%;transform:scale(0.333);transform-origin:top left;pointer-events:none">${m.svg}</div>
       </div>
-      ${i===0?'<div style=\"position:absolute;top:4px;right:4px;background:var(--amber);border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700;color:#000\">✓</div>':''}
+      <div style="flex:1;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:4px;border-left:1px solid var(--line-1)">
+        <div style="font-size:9px;font-weight:700;color:var(--amber);letter-spacing:.1em;text-transform:uppercase">${m.n}</div>
+        <div style="font-size:13px;font-weight:700;color:var(--t0);letter-spacing:-.01em">${m.name}</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:2px" id="mdesc-${i}">${_getModelDesc(m.n)}</div>
+      </div>
+      <div class="mchk" style="display:none;position:absolute;top:8px;right:8px;background:var(--amber);border-radius:4px;padding:2px 7px;font-size:9px;font-weight:700;color:#000">✓ Selecionado</div>
     </div>
   `).join('');
-  _selectedModel = models[0];
+  _selectedModel = null;
   _updateModelInfo();
+}
+
+function _getModelDesc(n) {
+  const descs = {
+    '01':'Fundo escuro, tipografia dourada, hierarquia clean',
+    '02':'Fundo branco, serifa elegante, contraste editorial',
+    '03':'Divisão cromática, impacto visual, dois planos',
+    '04':'Gradiente escuro, composição cinematográfica',
+    '05':'Monocromático, peso tipográfico extremo',
+    '06':'Tons creme, luxo suave, requinte visual',
+    '07':'Dados e métricas, grid estruturado, técnico',
+    '08':'Neon sobre preto, energia digital, vibrante',
+    '09':'Branco limpo, espaço negativo, minimalismo',
+    '10':'Narrativa visual, sequência, storytelling',
+    '11':'Dourado full, presença e autoridade máxima',
+    '12':'Padrão de grid, estrutura, ordem visual',
+    '13':'Preto brutal, tipografia pesada, impacto',
+    '14':'Pastéis suaves, acolhedor, paleta feminina',
+    '15':'Terminal/código, tech, monospaced',
+    '16':'Diagramação magazine, colunas, editorial',
+    '17':'Formas geométricas, construção visual moderna',
+    '18':'Retro bold, anos 70-80, nostalgia colorida',
+    '19':'Glass morphism, translúcido, dark elegante',
+    '20':'Linha minimalista, traço fino, sofisticado',
+  };
+  return descs[n] || '';
 }
 
 function selectModel(idx) {
@@ -7600,15 +7633,9 @@ function selectModel(idx) {
   document.querySelectorAll('#modelo-grid > div').forEach((c, i) => {
     const on = i === idx;
     c.style.borderColor = on ? 'var(--amber)' : 'var(--line-1)';
+    c.style.boxShadow = on ? '0 0 0 1px var(--amber),0 4px 16px rgba(245,197,24,.15)' : 'none';
     const chk = c.querySelector('.mchk');
-    if (chk) chk.remove();
-    if (on) {
-      const d = document.createElement('div');
-      d.className = 'mchk';
-      d.style.cssText = 'position:absolute;top:4px;right:4px;background:var(--amber);border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700;color:#000';
-      d.textContent = '✓';
-      c.appendChild(d);
-    }
+    if (chk) chk.style.display = on ? 'block' : 'none';
   });
   _updateModelInfo();
 }

@@ -1261,8 +1261,9 @@ REGRAS ABSOLUTAS:
 1. Responda SOMENTE com SVG puro. Comece com <svg e termine com </svg>
 2. ZERO texto antes ou depois. Sem markdown. Sem explicações.
 3. viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg"
-4. Todos os elementos <text> com font-family="'Arial Black',Arial,sans-serif" explícito
+4. Todos os elementos <text> com font-family explícito (use as mesmas fontes do modelo de referência)
 5. Todos os elementos dentro dos limites 0,0,1080,1080
+6. SE um SVG de referência for fornecido no prompt: replique FIELMENTE sua estrutura, layout, posicionamento e estilo tipográfico — apenas substitua os textos pelo conteúdo do prompt. Adapte cores para o perfil da marca.
 
 IDENTIDADE DA MARCA:
 - Cor primária: ${cor1}
