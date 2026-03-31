@@ -121,8 +121,8 @@
 [data-theme="light"] input,
 [data-theme="light"] select,
 [data-theme="light"] textarea {
-  background: var(--bg3);
-  border-color: var(--tx-0);
+  background: #FFFFFF;
+  border-color: var(--line-2);
   color: var(--tx-0);
 }
 [data-theme="light"] input:focus,
@@ -520,7 +520,7 @@ body {
   gap: var(--sp-3);
   font-size: 9.5px;
   font-weight: 700;
-  color:var(--amber);
+  color: var(--amber);
   letter-spacing: .12em;
   text-transform: uppercase;
   margin-bottom: var(--sp-4);
@@ -1254,15 +1254,15 @@ tr:hover .td-actions { opacity: 1; }
   background: var(--ink-2); border: 1px solid var(--line-1);
   border-radius: var(--r3); padding: 26px;
 }
-.set-sec-title { font-family: var(--f-display); font-size: 15px; font-weight: 700; letter-spacing: -.3px; color: var(--amber); margin-bottom: 4px; }
-.set-sec-desc { font-size: 12px; color: var(--tx-0); margin-bottom: 18px; font-weight: 500; }
+.set-sec-title { font-family: var(--f-display); font-size: 15px; font-weight: 700; letter-spacing: -.3px; color: var(--tx-0); margin-bottom: 4px; }
+.set-sec-desc { font-size: 12px; color: var(--amber); margin-bottom: 18px; font-weight: 500; }
 .set-row {
   display: flex; align-items: center; justify-content: space-between;
   padding: 13px 0; border-bottom: 1px solid var(--line-1); gap: 16px;
 }
 .set-row:last-child { border-bottom: none; }
-.set-name { font-size: 13px; font-weight: 600; color: var(--amber); margin-bottom: 2px; letter-spacing: -.1px; }
-.set-desc { font-size: 11.5px; color: var(--tx-0); }
+.set-name { font-size: 13px; font-weight: 600; color: var(--tx-0); margin-bottom: 2px; letter-spacing: -.1px; }
+.set-desc { font-size: 11.5px; color: var(--amber); }
 
 /* Toggle */
 .toggle-wrap { display: flex; align-items: center; gap: 8px; }
@@ -2151,7 +2151,7 @@ tr:hover .td-actions { opacity: 1; }
   display:flex;align-items:center;justify-content:center;margin:0 auto 7px;
 }
 .fmt.on .fmt-ico{background:var(--adim2)}
-.fmt-name{font-size:11px;font-weight:600;color:var(--amber)}
+.fmt-name{font-size:11px;font-weight:600;color:var(--t2)}
 .fmt.on .fmt-name{color:var(--a)}
 
 .net-row{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
@@ -2165,13 +2165,13 @@ tr:hover .td-actions { opacity: 1; }
   width:20px;height:20px;border-radius:var(--r);background:var(--surface2);
   display:flex;align-items:center;justify-content:center;margin:0 auto 5px;
 }
-.net-name{font-size:10px;font-weight:600;color:var(--amber)}
+.net-name{font-size:10px;font-weight:600;color:var(--t2)}
 .net.on .net-name{color:var(--a)}
 
 .ta-wrap{position:relative}
 .ta-wrap textarea{padding-bottom:40px;font-size:13px;line-height:1.6}
 .ta-foot{position:absolute;bottom:9px;left:12px;right:9px;display:flex;align-items:center;justify-content:space-between}
-.ta-count{font-size:10px;color:var(--tx-0);font-weight:500}
+.ta-count{font-size:10px;color:var(--t3);font-weight:500}
 .mic-btn{
   display:flex;align-items:center;gap:5px;
   background:var(--surface);border:1px solid var(--b2);border-radius:var(--r);
@@ -2987,7 +2987,12 @@ label, .form-row > label, .agent-lbl, .out-lbl{color:var(--a)!important}
   <nav class="sb">
     <div class="sb-top">
       <div class="sb-logo-mark" style="background:transparent">
-        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px"><defs><linearGradient id="slg1" x1="10%" y1="90%" x2="90%" y2="10%"><stop offset="0%" stop-color="#E8A000"/><stop offset="100%" stop-color="#FFD000"/></linearGradient></defs><path d="M 72,14 L 26,14 Q 10,14 10,30 L 10,74 Q 10,90 26,90 L 68,90 Q 82,90 82,76 L 82,58" fill="none" stroke="url(#slg1)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/><line x1="24" y1="52" x2="62" y2="47" stroke="url(#slg1)" stroke-width="10" stroke-linecap="round"/><line x1="24" y1="66" x2="50" y2="62" stroke="url(#slg1)" stroke-width="10" stroke-linecap="round"/><line x1="68" y1="14" x2="90" y2="14" stroke="url(#slg1)" stroke-width="10" stroke-linecap="round"/><line x1="90" y1="14" x2="90" y2="40" stroke="url(#slg1)" stroke-width="10" stroke-linecap="round"/><line x1="72" y1="32" x2="86" y2="18" stroke="url(#slg1)" stroke-width="10" stroke-linecap="round"/><polygon points="90,6 100,22 82,18" fill="url(#slg1)"/></svg>
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:#0D0D0F;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round">
+          <rect x="3" y="5" width="14" height="12" rx="2"/>
+          <path d="M17 9l4-3v10l-4-3"/>
+          <line x1="7" y1="9" x2="13" y2="9"/>
+          <line x1="7" y1="12" x2="11" y2="12"/>
+        </svg>
       </div>
       <div class="sb-wordmark">
         <div class="sb-wordmark-name">Auto<b>Postt</b></div>
@@ -3070,7 +3075,9 @@ label, .form-row > label, .agent-lbl, .out-lbl{color:var(--a)!important}
         <span class="tb-crumb-cur" id="tb-cur">Dashboard</span>
       </div>
       <div class="tb-right">
-
+          <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Modo dia/noite">
+            <svg id="theme-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
           <div class="quota-pill" id="quota-tag">
             <div class="quota-pill-dot" id="quota-dot"></div>
             <strong id="quota-used">—</strong><span style="color:var(--tx-2);margin:0 2px">de</span><span id="quota-limit">—</span>
@@ -3080,97 +3087,42 @@ label, .form-row > label, .agent-lbl, .out-lbl{color:var(--a)!important}
 
     <!-- dashboard -->
     <div class="pg on" id="pg-dashboard">
-      <div class="pg-hd">
-        <div class="pg-title" id="dash-greeting">Bom dia 👋</div>
-        <div class="pg-sub">Aqui está o resumo da sua conta hoje.</div>
-      </div>
-
-      <!-- KPI row -->
-      <div class="kpi-row" id="dash-kpi" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px">
-        <div class="kpi-card" id="kpi-gens" style="background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r2);padding:16px 18px">
-          <div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Gerações</div>
-          <div style="font-size:26px;font-weight:800;color:var(--tx-0);letter-spacing:-1px" id="dash-gens-used">—</div>
-          <div style="font-size:11px;color:var(--t2);margin-top:3px">de <span id="dash-gens-limit">—</span> disponíveis</div>
-          <div style="height:3px;background:var(--bg4);border-radius:2px;margin-top:10px"><div id="dash-quota-bar" style="height:100%;background:var(--amber);border-radius:2px;width:0%;transition:width .5s"></div></div>
-        </div>
-        <div class="kpi-card" style="background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r2);padding:16px 18px">
-          <div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Plano atual</div>
-          <div style="font-size:22px;font-weight:800;color:var(--tx-0);letter-spacing:-0.5px" id="dash-plan">—</div>
-          <div style="font-size:11px;color:var(--t2);margin-top:3px" id="dash-plan-sub">—</div>
-        </div>
-        <div class="kpi-card" style="background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r2);padding:16px 18px">
-          <div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Histórico</div>
-          <div style="font-size:26px;font-weight:800;color:var(--tx-0);letter-spacing:-1px" id="dash-hist-count">—</div>
-          <div style="font-size:11px;color:var(--t2);margin-top:3px">conteúdos salvos</div>
-        </div>
-        <div class="kpi-card" style="background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r2);padding:16px 18px">
-          <div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Agentes ativos</div>
-          <div style="font-size:26px;font-weight:800;color:var(--tx-0);letter-spacing:-1px">8</div>
-          <div style="font-size:11px;color:var(--t2);margin-top:3px">especializados</div>
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
-
-        <!-- Atividade recente -->
+      <div class="pg-hd"><div class="pg-title">Bom dia, Pedro</div><div class="pg-sub">Visão geral da sua conta</div></div>
+      <div class="kpi-row"><div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:16px 0;color:var(--t3)"><div style="width:14px;height:14px;border:2px solid var(--b2);border-top-color:var(--a);border-radius:50%;animation:spin .7s linear infinite"></div> Carregando...</div></div>
+      <div class="g-dash">
         <div class="card p-20">
-          <div style="font-size:12px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">Atividade recente</div>
-          <div id="dash-activity">
-            <div class="act-row"><div class="act-ico"><svg class="ico ico-sm" style="color:var(--amber)" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg></div><div class="act-body"><div class="act-name">Post — Processo vs Vendedor</div><div class="act-meta"><span class="badge bdg-a">Instagram</span></div></div><div class="act-time">2h</div></div>
-            <div class="act-row"><div class="act-ico"><svg class="ico ico-sm" style="color:var(--amber)" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg></div><div class="act-body"><div class="act-name">Thumbnail — Como fechar</div><div class="act-meta"><span class="badge bdg-a">YouTube</span></div></div><div class="act-time">5h</div></div>
-            <div class="act-row"><div class="act-ico"><svg class="ico ico-sm" style="color:var(--amber)" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="act-body"><div class="act-name">Legenda — 3 erros do gestor</div><div class="act-meta"><span class="badge bdg-a">LinkedIn</span></div></div><div class="act-time">1d</div></div>
-          </div>
+          <div class="t-sm fw-7" style="margin-bottom:14px">Atividade recente</div>
+          <div class="act-row"><div class="act-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg></div><div class="act-body"><div class="act-name">Post — Processo vs Vendedor</div><div class="act-meta"><span class="badge bdg-a">Instagram</span></div></div><div class="act-time">2h</div></div>
+          <div class="act-row"><div class="act-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><div class="act-body"><div class="act-name">Carrossel — 5 erros de gestão</div><div class="act-meta"><span class="badge bdg-b">LinkedIn</span></div></div><div class="act-time">1d</div></div>
+          <div class="act-row"><div class="act-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><div class="act-body"><div class="act-name">Anúncio — Mentoria Premium</div><div class="act-meta"><span class="badge bdg-g">Meta Ads</span></div></div><div class="act-time">3d</div></div>
+          <div class="act-row"><div class="act-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg></div><div class="act-body"><div class="act-name">Thumbnail — Fechar em 1 call</div><div class="act-meta"><span class="badge bdg-n">YouTube</span></div></div><div class="act-time">5d</div></div>
         </div>
-
-        <!-- Dica do dia -->
-        <div class="card p-20" style="display:flex;flex-direction:column;gap:12px">
-          <div style="font-size:12px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em">Dica do dia</div>
-          <div style="flex:1;font-size:13px;color:var(--tx-0);line-height:1.65" id="dash-tip">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-              <div style="width:8px;height:8px;border-radius:50%;background:var(--amber);flex-shrink:0"></div>
-              <span style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em">IA</span>
+        <div>
+          <div class="card p-20" style="margin-bottom:10px">
+            <div class="t-sm fw-7" style="margin-bottom:12px">Ações rápidas</div>
+            <div class="qa-grid">
+              <div class="qa" onclick="navP('generate');selFmt('post')"><div class="qa-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg></div><div class="qa-lbl">Novo post</div></div>
+              <div class="qa" onclick="navP('generate');selFmt('carrossel')"><div class="qa-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><div class="qa-lbl">Carrossel</div></div>
+              <div class="qa" onclick="navP('generate');selFmt('anuncio')"><div class="qa-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><div class="qa-lbl">Anúncio</div></div>
+              <div class="qa" onclick="navP('generate')"><div class="qa-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg></div><div class="qa-lbl">Por voz</div></div>
+              <div class="qa" onclick="navP('history')"><div class="qa-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg></div><div class="qa-lbl">Reusar</div></div>
+              <div class="qa" onclick="navP('profile')"><div class="qa-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4"/></svg></div><div class="qa-lbl">Editar marca</div></div>
             </div>
-            Conteúdo que para o scroll tem 3 elementos: gancho nos 2 primeiros segundos, tensão no meio e CTA claro no final. Aplique isso no próximo Reels.
           </div>
-          <button class="btn btn-g btn-sm" onclick="nav('generate',null)" style="align-self:flex-start">Gerar conteúdo →</button>
-        </div>
-
-      </div>
-
-      <!-- Acesso rápido aos agentes -->
-      <div class="card p-20">
-        <div style="font-size:12px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">Agentes disponíveis</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px">
-          <button class="btn btn-g" onclick="nav('agent-legenda',null)" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 10px;height:auto">
-            <svg class="ico" style="color:var(--amber)" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            <span style="font-size:11px;font-weight:600;color:var(--amber)">Legenda</span>
-          </button>
-          <button class="btn btn-g" onclick="nav('agent-roteiro-reels',null)" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 10px;height:auto">
-            <svg class="ico" style="color:var(--amber)" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-            <span style="font-size:11px;font-weight:600;color:var(--amber)">Reels</span>
-          </button>
-          <button class="btn btn-g" onclick="nav('agent-roteiro-yt',null)" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 10px;height:auto">
-            <svg class="ico" style="color:var(--amber)" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
-            <span style="font-size:11px;font-weight:600;color:var(--amber)">YouTube</span>
-          </button>
-          <button class="btn btn-g" onclick="nav('agent-story',null)" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 10px;height:auto">
-            <svg class="ico" style="color:var(--amber)" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/></svg>
-            <span style="font-size:11px;font-weight:600;color:var(--amber)">Story</span>
-          </button>
-          <button class="btn btn-g" onclick="nav('agent-linkedin',null)" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 10px;height:auto">
-            <svg class="ico" style="color:var(--amber)" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-            <span style="font-size:11px;font-weight:600;color:var(--amber)">LinkedIn</span>
-          </button>
-          <button class="btn btn-g" onclick="nav('agent-tiktok',null)" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 10px;height:auto">
-            <svg class="ico" style="color:var(--amber)" viewBox="0 0 24 24"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
-            <span style="font-size:11px;font-weight:600;color:var(--amber)">TikTok</span>
-          </button>
-          <button class="btn btn-g" onclick="nav('generate',null)" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 10px;height:auto">
-            <svg class="ico" style="color:var(--amber)" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <span style="font-size:11px;font-weight:600;color:var(--amber)">Imagem</span>
-          </button>
+          <div class="tip-card" id="tip-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+              <div class="tip-lbl">Dica do dia</div>
+              <button class="btn btn-g btn-sm" style="padding:3px 8px;font-size:10px" onclick="loadDailyTip(true)" title="Nova dica">
+                <svg class="ico ico-sm" style="width:11px;height:11px" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
+              </button>
+            </div>
+            <div class="tip-txt" id="tip-txt">
+              <span style="color:var(--t3)">Carregando dica...</span>
+            </div>
+          </div>
         </div>
       </div>
+    </div>
 
     <!-- generate -->
     <div class="pg" id="pg-generate">
@@ -3182,11 +3134,11 @@ label, .form-row > label, .agent-lbl, .out-lbl{color:var(--a)!important}
             <div class="sec-lbl">Formato</div>
             <div class="fmt-grid">
               <div class="fmt on" id="f-post" onclick="selFmt('post')"><div class="fmt-ico"><svg class="ico ico-sm" style="color:var(--a)" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg></div><div class="fmt-name">Post único</div></div>
-              <div class="fmt" id="f-carrossel" onclick="selFmt('carrossel')"><div class="fmt-ico"><svg class="ico ico-sm" style="color:var(--amber)" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><div class="fmt-name">Carrossel</div></div>
-              <div class="fmt" id="f-anuncio" onclick="selFmt('anuncio')"><div class="fmt-ico"><svg class="ico ico-sm" style="color:var(--amber)" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><div class="fmt-name">Anúncio</div></div>
-              <div class="fmt" id="f-story" onclick="selFmt('story')"><div class="fmt-ico"><svg class="ico ico-sm" style="color:var(--amber)" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/></svg></div><div class="fmt-name">Story</div></div>
-              <div class="fmt" id="f-thumb" onclick="selFmt('thumb')"><div class="fmt-ico"><svg class="ico ico-sm" style="color:var(--amber)" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg></div><div class="fmt-name">Thumbnail</div></div>
-              <div class="fmt" id="f-banner" onclick="selFmt('banner')"><div class="fmt-ico"><svg class="ico ico-sm" style="color:var(--amber)" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><div class="fmt-name">Banner</div></div>
+              <div class="fmt" id="f-carrossel" onclick="selFmt('carrossel')"><div class="fmt-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><div class="fmt-name">Carrossel</div></div>
+              <div class="fmt" id="f-anuncio" onclick="selFmt('anuncio')"><div class="fmt-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><div class="fmt-name">Anúncio</div></div>
+              <div class="fmt" id="f-story" onclick="selFmt('story')"><div class="fmt-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/></svg></div><div class="fmt-name">Story</div></div>
+              <div class="fmt" id="f-thumb" onclick="selFmt('thumb')"><div class="fmt-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg></div><div class="fmt-name">Thumbnail</div></div>
+              <div class="fmt" id="f-banner" onclick="selFmt('banner')"><div class="fmt-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><div class="fmt-name">Banner</div></div>
             </div>
           </div>
           <!-- network -->
@@ -3194,9 +3146,9 @@ label, .form-row > label, .agent-lbl, .out-lbl{color:var(--a)!important}
             <div class="sec-lbl">Rede social</div>
             <div class="net-row">
               <div class="net on" id="n-ig" onclick="selNet('ig')"><div class="net-ico"><svg class="ico ico-sm" style="color:var(--a)" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg></div><div class="net-name">Instagram</div></div>
-              <div class="net" id="n-li" onclick="selNet('li')"><div class="net-ico"><svg class="ico ico-sm" style="color:var(--amber)" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></div><div class="net-name">LinkedIn</div></div>
-              <div class="net" id="n-yt" onclick="selNet('yt')"><div class="net-ico"><svg class="ico ico-sm" style="color:var(--amber)" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg></div><div class="net-name">YouTube</div></div>
-              <div class="net" id="n-tt" onclick="selNet('tt')"><div class="net-ico"><svg class="ico ico-sm" style="color:var(--amber)" viewBox="0 0 24 24"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg></div><div class="net-name">TikTok</div></div>
+              <div class="net" id="n-li" onclick="selNet('li')"><div class="net-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></div><div class="net-name">LinkedIn</div></div>
+              <div class="net" id="n-yt" onclick="selNet('yt')"><div class="net-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg></div><div class="net-name">YouTube</div></div>
+              <div class="net" id="n-tt" onclick="selNet('tt')"><div class="net-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg></div><div class="net-name">TikTok</div></div>
             </div>
           </div>
           <!-- textarea + refinador -->
@@ -3226,11 +3178,11 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
           </div>
           <!-- upload -->
           <div style="margin-bottom:20px">
-            <div class="sec-lbl">Referência visual <span style="font-size:10px;color:var(--tx-0);font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></div>
+            <div class="sec-lbl">Referência visual <span style="font-size:10px;color:var(--t3);font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></div>
             <div class="drop-zone" onclick="document.getElementById('ref-img-input').click()" id="drop-zone-el" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleRefDrop(event)">
               <input type="file" id="ref-img-input" accept="image/*" style="display:none" onchange="handleRefFile(this.files[0])">
               <div id="drop-zone-content">
-                <div class="drop-ico"><svg class="ico ico-sm" style="color:var(--amber)" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+                <div class="drop-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
                 <div class="drop-main"><b>Arraste ou clique</b> para enviar referência</div>
                 <div class="drop-sub">PNG, JPG até 10 MB</div>
               </div>
@@ -3285,7 +3237,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                 <div class="divider"></div>
                 <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:7px">Prompt selecionado</div>
                 
-                <div id="img-mode-panel" style="display:none;margin-top:12px;padding:12px;background:var(--ink-3);border:1px solid var(--line-1);border-radius:8px">
+                <div style="margin-top:12px;padding:12px;background:var(--ink-3);border:1px solid var(--line-1);border-radius:8px">
                   <div style="font-size:11px;font-weight:700;color:var(--a);letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px">Modo da imagem enviada</div>
                   <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:8px">
                     <input type="radio" name="img-mode" value="reference" id="img-mode-ref" checked style="width:auto;margin-top:2px;accent-color:var(--a)">
@@ -3554,7 +3506,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
             <div class="form-row"><label>Nome completo</label><input id="sett-name" placeholder="Seu nome"></div>
             <div class="form-row"><label>E-mail</label><input type="email" id="sett-email" placeholder="seu@email.com"></div>
           </div>
-          <div class="form-row" style="max-width:400px"><label>Nova senha <span style="color:var(--tx-0);font-weight:400;text-transform:none">(deixe vazio para não alterar)</span></label><input type="password" id="sett-pass" placeholder="Mínimo 8 caracteres"></div>
+          <div class="form-row" style="max-width:400px"><label>Nova senha <span style="color:var(--t3);font-weight:400;text-transform:none">(deixe vazio para não alterar)</span></label><input type="password" id="sett-pass" placeholder="Mínimo 8 caracteres"></div>
           <button class="btn btn-p btn-sm" style="margin-top:4px" onclick="saveAccount()">Salvar alterações</button>
           <div class="divider"></div>
           <div class="set-sec-title">Preferências de geração</div>
@@ -3585,7 +3537,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:18px 0 24px">
 
             <div>
-              <label style="font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px">Cor Primária</label>
+              <label style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px">Cor Primária</label>
               <div style="display:flex;align-items:center;gap:10px">
                 <div id="brand-c1-swatch" style="width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);cursor:pointer;position:relative;overflow:hidden;flex-shrink:0">
                   <input type="color" id="brand-c1" value="#F5C518" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
@@ -3593,13 +3545,13 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                 </div>
                 <div>
                   <div id="brand-c1-hex" style="font-size:12px;font-weight:700;color:var(--t1);font-family:monospace">#F5C518</div>
-                  <div style="font-size:10px;color:var(--tx-0)">Destaque</div>
+                  <div style="font-size:10px;color:var(--t3)">Destaque</div>
                 </div>
               </div>
             </div>
 
             <div>
-              <label style="font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px">Cor de Fundo</label>
+              <label style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px">Cor de Fundo</label>
               <div style="display:flex;align-items:center;gap:10px">
                 <div id="brand-c2-swatch" style="width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);cursor:pointer;position:relative;overflow:hidden;flex-shrink:0">
                   <input type="color" id="brand-c2" value="#0D0D0F" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
@@ -3607,13 +3559,13 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                 </div>
                 <div>
                   <div id="brand-c2-hex" style="font-size:12px;font-weight:700;color:var(--t1);font-family:monospace">#0D0D0F</div>
-                  <div style="font-size:10px;color:var(--tx-0)">Background</div>
+                  <div style="font-size:10px;color:var(--t3)">Background</div>
                 </div>
               </div>
             </div>
 
             <div>
-              <label style="font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px">Cor de Texto</label>
+              <label style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px">Cor de Texto</label>
               <div style="display:flex;align-items:center;gap:10px">
                 <div id="brand-c3-swatch" style="width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);cursor:pointer;position:relative;overflow:hidden;flex-shrink:0">
                   <input type="color" id="brand-c3" value="#F5F4F0" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
@@ -3621,7 +3573,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                 </div>
                 <div>
                   <div id="brand-c3-hex" style="font-size:12px;font-weight:700;color:var(--t1);font-family:monospace">#F5F4F0</div>
-                  <div style="font-size:10px;color:var(--tx-0)">Texto</div>
+                  <div style="font-size:10px;color:var(--t3)">Texto</div>
                 </div>
               </div>
             </div>
@@ -3629,7 +3581,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
           </div>
 
           <!-- Live preview label -->
-          <div style="font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;gap:6px">
+          <div style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;gap:6px">
             <svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:none;stroke:var(--amber);stroke-width:2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             Preview ao vivo — seus modelos nas suas cores
           </div>
@@ -3638,7 +3590,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
           <div id="brand-model-previews" style="display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;margin-bottom:20px"></div>
 
           <!-- Preset palettes -->
-          <div style="font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Paletas rápidas</div>
+          <div style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Paletas rápidas</div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">
             <button class="btn btn-g btn-sm" onclick="applyPreset('#F5C518','#0D0D0F','#F5F4F0')">AutoPostt</button>
             <button class="btn btn-g btn-sm" onclick="applyPreset('#003DA5','#FFFFFF','#1A1A1A')">WEG Azul</button>
@@ -3686,7 +3638,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
               Formatos suportados
             </div>
           </div>
-          <div style="font-size:12px;color:var(--tx-0);line-height:1.7;margin-bottom:14px">
+          <div style="font-size:12px;color:var(--tx-2);line-height:1.7;margin-bottom:14px">
             Legenda · Roteiro YouTube · Roteiro Reels · Stories · LinkedIn · TikTok
           </div>
           <div class="divider"></div>
@@ -3695,7 +3647,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
           <div class="set-row">
             <div>
               <div class="set-name" style="display:flex;align-items:center;gap:8px">
-                <svg class="ico ico-sm" style="color:var(--amber)" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg>
+                <svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg>
                 Instagram / Meta
               </div>
               <div class="set-desc">Publique diretamente pelo AutoPostt</div>
@@ -3705,7 +3657,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
           <div class="set-row">
             <div>
               <div class="set-name" style="display:flex;align-items:center;gap:8px">
-                <svg class="ico ico-sm" style="color:var(--amber)" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                <svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
                 LinkedIn
               </div>
               <div class="set-desc">Publique posts diretamente no LinkedIn</div>
@@ -3715,7 +3667,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
           <div class="set-row">
             <div>
               <div class="set-name" style="display:flex;align-items:center;gap:8px">
-                <svg class="ico ico-sm" style="color:var(--amber)" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
+                <svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
                 YouTube
               </div>
               <div class="set-desc">Envie thumbnails diretamente para seus vídeos</div>
@@ -3725,7 +3677,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
           <div class="set-row">
             <div>
               <div class="set-name" style="display:flex;align-items:center;gap:8px">
-                <svg class="ico ico-sm" style="color:var(--amber)" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                <svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
                 Zapier / Make
               </div>
               <div class="set-desc">Automatize fluxos com sua API key</div>
@@ -3819,7 +3771,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
               </div>
             </div>
           </div>
-          <div class="form-row" style="margin-top:12px"><label>Tom de voz <span style="color:var(--tx-0);font-weight:400;text-transform:none">(opcional)</span></label>
+          <div class="form-row" style="margin-top:12px"><label>Tom de voz <span style="color:var(--t3);font-weight:400;text-transform:none">(opcional)</span></label>
             <select id="ag-legenda-tom"><option value="">Usar perfil de marca</option>              <option>Autoridade</option>
               <option>Provocativo</option>
               <option>Educativo</option>
@@ -3880,7 +3832,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
               </div>
             </div>
           </div>
-          <div class="form-row" style="margin-top:12px"><label>Tom de voz <span style="color:var(--tx-0);font-weight:400;text-transform:none">(opcional)</span></label>
+          <div class="form-row" style="margin-top:12px"><label>Tom de voz <span style="color:var(--t3);font-weight:400;text-transform:none">(opcional)</span></label>
             <select id="ag-roteiro-yt-tom"><option value="">Usar perfil de marca</option>              <option>Autoridade</option>
               <option>Provocativo</option>
               <option>Educativo</option>
@@ -3941,7 +3893,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
               </div>
             </div>
           </div>
-          <div class="form-row" style="margin-top:12px"><label>Tom de voz <span style="color:var(--tx-0);font-weight:400;text-transform:none">(opcional)</span></label>
+          <div class="form-row" style="margin-top:12px"><label>Tom de voz <span style="color:var(--t3);font-weight:400;text-transform:none">(opcional)</span></label>
             <select id="ag-roteiro-reels-tom"><option value="">Usar perfil de marca</option>              <option>Autoridade</option>
               <option>Provocativo</option>
               <option>Educativo</option>
@@ -4002,7 +3954,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
               </div>
             </div>
           </div>
-          <div class="form-row" style="margin-top:12px"><label>Tom de voz <span style="color:var(--tx-0);font-weight:400;text-transform:none">(opcional)</span></label>
+          <div class="form-row" style="margin-top:12px"><label>Tom de voz <span style="color:var(--t3);font-weight:400;text-transform:none">(opcional)</span></label>
             <select id="ag-story-tom"><option value="">Usar perfil de marca</option>              <option>Autoridade</option>
               <option>Provocativo</option>
               <option>Educativo</option>
@@ -4063,7 +4015,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
               </div>
             </div>
           </div>
-          <div class="form-row" style="margin-top:12px"><label>Tom de voz <span style="color:var(--tx-0);font-weight:400;text-transform:none">(opcional)</span></label>
+          <div class="form-row" style="margin-top:12px"><label>Tom de voz <span style="color:var(--t3);font-weight:400;text-transform:none">(opcional)</span></label>
             <select id="ag-linkedin-tom"><option value="">Usar perfil de marca</option>              <option>Autoridade</option>
               <option>Técnico</option>
               <option>Inspiracional</option>
@@ -4124,7 +4076,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
               </div>
             </div>
           </div>
-          <div class="form-row" style="margin-top:12px"><label>Tom de voz <span style="color:var(--tx-0);font-weight:400;text-transform:none">(opcional)</span></label>
+          <div class="form-row" style="margin-top:12px"><label>Tom de voz <span style="color:var(--t3);font-weight:400;text-transform:none">(opcional)</span></label>
             <select id="ag-tiktok-tom"><option value="">Usar perfil de marca</option>              <option>Autoridade</option>
               <option>Provocativo</option>
               <option>Educativo</option>
@@ -4331,8 +4283,7 @@ async function doSignup() {
 function doLogout() {
   token = ''; me = null;
   localStorage.removeItem('gerai_token');
-  localStorage.removeItem('gerai_ob_done');
-  go('login');
+  go('land');
 }
 
 // Enter key support on auth screens
@@ -4462,9 +4413,8 @@ function selFmt(f) {
 
 function selNet(n) {
   _currentNet = n;
-  document.querySelectorAll('.net').forEach(c => { c.classList.remove('on'); const s=c.querySelector('svg'); if(s) s.style.color='var(--amber)'; });
-  const el = document.getElementById('n-' + n);
-  if (el) { el.classList.add('on'); const s=el.querySelector('svg'); if(s) s.style.color='var(--amber)'; }
+  document.querySelectorAll('.net').forEach(c => c.classList.remove('on'));
+  document.getElementById('n-' + n).classList.add('on');
 }
 
 function ucc() {
@@ -4922,12 +4872,12 @@ function fmtBadge(format) {
 
 function fmtIcon(format) {
   const icons = {
-    post:      `<svg class="ico" style="color:var(--amber)" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg>`,
-    carrossel: `<svg class="ico" style="color:var(--amber)" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
-    anuncio:   `<svg class="ico" style="color:var(--amber)" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
-    story:     `<svg class="ico" style="color:var(--amber)" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/></svg>`,
-    thumb:     `<svg class="ico" style="color:var(--amber)" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>`,
-    banner:    `<svg class="ico" style="color:var(--amber)" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>`
+    post:      `<svg class="ico" style="color:var(--t2)" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg>`,
+    carrossel: `<svg class="ico" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
+    anuncio:   `<svg class="ico" style="color:var(--t2)" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+    story:     `<svg class="ico" style="color:var(--t2)" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/></svg>`,
+    thumb:     `<svg class="ico" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>`,
+    banner:    `<svg class="ico" style="color:var(--t2)" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>`
   };
   return icons[format] || icons.post;
 }
@@ -5688,9 +5638,6 @@ function handleRefFile(file) {
     if (thumb) thumb.src = e.target.result;
     if (preview) preview.style.display = 'block';
     if (dzContent) dzContent.style.display = 'none';
-    // Show image mode options
-    const modePanel = document.getElementById('img-mode-panel');
-    if (modePanel) modePanel.style.display = 'block';
     toast('Imagem de referência carregada!', 'ok');
   };
   reader.readAsDataURL(file);
@@ -5715,8 +5662,6 @@ function clearRefImage(e) {
   if (preview) preview.style.display = 'none';
   if (dzContent) dzContent.style.display = 'block';
   if (input) input.value = '';
-  const modePanel = document.getElementById('img-mode-panel');
-  if (modePanel) modePanel.style.display = 'none';
   toast('Imagem removida', 'ok');
 }
 
@@ -5913,40 +5858,80 @@ document.addEventListener('DOMContentLoaded', () => {
 // DASHBOARD — IMPROVED
 // ─────────────────────────────────────────────────
 async function loadDashboard() {
-  // Greeting
-  const hr = new Date().getHours();
-  const greet = hr < 12 ? 'Bom dia' : hr < 18 ? 'Boa tarde' : 'Boa noite';
-  const nameEl = document.getElementById('dash-greeting');
-  if (nameEl) nameEl.textContent = greet + (me?.name ? ', ' + me.name.split(' ')[0] : '') + ' 👋';
-
-  // Fill KPIs from me object
-  const used  = me?.quota_used  || 0;
-  const limit = me?.quota_limit || 10;
-  const pct   = Math.min(Math.round(used/limit*100), 100);
-  const planName = (me?.plan || 'free').charAt(0).toUpperCase() + (me?.plan || 'free').slice(1);
-
-  const usedEl  = document.getElementById('dash-gens-used');
-  const limEl   = document.getElementById('dash-gens-limit');
-  const barEl   = document.getElementById('dash-quota-bar');
-  const planEl  = document.getElementById('dash-plan');
-  const planSub = document.getElementById('dash-plan-sub');
-  const histEl  = document.getElementById('dash-hist-count');
-
-  if (usedEl)  usedEl.textContent  = used;
-  if (limEl)   limEl.textContent   = limit;
-  if (barEl)   setTimeout(() => { barEl.style.width = pct + '%'; }, 300);
-  if (planEl)  planEl.textContent  = planName;
-  if (planSub) planSub.textContent = limit + ' gerações/mês';
-  if (histEl)  histEl.textContent  = JSON.parse(localStorage.getItem('autopostt_hist') || '[]').length;
-
-  // Fetch tip from API if available
   try {
-    const saved = localStorage.getItem('autopostt_tip_text');
-    const tipEl = document.getElementById('dash-tip');
-    if (tipEl && saved) {
-      tipEl.innerHTML = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><div style="width:8px;height:8px;border-radius:50%;background:var(--amber);flex-shrink:0"></div><span style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em">IA</span></div>' + saved;
+    const uData = await api('GET', '/api/auth/me');
+    me = uData.user;
+    updateQuota();
+
+    const gData = await api('GET', '/api/user/generations');
+    const gens = gData.generations || [];
+
+    // KPIs with icons
+    const recent7 = gens.filter(g => Date.now() - new Date(g.created_at) < 7*86400000).length;
+    const kpiEl = document.querySelector('#pg-dashboard .kpi-row');
+    if (kpiEl) kpiEl.innerHTML = `
+      <div class="kpi">
+        <div class="kpi-icon"><svg style="width:14px;height:14px;fill:none;stroke:var(--a);stroke-width:2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div class="kpi-val" style="color:var(--a)">${me.quota_used || 0}</div>
+        <div class="kpi-lbl">Total gerado</div>
+        <div class="kpi-delta delta-fl">${me.quota_limit - (me.quota_used||0)} créditos restantes</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-icon"><svg style="width:14px;height:14px;fill:none;stroke:var(--green);stroke-width:2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <div class="kpi-val">${recent7}</div>
+        <div class="kpi-lbl">Últimos 7 dias</div>
+        <div class="kpi-delta delta-fl">${recent7 > 0 ? 'Você está ativo' : 'Nenhuma geração'}</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-icon"><svg style="width:14px;height:14px;fill:none;stroke:var(--blue);stroke-width:2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+        <div class="kpi-val" style="color:var(--green)">${(me.plan||'free').toUpperCase()}</div>
+        <div class="kpi-lbl">Plano ativo</div>
+        <div class="kpi-delta" style="color:var(--a);cursor:pointer" onclick="navP('settings');setTimeout(()=>settTab('plano',document.querySelector('[onclick*=plano]')),100)">Ver planos →</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-icon"><svg style="width:14px;height:14px;fill:none;stroke:var(--t2);stroke-width:2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="kpi-val">${gens.length > 0 ? timeAgo(gens[0].created_at) : '—'}</div>
+        <div class="kpi-lbl">Última geração</div>
+        <div class="kpi-delta delta-fl">${gens[0] ? esc(gens[0].format || '') : 'Sem gerações'}</div>
+      </div>
+    `;
+
+    // Activity feed + usage bar
+    const actEl = document.querySelector('#pg-dashboard .g-dash > .card');
+    if (actEl) {
+      const pct = me.quota_limit ? Math.round((me.quota_used||0) / me.quota_limit * 100) : 0;
+      actEl.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div class="t-sm fw-7">Atividade recente</div>
+          <button class="btn btn-g btn-sm" onclick="navP('history')">Ver histórico</button>
+        </div>
+        ${gens.length ? gens.slice(0,6).map(g => `
+          <div class="act-row">
+            <div class="act-ico">${fmtIcon(g.format)}</div>
+            <div class="act-body">
+              <div class="act-name">${esc(g.concept_name || g.format)}</div>
+              <div class="act-meta">
+                <span class="badge ${fmtBadge(g.format)}">${g.format}</span>
+                <span class="badge bdg-n">${g.network}</span>
+              </div>
+            </div>
+            <div class="act-time">${timeAgo(g.created_at)}</div>
+          </div>
+        `).join('') : '<div style="padding:20px 0;color:var(--t3);font-size:13px;text-align:center">Nenhuma geração ainda.</div>'}
+        <div class="divider"></div>
+        <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px">Uso do plano</div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:6px">
+          <span>${me.quota_used||0} de ${me.quota_limit} gerações</span>
+          <span style="color:${pct>80?'var(--red)':'var(--a)'};font-weight:700">${pct}%</span>
+        </div>
+        <div style="height:5px;background:var(--surface);border-radius:3px;overflow:hidden">
+          <div style="height:100%;background:${pct>80?'var(--red)':'var(--a)'};width:${pct}%;transition:width .6s;border-radius:3px"></div>
+        </div>
+        ${pct >= 80 ? `<div style="margin-top:10px"><button class="btn btn-p btn-full btn-sm" onclick="navP('settings');setTimeout(()=>settTab('plano',document.querySelector('[onclick*=plano]')),100)">Fazer upgrade ou comprar créditos →</button></div>` : ''}
+      `;
     }
-  } catch(e) {}
+    loadDailyTip();
+  } catch(e) { toast(e.message, 'err'); }
 }
 
 // ─────────────────────────────────────────────────
@@ -5969,8 +5954,9 @@ async function applyPackage(packageId, pkgName) {
 
 // ── THEME TOGGLE ──
 (function(){
-  // Theme locked to dark mode
-  document.documentElement.setAttribute('data-theme', 'dark');
+  const t = localStorage.getItem('autopostt_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  _applyThemeIcon(t);
 })();
 function _applyThemeIcon(t) {
   const ic = document.getElementById('theme-icon');
@@ -6587,16 +6573,13 @@ function restoreSavedData() {
     var screen = document.getElementById(screenId);
     if (!screen) return;
     var started = false;
-    function tryStart() {
+    var observer = new MutationObserver(function() {
       if (screen.classList.contains('on') && !started) {
         started = true;
         setTimeout(function() { runAuthPreview(previewId, tagId, seqs); }, 400);
       }
-    }
-    var observer = new MutationObserver(tryStart);
+    });
     observer.observe(screen, { attributes: true, attributeFilter: ['class'] });
-    // Fire immediately in case screen is already visible on load
-    tryStart();
   }
 
   watchAndStart('sc-login',  'auth-login-preview',  'auth-login-tag',  AUTH_PREVIEWS);
