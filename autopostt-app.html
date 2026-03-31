@@ -7761,18 +7761,6 @@ window.gerarImagem = async function() {
   </div>
 
 <script>
-/**
- * AutoPostt Frontend Patch v1
- * 
- * Injetar no final do <body> do autopostt-app.html:
- * [incluir este bloco como script inline no final do body]
- * 
- * Blocos implementados:
- * 1. Streaming SSE nos agentes (substitui runAgent com efeito de digitação)
- * 2. Calendário editorial completo (nova página + nav item)
- * 3. Onboarding v2 — step-by-step com save incremental
- * 4. Dashboard upgrades — KPIs reais, atividade real, quota visual
- */
 
 (function () {
   'use strict';
@@ -9117,6 +9105,8 @@ window.gerarImagem = async function() {
 
 })();
 
-</script>
+<script src="/autopostt-patch-v1.js?v=3"></script>
+</body>
+</html>
 </body>
 </html>
