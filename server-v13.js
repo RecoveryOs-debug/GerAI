@@ -1483,7 +1483,11 @@ route('GET', '/autopostt-patch-v1.js', async (req, res) => {
   }
 
   res.writeHead(200, {
-    'Content-Type': 'application/javascript',
+    'Content-Type': 'application/javascript; charset=utf-8',
+    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+    'Pragma': 'no-cache',
+    'Expires': '0',
+    'Surrogate-Control': 'no-store',
     'Access-Control-Allow-Origin': '*'
   });
 
