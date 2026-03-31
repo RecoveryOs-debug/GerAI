@@ -1254,15 +1254,15 @@ tr:hover .td-actions { opacity: 1; }
   background: var(--ink-2); border: 1px solid var(--line-1);
   border-radius: var(--r3); padding: 26px;
 }
-.set-sec-title { font-family: var(--f-display); font-size: 15px; font-weight: 700; letter-spacing: -.3px; color: var(--tx-0); margin-bottom: 4px; }
-.set-sec-desc { font-size: 12px; color: var(--amber); margin-bottom: 18px; font-weight: 500; }
+.set-sec-title { font-family: var(--f-display); font-size: 15px; font-weight: 700; letter-spacing: -.3px; color: var(--amber); margin-bottom: 4px; }
+.set-sec-desc { font-size: 12px; color: var(--tx-0); margin-bottom: 18px; font-weight: 500; }
 .set-row {
   display: flex; align-items: center; justify-content: space-between;
   padding: 13px 0; border-bottom: 1px solid var(--line-1); gap: 16px;
 }
 .set-row:last-child { border-bottom: none; }
 .set-name { font-size: 13px; font-weight: 600; color: var(--tx-0); margin-bottom: 2px; letter-spacing: -.1px; }
-.set-desc { font-size: 11.5px; color: var(--amber); }
+.set-desc { font-size: 11.5px; color: var(--tx-0); }
 
 /* Toggle */
 .toggle-wrap { display: flex; align-items: center; gap: 8px; }
@@ -2336,12 +2336,12 @@ tr:hover .td-actions { opacity: 1; }
 .sni:hover{background:var(--bg3);color:var(--t0)}
 .sni.on{background:var(--bg3);color:var(--t0);font-weight:600}
 .sb-content{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r3);padding:22px}
-.set-sec-title{font-size:14px;font-weight:700;letter-spacing:-0.2px;margin-bottom:3px}
-.set-sec-desc{font-size:12px;color:var(--t2);margin-bottom:16px}
+.set-sec-title{font-size:14px;font-weight:700;letter-spacing:-0.2px;margin-bottom:3px;color:var(--a)}
+.set-sec-desc{font-size:12px;color:var(--t0);margin-bottom:16px}
 .set-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--b0)}
 .set-row:last-child{border-bottom:none}
-.set-name{font-size:13px;font-weight:500;margin-bottom:2px}
-.set-desc{font-size:11px;color:var(--t3)}
+.set-name{font-size:13px;font-weight:500;margin-bottom:2px;color:var(--a)}
+.set-desc{font-size:11px;color:var(--t0)}
 .danger-box{background:rgba(224,82,82,.03);border:1px solid rgba(224,82,82,.12);border-radius:var(--r2);padding:14px;margin-top:18px}
 .danger-title{font-size:11px;font-weight:700;color:var(--red);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em}
 
@@ -2385,34 +2385,60 @@ svg.ico-sm{width:12px;height:12px}
   .hero-feats,.hero-stats{grid-template-columns:1fr}
 }
 
-/* ── ORANGE LABELS — comprehensive ── */
+/* ── LABELS & COLORS — sistema de cores ── */
 /* Sidebar section headers */
 .sb-lbl{color:var(--a)!important}
 /* All form labels */
 label, .form-row > label, .agent-lbl, .out-lbl{color:var(--a)!important}
-/* Settings sections */
+/* Settings sections — TÍTULOS amarelo, DESCRIÇÕES branco */
 .set-sec-title{color:var(--a)!important}
-.set-sec-desc{color:var(--a)!important}
+.set-sec-desc{color:var(--tx-0,#F5F4F0)!important}
 .set-name{color:var(--a)!important}
-.set-desc{color:var(--a)!important}
-.sett-panel .set-desc{color:var(--a)!important}
+.set-desc{color:var(--tx-0,#F5F4F0)!important}
+.sett-panel .set-desc{color:var(--tx-0,#F5F4F0)!important}
 /* Page subtitles */
-.pg-sub{color:var(--a)!important}
+.pg-sub{color:var(--tx-0,#F5F4F0)!important}
 /* Agent description below title */
-.agent-sub{color:var(--a)!important}
-.agent-pg .pg-sub{color:var(--a)!important}
-.agent-desc{color:var(--a)!important}
-.agent-desc-sub{color:var(--a)!important}
+.agent-sub{color:var(--tx-0,#F5F4F0)!important}
+.agent-pg .pg-sub{color:var(--tx-0,#F5F4F0)!important}
+.agent-desc{color:var(--tx-0,#F5F4F0)!important}
+.agent-desc-sub{color:var(--tx-0,#F5F4F0)!important}
 /* Section dividers */
 .sec-lbl{color:var(--a)!important;opacity:1!important}
 /* Plan related */
-.plan-quota{color:var(--a)!important}
-.l-plan-note{color:var(--a)!important}
+.plan-quota{color:var(--tx-0,#F5F4F0)!important}
+.l-plan-note{color:var(--tx-0,#F5F4F0)!important}
 /* Generate page section labels — Formato, Rede Social, Sua Ideia, Referência Visual */
 .gen-sect-lbl{color:var(--a)!important;font-weight:600}
-/* Special overrides for specific colors */
-#sett-used-gen, .sett-used-gen{color:var(--t0)!important} /* Gerações usadas = white */
-#sett-remain-gen, .sett-remain-gen{color:var(--green)!important} /* Restantes = green */
+/* Special overrides */
+#sett-used-gen, .sett-used-gen{color:var(--t0)!important}
+#sett-remain-gen, .sett-remain-gen{color:var(--green)!important}
+
+/* ── SVG ICONS — stroke amarelo em toda a UI (exceto auth/landing) ── */
+#sc-app svg.ico,
+#sc-app svg.ico-sm,
+.pg svg.ico,
+.pg svg.ico-sm,
+.sb svg.ico,
+.sb svg.ico-sm,
+.tb svg.ico,
+.tb svg.ico-sm,
+.agent-pg svg.ico,
+.agent-pg svg.ico-sm,
+.sett-panel svg.ico,
+.sett-panel svg.ico-sm,
+.ni svg.ico,
+.ni svg.ico-sm {
+  stroke: var(--a)!important;
+  color: var(--a)!important;
+}
+/* Exceções: ícones de status/feedback mantêm cor própria */
+.t-ok svg, .toast svg,
+.badge svg,
+[style*="color:var(--green)"] svg,
+[style*="color:var(--red)"] svg,
+[style*="color:var(--ok)"] svg,
+[style*="color:var(--err)"] svg { stroke: currentColor!important; color: inherit!important; }
 
 /* ── APP BACKGROUND GRADIENT ── */
 
@@ -3366,60 +3392,54 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
             <div class="pb-title">Identidade visual</div>
             <!-- ── COLOR PICKERS COMPLETOS ── -->
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px">
-
               <div>
-                <label style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px">Cor Primária</label>
+                <label style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px">Cor Primária</label>
                 <div style="display:flex;align-items:center;gap:10px">
                   <div id="brand-c1-swatch" style="width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);cursor:pointer;position:relative;overflow:hidden;flex-shrink:0">
                     <input type="color" id="brand-c1" value="#F5C518" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
                     <div id="brand-c1-fill" style="position:absolute;inset:0;background:#F5C518;pointer-events:none"></div>
                   </div>
                   <div>
-                    <div id="brand-c1-hex" style="font-size:12px;font-weight:700;color:var(--t1);font-family:monospace">#F5C518</div>
-                    <div style="font-size:10px;color:var(--t3)">Destaque</div>
+                    <div id="brand-c1-hex" style="font-size:12px;font-weight:700;color:var(--t0);font-family:monospace">#F5C518</div>
+                    <div style="font-size:10px;color:var(--t0)">Destaque</div>
                   </div>
                 </div>
               </div>
-
               <div>
-                <label style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px">Cor de Fundo</label>
+                <label style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px">Cor de Fundo</label>
                 <div style="display:flex;align-items:center;gap:10px">
                   <div id="brand-c2-swatch" style="width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);cursor:pointer;position:relative;overflow:hidden;flex-shrink:0">
                     <input type="color" id="brand-c2" value="#0D0D0F" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
                     <div id="brand-c2-fill" style="position:absolute;inset:0;background:#0D0D0F;pointer-events:none"></div>
                   </div>
                   <div>
-                    <div id="brand-c2-hex" style="font-size:12px;font-weight:700;color:var(--t1);font-family:monospace">#0D0D0F</div>
-                    <div style="font-size:10px;color:var(--t3)">Background</div>
+                    <div id="brand-c2-hex" style="font-size:12px;font-weight:700;color:var(--t0);font-family:monospace">#0D0D0F</div>
+                    <div style="font-size:10px;color:var(--t0)">Background</div>
                   </div>
                 </div>
               </div>
-
               <div>
-                <label style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px">Cor de Texto</label>
+                <label style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px">Cor de Texto</label>
                 <div style="display:flex;align-items:center;gap:10px">
                   <div id="brand-c3-swatch" style="width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);cursor:pointer;position:relative;overflow:hidden;flex-shrink:0">
                     <input type="color" id="brand-c3" value="#F5F4F0" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
                     <div id="brand-c3-fill" style="position:absolute;inset:0;background:#F5F4F0;pointer-events:none"></div>
                   </div>
                   <div>
-                    <div id="brand-c3-hex" style="font-size:12px;font-weight:700;color:var(--t1);font-family:monospace">#F5F4F0</div>
-                    <div style="font-size:10px;color:var(--t3)">Texto</div>
+                    <div id="brand-c3-hex" style="font-size:12px;font-weight:700;color:var(--t0);font-family:monospace">#F5F4F0</div>
+                    <div style="font-size:10px;color:var(--t0)">Texto</div>
                   </div>
                 </div>
               </div>
-
             </div>
-
             <!-- Preview ao vivo -->
-            <div style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+            <div style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;display:flex;align-items:center;gap:6px">
               <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:none;stroke:var(--amber);stroke-width:2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
               Preview ao vivo — seus modelos nas suas cores
             </div>
             <div id="brand-model-previews" style="display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;margin-bottom:20px"></div>
-
             <!-- Paletas rápidas -->
-            <div style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Paletas rápidas</div>
+            <div style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Paletas rápidas</div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
               <button class="btn btn-g btn-sm" onclick="applyPreset('#F5C518','#0D0D0F','#F5F4F0')">AutoPostt</button>
               <button class="btn btn-g btn-sm" onclick="applyPreset('#E8302A','#0A0A0A','#F5F5F5')">Sangue Frio</button>
@@ -3429,7 +3449,6 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
               <button class="btn btn-g btn-sm" onclick="applyPreset('#06B6D4','#030712','#F0F9FF')">Gelo Cibernético</button>
               <button class="btn btn-g btn-sm" onclick="applyPreset('#EC4899','#1A0010','#FFF0F7')">Rosa Brutalista</button>
             </div>
-
             <div class="form-row"><label>Estilo visual</label><select id="prof-estilo"><option value="Dark Luxury">Dark Luxury</option><option value="Minimalista">Minimalista</option><option value="Editorial">Editorial</option><option value="Futurista">Futurista</option></select></div>
             <div class="form-row"><label>Redes integradas</label>
               <div id="prof-redes-integrations">
@@ -3589,7 +3608,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
       <div class="sett-panel" id="sett-panel-marca">
         <div class="sb-content">
           <div class="set-sec-title">Identidade de Marca</div>
-          <div class="set-sec-desc">Gerencie sua identidade visual no <a onclick="navP('profile')" style="color:var(--a);cursor:pointer;text-decoration:underline">Perfil de Marca</a></div>
+          <div class="set-sec-desc">Gerencie sua identidade visual no Perfil de Marca</div>
           <div style="margin-top:16px">
             <button class="btn btn-p btn-sm" onclick="navP('profile')">
               <svg class="ico ico-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
