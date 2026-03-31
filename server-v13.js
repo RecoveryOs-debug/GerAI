@@ -1450,6 +1450,25 @@ route('GET', '/api/plans', async (req, res) => {
   ok(res, { plans: db.getPlans(), packages: db.getPackages().filter(p => p.active) });
 });
 
+route('GET', '/autopostt-patch-v1.js', async (req, res) => {
+  const file = path.join(__dirname, 'autopostt-patch-v1.js');
+
+  if (!fs.existsSync(file)) {
+    return err(res, 'autopostt-patch-v1.js não encontrado', 404);
+  }
+
+  res.writeHead(200, {
+    'Content-Type': 'application/javascript; charset=utf-8',
+    'Access-Control-Allow-Origin': '*',
+    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0',
+    'Surrogate-Control': 'no-store'
+  });
+
+  fs.createReadStream(file).pipe(res);
+});
+
 // ─────────────────────────────────────────────
 // STATIC FILES
 // ─────────────────────────────────────────────
