@@ -2385,60 +2385,32 @@ svg.ico-sm{width:12px;height:12px}
   .hero-feats,.hero-stats{grid-template-columns:1fr}
 }
 
-/* ── LABELS & COLORS — sistema de cores ── */
-/* Sidebar section headers */
+/* ── LABELS & COLORS ── */
 .sb-lbl{color:var(--a)!important}
-/* All form labels */
 label, .form-row > label, .agent-lbl, .out-lbl{color:var(--a)!important}
-/* Settings sections — TÍTULOS amarelo, DESCRIÇÕES branco */
 .set-sec-title{color:var(--a)!important}
 .set-sec-desc{color:var(--tx-0,#F5F4F0)!important}
 .set-name{color:var(--a)!important}
 .set-desc{color:var(--tx-0,#F5F4F0)!important}
 .sett-panel .set-desc{color:var(--tx-0,#F5F4F0)!important}
-/* Page subtitles */
 .pg-sub{color:var(--tx-0,#F5F4F0)!important}
-/* Agent description below title */
 .agent-sub{color:var(--tx-0,#F5F4F0)!important}
 .agent-pg .pg-sub{color:var(--tx-0,#F5F4F0)!important}
 .agent-desc{color:var(--tx-0,#F5F4F0)!important}
 .agent-desc-sub{color:var(--tx-0,#F5F4F0)!important}
-/* Section dividers */
 .sec-lbl{color:var(--a)!important;opacity:1!important}
-/* Plan related */
 .plan-quota{color:var(--tx-0,#F5F4F0)!important}
 .l-plan-note{color:var(--tx-0,#F5F4F0)!important}
-/* Generate page section labels — Formato, Rede Social, Sua Ideia, Referência Visual */
 .gen-sect-lbl{color:var(--a)!important;font-weight:600}
-/* Special overrides */
-#sett-used-gen, .sett-used-gen{color:var(--t0)!important}
-#sett-remain-gen, .sett-remain-gen{color:var(--green)!important}
-
-/* ── SVG ICONS — stroke amarelo em toda a UI (exceto auth/landing) ── */
-#sc-app svg.ico,
-#sc-app svg.ico-sm,
-.pg svg.ico,
-.pg svg.ico-sm,
-.sb svg.ico,
-.sb svg.ico-sm,
-.tb svg.ico,
-.tb svg.ico-sm,
-.agent-pg svg.ico,
-.agent-pg svg.ico-sm,
-.sett-panel svg.ico,
-.sett-panel svg.ico-sm,
-.ni svg.ico,
-.ni svg.ico-sm {
-  stroke: var(--a)!important;
-  color: var(--a)!important;
-}
-/* Exceções: ícones de status/feedback mantêm cor própria */
-.t-ok svg, .toast svg,
-.badge svg,
-[style*="color:var(--green)"] svg,
-[style*="color:var(--red)"] svg,
-[style*="color:var(--ok)"] svg,
-[style*="color:var(--err)"] svg { stroke: currentColor!important; color: inherit!important; }
+#sett-used-gen,.sett-used-gen{color:var(--t0)!important}
+#sett-remain-gen,.sett-remain-gen{color:var(--green)!important}
+/* SVG icons amber in app shell */
+#sc-app svg.ico,#sc-app svg.ico-sm,.pg svg.ico,.pg svg.ico-sm,
+.sb svg.ico,.sb svg.ico-sm,.tb svg.ico,.tb svg.ico-sm,
+.agent-pg svg.ico,.agent-pg svg.ico-sm,
+.sett-panel svg.ico,.sett-panel svg.ico-sm,
+.ni svg.ico,.ni svg.ico-sm{stroke:var(--a)!important;color:var(--a)!important}
+.toast svg,.badge svg{stroke:currentColor!important;color:inherit!important}
 
 /* ── APP BACKGROUND GRADIENT ── */
 
@@ -3243,15 +3215,15 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
             <div id="out-tab-conceitos">
 
               <!-- ── MODELO PICKER ── -->
-              <div id="modelo-picker-section" style="margin-bottom:16px">
-                <div style="font-size:10px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px">Escolha um modelo</div>
-                <div id="modelo-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:420px;overflow-y:auto;padding-right:4px;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent"></div>
-                <div style="margin-top:10px;padding:8px 10px;background:var(--ink-3);border:1px solid var(--line-1);border-radius:6px;display:none" id="modelo-selected-info">
-                  <div style="font-size:11px;color:var(--t2)">Modelo selecionado:</div>
+              <div id="modelo-picker-section" style="margin-bottom:14px">
+                <div style="font-size:10px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">Escolha um modelo</div>
+                <div id="modelo-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:400px;overflow-y:auto;padding-right:2px;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent"></div>
+                <div id="modelo-selected-info" style="display:none;margin-top:8px;padding:7px 10px;background:var(--ink-3);border:1px solid var(--amber-18);border-radius:6px">
+                  <div style="font-size:10px;color:var(--t2)">Modelo selecionado</div>
                   <div style="font-size:12px;font-weight:700;color:var(--a)" id="modelo-selected-name">—</div>
                 </div>
               </div>
-              <div class="divider" style="margin:0 0 14px"></div>
+              <div class="divider" style="margin:0 0 12px"></div>
 
               <div class="out-empty" id="out-e">
                 <div class="out-empty-ico"><svg class="ico" style="color:var(--t3)" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
@@ -3402,57 +3374,36 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
         <div>
           <div class="pb" style="margin-bottom:12px">
             <div class="pb-title">Identidade visual</div>
-            <!-- ── COLOR PICKERS COMPLETOS ── -->
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px">
-              <div>
-                <label style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px">Cor Primária</label>
-                <div style="display:flex;align-items:center;gap:10px">
-                  <div id="brand-c1-swatch" style="width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);cursor:pointer;position:relative;overflow:hidden;flex-shrink:0">
-                    <input type="color" id="brand-c1" value="#F5C518" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
-                    <div id="brand-c1-fill" style="position:absolute;inset:0;background:#F5C518;pointer-events:none"></div>
-                  </div>
-                  <div>
-                    <div id="brand-c1-hex" style="font-size:12px;font-weight:700;color:var(--t0);font-family:monospace">#F5C518</div>
-                    <div style="font-size:10px;color:var(--t0)">Destaque</div>
-                  </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:18px">
+              <div><label style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px">Primária</label>
+                <div style="position:relative;width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);overflow:hidden;cursor:pointer">
+                  <input type="color" id="brand-c1" value="#F5C518" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
+                  <div id="brand-c1-fill" style="position:absolute;inset:0;background:#F5C518;pointer-events:none"></div>
                 </div>
+                <div id="brand-c1-hex" style="font-size:11px;font-weight:600;color:var(--t0);font-family:monospace;margin-top:4px">#F5C518</div>
               </div>
-              <div>
-                <label style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px">Cor de Fundo</label>
-                <div style="display:flex;align-items:center;gap:10px">
-                  <div id="brand-c2-swatch" style="width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);cursor:pointer;position:relative;overflow:hidden;flex-shrink:0">
-                    <input type="color" id="brand-c2" value="#0D0D0F" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
-                    <div id="brand-c2-fill" style="position:absolute;inset:0;background:#0D0D0F;pointer-events:none"></div>
-                  </div>
-                  <div>
-                    <div id="brand-c2-hex" style="font-size:12px;font-weight:700;color:var(--t0);font-family:monospace">#0D0D0F</div>
-                    <div style="font-size:10px;color:var(--t0)">Background</div>
-                  </div>
+              <div><label style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px">Fundo</label>
+                <div style="position:relative;width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);overflow:hidden;cursor:pointer">
+                  <input type="color" id="brand-c2" value="#0D0D0F" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
+                  <div id="brand-c2-fill" style="position:absolute;inset:0;background:#0D0D0F;pointer-events:none"></div>
                 </div>
+                <div id="brand-c2-hex" style="font-size:11px;font-weight:600;color:var(--t0);font-family:monospace;margin-top:4px">#0D0D0F</div>
               </div>
-              <div>
-                <label style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px">Cor de Texto</label>
-                <div style="display:flex;align-items:center;gap:10px">
-                  <div id="brand-c3-swatch" style="width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);cursor:pointer;position:relative;overflow:hidden;flex-shrink:0">
-                    <input type="color" id="brand-c3" value="#F5F4F0" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
-                    <div id="brand-c3-fill" style="position:absolute;inset:0;background:#F5F4F0;pointer-events:none"></div>
-                  </div>
-                  <div>
-                    <div id="brand-c3-hex" style="font-size:12px;font-weight:700;color:var(--t0);font-family:monospace">#F5F4F0</div>
-                    <div style="font-size:10px;color:var(--t0)">Texto</div>
-                  </div>
+              <div><label style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px">Texto</label>
+                <div style="position:relative;width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);overflow:hidden;cursor:pointer">
+                  <input type="color" id="brand-c3" value="#F5F4F0" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
+                  <div id="brand-c3-fill" style="position:absolute;inset:0;background:#F5F4F0;pointer-events:none"></div>
                 </div>
+                <div id="brand-c3-hex" style="font-size:11px;font-weight:600;color:var(--t0);font-family:monospace;margin-top:4px">#F5F4F0</div>
               </div>
             </div>
-            <!-- Preview ao vivo -->
-            <div style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+            <div style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;display:flex;align-items:center;gap:5px">
               <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:none;stroke:var(--amber);stroke-width:2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              Preview ao vivo — seus modelos nas suas cores
+              Preview ao vivo
             </div>
-            <div id="brand-model-previews" style="display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;margin-bottom:20px"></div>
-            <!-- Paletas rápidas -->
-            <div style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Paletas rápidas</div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
+            <div id="brand-model-previews" style="display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;margin-bottom:18px"></div>
+            <div style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Paletas rápidas</div>
+            <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px">
               <button class="btn btn-g btn-sm" onclick="applyPreset('#F5C518','#0D0D0F','#F5F4F0')">AutoPostt</button>
               <button class="btn btn-g btn-sm" onclick="applyPreset('#E8302A','#0A0A0A','#F5F5F5')">Sangue Frio</button>
               <button class="btn btn-g btn-sm" onclick="applyPreset('#00A86B','#0D1117','#F0FFF4')">Matrix Verde</button>
@@ -3616,17 +3567,16 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
       </div>
 
 
-      <!-- PANEL: MARCA — consolidado no Perfil de Marca -->
+      <!-- PANEL: MARCA -->
       <div class="sett-panel" id="sett-panel-marca">
         <div class="sb-content">
+
           <div class="set-sec-title">Identidade de Marca</div>
           <div class="set-sec-desc">Gerencie sua identidade visual no Perfil de Marca</div>
-          <div style="margin-top:16px">
-            <button class="btn btn-p btn-sm" onclick="navP('profile')">
-              <svg class="ico ico-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-              Ir para Perfil de Marca →
-            </button>
+          <div style="margin-top:14px">
+            <button class="btn btn-p btn-sm" onclick="navP('profile')">Ir para Perfil de Marca →</button>
           </div>
+
         </div>
       </div>
 
@@ -4309,7 +4259,6 @@ function doLogout() {
   token = ''; me = null;
   localStorage.removeItem('gerai_token');
   localStorage.removeItem('gerai_ob_done');
-  // sc-land lives in landing.html — redirect there
   window.location.href = '/';
 }
 
@@ -4992,7 +4941,6 @@ REGRAS ABSOLUTAS:
 4. viewBox="0 0 1080 1080" | xmlns="http://www.w3.org/2000/svg" obrigatório
 5. font-family explícito em todo elemento text
 6. Fundo dark. Hierarquia 3 pesos: dominante 60%, suporte 25%, accent 5-10%
-7. MODELO SELECIONADO: reproduza fielmente o layout, tipografia e composição do modelo escolhido pelo usuário, adaptando apenas as cores da marca e o conteúdo do prompt.
 7. Use as CORES DO PERFIL fornecidas. Não substitua por paletas genéricas.`;
 
 const IMG_STAGES = ['Lendo perfil da marca...','Definindo composição...','Aplicando cores...','Construindo SVG...','Refinando...','Finalizando...'];
@@ -5019,7 +4967,7 @@ async function gerarImagem() {
   try {
     const _modelCtx = window._selectedModel
       ? '\n\nMODELO DE LAYOUT: ' + window._selectedModel.n + ' — ' + window._selectedModel.name +
-        '. Use a estrutura de composição, tipografia e hierarquia visual deste modelo como base.'
+        '. Replique a estrutura de composição, tipografia e hierarquia visual deste modelo como base do design.'
       : '';
     const body = {
       prompt: prompt + _modelCtx,
@@ -6912,11 +6860,31 @@ async function obFinish() {
 }
 
 
+</script>
 
+  <!-- Image fullscreen modal -->
+  <div id="img-modal-bg">
+    <div id="img-modal-inner">
+      <button id="img-modal-x" onclick="closeImgModal(); event.stopPropagation();" aria-label="Fechar">&#x2715;</button>
+      <div id="img-modal-body"></div>
+      <div id="img-modal-actions">
+        <button class="btn btn-p btn-sm" onclick="downloadImg(); event.stopPropagation();">
+          <svg style="width:13px;height:13px;fill:none;stroke:#fff;stroke-width:2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Baixar JPG
+        </button>
+        <button class="btn btn-g btn-sm" onclick="closeImgModal(); event.stopPropagation();">Fechar</button>
+      </div>
+    </div>
+  </div>
 
-// ─────────────────────────────────────────────────
-// TEMPLATES — modelos instagram (from Modelos_instagram.html)
-// ─────────────────────────────────────────────────
+<script>
+/* =====================================================
+   AutoPostt — Models + Patch v1
+   Carregado APÓS o script principal para garantir que
+   todas as funções (toast, go, doLogin, nav) já existam
+   ===================================================== */
+
+// ─── MODELS (Modelos_instagram.html) ───
 const models = [
 
 // ─── 01 DARK MINIMAL ───────────────────────────────────────────
@@ -7632,135 +7600,126 @@ const models = [
 
 ];
 
-// ─────────────────────────────────────────────────
-// MODEL PICKER — renders grid + selection logic
-// ─────────────────────────────────────────────────
+// ─── MODEL PICKER ───
 let _selectedModel = null;
 
 function renderModelGrid() {
   const grid = document.getElementById('modelo-grid');
   if (!grid || typeof models === 'undefined') return;
   grid.innerHTML = models.map((m, i) => `
-    <div class="modelo-card ${i === 0 ? 'on' : ''}" data-idx="${i}" onclick="selectModel(${i})" style="
+    <div onclick="selectModel(${i})" data-idx="${i}" style="
       position:relative;cursor:pointer;border-radius:8px;overflow:hidden;
-      border:2px solid ${i === 0 ? 'var(--amber)' : 'var(--line-1)'};
-      transition:border-color .15s,transform .12s;aspect-ratio:1/1.25;background:var(--ink-3);
+      border:2px solid ${i===0?'var(--amber)':'var(--line-1)'};
+      transition:border-color .15s;aspect-ratio:0.8/1;background:var(--ink-3);
     ">
       <div style="width:100%;height:100%;overflow:hidden;pointer-events:none">${m.svg}</div>
-      <div style="
-        position:absolute;bottom:0;left:0;right:0;
-        background:linear-gradient(to top,rgba(0,0,0,.85) 0%,transparent 100%);
-        padding:8px 8px 6px;
-      ">
+      <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,.88) 0%,transparent 100%);padding:8px 7px 6px">
         <div style="font-size:9px;font-weight:700;color:var(--amber);letter-spacing:.06em">${m.n}</div>
         <div style="font-size:10px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.name}</div>
       </div>
-      ${i === 0 ? '<div style="position:absolute;top:5px;right:5px;background:var(--amber);border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700;color:#000">✓</div>' : ''}
+      ${i===0?'<div style=\"position:absolute;top:4px;right:4px;background:var(--amber);border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700;color:#000\">✓</div>':''}
     </div>
   `).join('');
-  // Pre-select first
   _selectedModel = models[0];
-  updateSelectedModelInfo();
+  _updateModelInfo();
 }
 
 function selectModel(idx) {
   _selectedModel = models[idx];
-  // Update UI
-  document.querySelectorAll('.modelo-card').forEach((c, i) => {
-    const active = i === idx;
-    c.style.borderColor = active ? 'var(--amber)' : 'var(--line-1)';
-    c.classList.toggle('on', active);
-    // update checkmark
-    const existing = c.querySelector('.modelo-check');
-    if (existing) existing.remove();
-    if (active) {
-      const chk = document.createElement('div');
-      chk.className = 'modelo-check';
-      chk.style.cssText = 'position:absolute;top:5px;right:5px;background:var(--amber);border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700;color:#000';
-      chk.textContent = '✓';
-      c.appendChild(chk);
+  document.querySelectorAll('#modelo-grid > div').forEach((c, i) => {
+    const on = i === idx;
+    c.style.borderColor = on ? 'var(--amber)' : 'var(--line-1)';
+    const chk = c.querySelector('.mchk');
+    if (chk) chk.remove();
+    if (on) {
+      const d = document.createElement('div');
+      d.className = 'mchk';
+      d.style.cssText = 'position:absolute;top:4px;right:4px;background:var(--amber);border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700;color:#000';
+      d.textContent = '✓';
+      c.appendChild(d);
     }
   });
-  updateSelectedModelInfo();
+  _updateModelInfo();
 }
 
-function updateSelectedModelInfo() {
+function _updateModelInfo() {
   const info = document.getElementById('modelo-selected-info');
   const name = document.getElementById('modelo-selected-name');
-  if (!_selectedModel) return;
-  if (info) info.style.display = 'block';
-  if (name) name.textContent = _selectedModel.n + ' — ' + _selectedModel.name;
+  if (info) info.style.display = _selectedModel ? 'block' : 'none';
+  if (name && _selectedModel) name.textContent = _selectedModel.n + ' — ' + _selectedModel.name;
 }
 
-// Show/hide img-mode-box based on whether ref image is set
+// Show/hide img-mode-box based on ref image
 function _syncImgModeBox() {
   const box = document.getElementById('img-mode-box');
-  if (!box) return;
-  const hasRef = !!(window._refImageB64);
-  box.style.display = hasRef ? 'block' : 'none';
+  if (box) box.style.display = window._refImageB64 ? 'block' : 'none';
 }
 
-// Patch handleRefFile to also show/hide img-mode-box
-const _origHandleRefFile = window.handleRefFile;
-window.handleRefFile = function(file) {
-  if (_origHandleRefFile) _origHandleRefFile(file);
-  setTimeout(_syncImgModeBox, 100);
-};
+// Patch handleRefFile & clearRefImage to trigger visibility toggle
+(function() {
+  const _origHRF = window.handleRefFile;
+  window.handleRefFile = function(file) {
+    if (_origHRF) _origHRF.call(this, file);
+    setTimeout(_syncImgModeBox, 150);
+  };
+  const _origCRI = window.clearRefImage;
+  window.clearRefImage = function(e) {
+    if (_origCRI) _origCRI.call(this, e);
+    setTimeout(_syncImgModeBox, 150);
+  };
+})();
 
-const _origClearRefImage = window.clearRefImage;
-window.clearRefImage = function(e) {
-  if (_origClearRefImage) _origClearRefImage(e);
-  setTimeout(_syncImgModeBox, 100);
-};
+// Patch nav to init model grid when generate page opens
+(function() {
+  const _origNav = window.nav;
+  window.nav = function(p, el) {
+    // Handle calendar (from patch v1)
+    if (p === 'calendar') {
+      document.querySelectorAll('.pg').forEach(x => x.classList.remove('on'));
+      document.querySelectorAll('.agent-pg').forEach(x => x.classList.remove('on'));
+      document.querySelectorAll('.ni').forEach(x => x.classList.remove('on'));
+      const calPg = document.getElementById('pg-calendar');
+      if (calPg) calPg.classList.add('on');
+      if (el && el.classList) el.classList.add('on');
+      const curEl = document.getElementById('tb-cur');
+      if (curEl) curEl.textContent = 'Calendário';
+      if (typeof loadCalendar === 'function') loadCalendar();
+      return;
+    }
+    if (_origNav) _origNav.call(this, p, el);
+    if (p === 'generate') {
+      setTimeout(() => {
+        if (document.getElementById('modelo-grid') && !document.querySelector('#modelo-grid > div')) {
+          renderModelGrid();
+        }
+      }, 80);
+    }
+  };
+})();
 
-// Init model grid when generate page is shown
-const _origNavForModels = window.nav;
-window.nav = function(p, el) {
-  if (_origNavForModels) _origNavForModels(p, el);
-  if (p === 'generate') {
-    setTimeout(() => {
-      if (!document.querySelector('.modelo-card')) renderModelGrid();
-    }, 50);
-  }
-};
-
-// Also init on DOMContentLoaded in case generate is default page
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    if (!document.querySelector('.modelo-card')) renderModelGrid();
+// Init on load
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    if (document.getElementById('modelo-grid') && !document.querySelector('#modelo-grid > div')) {
+      renderModelGrid();
+    }
     _syncImgModeBox();
-  }, 300);
+  }, 500);
 });
 
-// Patch gerarImagem to pass selected model SVG to the IA system prompt
-const _origGerarImagem = window.gerarImagem;
-window.gerarImagem = async function() {
-  // Inject selected model template info into the prompt context
-  if (_selectedModel) {
-    window._selectedModelName = _selectedModel.n + ' — ' + _selectedModel.name;
-    window._selectedModelSvg  = _selectedModel.svg;
-  }
-  if (_origGerarImagem) return _origGerarImagem();
-};
-
-</script>
-
-  <!-- Image fullscreen modal -->
-  <div id="img-modal-bg">
-    <div id="img-modal-inner">
-      <button id="img-modal-x" onclick="closeImgModal(); event.stopPropagation();" aria-label="Fechar">&#x2715;</button>
-      <div id="img-modal-body"></div>
-      <div id="img-modal-actions">
-        <button class="btn btn-p btn-sm" onclick="downloadImg(); event.stopPropagation();">
-          <svg style="width:13px;height:13px;fill:none;stroke:#fff;stroke-width:2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Baixar JPG
-        </button>
-        <button class="btn btn-g btn-sm" onclick="closeImgModal(); event.stopPropagation();">Fechar</button>
-      </div>
-    </div>
-  </div>
-
-<script>
+// ─── PATCH v1 (Calendar, Onboarding v2, Streaming, Dashboard) ───
+/**
+ * AutoPostt Frontend Patch v1
+ * 
+ * Injetar no final do <body> do autopostt-app.html:
+ * [incluir como script inline no final do body]
+ * 
+ * Blocos implementados:
+ * 1. Streaming SSE nos agentes (substitui runAgent com efeito de digitação)
+ * 2. Calendário editorial completo (nova página + nav item)
+ * 3. Onboarding v2 — step-by-step com save incremental
+ * 4. Dashboard upgrades — KPIs reais, atividade real, quota visual
+ */
 
 (function () {
   'use strict';
@@ -9105,8 +9064,7 @@ window.gerarImagem = async function() {
 
 })();
 
-<script src="/autopostt-patch-v1.js?v=3"></script>
-</body>
-</html>
+</script>
+
 </body>
 </html>
