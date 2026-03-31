@@ -1,3 +1,4 @@
+console.log('PATCH CARREGADO');
 /**
  * AutoPostt Frontend Patch v1
  * 
