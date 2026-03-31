@@ -1453,7 +1453,23 @@ route('GET', '/api/plans', async (req, res) => {
 // ─────────────────────────────────────────────
 // STATIC FILES
 // ─────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// STATIC FILE: autopostt-patch
+// ─────────────────────────────────────────────
+route('GET', '/autopostt-patch-v1.js', async (req, res) => {
+  const file = path.join(__dirname, 'autopostt-patch-v1.js');
 
+  if (!fs.existsSync(file)) {
+    return err(res, 'autopostt-patch-v1.js não encontrado', 404);
+  }
+
+  res.writeHead(200, {
+    'Content-Type': 'application/javascript',
+    'Access-Control-Allow-Origin': '*'
+  });
+
+  fs.createReadStream(file).pipe(res);
+});
 const staticFiles = [
   ['/landing', 'landing.html'],
   ['/admin',   'admin.html'],
@@ -1479,6 +1495,7 @@ staticFiles.forEach(([urlPath, files]) => {
     }
   });
 });
+
 
 // ─────────────────────────────────────────────
 // SERVER
