@@ -3207,12 +3207,12 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
           <div class="out-panel">
             <!-- tabs -->
             <div class="out-tabs">
-              <div class="out-tab on" id="tab-conceitos" onclick="switchOutTab('conceitos')">Modelos</div>
+              <div class="out-tab on" id="tab-conceitos" onclick="switchOutTab('conceitos')" style="display:none">Modelos</div>
               <div class="out-tab" id="tab-imagem" onclick="switchOutTab('imagem')">Imagem gerada</div>
             </div>
 
             <!-- tab: modelos + conceitos -->
-            <div id="out-tab-conceitos">
+            <div id="out-tab-conceitos" style="display:none">
 
               <!-- ── MODELO PICKER ── -->
               <div id="modelo-picker-section" style="margin-bottom:14px">
@@ -3236,16 +3236,13 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                 <div class="sk" style="height:60px"></div>
               </div>
               <div class="out-res" id="out-r">
-                <div class="out-hd">
-                  <span style="font-size:10px;font-weight:700;color:var(--a);letter-spacing:.08em;text-transform:uppercase">3 conceitos</span>
+                <div class="out-hd" id="out-hd-conceitos" style="display:none">
+                  <span style="font-size:10px;font-weight:700;color:var(--a);letter-spacing:.08em;text-transform:uppercase" id="out-hd-lbl">Escolha um modelo</span>
                   <button class="btn btn-g btn-sm" onclick="regenWithCredit()" title="Consome 1 crédito">
                     <svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
                     Regerar <span style="color:var(--a);font-size:10px">−1</span>
                   </button>
                 </div>
-                <!-- concept cards injected dynamically by JS -->
-                <div class="divider"></div>
-                <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:7px">Prompt selecionado</div>
                 
                 <div id="img-mode-box" style="display:none;margin-top:12px;padding:12px;background:var(--ink-3);border:1px solid var(--line-1);border-radius:8px">
                   <div style="font-size:11px;font-weight:700;color:var(--a);letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px">Modo da imagem enviada</div>
@@ -3264,7 +3261,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                     </div>
                   </label>
                 </div>
-<div class="cmd-box" id="cmd-out" data-prompt="" style="word-break:break-word;font-size:11px"><span id="cmd-out-txt">Selecione um conceito acima</span><button class="cp-btn" onclick="cpElById('cmd-out')">Copiar</button></div>
+<div class="cmd-box" id="cmd-out" data-prompt="" style="word-break:break-word;font-size:11px"><span id="cmd-out-txt" style="color:var(--t3);font-style:italic">O prompt refinado aparecerá aqui após gerar</span><button class="cp-btn" onclick="cpElById('cmd-out')">Copiar</button></div>
                 <button id="btn-gerar-img" onclick="gerarImagem()" style="width:100%;margin-top:12px;background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:var(--f);font-size:14px;font-weight:700;color:#fff;letter-spacing:-.02em;box-shadow:0 4px 20px rgba(243,107,42,.3);transition:all .15s">
                   <svg style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                   Gerar imagem com IA
@@ -4378,7 +4375,7 @@ function navP(p) {
 let _currentFmt = 'post';
 let _currentNet = 'ig';
 const _netMap = { ig:'instagram', li:'linkedin', yt:'youtube', tt:'tiktok' };
-const skt = ['Interpretando sua ideia...','Aplicando perfil de marca...','Construindo conceitos visuais...','Refinando os prompts...'];
+const skt = ['Interpretando sua ideia...','Aplicando perfil de marca...','Refinando com contexto da marca...','Finalizando prompt...'];
 
 function selFmt(f) {
   _currentFmt = f;
@@ -4398,80 +4395,38 @@ function ucc() {
   document.getElementById('cc').textContent = v + ' / 500';
 }
 
-async function runGen(refinedPrompt) {
-  const raw = (document.getElementById('gen-in').value || '').trim();
-  const input = refinedPrompt || raw;
-  if (!input) { toast('Descreva sua ideia antes de gerar'); return; }
+// runGen: após refinamento, revela a aba Modelos para o usuário escolher e clicar em Gerar imagem
+function runGen(refinedPrompt) {
+  // Revelar aba Modelos
+  const tabModelos = document.getElementById('tab-conceitos');
+  const tabContent = document.getElementById('out-tab-conceitos');
+  const outHd = document.getElementById('out-hd-conceitos');
+  if (tabModelos) tabModelos.style.display = '';
+  if (tabContent) tabContent.style.display = 'block';
+  if (outHd) outHd.style.display = 'flex';
 
-  // show loading
+  // Esconder empty state, mostrar painel de resultado
   document.getElementById('out-e').style.display = 'none';
-  document.getElementById('out-r').classList.remove('vis');
-  document.getElementById('sk-w').classList.add('vis');
+  document.getElementById('sk-w').classList.remove('vis');
+  document.getElementById('out-r').classList.add('vis');
 
-  let k = 0;
-  const iv = setInterval(() => {
-    if (k < skt.length) document.getElementById('sk-t').textContent = skt[k++];
-  }, 700);
-
-  try {
-    const genBody = { format: _currentFmt, network: _netMap[_currentNet] || 'instagram', input };
-    if (window._refImageB64) genBody.refImageBase64 = window._refImageB64;
-    const data = await api('POST', '/api/user/generate', genBody);
-
-    clearInterval(iv);
-    if (me) { me.quota_used = (me.quota_used || 0) + 1; updateQuota(); }
-
-    const concepts = data.concepts || [];
-    document.getElementById('sk-w').classList.remove('vis');
-    document.getElementById('out-r').classList.add('vis');
-    document.querySelector('#out-r .out-hd span').textContent = `${concepts.length} conceito${concepts.length !== 1 ? 's' : ''}`;
-
-    // render concept cards dynamically
-    const cptContainer = document.getElementById('out-r');
-    // remove old concept cards
-    cptContainer.querySelectorAll('.cpt').forEach(c => c.remove());
-    // remove old divider+cmd section
-    cptContainer.querySelectorAll('.divider, .cmd-box, .btn-p').forEach(c => c.remove());
-    const oldLbl = cptContainer.querySelector('[style*="Comando Nano"]')?.parentElement;
-    if (oldLbl) oldLbl.remove();
-
-    const insertBefore = cptContainer.querySelector('.divider') || null;
-    concepts.forEach((c, i) => {
-      const div = document.createElement('div');
-      div.className = 'cpt' + (i === 0 ? ' on' : '');
-      div.onclick = function() { selCpt(this); };
-      div.innerHTML = `
-        <div class="cpt-name">${esc(c.name)}</div>
-        <div class="cpt-desc">${esc(c.approach)}</div>
-        <div class="cpt-emo">${esc(c.emotion)}</div>
-        <div class="cpt-vision">${esc(c.vision || c.name + ' — ' + c.approach)}</div>
-      `;
-      cptContainer.appendChild(div);
-    });
-
-    // append prompt section
-    const firstPrompt = concepts[0]?.prompt || '';
-    // update the static cmd-out box
-    const cmdOutEl = document.getElementById('cmd-out');
-    if (cmdOutEl) {
-      cmdOutEl.dataset.prompt = firstPrompt;
-      const sp = document.getElementById('cmd-out-txt');
-      if (sp) sp.textContent = firstPrompt;
-    }
-    // reset image tab
-    document.getElementById('img-preview-wrap')?.classList.remove('vis');
-    document.getElementById('img-preview-empty').style.display = 'flex';
-    document.getElementById('img-preview-empty').innerHTML = `
-      <svg style="width:28px;height:28px;fill:none;stroke:var(--t3);stroke-width:1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-      Clique em "Gerar imagem" para criar o visual`;
-
-    toast(`${concepts.length} conceitos gerados!`, 'ok');
-  } catch(e) {
-    clearInterval(iv);
-    document.getElementById('sk-w').classList.remove('vis');
-    document.getElementById('out-e').style.display = 'flex';
-    toast(e.message, 'err');
+  // Resetar aba de imagem
+  document.getElementById('img-preview-wrap')?.classList.remove('vis');
+  const emptyEl = document.getElementById('img-preview-empty');
+  if (emptyEl) {
+    emptyEl.style.display = 'flex';
+    emptyEl.innerHTML = `<svg style="width:28px;height:28px;fill:none;stroke:var(--t3);stroke-width:1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Escolha um modelo e clique em "Gerar imagem"`;
   }
+
+  // Atualizar o cmd-out com o prompt refinado (será usado pelo gerarImagem)
+  const cmdOutEl = document.getElementById('cmd-out');
+  if (cmdOutEl) {
+    cmdOutEl.dataset.prompt = refinedPrompt || '';
+    const sp = document.getElementById('cmd-out-txt');
+    if (sp) sp.textContent = refinedPrompt || '';
+  }
+
+  toast('Prompt refinado! Escolha um modelo e gere a imagem.', 'ok');
 }
 
 function selCpt(el) {
@@ -4901,7 +4856,7 @@ function regenWithCredit() {
   const raw = document.getElementById('gen-in').value || '';
   const input = (box?.textContent || raw).trim();
   if (!input) { toast('Nenhum input para regerar'); return; }
-  toast('Regerando... −1 crédito', 'ok');
+  toast('Refinando novamente... −1 crédito', 'ok');
   startGenPipeline();
 }
 
@@ -4926,6 +4881,17 @@ function clearGenForm() {
   if (w) w.style.display = 'none';
   document.getElementById('out-e').style.display = 'flex';
   document.getElementById('out-r').classList.remove('vis');
+  // Esconder aba Modelos novamente
+  const tabModelos = document.getElementById('tab-conceitos');
+  const tabContent = document.getElementById('out-tab-conceitos');
+  const outHd = document.getElementById('out-hd-conceitos');
+  if (tabModelos) tabModelos.style.display = 'none';
+  if (tabContent) tabContent.style.display = 'none';
+  if (outHd) outHd.style.display = 'none';
+  window._refinedPrompt = '';
+  // Resetar cmd-out
+  const cmdEl = document.getElementById('cmd-out');
+  if (cmdEl) { cmdEl.dataset.prompt = ''; const sp = document.getElementById('cmd-out-txt'); if (sp) sp.textContent = 'Selecione um modelo acima'; }
 }
 
 // ─────────────────────────────────────────────────
@@ -4946,11 +4912,10 @@ REGRAS ABSOLUTAS:
 const IMG_STAGES = ['Lendo perfil da marca...','Definindo composição...','Aplicando cores...','Construindo SVG...','Refinando...','Finalizando...'];
 
 async function gerarImagem() {
-  const cmdEl = document.getElementById('cmd-out');
-  const rawPrompt = (cmdEl?.dataset?.prompt || cmdEl?.childNodes[0]?.textContent || '').trim();
   const refinedPrompt = document.getElementById('refined-prompt-box')?.textContent?.trim() || '';
-  const prompt = rawPrompt && rawPrompt !== '—' ? rawPrompt : refinedPrompt;
-  if (!prompt || prompt === '—') { toast('Selecione um conceito primeiro','err'); return; }
+  const rawInput = (document.getElementById('gen-in')?.value || '').trim();
+  const prompt = refinedPrompt || rawInput;
+  if (!prompt) { toast('Refine o prompt primeiro clicando em "Gerar conteúdo com IA"','err'); return; }
   
   const imgMode = document.querySelector('input[name="img-mode"]:checked')?.value || 'reference';
   
@@ -4969,8 +4934,14 @@ async function gerarImagem() {
       ? '\n\nMODELO DE LAYOUT: ' + window._selectedModel.n + ' — ' + window._selectedModel.name +
         '. Replique a estrutura de composição, tipografia e hierarquia visual deste modelo como base do design.'
       : '';
+    const rawInput = (document.getElementById('gen-in')?.value || '').trim();
+    const fullPrompt = [
+      rawInput ? 'IDEIA ORIGINAL: ' + rawInput : '',
+      'PROMPT REFINADO: ' + prompt,
+      _modelCtx
+    ].filter(Boolean).join('\n');
     const body = {
-      prompt: prompt + _modelCtx,
+      prompt: fullPrompt,
       format: _currentFmt,
       network: _netMap[_currentNet]||'instagram',
       imgMode,

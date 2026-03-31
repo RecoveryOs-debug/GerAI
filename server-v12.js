@@ -577,7 +577,11 @@ function callClaude({ system, userMsg, maxTokens = 2000 }) {
         try {
           const p = JSON.parse(data);
           if (p.error) return reject(new Error(p.error.message || 'Erro Anthropic'));
-          resolve(p.content?.[0]?.text || '');
+          resolve({
+            text: p.content?.[0]?.text || '',
+            inputTokens: p.usage?.input_tokens || 0,
+            outputTokens: p.usage?.output_tokens || 0
+          });
         } catch { reject(new Error('Resposta inválida da API')); }
       });
     });
@@ -1119,12 +1123,12 @@ route('POST', '/api/user/generate', async (req, res) => {
   if (user.quota_used >= user.quota_limit) return err(res, 'Cota mensal esgotada. Faça upgrade do seu plano.');
   let concepts;
   try {
-    const raw = await callClaude({
+    const { text: rawConcepts } = await callClaude({
       system: getConceptsSkill(user),
       userMsg: `Formato: ${format}\nRede: ${network}\nIdeia: "${input}"\n\nGere os 3 conceitos em JSON:`,
       maxTokens: 1500
     });
-    const jsonMatch = raw.match(/\[[\s\S]*\]/);
+    const jsonMatch = rawConcepts.match(/\[[\s\S]*\]/);
     if (!jsonMatch) throw new Error('JSON inválido');
     concepts = JSON.parse(jsonMatch[0]);
   } catch {
@@ -1282,18 +1286,18 @@ ${isInclude ? 'Crie espaço/moldura no SVG para a foto do usuário.' : 'Use imag
 QUALIDADE: Designer profissional de agência tier-1.`;
 
   try {
-    const raw = await callClaude({ system, userMsg: `CONCEITO: "${prompt}"\nFORMATO: ${format||'post'} para ${network||'instagram'}\n\nGere o SVG agora. Comece com <svg`, maxTokens:4000 });
+    const { text: rawSvg, inputTokens: svgInp, outputTokens: svgOut } = await callClaude({ system, userMsg: `CONCEITO: "${prompt}"\nFORMATO: ${format||'post'} para ${network||'instagram'}\n\nGere o SVG agora. Comece com <svg`, maxTokens:4000 });
     let svg = '';
-    if (raw.trim().startsWith('<svg')) svg = raw.trim();
+    if (rawSvg.trim().startsWith('<svg')) svg = rawSvg.trim();
     else {
-      const m = raw.match(/<svg[\s\S]*?<\/svg>/i);
+      const m = rawSvg.match(/<svg[\s\S]*?<\/svg>/i);
       if (m) svg = m[0];
-      else { const md = raw.match(/```(?:svg|xml)?\s*([\s\S]*?)```/i); if (md && md[1].trim().startsWith('<svg')) svg = md[1].trim(); }
+      else { const md = rawSvg.match(/```(?:svg|xml)?\s*([\s\S]*?)```/i); if (md && md[1].trim().startsWith('<svg')) svg = md[1].trim(); }
     }
     if (!svg || svg.length < 100) throw new Error('A IA não gerou um SVG válido. Tente reformular o conceito.');
     if (!svg.includes('xmlns=')) svg = svg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
     db.updateUser(payload.id, { quota_used:(user.quota_used||0)+1 });
-    db.addGeneration({ user_id:payload.id, feature:'gerar-imagem', format:format||'post', network:network||'instagram', concept_name:prompt.slice(0,60), prompt:prompt.slice(0,200), svg_data:svg, credits_used:1 });
+    db.addGeneration({ user_id:payload.id, feature:'gerar-imagem', format:format||'post', network:network||'instagram', concept_name:prompt.slice(0,60), prompt:prompt.slice(0,200), svg_data:svg, credits_used:1, input_tokens:svgInp, output_tokens:svgOut });
     ok(res, { svg });
   } catch (e) { err(res, e.message); }
 });
