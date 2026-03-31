@@ -1,0 +1,16 @@
+{
+  "name": "autopostt-backend",
+  "version": "13.0.0",
+  "description": "AutoPostt — Plataforma de Automação de Conteúdo Social com IA",
+  "main": "server-v12.js",
+  "scripts": {
+    "start": "node server-v12.js",
+    "dev": "node --watch server-v12.js"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "keywords": ["autopostt", "ia", "conteudo", "redes-sociais", "automacao"],
+  "author": "AutoPostt",
+  "license": "UNLICENSED"
+}
