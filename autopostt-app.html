@@ -2677,6 +2677,260 @@ label, .form-row > label, .agent-lbl, .out-lbl{color:var(--a)!important}
   border-color:var(--amber-18,rgba(245,197,24,.18));
   color:var(--amber,#F5C518); font-weight:600;
 }
+
+
+/* ══════════════════════════════════════════════
+   AUTOPOSTT — DESIGN UPGRADE v3 (VISUAL ONLY)
+   Zero functional changes. Premium visual layer.
+══════════════════════════════════════════════ */
+
+body {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(245,197,24,0.045), transparent 34%),
+    radial-gradient(circle at 82% 0%, rgba(255,255,255,0.03), transparent 26%),
+    radial-gradient(circle at 50% 100%, rgba(255,255,255,0.02), transparent 30%),
+    #0D0D0F;
+}
+
+#sc-app {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(245,197,24,0.04), transparent 34%),
+    radial-gradient(circle at 82% 0%, rgba(255,255,255,0.025), transparent 24%),
+    var(--ink-0);
+}
+
+.pg {
+  max-width: 1120px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.pg-title {
+  font-size: 24px;
+  letter-spacing: -0.7px;
+}
+
+.pg-sub,
+.sec-lbl,
+label,
+.form-row > label,
+.form-grid2 label {
+  opacity: .82;
+}
+
+.card,
+.kpi,
+.hist-card,
+.auth-card,
+.tip-card,
+.out-panel,
+.agent-out-panel,
+.agent-input-panel,
+.sett-nav,
+.sb-content,
+.modal-box,
+.cmd-box,
+.agent-result,
+.cpt {
+  background: linear-gradient(180deg, rgba(255,255,255,0.024), rgba(255,255,255,0.008));
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.22);
+  backdrop-filter: blur(10px);
+}
+
+.card:hover,
+.kpi:hover,
+.hist-card:hover,
+.tip-card:hover,
+.cpt:hover {
+  border-color: rgba(255,255,255,0.11);
+  box-shadow: 0 14px 38px rgba(0,0,0,0.28);
+}
+
+.card + .card {
+  margin-top: 24px;
+}
+
+input, textarea, select {
+  background: rgba(255,255,255,0.022);
+  border: 1px solid rgba(255,255,255,0.085);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.015);
+}
+
+input:hover, textarea:hover, select:hover {
+  border-color: rgba(255,255,255,0.15);
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: #F5C518;
+  box-shadow: 0 0 0 3px rgba(245,197,24,0.12);
+  background: rgba(255,255,255,0.03);
+}
+
+textarea {
+  min-height: 110px;
+}
+
+.form-row {
+  margin-bottom: 18px;
+}
+
+.btn {
+  border-radius: 10px;
+}
+
+.btn-p {
+  background: linear-gradient(135deg, #F5C518 0%, #E6AC00 100%);
+  box-shadow: 0 4px 20px rgba(245,197,24,0.18), 0 1px 2px rgba(0,0,0,0.18);
+}
+
+.btn-p:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 28px rgba(245,197,24,0.24), 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.btn-g,
+.btn-s {
+  background: rgba(255,255,255,0.03);
+}
+
+.btn-g:hover,
+.btn-s:hover {
+  background: rgba(255,255,255,0.055);
+}
+
+.sb {
+  background: rgba(15,15,18,0.92);
+  backdrop-filter: blur(14px);
+}
+
+.sb-top,
+.sb-bot {
+  background: rgba(255,255,255,0.01);
+}
+
+.ni {
+  border-radius: 10px;
+}
+
+.ni:hover {
+  background: rgba(255,255,255,0.04);
+}
+
+.ni.on {
+  background: rgba(245,197,24,0.12);
+  color: #F5C518;
+}
+
+.tb {
+  background: rgba(15,15,18,0.78);
+  backdrop-filter: blur(14px);
+}
+
+.tb-crumb-cur {
+  font-weight: 700;
+}
+
+.chip {
+  border: 1px solid rgba(255,255,255,0.08);
+  background: transparent;
+}
+
+.chip:hover {
+  border-color: rgba(255,255,255,0.18);
+}
+
+.chip.on {
+  background: rgba(245,197,24,0.12);
+  border-color: #F5C518;
+  color: #F5C518;
+}
+
+.preview-card,
+#brand-model-previews > div > div {
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+
+.preview-card:hover,
+#brand-model-previews > div > div:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 14px 40px rgba(0,0,0,0.42);
+  border-color: rgba(245,197,24,0.22) !important;
+}
+
+/* Better section rhythm */
+.pg > .card,
+.pg > div > .card,
+.pg .card-accent {
+  margin-bottom: 24px;
+}
+
+/* Agent/result panels with cleaner hierarchy */
+.agent-result,
+.out-panel,
+.agent-out-panel,
+.agent-input-panel {
+  border-radius: 14px;
+}
+
+/* Tables and dense content */
+thead {
+  background: rgba(255,255,255,0.025);
+}
+
+tbody tr:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+/* Scroll polish */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.18);
+}
+
+/* Light mode polish */
+[data-theme="light"] body,
+[data-theme="light"] #sc-app {
+  background:
+    radial-gradient(circle at 20% 10%, rgba(245,197,24,0.08), transparent 30%),
+    radial-gradient(circle at 80% 0%, rgba(0,0,0,0.025), transparent 20%),
+    var(--ink-0);
+}
+
+[data-theme="light"] .card,
+[data-theme="light"] .kpi,
+[data-theme="light"] .hist-card,
+[data-theme="light"] .auth-card,
+[data-theme="light"] .tip-card,
+[data-theme="light"] .out-panel,
+[data-theme="light"] .agent-out-panel,
+[data-theme="light"] .agent-input-panel,
+[data-theme="light"] .sett-nav,
+[data-theme="light"] .sb-content,
+[data-theme="light"] .modal-box,
+[data-theme="light"] .cmd-box,
+[data-theme="light"] .agent-result,
+[data-theme="light"] .cpt {
+  background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.88));
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+[data-theme="light"] .sb {
+  background: rgba(255,255,255,0.84);
+}
+
+[data-theme="light"] .tb {
+  background: rgba(255,255,255,0.78);
+}
+
 </style>
 </head>
 <body>
