@@ -3183,6 +3183,97 @@ tbody tr:hover{background:rgba(255,255,255,.025)}
   .profile-palette-grid,.profile-grid-2{grid-template-columns:1fr !important}
 }
 
+
+/* ═════════════════════════════════════════════════════════════
+   PREMIUM REFOCUS — transparent workspace + stronger dashboard
+   Visual only. No functional changes.
+═════════════════════════════════════════════════════════════ */
+:root{
+  --workspace-max: 1360px;
+  --surface-clear: transparent;
+  --surface-border-soft: rgba(255,255,255,.08);
+  --surface-border-strong: rgba(255,255,255,.14);
+}
+.pg{max-width:var(--workspace-max)!important;padding:36px 34px 56px!important}
+.pg-hd{margin-bottom:26px!important}
+.pg-title{font-size:46px!important;line-height:1.02!important;letter-spacing:-.055em!important;font-weight:800!important}
+.pg-sub{font-size:15px!important;color:var(--t2)!important;max-width:720px!important}
+.sec-lbl{margin-bottom:12px!important}
+.card,.kpi,.hist-card,.out-panel,.agent-input-panel,.agent-out-panel,.agent-result,.tip-card,.profile-card,.sett-nav,.sett-panel .sett-plan-card,.sett-panel .card,#pg-generate > .g-gen > .card,#pg-dashboard .g-dash > .card,#pg-dashboard .g-dash .tip-card,#pg-profile .profile-card,#pg-settings .card,#pg-settings .sett-nav,#pg-history .hist-card{background:transparent!important;backdrop-filter:none!important;box-shadow:none!important;border:1px solid rgba(255,255,255,.08)!important}
+.card:hover,.kpi:hover,.hist-card:hover,.tip-card:hover,.profile-card:hover{border-color:rgba(255,255,255,.14)!important;box-shadow:0 0 0 1px rgba(245,197,24,.04) inset!important}
+.plan-box,.profile-plan-wrap .plan-box,#pg-settings .sett-plan-card.feat,#pg-settings .sett-plan-card.premium,#pg-settings .sett-plan-card.pro,#pg-settings .sett-plan-card.elite{background:radial-gradient(circle at top right, rgba(245,197,24,.12), transparent 38%),linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)),#17171D!important;border:1px solid rgba(245,197,24,.18)!important;box-shadow:0 18px 60px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.03)!important}
+.g-gen{grid-template-columns:minmax(0,1.04fr) minmax(420px,.96fr)!important;gap:26px!important;align-items:start!important}
+#pg-generate .card{padding:0!important;border:none!important}
+#pg-generate .card:hover{box-shadow:none!important}
+#pg-generate .fmt-grid{gap:10px!important}
+#pg-generate .net-row{gap:10px!important}
+#pg-generate .fmt,#pg-generate .net,#pg-generate .drop-zone,#pg-generate .out-tab,#pg-generate .ta-wrap,#pg-generate #refined-prompt-box,#pg-generate #modelo-selected-info{background:transparent!important;border:1px solid rgba(255,255,255,.08)!important;box-shadow:none!important}
+#pg-generate .fmt,#pg-generate .net{min-height:92px!important;border-radius:22px!important}
+#pg-generate .fmt:hover,#pg-generate .net:hover,#pg-generate .drop-zone:hover{border-color:rgba(245,197,24,.24)!important;background:rgba(245,197,24,.035)!important}
+#pg-generate .fmt.on,#pg-generate .net.on{background:linear-gradient(180deg, rgba(245,197,24,.09), rgba(245,197,24,.05))!important;border-color:rgba(245,197,24,.34)!important;box-shadow:0 0 0 1px rgba(245,197,24,.07) inset!important}
+#pg-generate textarea,.agent-pg textarea,#pg-profile textarea,#pg-settings textarea,#pg-generate input,.agent-pg input,#pg-profile input,#pg-settings input,#pg-settings select,.agent-pg select,#pg-profile select{background:rgba(255,255,255,.01)!important;border:1px solid rgba(255,255,255,.08)!important}
+#pg-generate .ta-wrap{padding:0!important;overflow:hidden!important;border-radius:24px!important}
+#pg-generate textarea{min-height:196px!important;padding:20px 22px 84px!important;border:none!important;background:transparent!important}
+#pg-generate .ta-foot{padding:14px 16px!important;border-top:1px solid rgba(255,255,255,.06)!important;background:rgba(255,255,255,.015)!important}
+#pg-generate .drop-zone{min-height:164px!important;border-radius:24px!important}
+#pg-generate .out-panel{min-height:calc(100vh - 138px)!important;top:88px!important;padding:18px!important;border-radius:28px!important}
+#pg-generate .out-tabs{background:transparent!important;border:none!important;padding:0 0 12px!important}
+#pg-generate .out-tab{border-radius:999px!important;padding:12px 16px!important}
+.agent-layout,.agent-cols{grid-template-columns:minmax(0,1.08fr) minmax(440px,.92fr)!important;gap:24px!important}
+.agent-pg .agent-left,.agent-pg .agent-right{background:transparent!important}
+.agent-pg .agent-input-panel,.agent-pg .agent-out-panel,.agent-pg .agent-result{padding:0!important;border:none!important;min-height:auto!important}
+.agent-pg .agent-hd{margin-bottom:24px!important}
+.agent-pg .agent-title{font-size:56px!important;letter-spacing:-.06em!important;line-height:1.02!important}
+.agent-pg .agent-sub{font-size:16px!important;color:var(--t2)!important;max-width:760px!important}
+.agent-pg .refine-step{background:rgba(245,197,24,.07)!important;border:1px solid rgba(245,197,24,.18)!important;border-radius:999px!important;padding:14px 18px!important;margin-bottom:18px!important}
+.agent-pg .ta-wrap{background:transparent!important;border:1px solid rgba(255,255,255,.08)!important;border-radius:26px!important;overflow:hidden!important}
+.agent-pg textarea{min-height:188px!important;padding:22px 24px 84px!important;background:transparent!important;border:none!important}
+.agent-pg .ta-foot{padding:14px 16px!important;border-top:1px solid rgba(255,255,255,.06)!important;background:rgba(255,255,255,.015)!important}
+.agent-pg .agent-out-panel{padding-left:22px!important;border-left:1px solid rgba(255,255,255,.08)!important}
+.agent-pg .agent-result-empty,.agent-pg .out-empty{min-height:420px!important;display:flex!important;align-items:center!important;justify-content:center!important;background:transparent!important;border:none!important}
+.agent-pg .form-row{margin-bottom:20px!important}
+#pg-profile .profile-layout,#pg-settings .g-sett,#pg-history .g-hist{gap:24px!important}
+#pg-profile .profile-card,#pg-settings .sett-panel,#pg-history .hist-card{border-radius:24px!important}
+#pg-profile .profile-card.hero{background:transparent!important;border-color:rgba(245,197,24,.14)!important}
+#pg-profile .profile-card-title{font-size:24px!important}
+#pg-profile .profile-card-sub{font-size:13px!important}
+#pg-profile .profile-palette-grid{gap:14px!important}
+#pg-profile .profile-memory-grid,#pg-profile .profile-grid-2{gap:16px!important}
+#pg-settings .sett-tabs{background:transparent!important;border:none!important;padding:0!important;gap:10px!important}
+#pg-settings .sett-tab{background:transparent!important;border:1px solid rgba(255,255,255,.08)!important;border-radius:999px!important;padding:12px 16px!important;flex:0 0 auto!important}
+#pg-settings .sett-tab.on{background:rgba(245,197,24,.08)!important;border-color:rgba(245,197,24,.24)!important;color:var(--a)!important}
+#pg-dashboard .pg-hd{align-items:flex-end!important;justify-content:space-between!important}
+#pg-dashboard .pg-title{font-size:52px!important}
+#pg-dashboard .pg-sub{font-size:16px!important}
+#pg-dashboard .kpi-row{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:14px!important;margin-bottom:24px!important}
+#pg-dashboard .kpi{padding:22px 20px 18px!important;border-radius:24px!important;position:relative!important;overflow:hidden!important;min-height:170px!important}
+#pg-dashboard .kpi::before{content:'';position:absolute;left:20px;right:20px;top:0;height:1px;background:linear-gradient(90deg, rgba(245,197,24,.46), transparent 68%);transform:none!important}
+#pg-dashboard .kpi::after{content:'';position:absolute;inset:auto auto 18px 20px;width:44px;height:44px;border-radius:14px;background:rgba(245,197,24,.07);border:1px solid rgba(245,197,24,.14)}
+#pg-dashboard .kpi-icon{position:relative;z-index:2;width:48px!important;height:48px!important;border-radius:16px!important;background:rgba(245,197,24,.08)!important;border:1px solid rgba(245,197,24,.14)!important;margin-bottom:22px!important}
+#pg-dashboard .kpi-val{font-size:38px!important;letter-spacing:-.05em!important;line-height:1!important;margin-bottom:10px!important}
+#pg-dashboard .kpi-lbl{font-size:12px!important;text-transform:uppercase!important;letter-spacing:.1em!important;color:var(--t2)!important;margin-bottom:8px!important}
+#pg-dashboard .kpi-delta{font-size:12px!important;line-height:1.5!important;color:var(--t1)!important;max-width:220px!important}
+#pg-dashboard .g-dash{grid-template-columns:minmax(0,1.25fr) minmax(320px,.75fr)!important;gap:18px!important}
+#pg-dashboard .g-dash > .card,#pg-dashboard .g-dash .tip-card{padding:22px!important;border-radius:26px!important}
+#pg-dashboard .act-row{padding:16px 0!important;gap:14px!important}
+#pg-dashboard .act-ico{width:46px!important;height:46px!important;border-radius:14px!important;background:rgba(255,255,255,.025)!important;border:1px solid rgba(255,255,255,.06)!important}
+#pg-dashboard .act-name{font-size:14px!important;color:var(--t0)!important}
+#pg-dashboard .act-meta{margin-top:6px!important}
+#pg-dashboard .act-time{font-size:12px!important;color:var(--t2)!important}
+#pg-dashboard .qa-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+#pg-dashboard .qa{min-height:104px!important;padding:16px!important;border-radius:20px!important;background:transparent!important;border:1px solid rgba(255,255,255,.08)!important;align-items:flex-start!important}
+#pg-dashboard .qa:hover{background:rgba(245,197,24,.035)!important;border-color:rgba(245,197,24,.22)!important}
+#pg-dashboard .qa-ico{width:42px!important;height:42px!important;border-radius:12px!important;background:rgba(245,197,24,.07)!important;border:1px solid rgba(245,197,24,.12)!important;margin-bottom:14px!important}
+#pg-dashboard .qa-lbl{font-size:13px!important;color:var(--t0)!important}
+#pg-dashboard .tip-card{min-height:214px!important;display:flex!important;flex-direction:column!important;justify-content:space-between!important}
+#pg-dashboard .tip-lbl{font-size:11px!important;letter-spacing:.12em!important;text-transform:uppercase!important;color:var(--a)!important}
+#pg-dashboard .tip-txt{font-size:17px!important;line-height:1.6!important;color:var(--t0)!important;max-width:32ch!important}
+.hist-card{padding:18px 0!important;border-left:none!important;border-right:none!important;border-radius:0!important}
+@media (max-width: 1180px){.g-gen,.agent-layout,.agent-cols,#pg-dashboard .g-dash,.dash-stage-grid{grid-template-columns:1fr!important}#pg-generate .out-panel,.agent-pg .agent-out-panel{position:relative!important;top:auto!important;min-height:auto!important;border-left:none!important;padding-left:0!important}#pg-dashboard .kpi-row{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media (max-width: 760px){.pg{padding:24px 18px 40px!important}.pg-title,#pg-dashboard .pg-title,.agent-pg .agent-title{font-size:36px!important}#pg-dashboard .kpi-row{grid-template-columns:1fr!important}#pg-dashboard .qa-grid,.fmt-grid{grid-template-columns:1fr!important}}
+[data-theme="light"] .card,[data-theme="light"] .kpi,[data-theme="light"] .hist-card,[data-theme="light"] .out-panel,[data-theme="light"] .agent-input-panel,[data-theme="light"] .agent-out-panel,[data-theme="light"] .agent-result,[data-theme="light"] .tip-card,[data-theme="light"] .profile-card,[data-theme="light"] .sett-nav,[data-theme="light"] .sett-panel .card{background:transparent!important;border-color:rgba(0,0,0,.10)!important;box-shadow:none!important}
+[data-theme="light"] .plan-box,[data-theme="light"] .profile-plan-wrap .plan-box{background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.88)), radial-gradient(circle at top right, rgba(245,197,24,.16), transparent 42%)!important;border-color:rgba(245,197,24,.20)!important;box-shadow:0 14px 40px rgba(0,0,0,.08)!important}
+
 </style>
 </head>
 <body>
@@ -6439,68 +6530,90 @@ async function loadDashboard() {
     const gData = await api('GET', '/api/user/generations');
     const gens = gData.generations || [];
 
-    // KPIs with icons
     const recent7 = gens.filter(g => Date.now() - new Date(g.created_at) < 7*86400000).length;
+    const planName = (me.plan || 'free').toUpperCase();
+    const remaining = Math.max((me.quota_limit || 0) - (me.quota_used || 0), 0);
+    const pct = me.quota_limit ? Math.round((me.quota_used||0) / me.quota_limit * 100) : 0;
+    const planCTA = `navP('settings');setTimeout(()=>settTab('plano',document.querySelector('[onclick*=plano]')),100)`;
+
     const kpiEl = document.querySelector('#pg-dashboard .kpi-row');
     if (kpiEl) kpiEl.innerHTML = `
       <div class="kpi">
-        <div class="kpi-icon"><svg style="width:14px;height:14px;fill:none;stroke:var(--a);stroke-width:2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div class="kpi-icon"><svg style="width:18px;height:18px;fill:none;stroke:var(--a);stroke-width:2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
         <div class="kpi-val" style="color:var(--a)">${me.quota_used || 0}</div>
         <div class="kpi-lbl">Total gerado</div>
-        <div class="kpi-delta delta-fl">${me.quota_limit - (me.quota_used||0)} créditos restantes</div>
+        <div class="kpi-delta">${remaining} créditos disponíveis no plano atual.</div>
       </div>
       <div class="kpi">
-        <div class="kpi-icon"><svg style="width:14px;height:14px;fill:none;stroke:var(--green);stroke-width:2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <div class="kpi-icon"><svg style="width:18px;height:18px;fill:none;stroke:var(--green);stroke-width:2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
         <div class="kpi-val">${recent7}</div>
         <div class="kpi-lbl">Últimos 7 dias</div>
-        <div class="kpi-delta delta-fl">${recent7 > 0 ? 'Você está ativo' : 'Nenhuma geração'}</div>
+        <div class="kpi-delta">${recent7 > 0 ? 'Ritmo ativo de geração nesta semana.' : 'Sem gerações nos últimos 7 dias.'}</div>
       </div>
       <div class="kpi">
-        <div class="kpi-icon"><svg style="width:14px;height:14px;fill:none;stroke:var(--blue);stroke-width:2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
-        <div class="kpi-val" style="color:var(--green)">${(me.plan||'free').toUpperCase()}</div>
+        <div class="kpi-icon"><svg style="width:18px;height:18px;fill:none;stroke:var(--blue);stroke-width:2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+        <div class="kpi-val" style="font-size:30px;color:var(--t0)">${planName}</div>
         <div class="kpi-lbl">Plano ativo</div>
-        <div class="kpi-delta" style="color:var(--a);cursor:pointer" onclick="navP('settings');setTimeout(()=>settTab('plano',document.querySelector('[onclick*=plano]')),100)">Ver planos →</div>
+        <div class="kpi-delta" style="color:var(--a);cursor:pointer" onclick="${planCTA}">Ver planos e upgrades →</div>
       </div>
       <div class="kpi">
-        <div class="kpi-icon"><svg style="width:14px;height:14px;fill:none;stroke:var(--t2);stroke-width:2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="kpi-icon"><svg style="width:18px;height:18px;fill:none;stroke:var(--t2);stroke-width:2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
         <div class="kpi-val">${gens.length > 0 ? timeAgo(gens[0].created_at) : '—'}</div>
         <div class="kpi-lbl">Última geração</div>
-        <div class="kpi-delta delta-fl">${gens[0] ? esc(gens[0].format || '') : 'Sem gerações'}</div>
+        <div class="kpi-delta">${gens[0] ? esc(gens[0].format || '') + ' em ' + esc(gens[0].network || '') : 'Seu histórico ainda está vazio.'}</div>
       </div>
     `;
 
-    // Activity feed + usage bar
     const actEl = document.querySelector('#pg-dashboard .g-dash > .card');
     if (actEl) {
-      const pct = me.quota_limit ? Math.round((me.quota_used||0) / me.quota_limit * 100) : 0;
       actEl.innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-          <div class="t-sm fw-7">Atividade recente</div>
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:18px">
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--a);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Workspace</div>
+            <div style="font-size:28px;font-weight:800;letter-spacing:-.05em;color:var(--t0);line-height:1.05">Painel operacional da sua criação</div>
+            <div style="font-size:13px;color:var(--t2);margin-top:8px;max-width:52ch">Acompanhe o que foi gerado, reutilize ativos e avance sem atrito.</div>
+          </div>
           <button class="btn btn-g btn-sm" onclick="navP('history')">Ver histórico</button>
         </div>
-        ${gens.length ? gens.slice(0,6).map(g => `
-          <div class="act-row">
-            <div class="act-ico">${fmtIcon(g.format)}</div>
-            <div class="act-body">
-              <div class="act-name">${esc(g.concept_name || g.format)}</div>
-              <div class="act-meta">
-                <span class="badge ${fmtBadge(g.format)}">${g.format}</span>
-                <span class="badge bdg-n">${g.network}</span>
+
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:18px;align-items:start" class="dash-stage-grid">
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Atividade recente</div>
+            ${gens.length ? gens.slice(0,6).map(g => `
+              <div class="act-row">
+                <div class="act-ico">${fmtIcon(g.format)}</div>
+                <div class="act-body">
+                  <div class="act-name">${esc(g.concept_name || g.format)}</div>
+                  <div class="act-meta">
+                    <span class="badge ${fmtBadge(g.format)}">${g.format}</span>
+                    <span class="badge bdg-n">${g.network}</span>
+                  </div>
+                </div>
+                <div class="act-time">${timeAgo(g.created_at)}</div>
               </div>
-            </div>
-            <div class="act-time">${timeAgo(g.created_at)}</div>
+            `).join('') : '<div style="padding:28px 0;color:var(--t3);font-size:13px">Nenhuma geração ainda. Crie sua primeira peça para ativar o histórico.</div>'}
           </div>
-        `).join('') : '<div style="padding:20px 0;color:var(--t3);font-size:13px;text-align:center">Nenhuma geração ainda.</div>'}
-        <div class="divider"></div>
-        <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px">Uso do plano</div>
-        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:6px">
-          <span>${me.quota_used||0} de ${me.quota_limit} gerações</span>
+
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Ações rápidas</div>
+            <div class="qa-grid">
+              <div class="qa" onclick="navP('generate');selFmt('post')"><div class="qa-ico"><svg class="ico ico-sm" style="color:var(--a)" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg></div><div class="qa-lbl">Novo post</div></div>
+              <div class="qa" onclick="navP('generate');selFmt('carrossel')"><div class="qa-ico"><svg class="ico ico-sm" style="color:var(--a)" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><div class="qa-lbl">Carrossel</div></div>
+              <div class="qa" onclick="navP('generate');selFmt('anuncio')"><div class="qa-ico"><svg class="ico ico-sm" style="color:var(--a)" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><div class="qa-lbl">Anúncio</div></div>
+              <div class="qa" onclick="navP('profile')"><div class="qa-ico"><svg class="ico ico-sm" style="color:var(--a)" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4"/></svg></div><div class="qa-lbl">Editar marca</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider" style="margin:18px 0 14px"></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:8px">
+          <span>${me.quota_used||0} de ${me.quota_limit} gerações consumidas</span>
           <span style="color:${pct>80?'var(--red)':'var(--a)'};font-weight:700">${pct}%</span>
         </div>
-        <div style="height:5px;background:var(--surface);border-radius:3px;overflow:hidden">
-          <div style="height:100%;background:${pct>80?'var(--red)':'var(--a)'};width:${pct}%;transition:width .6s;border-radius:3px"></div>
+        <div style="height:7px;background:rgba(255,255,255,.04);border-radius:999px;overflow:hidden">
+          <div style="height:100%;background:${pct>80?'linear-gradient(90deg,#FF6666,#FF4444)':'linear-gradient(90deg,var(--a),#FFD95A)'};width:${pct}%;transition:width .6s;border-radius:999px"></div>
         </div>
-        ${pct >= 80 ? `<div style="margin-top:10px"><button class="btn btn-p btn-full btn-sm" onclick="navP('settings');setTimeout(()=>settTab('plano',document.querySelector('[onclick*=plano]')),100)">Fazer upgrade ou comprar créditos →</button></div>` : ''}
+        ${pct >= 80 ? `<div style="margin-top:14px"><button class="btn btn-p btn-full btn-sm" onclick="${planCTA}">Fazer upgrade ou comprar créditos →</button></div>` : ''}
       `;
     }
     loadDailyTip();
