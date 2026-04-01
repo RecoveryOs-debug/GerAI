@@ -1358,10 +1358,18 @@ route('POST', '/api/user/generate-image', async (req, res) => {
   const user = db.getUserById(payload.id);
   try { db.consumeQuota(payload.id); } catch(e) { return err(res, e.message); }
 
-  // ── Cores da marca ──────────────────────────────────────────
-  const rawCores   = (brandProfile?.cores || user.cores || '#F06B28,#0A0D10').split(',').map(s => s.trim());
-  const brandAccent = rawCores[0] || '#F06B28';
-  const brandBg     = rawCores[1] || '#0A0D10';
+  // ── Paleta da marca (Primária, Secundária, Terciária, Quaternária) ─────────────
+  // O frontend envia brandProfile.brandPalette com nomes semânticos quando disponível
+  const bp = brandProfile?.brandPalette;
+  const rawCores = (brandProfile?.cores || user.cores || '#F5C518,#0D0D0F,#F5F4F0,#888888')
+    .split(',').map(s => s.trim()).filter(Boolean);
+  const brandPrimaria    = bp?.primaria    || rawCores[0] || '#F5C518'; // accent / destaques
+  const brandSecundaria  = bp?.secundaria  || rawCores[1] || '#0D0D0F'; // fundo principal
+  const brandTerciaria   = bp?.terciaria   || rawCores[2] || '#F5F4F0'; // texto / contraste
+  const brandQuaternaria = bp?.quaternaria || rawCores[3] || '#888888'; // subtítulos / suporte
+  // Aliases para compatibilidade com código legado abaixo
+  const brandAccent = brandPrimaria;
+  const brandBg     = brandSecundaria;
 
   const nicho     = brandProfile?.nicho     || user.nicho     || 'marketing digital';
   const profissao = brandProfile?.profissao || user.profissao || 'criador de conteúdo';
@@ -1400,8 +1408,9 @@ route('POST', '/api/user/generate-image', async (req, res) => {
 Profissão: ${profissao} | Nicho: ${nicho}
 Modelo de design: ${modelN} — ${modelName}
 
+IMPORTANTE: As cores já serão aplicadas programaticamente. Foque apenas nos TEXTOS.
 Substitua cada texto-placeholder abaixo por um texto real relacionado ao tema.
-Regras: (1) mantenha comprimento similar, (2) não substitua nomes de fontes, (3) não substitua valores puramente técnicos.
+Regras: (1) mantenha comprimento similar, (2) não substitua nomes de fontes, (3) não substitua valores puramente técnicos, (4) preserve números e dados exatos do tema.
 
 Textos originais:
 ${uniqueTexts.map((t, i) => `${i + 1}. "${t}"`).join('\n')}
@@ -1436,26 +1445,50 @@ Responda SOMENTE com este JSON (sem mais nada):
         svg = svg.replace(new RegExp(`(>\\s*)${safe}(\\s*<)`, 'g'), `$1${novo}$2`);
       }
 
-      // 2b. Substituir cores ACCENT (dourado → cor primária da marca)
+      // 2b. Substituir cores ACCENT (amarelo-ouro padrão → COR PRIMÁRIA da marca)
       const ACCENT_COLORS = [
         '#F5C518','#E6A800','#C87800','#FFD740','#C8960A',
         '#A08030','#D4A520','#C8A850','#FFE040','#F5C51',
+        '#F5C518'.slice(0,7), // garante match exato
       ];
       for (const c of ACCENT_COLORS) {
-        svg = svg.replace(new RegExp(c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), brandAccent);
+        const safe = c.replace(/[.*+?^${}()|[\]\]/g, '\$&');
+        svg = svg.replace(new RegExp(safe, 'gi'), brandPrimaria);
       }
 
-      // 2c. Substituir fundos ESCUROS → cor base da marca (só modelos dark)
+      // 2c. Substituir fundos ESCUROS → COR SECUNDÁRIA da marca
       if (!isLightBg) {
         const DARK_COLORS = [
           '#0A0A0A','#080808','#0C0C0C','#111111','#050505',
           '#04040A','#0A0806','#18140E','#100C08','#080C08',
           '#0C100C','#0A0E12','#080C10','#0E0E0E','#141414',
           '#0A0A10','#080810','#0A0A12','#0E120E','#111811',
+          '#0D0D0F','#0D0D0D','#101010','#121212',
         ];
         for (const c of DARK_COLORS) {
-          svg = svg.replace(new RegExp(c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), brandBg);
+          const safe = c.replace(/[.*+?^${}()|[\]\]/g, '\$&');
+          svg = svg.replace(new RegExp(safe, 'gi'), brandSecundaria);
         }
+      } else {
+        // Modelos claros: substituir brancos/cremes → COR SECUNDÁRIA (fundo claro da marca)
+        const LIGHT_COLORS = [
+          '#FAF6EE','#F0E8D5','#FAFAF5','#F0EBE0','#FFFFFF','#FAFAFA',
+          '#F7F7F5','#F5F5F5','#FFFFF0',
+        ];
+        for (const c of LIGHT_COLORS) {
+          const safe = c.replace(/[.*+?^${}()|[\]\]/g, '\$&');
+          svg = svg.replace(new RegExp(safe, 'gi'), brandSecundaria);
+        }
+      }
+
+      // 2d-extra. Substituir cinzas de texto → COR TERCIÁRIA da marca
+      const TEXT_GRAY_COLORS = [
+        '#F5F4F0','#F2F0EC','#EEEDE8','#E8E6E0','#E0DDD5',
+        '#FAFAFA','#F5F5F5',
+      ];
+      for (const c of TEXT_GRAY_COLORS) {
+        const safe = c.replace(/[.*+?^${}()|[\]\]/g, '\$&');
+        svg = svg.replace(new RegExp(safe, 'gi'), brandTerciaria);
       }
 
       // 2d. Garantir xmlns e viewBox
