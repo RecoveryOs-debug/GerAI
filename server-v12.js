@@ -1247,97 +1247,118 @@ route('POST', '/api/user/generate-image', async (req, res) => {
   const user = db.getUserById(payload.id);
   if (user.quota_used >= user.quota_limit) return err(res, 'Cota mensal esgotada.');
 
-  const cores = (brandProfile?.cores || user.cores || '#F06B28,#0A0D10').split(',').map(s => s.trim());
-  const cor1 = cores[0]||'#F06B28', cor2 = cores[1]||'#0A0D10', cor3 = cores[2]||cor1;
-  const nicho = brandProfile?.nicho || user.nicho || 'marketing digital';
-  const profissao = brandProfile?.profissao || user.profissao || 'criador de conteúdo';
-  const estilo = brandProfile?.estilo || user.estilo || 'moderno e profissional';
-  const memoria = brandProfile?.visualMemory?.notes || '';
-  const isInclude = imgMode === 'include';
+  // ── Cores da marca ──────────────────────────────────────────────
+  const rawCores = (brandProfile?.cores || user.cores || '#F06B28,#0A0D10').split(',').map(s => s.trim());
+  const brandAccent = rawCores[0] || '#F06B28';   // cor primária / accent
+  const brandBg     = rawCores[1] || '#0A0D10';   // cor de fundo / base
+  const brandHl     = rawCores[2] || brandAccent; // cor de destaque
 
-  const system = `Você é um especialista em design gráfico SVG para redes sociais. Sua única saída é código SVG válido.
+  const nicho    = brandProfile?.nicho    || user.nicho    || 'marketing digital';
+  const profissao= brandProfile?.profissao|| user.profissao|| 'criador de conteúdo';
+  const estilo   = brandProfile?.estilo   || user.estilo   || 'moderno e profissional';
 
-REGRAS ABSOLUTAS — NUNCA VIOLE:
-1. Responda SOMENTE com SVG puro. Comece com <svg e termine com </svg>
-2. ZERO texto antes ou depois. Sem markdown. Sem explicações.
-3. viewBox="0 0 1080 1350" xmlns="http://www.w3.org/2000/svg"
-4. Preserve todos os elementos <defs> (gradientes, filtros, clipPaths, patterns) do template
-5. Preserve TODA a estrutura geométrica: rects, polygons, circles, lines, paths decorativos
-6. Preserve EXATAMENTE as mesmas fontes, tamanhos, pesos e posições (x,y) dos textos
-7. Substitua APENAS o conteúdo dos textos pelo tema do prompt — mantendo hierarquia e comprimento aproximado
-8. Substitua as cores fixas do template pelas cores da marca conforme mapeamento fornecido
-9. NUNCA invente elementos novos nem remova elementos existentes do template
-
-IDENTIDADE DA MARCA:
-- Cor primária: ${cor1}
-- Cor de fundo/base: ${cor2}
-- Cor de destaque: ${cor3}
-- Nicho: ${nicho}
-- Profissão: ${profissao}
-- Estilo visual: ${estilo}
-${memoria ? '- Preferências: ' + memoria : ''}
-
-SISTEMA DE DESIGN:
-1. Background: rect 1080x1080 com ${cor2}
-2. Elemento geométrico: grid, linhas, formas em ${cor1} opacidade 0.1-0.3
-3. Bloco/shape de destaque em ${cor1}: 30-40% do espaço
-4. Tipografia PRINCIPAL: 80-140px Bold branco ou ${cor1}
-5. Tipografia suporte: 28-48px cinza claro
-6. Hierarquia 60/30/10
-
-${isInclude ? 'Crie espaço/moldura no SVG para a foto do usuário.' : 'Use imagem de referência apenas como inspiração de estilo.'}
-
-QUALIDADE: Designer profissional de agência tier-1.`;
+  // ── Template do modelo ─────────────────────────────────────────
+  const modelSvg  = brandProfile?.modelSvg  || '';
+  const modelN    = brandProfile?.modelN    || '';
+  const modelName = brandProfile?.modelName || '';
 
   try {
-    // Extrair SVG do modelo e cores da marca do brandProfile
-    const modelSvg   = brandProfile?.modelSvg   || '';
-    const modelN     = brandProfile?.modelN     || '';
-    const modelName  = brandProfile?.modelName  || '';
+    let finalSvg = '';
 
-    // Mapeamento de cores: substitui dourado/accent do template pelas cores da marca
-    const brandCor1  = (cor1 || '#F5C518').trim();  // cor primária/accent
-    const brandCor2  = (cor2 || '#0A0A0A').trim();  // cor de fundo/base
-    const brandCor3  = (cor3 || brandCor1).trim();  // cor de destaque
+    if (modelSvg) {
+      // ── PASSO 1: Pedir à IA APENAS os textos substituídos (sem SVG) ────
+      const isLightBg = ['02','06','09','12','14','18','20'].includes(modelN);
 
-    const templateSection = modelSvg
-      ? `TEMPLATE SVG (modelo ${modelN} — ${modelName}):
-Você DEVE usar este SVG como template base. Preserve TODO o layout, estrutura, elementos decorativos, fontes e posicionamento.
-Faça APENAS duas mudanças:
-1. Substitua os textos de demonstração pelo conteúdo do prompt (mantenha a hierarquia e tamanhos)
-2. Substitua as cores do template pelas cores da marca:
-   - Cor accent/dourado (#F5C518, #E6A800, #C87800, #FFD740, #C8960A, #A08030) → ${brandCor1}
-   - Cor fundo escuro (#0A0A0A, #080808, #0C0C0C, #111111, #050505, #04040A) → ${brandCor2}
-   - Cor fundo claro (#FAFAF7, #FAF6EE, #F2EDE3, #F0E8D5, #FAF5EB) → quando modelo claro, mantenha ou adapte levemente
-   - Texto branco/claro (#F5F0E8, #FFFFFF, #F8F8F6) → mantenha branco/claro se fundo escuro, ou use ${brandCor2} se fundo claro
+      // Extrair todos os conteúdos de texto do template para mapear
+      const textMatches = [...modelSvg.matchAll(/>([^<]{2,})</g)]
+        .map(m => m[1].trim())
+        .filter(t => t.length > 1 && !/^[\d\.\-\,\s]+$/.test(t));
+      const uniqueTexts = [...new Set(textMatches)].slice(0, 20);
 
-SVG DO TEMPLATE:
-${modelSvg}`
-      : `Crie um design profissional para redes sociais no estilo dark luxury.`;
+      const textSystem = `Você é um especialista em copy para design gráfico. Responda APENAS com JSON válido, sem nenhum texto antes ou depois.`;
+      const textPrompt = `Tema do post: "${prompt}"
+Nicho: ${nicho} | Profissão: ${profissao}
 
-    const userMsg = `TEMA/PROMPT: "${prompt}"
-FORMATO: ${format||'post'} para ${network||'instagram'}
-MARCA: ${nicho} | ${profissao} | estilo ${estilo}
-COR PRIMÁRIA DA MARCA: ${brandCor1}
-COR BASE DA MARCA: ${brandCor2}
+Os textos abaixo são placeholders de demonstração de um template de design (modelo ${modelN} — ${modelName}).
+Substitua cada um por um texto real relacionado ao tema, mantendo comprimento e hierarquia similares.
+Preserve tags técnicas como "IBM PLEX MONO", "Bebas Neue", nomes de fontes — NÃO as substitua.
+Preserve textos que são puramente numéricos ou técnicos (px, %, números soltos).
 
-${templateSection}
+Textos para substituir:
+${uniqueTexts.map((t,i) => `${i+1}. "${t}"`).join('\n')}
 
-Gere o SVG final agora. Comece com <svg`;
+Responda SOMENTE com um objeto JSON assim (sem markdown):
+{"replacements": {"texto original": "texto novo", ...}}`;
 
-    const { text: rawSvg, inputTokens: svgInp, outputTokens: svgOut } = await callClaude({ system, userMsg, maxTokens: 6000 });
-    let svg = '';
-    if (rawSvg.trim().startsWith('<svg')) svg = rawSvg.trim();
-    else {
-      const m = rawSvg.match(/<svg[\s\S]*?<\/svg>/i);
-      if (m) svg = m[0];
-      else { const md = rawSvg.match(/```(?:svg|xml)?\s*([\s\S]*?)```/i); if (md && md[1].trim().startsWith('<svg')) svg = md[1].trim(); }
+      let replacements = {};
+      try {
+        const { text: jsonRaw } = await callClaude({ system: textSystem, userMsg: textPrompt, maxTokens: 1500 });
+        const clean = jsonRaw.replace(/```json|```/g, '').trim();
+        const parsed = JSON.parse(clean);
+        replacements = parsed.replacements || {};
+      } catch(e) {
+        console.error('[generate-image] texto replacement falhou:', e.message);
+      }
+
+      // ── PASSO 2: Substituição programática no SVG ──────────────────
+      let svg = modelSvg;
+
+      // 2a. Substituir textos (apenas conteúdo entre tags >texto<)
+      for (const [orig, novo] of Object.entries(replacements)) {
+        if (!orig || !novo) continue;
+        // Pular se for nome de fonte ou puramente técnico
+        if (/^(IBM Plex|Bebas|Playfair|Cormorant|DM Sans|Syne|monospace|sans-serif)/i.test(orig)) continue;
+        if (/^\d+(\.\d+)?(px|%)?$/.test(orig.trim())) continue;
+        // Escape para uso em regex
+        const escaped = orig.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        svg = svg.replace(new RegExp(`>\\s*${escaped}\\s*<`, 'g'), `>${novo}<`);
+      }
+
+      // 2b. Substituir cores do accent (dourado padrão → cor primária da marca)
+      const accentColors = ['#F5C518','#E6A800','#C87800','#FFD740','#C8960A','#A08030','#D4A520','#C8A850','#FFE040'];
+      for (const c of accentColors) {
+        const re = new RegExp(c.replace('#','#?').replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi');
+        svg = svg.replace(new RegExp(c, 'gi'), brandAccent);
+      }
+
+      // 2c. Substituir cores de fundo escuro → cor base da marca (só para modelos escuros)
+      if (!isLightBg) {
+        const darkColors = ['#0A0A0A','#080808','#0C0C0C','#111111','#050505','#04040A','#0A0806','#18140E','#100C08','#080C08','#0C100C','#0A0E12','#080C10','#0E0E0E','#141414','#0A0A10','#080810','#0A0A12','#0E120E','#111811'];
+        for (const c of darkColors) {
+          svg = svg.replace(new RegExp(c, 'gi'), brandBg);
+        }
+      }
+
+      // 2d. Atualizar gradientes que referenciam as cores antigas nos stops
+      // (já coberto pelas substituições acima pois substituímos os valores hex diretamente)
+
+      // 2e. Garantir xmlns e viewBox correto
+      if (!svg.includes('xmlns=')) svg = svg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+
+      finalSvg = svg;
+
+    } else {
+      // ── Fallback: sem modelo, gerar SVG livre ──────────────────────
+      const system = `Você é um especialista em design gráfico SVG para redes sociais. Responda SOMENTE com SVG puro começando com <svg.`;
+      const userMsg = `Crie um post SVG profissional. viewBox="0 0 1080 1350". Tema: "${prompt}". Cores: fundo ${brandBg}, accent ${brandAccent}. Estilo: ${estilo}. Nicho: ${nicho}. Comece com <svg`;
+      const { text: rawSvg, inputTokens: svgInp, outputTokens: svgOut } = await callClaude({ system, userMsg, maxTokens: 4000 });
+      finalSvg = rawSvg.trim().startsWith('<svg') ? rawSvg.trim() : (rawSvg.match(/<svg[\s\S]*?<\/svg>/i)?.[0] || '');
+      if (!finalSvg.includes('xmlns=')) finalSvg = finalSvg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
     }
-    if (!svg || svg.length < 100) throw new Error('A IA não gerou um SVG válido. Tente reformular o conceito.');
-    if (!svg.includes('xmlns=')) svg = svg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+
+    if (!finalSvg || finalSvg.length < 200) throw new Error('SVG inválido ou muito curto. Tente novamente.');
+
+    // ── Salvar no banco ────────────────────────────────────────────
     db.updateUser(payload.id, { quota_used:(user.quota_used||0)+1 });
-    db.addGeneration({ user_id:payload.id, feature:'gerar-imagem', format:format||'post', network:network||'instagram', concept_name:prompt.slice(0,60), prompt:prompt.slice(0,200), svg_data:svg, credits_used:1, input_tokens:svgInp, output_tokens:svgOut });
-    ok(res, { svg });
+    db.addGeneration({
+      user_id: payload.id, feature:'gerar-imagem',
+      format: format||'post', network: network||'instagram',
+      concept_name: (modelName || prompt).slice(0,60),
+      prompt: prompt.slice(0,200), svg_data: finalSvg, credits_used: 1,
+      input_tokens: 0, output_tokens: 0
+    });
+    ok(res, { svg: finalSvg });
+
   } catch (e) { err(res, e.message); }
 });
 
