@@ -11,11 +11,11 @@
  * Novos endpoints prefixados claramente abaixo.
  */
 
+const originalEmit = process.emitWarning.bind(process);
 process.emitWarning = (warning, ...args) => {
   if (typeof warning === 'string' && warning.includes('SQLite is an experimental')) return;
   originalEmit(warning, ...args);
 };
-const originalEmit = process.emitWarning.bind(process);
 
 const http   = require('http');
 const https  = require('https');
@@ -24,12 +24,14 @@ const fs     = require('fs');
 const path   = require('path');
 const { DatabaseSync } = require('node:sqlite');
 
-const PORT        = process.env.PORT || 3001;
-const HOST        = '0.0.0.0';
-const JWT_SECRET  = process.env.JWT_SECRET || 'autopostt-dev-' + crypto.randomBytes(8).toString('hex');
-const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY || '';
-const DB_PATH     = process.env.DB_PATH || path.join(__dirname, 'autopostt.db');
-const LEGACY_JSON = process.env.LEGACY_JSON || path.join(__dirname, 'gerai.db.json');
+const PORT           = process.env.PORT || 3001;
+const HOST           = '0.0.0.0';
+const JWT_SECRET     = process.env.JWT_SECRET || 'autopostt-dev-' + crypto.randomBytes(8).toString('hex');
+const ANTHROPIC_KEY  = process.env.ANTHROPIC_API_KEY || '';
+const DB_PATH        = process.env.DB_PATH || path.join(__dirname, 'autopostt.db');
+const LEGACY_JSON    = process.env.LEGACY_JSON || path.join(__dirname, 'gerai.db.json');
+// Em produção, defina ALLOWED_ORIGIN=https://seudominio.com no Railway
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';
 
 // ─────────────────────────────────────────────
 // SQLITE DATABASE LAYER
@@ -239,8 +241,8 @@ class Database {
   _verifySync(pw, stored) {
     if (!stored) return false;
     if (stored.startsWith('$2')) {
-      // Legacy bcrypt hashes — accept during transition (compare raw for simplicity)
-      return false; // Force password reset for legacy bcrypt users in production
+      // Hash legado bcrypt — não conseguimos verificar sem a lib; sinaliza para o caller
+      return 'bcrypt_legacy';
     }
     const [salt, hash] = stored.split(':');
     if (!salt || !hash) return false;
@@ -249,12 +251,17 @@ class Database {
   }
 
   _seedAdmin() {
+    const adminPw = process.env.ADMIN_PASSWORD;
+    if (!adminPw) {
+      console.error('[SEED] ADMIN_PASSWORD não definida. Admin não criado. Defina a variável de ambiente.');
+      return;
+    }
     const id = this._id();
-    const pw = this._hashSync('Rj94kx30@geraiainoz');
+    const pw = this._hashSync(adminPw);
     this.db.prepare(`
       INSERT OR IGNORE INTO users (id,name,email,password,role,plan,quota_limit,quota_used)
       VALUES (?,?,?,?,?,?,?,?)
-    `).run(id, 'Pedro Admin', 'pedro@ainoz.com.br', pw, 'admin', 'elite', 99999, 0);
+    `).run(id, 'Pedro Admin', process.env.ADMIN_EMAIL || 'pedro@ainoz.com.br', pw, 'admin', 'elite', 99999, 0);
   }
 
   // ── USERS ──
@@ -327,7 +334,9 @@ class Database {
   verifyPassword(email, password) {
     const user = this.getUserByEmail(email);
     if (!user) return null;
-    if (!this._verifySync(password, user.password)) return null;
+    const check = this._verifySync(password, user.password);
+    if (check === 'bcrypt_legacy') throw new Error('BCRYPT_LEGACY');
+    if (!check) return null;
     this.db.prepare(`UPDATE users SET last_login=datetime('now') WHERE id=?`).run(user.id);
     const { password: _, ...rest } = user;
     return rest;
@@ -495,6 +504,20 @@ class Database {
     return { total, idea, draft, ready, published };
   }
 
+
+  // ── QUOTA (atômico — sem race condition) ──
+  consumeQuota(userId) {
+    const result = this.db.prepare(
+      `UPDATE users SET quota_used = quota_used + 1, updated_at = datetime('now')
+       WHERE id = ? AND quota_used < quota_limit`
+    ).run(userId);
+    if (result.changes === 0) throw new Error('Cota mensal esgotada. Faça upgrade do seu plano.');
+    return true;
+  }
+
+  resetMonthlyQuotas() {
+    this.db.prepare(`UPDATE users SET quota_used = 0, updated_at = datetime('now')`).run();
+  }
   // ── STATS ──
   getStats() {
     const users  = this.db.prepare(`SELECT * FROM users WHERE role != 'admin'`).all();
@@ -915,9 +938,10 @@ function parseBody(req) {
 }
 
 function cors(res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', ALLOWED_ORIGIN);
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+  if (ALLOWED_ORIGIN !== '*') res.setHeader('Vary', 'Origin');
 }
 
 function json(res, data, status = 200) {
@@ -967,6 +991,42 @@ function requireAdmin(req, res) {
 }
 
 // ─────────────────────────────────────────────
+// RATE LIMITER — proteção contra força bruta
+// ─────────────────────────────────────────────
+const _loginAttempts = new Map(); // key: email|ip → { count, firstAt }
+const LOGIN_MAX      = 10;        // tentativas máximas
+const LOGIN_WINDOW   = 15 * 60 * 1000; // janela de 15 minutos
+
+function loginRateLimit(identifier) {
+  const now  = Date.now();
+  const entry = _loginAttempts.get(identifier) || { count: 0, firstAt: now };
+  if (now - entry.firstAt > LOGIN_WINDOW) {
+    // Janela expirou — resetar
+    _loginAttempts.set(identifier, { count: 1, firstAt: now });
+    return { blocked: false };
+  }
+  entry.count++;
+  _loginAttempts.set(identifier, entry);
+  if (entry.count > LOGIN_MAX) {
+    const retryAfter = Math.ceil((LOGIN_WINDOW - (now - entry.firstAt)) / 1000);
+    return { blocked: true, retryAfter };
+  }
+  return { blocked: false };
+}
+
+function loginRateLimitReset(identifier) {
+  _loginAttempts.delete(identifier);
+}
+
+// Limpa entradas expiradas a cada 30 minutos (evita memory leak)
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of _loginAttempts.entries()) {
+    if (now - entry.firstAt > LOGIN_WINDOW) _loginAttempts.delete(key);
+  }
+}, 30 * 60 * 1000);
+
+// ─────────────────────────────────────────────
 // ROUTES — AUTH (preservados do v12)
 // ─────────────────────────────────────────────
 
@@ -984,8 +1044,26 @@ route('POST', '/api/auth/register', async (req, res) => {
 route('POST', '/api/auth/login', async (req, res) => {
   const { email, password } = await parseBody(req);
   if (!email || !password) return err(res, 'E-mail e senha obrigatórios');
-  const user = db.verifyPassword(email, password);
+
+  // Rate limiting por e-mail
+  const rlKey = 'login:' + (email || '').toLowerCase().trim();
+  const rl = loginRateLimit(rlKey);
+  if (rl.blocked) {
+    res.setHeader('Retry-After', String(rl.retryAfter));
+    return err(res, `Muitas tentativas. Tente novamente em ${Math.ceil(rl.retryAfter / 60)} minutos.`, 429);
+  }
+
+  let user;
+  try { user = db.verifyPassword(email, password); }
+  catch (e) {
+    if (e.message === 'BCRYPT_LEGACY')
+      return err(res, 'Sua conta usa um formato de senha antigo. Redefina sua senha para continuar.', 401);
+    return err(res, 'Erro interno ao verificar senha', 500);
+  }
   if (!user) return err(res, 'E-mail ou senha incorretos', 401);
+
+  // Login OK — resetar contador
+  loginRateLimitReset(rlKey);
   const token = JWT.sign({ id: user.id, email: user.email, role: user.role });
   ok(res, { user, token });
 });
@@ -1018,8 +1096,25 @@ route('POST', '/api/user/onboard-step', async (req, res) => {
   const { step, data: stepData } = body;
   if (!step) return err(res, 'step obrigatório');
 
+  const stepNum = parseInt(step, 10);
+  if (isNaN(stepNum) || stepNum < 1 || stepNum > 7) return err(res, 'step inválido (1-7)');
+
+  // Validadores por campo
+  const HEX_COLOR = /^#[0-9A-Fa-f]{6}$/;
+  const CORES_RE  = /^#[0-9A-Fa-f]{6},\s*#[0-9A-Fa-f]{6}$/;
+  const MAX_LEN   = { profissao:100, nicho:100, publico:200, tom:80, estilo:100, redes:200 };
+  const VALID_TOMS = ['autoridade','educativo','inspirador','descontraído','provocativo','empático'];
+  const VALID_ESTILOS = ['dark luxury','minimalista','colorido','editorial','corporativo','criativo'];
+
+  function sanitizeStr(val, field) {
+    if (typeof val !== 'string') return null;
+    const trimmed = val.trim().slice(0, MAX_LEN[field] || 200);
+    // remove tags HTML básicas
+    return trimmed.replace(/<[^>]*>/g, '');
+  }
+
   // Mapa de step para fields do usuário
-  const stepFields = { onboard_step: step };
+  const stepFields = { onboard_step: stepNum };
   const fieldMap = {
     1: ['profissao'],
     2: ['nicho', 'publico'],
@@ -1027,18 +1122,31 @@ route('POST', '/api/user/onboard-step', async (req, res) => {
     4: ['cores'],
     5: ['estilo'],
     6: ['redes'],
-    7: ['profissao','nicho','publico','tom','cores','estilo','redes'] // final save
+    7: ['profissao','nicho','publico','tom','cores','estilo','redes']
   };
 
-  if (stepData && fieldMap[step]) {
-    fieldMap[step].forEach(k => {
-      if (stepData[k] !== undefined) stepFields[k] = stepData[k];
-    });
+  if (stepData && fieldMap[stepNum]) {
+    for (const k of fieldMap[stepNum]) {
+      const val = stepData[k];
+      if (val === undefined) continue;
+
+      if (k === 'cores') {
+        // Aceita "cor1, cor2" ou apenas "cor1"
+        const normalized = String(val).trim();
+        if (!CORES_RE.test(normalized) && !HEX_COLOR.test(normalized.split(',')[0].trim()))
+          return err(res, `cores inválidas. Use formato "#RRGGBB, #RRGGBB"`);
+        stepFields[k] = normalized;
+      } else {
+        const clean = sanitizeStr(val, k);
+        if (clean === null) return err(res, `${k} deve ser texto`);
+        stepFields[k] = clean;
+      }
+    }
   }
 
   try {
     const user = db.updateUser(payload.id, stepFields);
-    ok(res, { user, step });
+    ok(res, { user, step: stepNum });
   } catch (e) { err(res, e.message); }
 });
 
@@ -1120,7 +1228,7 @@ route('POST', '/api/user/generate', async (req, res) => {
   const { format, network, input } = await parseBody(req);
   if (!format || !network || !input) return err(res, 'format, network e input obrigatórios');
   const user = db.getUserById(payload.id);
-  if (user.quota_used >= user.quota_limit) return err(res, 'Cota mensal esgotada. Faça upgrade do seu plano.');
+  try { db.consumeQuota(payload.id); } catch(e) { return err(res, e.message); }
   let concepts;
   try {
     const { text: rawConcepts } = await callClaude({
@@ -1138,7 +1246,6 @@ route('POST', '/api/user/generate', async (req, res) => {
       { name:'O Resultado', approach:`Abordagem emocional para "${input.slice(0,40)}..."`, emotion:'Insight + impacto', prompt:`cinematic portrait, ${input.slice(0,60)}, dramatic rim lighting, ${user?.cores||'#F36B2A'} backlight, editorial style, no text, no watermark` }
     ];
   }
-  db.updateUser(payload.id, { quota_used: (user.quota_used||0)+1 });
   const gen = db.addGeneration({ user_id:payload.id, feature:'imagem', format, network, concept_name:concepts[0].name, prompt:concepts[0].prompt, credits_used:1 });
   ok(res, { generation:gen, concepts });
 });
@@ -1150,7 +1257,7 @@ route('POST', '/api/user/generate-content-stream', async (req, res) => {
   if (!agent || !input) { err(res, 'agent e input obrigatórios'); return; }
 
   const user = db.getUserById(payload.id);
-  if (user.quota_used >= user.quota_limit) { err(res, 'Cota mensal esgotada'); return; }
+  try { db.consumeQuota(payload.id); } catch(e) { err(res, e.message); return; }
 
   // Setup SSE
   cors(res);
@@ -1193,7 +1300,6 @@ route('POST', '/api/user/generate-content-stream', async (req, res) => {
     onDone(fullText, { inputTokens, outputTokens }) {
       // Save to DB after stream completes
       try {
-        db.updateUser(payload.id, { quota_used: (user.quota_used||0)+1 });
         db.addGeneration({
           user_id: payload.id, feature: agent, format: tipo||agent,
           network: rede||'instagram', concept_name: agent,
@@ -1217,7 +1323,7 @@ route('POST', '/api/user/generate-content', async (req, res) => {
   const { agent, input, tom, tipo, rede, mediaFiles, visualMemoryNotes } = await parseBody(req);
   if (!agent || !input) return err(res, 'agent e input obrigatórios');
   const user = db.getUserById(payload.id);
-  if (user.quota_used >= user.quota_limit) return err(res, 'Cota mensal esgotada');
+  try { db.consumeQuota(payload.id); } catch(e) { return err(res, e.message); }
   try {
     const system = getAgentSkill(agent, user, tom);
     let messages;
@@ -1233,7 +1339,6 @@ route('POST', '/api/user/generate-content', async (req, res) => {
       messages = [{ role:'user', content:input }];
     }
     const responseText = await callClaudeMessages({ system, messages, maxTokens:2500 });
-    db.updateUser(payload.id, { quota_used:(user.quota_used||0)+1 });
     db.addGeneration({ user_id:payload.id, feature:agent, format:tipo||agent, network:rede||'instagram', concept_name:agent, prompt:input.slice(0,200), credits_used:1 });
     ok(res, { content:responseText, agent, rede, tipo });
   } catch (e) { err(res, e.message); }
@@ -1246,7 +1351,7 @@ route('POST', '/api/user/generate-image', async (req, res) => {
   if (!prompt) return err(res, 'prompt obrigatório');
 
   const user = db.getUserById(payload.id);
-  if (user.quota_used >= user.quota_limit) return err(res, 'Cota mensal esgotada.');
+  try { db.consumeQuota(payload.id); } catch(e) { return err(res, e.message); }
 
   // ── Cores da marca ──────────────────────────────────────────
   const rawCores   = (brandProfile?.cores || user.cores || '#F06B28,#0A0D10').split(',').map(s => s.trim());
@@ -1371,7 +1476,6 @@ Responda SOMENTE com este JSON (sem mais nada):
       throw new Error('SVG inválido ou muito curto. Tente novamente.');
 
     // ── Salvar geração com tokens e custo corretos ─────────────
-    db.updateUser(payload.id, { quota_used: (user.quota_used || 0) + 1 });
     db.addGeneration({
       user_id:      payload.id,
       feature:      'gerar-imagem',
@@ -1654,12 +1758,42 @@ staticFiles.forEach(([urlPath, files]) => {
 // SERVER
 // ─────────────────────────────────────────────
 
+// ─────────────────────────────────────────────
+// SCHEDULER — Reset mensal de quotas
+// ─────────────────────────────────────────────
+
+function scheduleMonthlyQuotaReset() {
+  function msUntilFirstOfNextMonth() {
+    const now  = new Date();
+    const next = new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0, 0);
+    return next.getTime() - now.getTime();
+  }
+
+  function doReset() {
+    try {
+      db.resetMonthlyQuotas();
+      console.log(`[QUOTA] Reset mensal executado em ${new Date().toISOString()}`);
+    } catch (e) {
+      console.error('[QUOTA] Falha no reset mensal:', e.message);
+    }
+    // Agenda próximo reset daqui a ~1 mês
+    setTimeout(doReset, msUntilFirstOfNextMonth());
+  }
+
+  const ms = msUntilFirstOfNextMonth();
+  console.log(`[QUOTA] Próximo reset mensal em ${new Date(Date.now() + ms).toISOString()}`);
+  setTimeout(doReset, ms);
+}
+
+scheduleMonthlyQuotaReset();
+
 const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS'
+      'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
+      ...(ALLOWED_ORIGIN !== '*' ? { 'Vary': 'Origin' } : {})
     });
     return res.end();
   }

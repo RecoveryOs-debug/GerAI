@@ -5006,11 +5006,6 @@ function closeImgModal() {
   const body = document.getElementById('img-modal-body');
   if (body) body.innerHTML = '';
 }
-function closeImgModal() {
-  const bg = document.getElementById('img-modal-bg');
-  if (bg) bg.style.display = 'none';
-}
-function closeImgModal() { document.getElementById('img-modal-bg').classList.remove('open'); }
 function downloadImg() {
   const svg = window._currentSVG || _currentSVG;
   if (!svg) { toast('Nenhuma imagem para baixar','err'); return; }
