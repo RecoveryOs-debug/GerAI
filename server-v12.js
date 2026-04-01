@@ -887,18 +887,23 @@ REGRAS dos prompts:
 
 function getRefineSkill(user) {
   const p = user || {};
-  return `Você é um especialista em marketing e copy. Sua tarefa é transformar inputs brutos em prompts estruturados.
+  return `Você é um especialista em marketing e copy. Sua única função é expandir e enriquecer o CONTEÚDO do input do usuário.
 
-PERFIL DO USUÁRIO:
+PERFIL DO USUÁRIO (use apenas para entender contexto e tom — NUNCA para definir design):
 - Profissão: ${p.profissao || 'criador de conteúdo'}
 - Nicho: ${p.nicho || 'negócios'}
-- Tom: ${p.tom || 'autoridade'}
-- Estilo visual: ${p.estilo || 'dark luxury'}
-- Cores: ${p.cores || '#F36B2A, #0A0D10'}
+- Tom de voz: ${p.tom || 'autoridade'}
+- Público-alvo: ${p.publico || 'profissionais'}
 
-TAREFA: Receba o input bruto e retorne APENAS o prompt refinado, em 1-3 frases.
-O prompt refinado deve: preservar a ideia central, adicionar contexto de marca, especificar o resultado esperado.
-ZERO texto adicional. Apenas o prompt refinado.`;
+REGRAS ABSOLUTAS — VIOLÁ-LAS INVALIDA SUA RESPOSTA:
+1. NUNCA mencione cores, fontes, estilos visuais, layouts, hierarquia visual ou design de qualquer tipo.
+2. NUNCA dite como o post deve ser organizado visualmente (colunas, cards, seções, etc.).
+3. Foque 100% em: CONTEÚDO, DADOS EXATOS, NARRATIVA e COPY.
+4. Preserve todos os números e dados fornecidos pelo usuário sem alteração.
+5. Expanda o contexto emocional e de negócio por trás da ideia.
+6. Retorne APENAS o prompt refinado em 2-4 frases. ZERO introduções ou explicações.
+
+Responda sempre à pergunta: Qual é a história por trás disso? Que emoção deve ser transmitida? Que dados precisam aparecer?`;
 }
 
 // ─────────────────────────────────────────────
@@ -1210,16 +1215,16 @@ route('POST', '/api/user/refine-prompt', async (req, res) => {
     if (refImageBase64) {
       messages = [{ role:'user', content:[
         { type:'image', source:{ type:'base64', media_type:'image/jpeg', data:refImageBase64 }},
-        { type:'text', text:`Input bruto: "${input}"\nFormato: ${format||'post'}\nRede: ${network||'instagram'}\n\nGere o prompt refinado considerando esta imagem como referência de estilo:` }
+        { type:'text', text:`Input bruto: "${input}"\n\nConsidere esta imagem como referência de CONTEÚDO (não de estilo visual). Expanda a narrativa e os dados. Retorne apenas o prompt refinado:` }
       ]}];
     } else {
-      messages = [{ role:'user', content:`Input bruto: "${input}"\nFormato: ${format||'post'}\nRede: ${network||'instagram'}\n\nGere o prompt refinado:` }];
+      messages = [{ role:'user', content:`Input bruto: "${input}"\n\nExpanda o conteúdo, a narrativa e os dados. Retorne apenas o prompt refinado:` }];
     }
     const refined = await callClaudeMessages({ system: getRefineSkill(user), messages, maxTokens:300 });
     ok(res, { refined_prompt: refined.trim(), original: input });
   } catch {
     const p = user || {};
-    ok(res, { refined_prompt: `${input} | estilo ${p.estilo||'dark luxury'} | cores ${p.cores||'#F36B2A'} | nicho ${p.nicho||'negócios'} | ${format} para ${network}`, original: input });
+    ok(res, { refined_prompt: `${input} — contexto: ${p.nicho||'negócios'}, tom ${p.tom||'autoridade'}, público ${p.publico||'profissionais'}`, original: input });
   }
 });
 
