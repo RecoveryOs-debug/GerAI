@@ -3798,6 +3798,177 @@ tbody tr:hover{background:rgba(255,255,255,.025)}
   #pg-dashboard, #pg-dashboard .kpi-row, #pg-dashboard .g-dash, #pg-dashboard .pg-hd, #pg-dashboard .pg-sub{max-width:100% !important;}
 }
 
+
+/* ═══════════════════════════════════════════════════════════
+   AUTOPOSTT — LIGHT MODE RESCUE + DASHBOARD FIX v5
+═══════════════════════════════════════════════════════════ */
+.dash-stage-grid{display:block}
+
+[data-theme="light"]{
+  --ink-0:#F6F1E7;
+  --ink-1:#FBF7F0;
+  --ink-2:#F3EDE2;
+  --ink-3:#ECE4D6;
+  --ink-4:#E3D9C7;
+  --ink-5:#DACDB7;
+  --tx-0:#17120B;
+  --tx-1:#5B4E3B;
+  --tx-2:#8C7B63;
+  --tx-3:#B2A28D;
+  --line-1:rgba(23,18,11,.07);
+  --line-2:rgba(23,18,11,.11);
+  --line-3:rgba(23,18,11,.16);
+  --amber-10:rgba(245,197,24,.12);
+  --amber-18:rgba(245,197,24,.18);
+}
+[data-theme="light"] body,
+[data-theme="light"] #sc-app{
+  background: linear-gradient(180deg,#F6F1E7 0%, #FBF7F0 100%) !important;
+}
+[data-theme="light"] .pg-sub,
+[data-theme="light"] .agent-sub,
+[data-theme="light"] .tb-crumb-base,
+[data-theme="light"] .tb-crumb-sep{color:var(--tx-2)!important}
+[data-theme="light"] .sb,
+[data-theme="light"] .tb{
+  background: rgba(251,247,240,.88)!important;
+  backdrop-filter: blur(14px);
+}
+[data-theme="light"] .card,
+[data-theme="light"] .kpi,
+[data-theme="light"] .hist-card,
+[data-theme="light"] .auth-card,
+[data-theme="light"] .tip-card,
+[data-theme="light"] .sett-nav,
+[data-theme="light"] .sb-content,
+[data-theme="light"] .modal-box,
+[data-theme="light"] .cmd-box,
+[data-theme="light"] .cpt{
+  background: rgba(255,252,247,.9)!important;
+  border: 1px solid rgba(23,18,11,.08)!important;
+  box-shadow: 0 12px 30px rgba(67,49,21,.06)!important;
+}
+[data-theme="light"] .out-panel,
+[data-theme="light"] .agent-out-panel,
+[data-theme="light"] .agent-input-panel,
+[data-theme="light"] .agent-result,
+[data-theme="light"] .agent-result-content,
+[data-theme="light"] .drop-zone,
+[data-theme="light"] .fmt,
+[data-theme="light"] .net{
+  background: transparent!important;
+  border-color: rgba(23,18,11,.08)!important;
+  box-shadow: none!important;
+}
+[data-theme="light"] .fmt,
+[data-theme="light"] .net{
+  min-height: 132px;
+}
+[data-theme="light"] .fmt:hover,
+[data-theme="light"] .net:hover{
+  background: rgba(255,255,255,.4)!important;
+  border-color: rgba(23,18,11,.14)!important;
+}
+[data-theme="light"] .fmt.on,
+[data-theme="light"] .net.on{
+  background: linear-gradient(180deg, rgba(245,197,24,.13), rgba(245,197,24,.06))!important;
+  border-color: rgba(214,163,0,.42)!important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.65)!important;
+}
+[data-theme="light"] .fmt-name,
+[data-theme="light"] .net-name{color:var(--tx-1)!important;font-weight:700}
+[data-theme="light"] .fmt.on .fmt-name,
+[data-theme="light"] .net.on .net-name{color:#B78600!important}
+[data-theme="light"] .fmt-ico,
+[data-theme="light"] .net-ico,
+[data-theme="light"] .qa-ico,
+[data-theme="light"] .kpi-ico{
+  background: #E4D6BE!important;
+  border: 1px solid rgba(23,18,11,.08)!important;
+}
+[data-theme="light"] .fmt.on .fmt-ico,
+[data-theme="light"] .net.on .net-ico{
+  background: #F0E2B9!important;
+  border-color: rgba(214,163,0,.26)!important;
+}
+[data-theme="light"] .fmt svg,
+[data-theme="light"] .net svg,
+[data-theme="light"] .qa svg,
+[data-theme="light"] .kpi svg{color:#C79600!important;stroke:#C79600!important}
+[data-theme="light"] textarea,
+[data-theme="light"] input,
+[data-theme="light"] select{
+  background:#FFFDF8!important;
+  border-color:rgba(23,18,11,.1)!important;
+  color:var(--tx-0)!important;
+}
+[data-theme="light"] textarea::placeholder,
+[data-theme="light"] input::placeholder{color:#A39177!important}
+[data-theme="light"] .ta-foot,
+[data-theme="light"] .drop-zone{background:transparent!important}
+[data-theme="light"] .btn-g,
+[data-theme="light"] .btn-s,
+[data-theme="light"] .mic-btn,
+[data-theme="light"] .agent-attach-btn{
+  background:#F6EFE2!important;
+  border-color:rgba(23,18,11,.09)!important;
+  color:var(--tx-1)!important;
+}
+[data-theme="light"] .btn-g:hover,
+[data-theme="light"] .btn-s:hover,
+[data-theme="light"] .mic-btn:hover,
+[data-theme="light"] .agent-attach-btn:hover{
+  background:#F1E6D2!important;
+  color:var(--tx-0)!important;
+}
+[data-theme="light"] .qa-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px!important}
+[data-theme="light"] .qa{
+  min-height:156px!important;
+  background: rgba(255,252,247,.9)!important;
+  border:1px solid rgba(23,18,11,.08)!important;
+  box-shadow: none!important;
+}
+[data-theme="light"] #pg-dashboard .g-dash{
+  grid-template-columns: minmax(0,1.1fr) minmax(0,.95fr)!important;
+  align-items:start;
+}
+[data-theme="light"] #pg-dashboard .g-dash > div:last-child{position:relative;z-index:1}
+[data-theme="light"] #pg-dashboard .g-dash > div:last-child .card{margin-bottom:16px}
+[data-theme="light"] #pg-dashboard .kpi-row{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:18px!important;
+  max-width:1480px;
+  margin:0 auto 24px auto!important;
+}
+[data-theme="light"] #pg-dashboard .kpi{
+  min-height:190px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:flex-end!important;
+  padding:28px!important;
+}
+[data-theme="light"] #pg-dashboard .kpi-val{font-size:58px!important;line-height:1!important}
+[data-theme="light"] #pg-dashboard .kpi-lbl{font-size:14px!important;letter-spacing:.08em!important}
+[data-theme="light"] #pg-generate .g-gen{grid-template-columns:1fr 420px!important;gap:28px!important}
+[data-theme="light"] #pg-generate > .card,
+[data-theme="light"] #pg-generate .card{background:transparent!important;box-shadow:none!important}
+[data-theme="light"] .sec-lbl{color:#C79600!important}
+[data-theme="light"] .ni{color:var(--tx-1)!important}
+[data-theme="light"] .ni:hover{background:#EFE6D8!important;color:var(--tx-0)!important}
+[data-theme="light"] .ni.on{
+  background:#EFE3C2!important;
+  color:#8C6500!important;
+  border:1px solid rgba(214,163,0,.22)!important;
+}
+[data-theme="light"] .sb-av{background:linear-gradient(135deg,#F5C518,#D69C00)!important;color:#fff!important}
+[data-theme="light"] .quota-pill{background:#F7F0E1!important;border-color:rgba(23,18,11,.08)!important}
+[data-theme="light"] .tb-crumb-cur,.pg-title{color:var(--tx-0)!important}
+@media (max-width: 1180px){
+  [data-theme="light"] #pg-dashboard .g-dash,
+  [data-theme="light"] #pg-generate .g-gen{grid-template-columns:1fr!important}
+}
+
 </style>
 
 </head>
@@ -7101,7 +7272,7 @@ async function loadDashboard() {
           <button class="btn btn-g btn-sm" onclick="navP('history')">Ver histórico</button>
         </div>
 
-        <div style="display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:18px;align-items:start" class="dash-stage-grid">
+        <div class="dash-stage-grid">
           <div>
             <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Atividade recente</div>
             ${gens.length ? gens.slice(0,6).map(g => `
@@ -7117,16 +7288,6 @@ async function loadDashboard() {
                 <div class="act-time">${timeAgo(g.created_at)}</div>
               </div>
             `).join('') : '<div style="padding:28px 0;color:var(--t3);font-size:13px">Nenhuma geração ainda. Crie sua primeira peça para ativar o histórico.</div>'}
-          </div>
-
-          <div>
-            <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Ações rápidas</div>
-            <div class="qa-grid">
-              <div class="qa" onclick="navP('generate');selFmt('post')"><div class="qa-ico"><svg class="ico ico-sm" style="color:var(--a)" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg></div><div class="qa-lbl">Novo post</div></div>
-              <div class="qa" onclick="navP('generate');selFmt('carrossel')"><div class="qa-ico"><svg class="ico ico-sm" style="color:var(--a)" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><div class="qa-lbl">Carrossel</div></div>
-              <div class="qa" onclick="navP('generate');selFmt('anuncio')"><div class="qa-ico"><svg class="ico ico-sm" style="color:var(--a)" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><div class="qa-lbl">Anúncio</div></div>
-              <div class="qa" onclick="navP('profile')"><div class="qa-ico"><svg class="ico ico-sm" style="color:var(--a)" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4"/></svg></div><div class="qa-lbl">Editar marca</div></div>
-            </div>
           </div>
         </div>
 
