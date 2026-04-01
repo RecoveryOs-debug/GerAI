@@ -2345,6 +2345,53 @@ tr:hover .td-actions { opacity: 1; }
 .usage-fill{height:100%;border-radius:2px;background:var(--a)}
 
 /* ══════════════════════════════════
+   PROFILE UX REWORK
+══════════════════════════════════ */
+.profile-shell{display:grid;grid-template-columns:minmax(0,1.55fr) 340px;gap:20px;align-items:start}
+.profile-main{display:flex;flex-direction:column;gap:18px;min-width:0}
+.profile-side{display:flex;flex-direction:column;gap:18px;position:sticky;top:84px}
+.profile-card{background:linear-gradient(180deg,rgba(255,255,255,.015) 0%,rgba(255,255,255,.008) 100%),var(--bg2);border:1px solid var(--b1);border-radius:18px;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.18)}
+.profile-card.hero{padding:24px 24px 20px;background:radial-gradient(circle at top right,rgba(245,197,24,.08),transparent 30%),linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.008)),var(--bg2);border-color:rgba(245,197,24,.14)}
+.profile-card.tight{padding:18px}
+.profile-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}
+.profile-card-title{font-size:18px;font-weight:700;letter-spacing:-.03em;color:var(--t0)}
+.profile-card-sub{font-size:12px;line-height:1.6;color:var(--t2);max-width:720px}
+.profile-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(245,197,24,.08);border:1px solid rgba(245,197,24,.16);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--a);margin-bottom:14px}
+.profile-stat-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.profile-stat{min-width:160px;flex:1;background:rgba(255,255,255,.02);border:1px solid var(--b1);border-radius:14px;padding:14px}
+.profile-stat-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:8px}
+.profile-stat-value{font-size:14px;font-weight:700;color:var(--t0);line-height:1.35}
+.profile-grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.profile-tone-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.profile-tone-pill{padding:8px 12px;border-radius:999px;border:1px solid var(--b1);background:var(--bg3);font-size:12px;font-weight:600;color:var(--t1);cursor:pointer;transition:all .14s}
+.profile-tone-pill:hover{border-color:rgba(245,197,24,.22);color:var(--t0);transform:translateY(-1px)}
+.profile-visual-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;align-items:start}
+.profile-palette-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.color-input-shell{background:rgba(255,255,255,.02);border:1px solid var(--b1);border-radius:14px;padding:12px}
+.color-input-shell input[type=color]{height:28px;padding:0;border:none;background:transparent}
+.color-meta{display:flex;align-items:center;gap:8px;margin-top:8px}
+.color-dot{width:18px;height:18px;border-radius:5px;border:1px solid var(--b2)}
+.profile-preset-row{display:flex;gap:8px;flex-wrap:wrap}
+.profile-preview-panel{background:rgba(255,255,255,.02);border:1px solid var(--b1);border-radius:16px;padding:14px;min-height:100%}
+.profile-preview-title{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:12px}
+.profile-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;flex-wrap:wrap}
+.profile-memory-grid{display:grid;grid-template-columns:1fr 280px;gap:18px;align-items:start}
+.memory-upload-box{border:1px dashed rgba(245,197,24,.24);background:linear-gradient(180deg,rgba(245,197,24,.06),rgba(245,197,24,.02));border-radius:16px;padding:16px;min-height:160px;display:flex;flex-direction:column;gap:12px}
+.memory-upload-title{font-size:12px;font-weight:700;color:var(--t0)}
+.memory-upload-sub{font-size:11px;line-height:1.55;color:var(--t2)}
+.memory-thumbs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.memory-thumbs-grid img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px;border:1px solid rgba(245,197,24,.18)}
+.profile-side-card-title{font-size:14px;font-weight:700;color:var(--t0);margin-bottom:10px}
+.profile-checklist{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.profile-check{display:flex;align-items:flex-start;gap:9px;font-size:12px;color:var(--t1);line-height:1.55}
+.profile-check svg{width:14px;height:14px;stroke:var(--a);stroke-width:2.2;fill:none;flex-shrink:0;margin-top:2px}
+.profile-plan-wrap .plan-box{height:auto;box-shadow:none;border-radius:18px;padding:22px}
+.profile-section-divider{height:1px;background:linear-gradient(90deg,rgba(245,197,24,.22),rgba(255,255,255,.04),transparent);margin:2px 0}
+.profile-hidden-legacy{display:none !important}
+@media (max-width: 1100px){.profile-shell{grid-template-columns:1fr}.profile-side{position:static;order:-1}.profile-visual-grid,.profile-memory-grid{grid-template-columns:1fr}}
+@media (max-width: 760px){.profile-grid-2,.profile-palette-grid{grid-template-columns:1fr}.profile-card{padding:18px}.profile-stat{min-width:100%}}
+
+/* ══════════════════════════════════
    SETTINGS
 ══════════════════════════════════ */
 .sn{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r3);padding:8px;height:fit-content}
@@ -3367,167 +3414,226 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
 
     <!-- profile -->
     <div class="pg" id="pg-profile">
-      <div class="pg-hd"><div class="pg-title">Perfil de Marca</div><div class="pg-sub">Identidade visual aplicada automaticamente em todas as gerações</div></div>
-      <div class="g-prof">
+      <div class="pg-hd">
         <div>
-          <div class="pb" style="margin-bottom:12px">
-            <div class="pb-title">Informações básicas</div>
-            <div class="form-row"><label>Profissão</label><input id="prof-profissao" placeholder="Ex: Mentor de Vendas..."></div>
-            <div class="form-row"><label>Nicho</label><input id="prof-nicho" placeholder="Ex: Vendas B2B..."></div>
-            <div class="form-row"><label>Público-alvo</label><textarea id="prof-publico" rows="2" placeholder="Descreva seu público-alvo..."></textarea></div>
-            <button class="btn btn-p btn-sm" style="margin-top:4px" onclick="saveProfile()">Salvar alterações</button>
+          <div class="pg-title">Perfil de Marca</div>
+          <div class="pg-sub">Organize contexto, paleta e memória visual em um fluxo limpo e previsível</div>
+        </div>
+      </div>
+
+      <div class="profile-shell">
+        <div class="profile-main">
+          <div class="profile-card hero">
+            <div class="profile-kicker">Brand OS</div>
+            <div class="profile-card-head">
+              <div>
+                <div class="profile-card-title">Sua marca em um único centro de comando</div>
+                <div class="profile-card-sub">Aqui você define a base estratégica, o sistema visual e a memória estética que a IA aplica automaticamente em prompts, modelos e gerações. Menos ruído. Mais consistência.</div>
+              </div>
+            </div>
+            <div class="profile-stat-row">
+              <div class="profile-stat">
+                <div class="profile-stat-label">Contexto</div>
+                <div class="profile-stat-value">Posicionamento, nicho, público e tom em um lugar só</div>
+              </div>
+              <div class="profile-stat">
+                <div class="profile-stat-label">Visual</div>
+                <div class="profile-stat-value">Paleta, presets e prévia aplicada aos modelos</div>
+              </div>
+              <div class="profile-stat">
+                <div class="profile-stat-label">Memória</div>
+                <div class="profile-stat-value">Referências visuais que aumentam a padronização</div>
+              </div>
+            </div>
           </div>
-          <div class="pb">
-            <div class="pb-title">Tom de voz</div>
+
+          <div class="profile-card" id="brand-profile-card">
+            <div class="profile-card-head">
+              <div>
+                <div class="sec-lbl" style="margin-bottom:10px">Essência da Marca</div>
+                <div class="profile-card-title">Defina as características da sua marca</div>
+                <div class="profile-card-sub">Preencha só o que muda o jogo. O resto o sistema resolve no pipeline.</div>
+              </div>
+              <div class="profile-kicker" style="margin-bottom:0">Aplicação automática</div>
+            </div>
+
+            <div class="profile-grid-2">
+              <div class="form-row">
+                <label>Profissão da marca</label>
+                <input id="brand-profissao" type="text" placeholder="Ex: Closer, Psicóloga, Consultor">
+              </div>
+              <div class="form-row">
+                <label>Nicho</label>
+                <input id="brand-nicho" type="text" placeholder="Ex: Vendas, Saúde, Imobiliário">
+              </div>
+            </div>
+
+            <div class="profile-grid-2">
+              <div class="form-row">
+                <label>Tom de voz</label>
+                <input id="brand-tom" type="text" placeholder="Ex: Premium, técnico, provocativo">
+                <div class="profile-tone-pills">
+                  <button type="button" class="profile-tone-pill" onclick="brandTonePick('Autoridade')">Autoridade</button>
+                  <button type="button" class="profile-tone-pill" onclick="brandTonePick('Premium')">Premium</button>
+                  <button type="button" class="profile-tone-pill" onclick="brandTonePick('Provocativo')">Provocativo</button>
+                  <button type="button" class="profile-tone-pill" onclick="brandTonePick('Educativo')">Educativo</button>
+                  <button type="button" class="profile-tone-pill" onclick="brandTonePick('Técnico')">Técnico</button>
+                </div>
+              </div>
+              <div class="form-row">
+                <label>Público</label>
+                <input id="brand-publico" type="text" placeholder="Ex: Empresários, corretores, gestores">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label>Identidade da marca</label>
+              <textarea id="brand-identidade" rows="4" placeholder="Ex: Marca premium, estratégica, sofisticada, direta e orientada a performance."></textarea>
+            </div>
+
+            <div class="profile-actions">
+              <button class="btn btn-s" onclick="saveBrandSettings()">Salvar só este bloco</button>
+              <button class="btn btn-p" onclick="saveBrandAndProfile()">Salvar base da marca</button>
+            </div>
+          </div>
+
+          <div class="profile-card">
+            <div class="profile-card-head">
+              <div>
+                <div class="sec-lbl" style="margin-bottom:10px">Sistema Visual</div>
+                <div class="profile-card-title">Paleta, presets e prévia em contexto</div>
+                <div class="profile-card-sub">A ideia aqui é simples: editar menos, decidir melhor e visualizar antes de gerar.</div>
+              </div>
+            </div>
+
+            <div class="profile-visual-grid">
+              <div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 12px">
+                  <div style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em">Paleta principal</div>
+                  <div style="font-size:11px;color:var(--t3)">Primária, secundária, terciária e apoio</div>
+                </div>
+                <div class="profile-palette-grid">
+                  <div class="color-input-shell">
+                    <label>Primária</label>
+                    <input id="brand-c1" type="color" value="#F5C518" oninput="BrandProfileModule.syncColorSwatches()">
+                    <div class="color-meta"><div id="brand-c1-fill" class="color-dot" style="background:#F5C518"></div><span id="brand-c1-hex" style="font-size:11px;color:var(--t1)">#F5C518</span></div>
+                  </div>
+                  <div class="color-input-shell">
+                    <label>Secundária</label>
+                    <input id="brand-c2" type="color" value="#0D0D0F" oninput="BrandProfileModule.syncColorSwatches()">
+                    <div class="color-meta"><div id="brand-c2-fill" class="color-dot" style="background:#0D0D0F"></div><span id="brand-c2-hex" style="font-size:11px;color:var(--t1)">#0D0D0F</span></div>
+                  </div>
+                  <div class="color-input-shell">
+                    <label>Terciária</label>
+                    <input id="brand-c3" type="color" value="#F5F4F0" oninput="BrandProfileModule.syncColorSwatches()">
+                    <div class="color-meta"><div id="brand-c3-fill" class="color-dot" style="background:#F5F4F0"></div><span id="brand-c3-hex" style="font-size:11px;color:var(--t1)">#F5F4F0</span></div>
+                  </div>
+                  <div class="color-input-shell">
+                    <label>Quaternária</label>
+                    <input id="brand-c4" type="color" value="#888888" oninput="BrandProfileModule.syncColorSwatches()">
+                    <div class="color-meta"><div id="brand-c4-fill" class="color-dot" style="background:#888888"></div><span id="brand-c4-hex" style="font-size:11px;color:var(--t1)">#888888</span></div>
+                  </div>
+                </div>
+
+                <div class="profile-section-divider" style="margin:18px 0 14px"></div>
+
+                <div style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Paletas prontas</div>
+                <div class="profile-preset-row">
+                  <button class="btn btn-g btn-sm" onclick="applyPreset('#F5C518','#0D0D0F','#F5F4F0','#888888')">AutoPostt</button>
+                  <button class="btn btn-g btn-sm" onclick="applyPreset('#003DA5','#FFFFFF','#1A1A1A','#6B7280')">Azul Corporativo</button>
+                  <button class="btn btn-g btn-sm" onclick="applyPreset('#E8302A','#0A0A0A','#F5F5F5','#8F8F8F')">Vermelho Bold</button>
+                  <button class="btn btn-g btn-sm" onclick="applyPreset('#00A86B','#0D1117','#F0FFF4','#7D8B99')">Verde Tech</button>
+                  <button class="btn btn-g btn-sm" onclick="applyPreset('#8B5CF6','#0F0A1E','#FAF5FF','#9CA3AF')">Roxo Premium</button>
+                </div>
+              </div>
+
+              <div class="profile-preview-panel">
+                <div class="profile-preview-title">Prévia aplicada aos modelos</div>
+                <div id="brand-model-previews" style="display:flex;gap:12px;overflow:auto;padding-bottom:4px"></div>
+              </div>
+            </div>
+
+            <div class="profile-actions">
+              <button class="btn btn-s" onclick="BrandProfileModule.reset(); _loadBrandSettingsPanel(); toast('Perfil de marca resetado!','ok')">Resetar</button>
+              <button class="btn btn-p" onclick="saveBrandAndProfile()">Salvar sistema visual</button>
+            </div>
+          </div>
+
+          <div class="profile-card">
+            <div class="profile-card-head">
+              <div>
+                <div class="sec-lbl" style="margin-bottom:10px">Banco de Memória Visual</div>
+                <div class="profile-card-title">Ensine o padrão visual que a IA deve perseguir</div>
+                <div class="profile-card-sub">Quanto melhores as referências, menor o retrabalho e maior a coerência entre saídas.</div>
+              </div>
+            </div>
+
+            <div class="profile-memory-grid">
+              <div>
+                <label style="margin-bottom:8px">Direção visual desejada</label>
+                <textarea id="mem-style-notes" rows="5" placeholder="Descreva o estilo visual que você quer padronizar: cores, fontes, layout, sensação..."></textarea>
+                <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+                  <button class="btn btn-p" onclick="saveVisualMemory()">
+                    <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                    Salvar memória visual
+                  </button>
+                  <button class="btn btn-g" onclick="clearVisualMemory()">Limpar</button>
+                </div>
+              </div>
+
+              <div class="memory-upload-box">
+                <div>
+                  <div class="memory-upload-title">Referências de design</div>
+                  <div class="memory-upload-sub">Suba prints, peças e exemplos que representem o acabamento que você quer reproduzir.</div>
+                </div>
+                <button class="btn btn-g btn-sm" onclick="document.getElementById('mem-upload').click()">+ Adicionar referências</button>
+                <input type="file" id="mem-upload" accept="image/*" multiple style="display:none" onchange="handleMemoryUpload(this)">
+                <div id="mem-status" style="font-size:12px;color:var(--a);display:none"><span id="mem-count">0</span> referências salvas</div>
+                <div id="mem-thumbs" class="memory-thumbs-grid"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-hidden-legacy" aria-hidden="true">
+            <input id="prof-profissao" placeholder="Profissão">
+            <input id="prof-nicho" placeholder="Nicho">
+            <textarea id="prof-publico"></textarea>
             <div class="chips" id="prof-tom">
-              <div class="chip" onclick="tc(this)">Autoridade</div><div class="chip" onclick="tc(this)">Provocativo</div>
-              <div class="chip" onclick="tc(this)">Acolhedor</div><div class="chip" onclick="tc(this)">Técnico</div>
-              <div class="chip" onclick="tc(this)">Inspiracional</div><div class="chip" onclick="tc(this)">Premium</div>
-              <div class="chip" onclick="tc(this)">Educativo</div><div class="chip" onclick="tc(this)">Urgente</div>
+              <div class="chip">Autoridade</div><div class="chip">Provocativo</div><div class="chip">Acolhedor</div><div class="chip">Técnico</div><div class="chip">Inspiracional</div><div class="chip">Premium</div><div class="chip">Educativo</div><div class="chip">Urgente</div>
             </div>
+            <div id="prof-redes"></div>
+            <select id="prof-estilo"></select>
+            <div id="prof-color-dots"></div>
           </div>
         </div>
-        <div>
-          <div class="plan-box">
-            <div class="plan-name" id="prof-plan-name">—</div>
-            <div class="plan-renew" id="prof-plan-renew"></div>
-            <div id="prof-plan-feats">
-              <div class="plan-feat">100 gerações por mês</div>
-              <div class="plan-feat">Todos os formatos</div>
+
+        <div class="profile-side">
+          <div class="profile-card tight">
+            <div class="profile-side-card-title">O que esse módulo controla</div>
+            <div class="profile-checklist">
+              <div class="profile-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>Refino de prompts com contexto estratégico da marca</span></div>
+              <div class="profile-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>Aplicação automática de paleta nos modelos visuais</span></div>
+              <div class="profile-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>Memória de referências para reduzir variação entre gerações</span></div>
             </div>
-            <div class="plan-feat">Geração de imagens com IA</div>
-            <div class="plan-feat">Histórico ilimitado</div>
-            <div class="usage-row"><span id="prof-usage-text">— gerações</span><span class="pct" id="prof-usage-pct">—</span></div>
-            <div class="usage-bar"><div class="usage-fill" id="prof-usage-fill" style="width:0%"></div></div>
-            <button class="btn btn-p btn-full btn-sm" style="margin-top:12px" onclick="toast('Upgrade em breve!','ok')">Upgrade para Elite →</button>
+          </div>
+
+          <div class="profile-plan-wrap">
+            <div class="plan-box">
+              <div class="plan-name" id="prof-plan-name">—</div>
+              <div class="plan-renew" id="prof-plan-renew"></div>
+              <div id="prof-plan-feats">
+                <div class="plan-feat">100 gerações por mês</div>
+                <div class="plan-feat">Todos os formatos</div>
+              </div>
+              <div class="plan-feat">Geração de imagens com IA</div>
+              <div class="plan-feat">Histórico ilimitado</div>
+              <div class="usage-row"><span id="prof-usage-text">— gerações</span><span class="pct" id="prof-usage-pct">—</span></div>
+              <div class="usage-bar"><div class="usage-fill" id="prof-usage-fill" style="width:0%"></div></div>
+              <button class="btn btn-p btn-full btn-sm" style="margin-top:12px" onclick="toast('Upgrade em breve!','ok')">Upgrade para Elite →</button>
+            </div>
           </div>
         </div>
       </div>
-    
-
-      <div class="card p24" id="brand-profile-card" style="margin-top:20px">
-        <div class="card-hd" style="margin-bottom:18px">
-          <div>
-            <div class="sec-lbl" style="margin-bottom:10px">Perfil de Marca</div>
-            <div style="font-size:18px;font-weight:700;color:var(--t0);letter-spacing:-.03em">Defina as características da sua marca</div>
-            <div style="font-size:12px;color:var(--t2);margin-top:6px;line-height:1.6">Esse módulo centraliza contexto, paleta e identidade visual para que a IA aplique sua marca automaticamente em prompts, modelos e gerações.</div>
-          </div>
-        </div>
-
-        <div class="form-grid2">
-          <div class="form-row">
-            <label>Profissão da marca</label>
-            <input id="brand-profissao" type="text" placeholder="Ex: Closer, Psicóloga, Consultor">
-          </div>
-          <div class="form-row">
-            <label>Nicho</label>
-            <input id="brand-nicho" type="text" placeholder="Ex: Vendas, Saúde, Imobiliário">
-          </div>
-        </div>
-
-        <div class="form-grid2">
-          <div class="form-row">
-            <label>Tom de voz</label>
-            <input id="brand-tom" type="text" placeholder="Ex: Premium, técnico, provocativo">
-          </div>
-          <div class="form-row">
-            <label>Público</label>
-            <input id="brand-publico" type="text" placeholder="Ex: Empresários, corretores, gestores">
-          </div>
-        </div>
-
-        <div class="form-row">
-          <label>Identidade da marca</label>
-          <textarea id="brand-identidade" rows="4" placeholder="Ex: Marca premium, estratégica, sofisticada, direta e orientada a performance."></textarea>
-        </div>
-
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin:18px 0 10px">
-          <div style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em">Paleta principal</div>
-          <div style="font-size:11px;color:var(--t3)">Primária, secundária, terciária e apoio</div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px">
-          <div class="form-row">
-            <label>Primária</label>
-            <input id="brand-c1" type="color" value="#F5C518" oninput="BrandProfileModule.syncColorSwatches()">
-            <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
-              <div id="brand-c1-fill" style="width:18px;height:18px;border-radius:4px;background:#F5C518;border:1px solid var(--b2)"></div>
-              <span id="brand-c1-hex" style="font-size:11px;color:var(--t1)">#F5C518</span>
-            </div>
-          </div>
-          <div class="form-row">
-            <label>Secundária</label>
-            <input id="brand-c2" type="color" value="#0D0D0F" oninput="BrandProfileModule.syncColorSwatches()">
-            <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
-              <div id="brand-c2-fill" style="width:18px;height:18px;border-radius:4px;background:#0D0D0F;border:1px solid var(--b2)"></div>
-              <span id="brand-c2-hex" style="font-size:11px;color:var(--t1)">#0D0D0F</span>
-            </div>
-          </div>
-          <div class="form-row">
-            <label>Terciária</label>
-            <input id="brand-c3" type="color" value="#F5F4F0" oninput="BrandProfileModule.syncColorSwatches()">
-            <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
-              <div id="brand-c3-fill" style="width:18px;height:18px;border-radius:4px;background:#F5F4F0;border:1px solid var(--b2)"></div>
-              <span id="brand-c3-hex" style="font-size:11px;color:var(--t1)">#F5F4F0</span>
-            </div>
-          </div>
-          <div class="form-row">
-            <label>Quaternária</label>
-            <input id="brand-c4" type="color" value="#888888" oninput="BrandProfileModule.syncColorSwatches()">
-            <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
-              <div id="brand-c4-fill" style="width:18px;height:18px;border-radius:4px;background:#888888;border:1px solid var(--b2)"></div>
-              <span id="brand-c4-hex" style="font-size:11px;color:var(--t1)">#888888</span>
-            </div>
-          </div>
-        </div>
-
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-top:20px;flex-wrap:wrap">
-          <div style="min-width:260px;flex:1">
-            <div style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Paletas prontas</div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button class="btn btn-g btn-sm" onclick="applyPreset('#F5C518','#0D0D0F','#F5F4F0')">AutoPostt</button>
-              <button class="btn btn-g btn-sm" onclick="applyPreset('#003DA5','#FFFFFF','#1A1A1A')">Azul Corporativo</button>
-              <button class="btn btn-g btn-sm" onclick="applyPreset('#E8302A','#0A0A0A','#F5F5F5')">Vermelho Bold</button>
-              <button class="btn btn-g btn-sm" onclick="applyPreset('#00A86B','#0D1117','#F0FFF4')">Verde Tech</button>
-              <button class="btn btn-g btn-sm" onclick="applyPreset('#8B5CF6','#0F0A1E','#FAF5FF')">Roxo Premium</button>
-            </div>
-          </div>
-          <div style="min-width:280px;flex:1">
-            <div style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Prévia aplicada aos modelos</div>
-            <div id="brand-model-previews" style="display:flex;gap:12px;overflow:auto;padding-bottom:4px"></div>
-          </div>
-        </div>
-
-        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:22px">
-          <button class="btn btn-s" onclick="BrandProfileModule.reset(); _loadBrandSettingsPanel(); toast('Perfil de marca resetado!','ok')">Resetar</button>
-          <button class="btn btn-p" onclick="saveBrandSettings()">Salvar perfil de marca</button>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-      <div class="sec-lbl">Banco de Memória Visual</div>
-      <div class="card p20" style="margin-top:0">
-        <div class="card-hd-title" style="margin-bottom:4px">Referência de design preferida</div>
-        <div style="font-size:12px;color:var(--t2);margin-bottom:14px">A IA aprende o seu estilo e replica automaticamente em novas gerações. Quanto mais exemplos, mais precisa a padronização.</div>
-        <div id="mem-status" style="font-size:12px;color:var(--a);margin-bottom:12px;display:none">
-          <span id="mem-count">0</span> referências salvas · A IA está aprendendo seu estilo
-        </div>
-        <div id="mem-thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"></div>
-        <label style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-          <span style="font-size:11px;font-weight:700;color:var(--a);letter-spacing:.07em;text-transform:uppercase">Adicionar referências visuais</span>
-          <button class="btn btn-g btn-sm" onclick="document.getElementById('mem-upload').click()">+ Adicionar</button>
-        </label>
-        <input type="file" id="mem-upload" accept="image/*" multiple style="display:none" onchange="handleMemoryUpload(this)">
-        <textarea id="mem-style-notes" rows="3" placeholder="Descreva o estilo visual que você quer padronizar: cores, fontes, layout, sensação..." style="margin-top:8px"></textarea>
-        <div style="display:flex;gap:8px;margin-top:10px">
-          <button class="btn btn-p" onclick="saveVisualMemory()">
-            <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            Salvar memória visual
-          </button>
-          <button class="btn btn-g" onclick="clearVisualMemory()">Limpar</button>
-        </div>
-      </div>
-
     </div>
 
     <!-- settings -->
@@ -6951,6 +7057,39 @@ function saveBrandSettings() {
   _renderBrandModelPreviews(brand.cores);
   toast('Perfil de marca salvo!', 'ok');
 }
+function brandTonePick(tone) {
+  const el = document.getElementById('brand-tom');
+  if (!el) return;
+  const current = (el.value || '').split(',').map(s => s.trim()).filter(Boolean);
+  if (!current.includes(tone)) current.push(tone);
+  el.value = current.join(', ');
+}
+
+function syncBrandToLegacyProfile(brand) {
+  const b = brand || BrandProfileModule.get();
+  const setVal = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.value = value || '';
+  };
+  setVal('prof-profissao', b.profissao || '');
+  setVal('prof-nicho', b.nicho || '');
+  setVal('prof-publico', b.publico || '');
+  document.querySelectorAll('#prof-tom .chip').forEach(chip => {
+    const label = chip.textContent.trim();
+    chip.classList.toggle('on', (b.tom || '').includes(label));
+  });
+}
+
+async function saveBrandAndProfile() {
+  const brand = BrandProfileModule.saveFromSettingsPanel();
+  _renderBrandModelPreviews(brand.cores);
+  syncBrandToLegacyProfile(brand);
+  try {
+    await saveProfile();
+  } catch (e) {}
+  toast('Base da marca salva e sincronizada!', 'ok');
+}
+
 
 function _loadBrandSettingsPanel() {
   const brand = BrandProfileModule.bindSettingsPanel();
