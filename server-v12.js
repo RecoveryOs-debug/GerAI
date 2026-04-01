@@ -1366,6 +1366,104 @@ Responda SOMENTE com um objeto JSON assim (sem markdown):
 // ROUTES — ADMIN (preservados do v12)
 // ─────────────────────────────────────────────
 
+// ─────────────────────────────────────────────
+// EXCHANGE RATE — cotação USD/BRL em tempo real
+// ─────────────────────────────────────────────
+
+let _fxCache = { rate: 5.20, source: 'fallback', updatedAt: null };
+
+async function fetchUsdBrl() {
+  return new Promise((resolve) => {
+    // Fonte 1: AwesomeAPI (gratuita, sem chave)
+    const opts = {
+      hostname: 'economia.awesomeapi.com.br',
+      path: '/json/last/USD-BRL',
+      method: 'GET',
+      headers: { 'User-Agent': 'AutoPostt/1.0' },
+      timeout: 5000
+    };
+    const req = https.request(opts, res => {
+      let data = '';
+      res.on('data', c => data += c);
+      res.on('end', () => {
+        try {
+          const p = JSON.parse(data);
+          const rate = parseFloat(p?.USDBRL?.bid || p?.USDBRL?.ask);
+          if (rate && rate > 1) {
+            resolve({ rate: parseFloat(rate.toFixed(4)), source: 'AwesomeAPI', high: parseFloat(p.USDBRL.high), low: parseFloat(p.USDBRL.low), pctChange: p.USDBRL.pctChange, updatedAt: new Date().toISOString() });
+          } else resolve(null);
+        } catch { resolve(null); }
+      });
+    });
+    req.on('error', () => resolve(null));
+    req.on('timeout', () => { req.destroy(); resolve(null); });
+    req.end();
+  });
+}
+
+async function fetchUsdBrlBcb() {
+  return new Promise((resolve) => {
+    // Fonte 2: Banco Central PTAX (fallback oficial)
+    const today = new Date();
+    // PTAX usa data no formato MM-DD-YYYY
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const yyyy = today.getFullYear();
+    const dateFmt = `${mm}-${dd}-${yyyy}`;
+    const path = `/olinda/servico/PTAX/versao/v1/odata/CotacaoDolarDia(dataCotacao=@dataCotacao)?@dataCotacao='${dateFmt}'&$format=json&$select=cotacaoVenda`;
+    const opts = {
+      hostname: 'olinda.bcb.gov.br',
+      path,
+      method: 'GET',
+      headers: { 'Accept': 'application/json' },
+      timeout: 8000
+    };
+    const req = https.request(opts, res => {
+      let data = '';
+      res.on('data', c => data += c);
+      res.on('end', () => {
+        try {
+          const p = JSON.parse(data);
+          const rate = p?.value?.[0]?.cotacaoVenda;
+          if (rate && rate > 1) {
+            resolve({ rate: parseFloat(rate.toFixed(4)), source: 'BCB-PTAX', updatedAt: new Date().toISOString() });
+          } else resolve(null);
+        } catch { resolve(null); }
+      });
+    });
+    req.on('error', () => resolve(null));
+    req.on('timeout', () => { req.destroy(); resolve(null); });
+    req.end();
+  });
+}
+
+async function getExchangeRate() {
+  // Cache de 10 minutos
+  if (_fxCache.updatedAt) {
+    const age = Date.now() - new Date(_fxCache.updatedAt).getTime();
+    if (age < 10 * 60 * 1000) return _fxCache;
+  }
+  // Tentar AwesomeAPI primeiro
+  let result = await fetchUsdBrl();
+  // Fallback para BCB-PTAX
+  if (!result) result = await fetchUsdBrlBcb();
+  // Fallback final: manter cache anterior ou valor padrão
+  if (result) {
+    _fxCache = result;
+  } else {
+    _fxCache.source = _fxCache.source === 'fallback' ? 'fallback' : _fxCache.source + ' (cache)';
+  }
+  return _fxCache;
+}
+
+route('GET', '/api/admin/exchange-rate', async (req, res) => {
+  const payload = requireAdmin(req, res); if (!payload) return;
+  try {
+    const fx = await getExchangeRate();
+    ok(res, { exchange: fx });
+  } catch(e) { err(res, e.message); }
+});
+
 route('GET', '/api/admin/stats', async (req, res) => {
   const payload = requireAdmin(req, res); if (!payload) return;
   ok(res, { stats: db.getStats() });
