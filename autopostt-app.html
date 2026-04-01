@@ -4931,16 +4931,11 @@ async function gerarImagem() {
   const p = me || {};
   
   try {
-    const _modelCtx = window._selectedModel
-      ? '\n\nMODELO DE LAYOUT SELECIONADO: ' + window._selectedModel.n + ' — ' + window._selectedModel.name + '\n' +
-        'INSTRUÇÃO CRÍTICA: Replique EXATAMENTE a estrutura deste SVG de referência — mesma composição, posicionamento, pesos tipográficos, hierarquia visual e estilo. Substitua apenas os textos pelo conteúdo do prompt. Preserve cores, fontes, geometria e layout.\n' +
-        'SVG DE REFERÊNCIA:\n' + window._selectedModel.svg
-      : '';
+    // O modelo SVG é enviado via brandProfile.modelSvg — não precisa duplicar no prompt
     const rawInput = (document.getElementById('gen-in')?.value || '').trim();
     const fullPrompt = [
       rawInput ? 'IDEIA ORIGINAL: ' + rawInput : '',
-      'PROMPT REFINADO: ' + prompt,
-      _modelCtx
+      'PROMPT REFINADO: ' + prompt
     ].filter(Boolean).join('\n');
     const body = {
       prompt: fullPrompt,
@@ -4956,7 +4951,10 @@ async function gerarImagem() {
         tom: p.tom,
         publico: p.publico,
         logoData: window._logoData || null,
-        visualMemory: window._visualMemory || null
+        visualMemory: window._visualMemory || null,
+        modelN:    window._selectedModel?.n    || '',
+        modelName: window._selectedModel?.name || '',
+        modelSvg:  window._selectedModel?.svg  || ''
       }
     };
     const data = await api('POST', '/api/user/generate-image', body);

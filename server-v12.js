@@ -1255,15 +1255,18 @@ route('POST', '/api/user/generate-image', async (req, res) => {
   const memoria = brandProfile?.visualMemory?.notes || '';
   const isInclude = imgMode === 'include';
 
-  const system = `Você é um especialista em design gráfico para redes sociais. Sua única saída é código SVG válido.
+  const system = `Você é um especialista em design gráfico SVG para redes sociais. Sua única saída é código SVG válido.
 
-REGRAS ABSOLUTAS:
+REGRAS ABSOLUTAS — NUNCA VIOLE:
 1. Responda SOMENTE com SVG puro. Comece com <svg e termine com </svg>
 2. ZERO texto antes ou depois. Sem markdown. Sem explicações.
-3. viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg"
-4. Todos os elementos <text> com font-family explícito (use as mesmas fontes do modelo de referência)
-5. Todos os elementos dentro dos limites 0,0,1080,1080
-6. SE um SVG de referência for fornecido no prompt: replique FIELMENTE sua estrutura, layout, posicionamento e estilo tipográfico — apenas substitua os textos pelo conteúdo do prompt. Adapte cores para o perfil da marca.
+3. viewBox="0 0 1080 1350" xmlns="http://www.w3.org/2000/svg"
+4. Preserve todos os elementos <defs> (gradientes, filtros, clipPaths, patterns) do template
+5. Preserve TODA a estrutura geométrica: rects, polygons, circles, lines, paths decorativos
+6. Preserve EXATAMENTE as mesmas fontes, tamanhos, pesos e posições (x,y) dos textos
+7. Substitua APENAS o conteúdo dos textos pelo tema do prompt — mantendo hierarquia e comprimento aproximado
+8. Substitua as cores fixas do template pelas cores da marca conforme mapeamento fornecido
+9. NUNCA invente elementos novos nem remova elementos existentes do template
 
 IDENTIDADE DA MARCA:
 - Cor primária: ${cor1}
@@ -1287,7 +1290,42 @@ ${isInclude ? 'Crie espaço/moldura no SVG para a foto do usuário.' : 'Use imag
 QUALIDADE: Designer profissional de agência tier-1.`;
 
   try {
-    const { text: rawSvg, inputTokens: svgInp, outputTokens: svgOut } = await callClaude({ system, userMsg: `CONCEITO: "${prompt}"\nFORMATO: ${format||'post'} para ${network||'instagram'}\n\nGere o SVG agora. Comece com <svg`, maxTokens:4000 });
+    // Extrair SVG do modelo e cores da marca do brandProfile
+    const modelSvg   = brandProfile?.modelSvg   || '';
+    const modelN     = brandProfile?.modelN     || '';
+    const modelName  = brandProfile?.modelName  || '';
+
+    // Mapeamento de cores: substitui dourado/accent do template pelas cores da marca
+    const brandCor1  = (cor1 || '#F5C518').trim();  // cor primária/accent
+    const brandCor2  = (cor2 || '#0A0A0A').trim();  // cor de fundo/base
+    const brandCor3  = (cor3 || brandCor1).trim();  // cor de destaque
+
+    const templateSection = modelSvg
+      ? `TEMPLATE SVG (modelo ${modelN} — ${modelName}):
+Você DEVE usar este SVG como template base. Preserve TODO o layout, estrutura, elementos decorativos, fontes e posicionamento.
+Faça APENAS duas mudanças:
+1. Substitua os textos de demonstração pelo conteúdo do prompt (mantenha a hierarquia e tamanhos)
+2. Substitua as cores do template pelas cores da marca:
+   - Cor accent/dourado (#F5C518, #E6A800, #C87800, #FFD740, #C8960A, #A08030) → ${brandCor1}
+   - Cor fundo escuro (#0A0A0A, #080808, #0C0C0C, #111111, #050505, #04040A) → ${brandCor2}
+   - Cor fundo claro (#FAFAF7, #FAF6EE, #F2EDE3, #F0E8D5, #FAF5EB) → quando modelo claro, mantenha ou adapte levemente
+   - Texto branco/claro (#F5F0E8, #FFFFFF, #F8F8F6) → mantenha branco/claro se fundo escuro, ou use ${brandCor2} se fundo claro
+
+SVG DO TEMPLATE:
+${modelSvg}`
+      : `Crie um design profissional para redes sociais no estilo dark luxury.`;
+
+    const userMsg = `TEMA/PROMPT: "${prompt}"
+FORMATO: ${format||'post'} para ${network||'instagram'}
+MARCA: ${nicho} | ${profissao} | estilo ${estilo}
+COR PRIMÁRIA DA MARCA: ${brandCor1}
+COR BASE DA MARCA: ${brandCor2}
+
+${templateSection}
+
+Gere o SVG final agora. Comece com <svg`;
+
+    const { text: rawSvg, inputTokens: svgInp, outputTokens: svgOut } = await callClaude({ system, userMsg, maxTokens: 6000 });
     let svg = '';
     if (rawSvg.trim().startsWith('<svg')) svg = rawSvg.trim();
     else {
