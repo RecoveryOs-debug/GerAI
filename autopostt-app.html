@@ -3404,6 +3404,106 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
         </div>
       </div>
     
+
+      <div class="card p24" id="brand-profile-card" style="margin-top:20px">
+        <div class="card-hd" style="margin-bottom:18px">
+          <div>
+            <div class="sec-lbl" style="margin-bottom:10px">Perfil de Marca</div>
+            <div style="font-size:18px;font-weight:700;color:var(--t0);letter-spacing:-.03em">Defina as características da sua marca</div>
+            <div style="font-size:12px;color:var(--t2);margin-top:6px;line-height:1.6">Esse módulo centraliza contexto, paleta e identidade visual para que a IA aplique sua marca automaticamente em prompts, modelos e gerações.</div>
+          </div>
+        </div>
+
+        <div class="form-grid2">
+          <div class="form-row">
+            <label>Profissão da marca</label>
+            <input id="brand-profissao" type="text" placeholder="Ex: Closer, Psicóloga, Consultor">
+          </div>
+          <div class="form-row">
+            <label>Nicho</label>
+            <input id="brand-nicho" type="text" placeholder="Ex: Vendas, Saúde, Imobiliário">
+          </div>
+        </div>
+
+        <div class="form-grid2">
+          <div class="form-row">
+            <label>Tom de voz</label>
+            <input id="brand-tom" type="text" placeholder="Ex: Premium, técnico, provocativo">
+          </div>
+          <div class="form-row">
+            <label>Público</label>
+            <input id="brand-publico" type="text" placeholder="Ex: Empresários, corretores, gestores">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>Identidade da marca</label>
+          <textarea id="brand-identidade" rows="4" placeholder="Ex: Marca premium, estratégica, sofisticada, direta e orientada a performance."></textarea>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin:18px 0 10px">
+          <div style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em">Paleta principal</div>
+          <div style="font-size:11px;color:var(--t3)">Primária, secundária, terciária e apoio</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px">
+          <div class="form-row">
+            <label>Primária</label>
+            <input id="brand-c1" type="color" value="#F5C518" oninput="BrandProfileModule.syncColorSwatches()">
+            <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+              <div id="brand-c1-fill" style="width:18px;height:18px;border-radius:4px;background:#F5C518;border:1px solid var(--b2)"></div>
+              <span id="brand-c1-hex" style="font-size:11px;color:var(--t1)">#F5C518</span>
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Secundária</label>
+            <input id="brand-c2" type="color" value="#0D0D0F" oninput="BrandProfileModule.syncColorSwatches()">
+            <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+              <div id="brand-c2-fill" style="width:18px;height:18px;border-radius:4px;background:#0D0D0F;border:1px solid var(--b2)"></div>
+              <span id="brand-c2-hex" style="font-size:11px;color:var(--t1)">#0D0D0F</span>
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Terciária</label>
+            <input id="brand-c3" type="color" value="#F5F4F0" oninput="BrandProfileModule.syncColorSwatches()">
+            <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+              <div id="brand-c3-fill" style="width:18px;height:18px;border-radius:4px;background:#F5F4F0;border:1px solid var(--b2)"></div>
+              <span id="brand-c3-hex" style="font-size:11px;color:var(--t1)">#F5F4F0</span>
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Quaternária</label>
+            <input id="brand-c4" type="color" value="#888888" oninput="BrandProfileModule.syncColorSwatches()">
+            <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+              <div id="brand-c4-fill" style="width:18px;height:18px;border-radius:4px;background:#888888;border:1px solid var(--b2)"></div>
+              <span id="brand-c4-hex" style="font-size:11px;color:var(--t1)">#888888</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-top:20px;flex-wrap:wrap">
+          <div style="min-width:260px;flex:1">
+            <div style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Paletas prontas</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-g btn-sm" onclick="applyPreset('#F5C518','#0D0D0F','#F5F4F0')">AutoPostt</button>
+              <button class="btn btn-g btn-sm" onclick="applyPreset('#003DA5','#FFFFFF','#1A1A1A')">Azul Corporativo</button>
+              <button class="btn btn-g btn-sm" onclick="applyPreset('#E8302A','#0A0A0A','#F5F5F5')">Vermelho Bold</button>
+              <button class="btn btn-g btn-sm" onclick="applyPreset('#00A86B','#0D1117','#F0FFF4')">Verde Tech</button>
+              <button class="btn btn-g btn-sm" onclick="applyPreset('#8B5CF6','#0F0A1E','#FAF5FF')">Roxo Premium</button>
+            </div>
+          </div>
+          <div style="min-width:280px;flex:1">
+            <div style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Prévia aplicada aos modelos</div>
+            <div id="brand-model-previews" style="display:flex;gap:12px;overflow:auto;padding-bottom:4px"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:22px">
+          <button class="btn btn-s" onclick="BrandProfileModule.reset(); _loadBrandSettingsPanel(); toast('Perfil de marca resetado!','ok')">Resetar</button>
+          <button class="btn btn-p" onclick="saveBrandSettings()">Salvar perfil de marca</button>
+        </div>
+      </div>
+
       <div class="divider"></div>
       <div class="sec-lbl">Banco de Memória Visual</div>
       <div class="card p20" style="margin-top:0">
@@ -4570,21 +4670,17 @@ async function loadProfile() {
     c.classList.toggle('on', me.redes && me.redes.toLowerCase().includes(net));
   });
 
-  // colors — brand palette (Primária, Secundária, Terciária, Quaternária)
-  if (me.cores) {
-    const parts = me.cores.split(',').map(s => s.trim()).filter(Boolean);
-    ['1','2','3','4'].forEach((n, i) => {
-      const inp  = document.getElementById('brand-c' + n);
-      const fill = document.getElementById('brand-c' + n + '-fill');
-      const hex  = document.getElementById('brand-c' + n + '-hex');
-      if (parts[i]) {
-        if (inp)  inp.value = parts[i];
-        if (fill) fill.style.background = parts[i];
-        if (hex)  hex.textContent = parts[i].toUpperCase();
-      }
-    });
-    _renderBrandModelPreviews(parts);
-  }
+  // carrega módulo profissional de marca com fallback do perfil do usuário
+  const fallbackBrand = {
+    profissao: me.profissao || '',
+    nicho: me.nicho || '',
+    tom: me.tom || '',
+    publico: me.publico || '',
+    identidade: '',
+    cores: (me.cores ? me.cores.split(',').map(s => s.trim()).filter(Boolean) : ['#F5C518','#0D0D0F','#F5F4F0','#888888'])
+  };
+  if (!BrandProfileModule.get().updatedAt) BrandProfileModule.save(fallbackBrand);
+  _loadBrandSettingsPanel();
 
   // plan info
   const planName = document.getElementById('prof-plan-name');
@@ -4881,20 +4977,16 @@ async function gerarImagem() {
   if (!window._selectedModel) { toast('Escolha um modelo antes de gerar a imagem','err'); return; }
 
   const model = window._selectedModel;
-  const p = me || {};
 
   // Usa prompt já refinado pelo _refineWithModel (chamado ao selecionar o modelo)
   // Se por algum motivo não tiver refinado, usa o raw
   const refined = (window._refinedPrompt || '').trim() || rawInput;
 
-  // Paleta da marca: Primária, Secundária, Terciária, Quaternária
-  const brandParts = (p.cores || '#F5C518,#0D0D0F,#F5F4F0,#888888').split(',').map(s => s.trim());
-  const brandPalette = {
-    primaria:    brandParts[0] || '#F5C518',
-    secundaria:  brandParts[1] || '#0D0D0F',
-    terciaria:   brandParts[2] || '#F5F4F0',
-    quaternaria: brandParts[3] || '#888888'
-  };
+  const brandProfile = BrandProfileModule.toGenerationPayload({
+    modelN: model.n,
+    modelName: model.name,
+    modelSvg: model.svg
+  });
 
   switchOutTab('imagem');
   document.getElementById('img-preview-empty').style.display = 'none';
@@ -4913,17 +5005,7 @@ async function gerarImagem() {
       format:  _currentFmt,
       network: _netMap[_currentNet] || 'instagram',
       imgMode: 'model',
-      brandProfile: {
-        profissao:   p.profissao,
-        nicho:       p.nicho,
-        tom:         p.tom,
-        publico:     p.publico,
-        cores:       p.cores,
-        brandPalette,
-        modelN:    model.n,
-        modelName: model.name,
-        modelSvg:  model.svg
-      }
+      brandProfile
     };
 
     const data = await api('POST', '/api/user/generate-image', body);
@@ -6638,28 +6720,201 @@ function _isColorDark(hex) {
   return (r*0.299+g*0.587+b*0.114) < 140;
 }
 
+const BrandProfileModule = (function () {
+  const STORAGE_KEY = 'gerai_brand_profile_v1';
+  const LEGACY_KEY = 'gerai_brand';
+  const DEFAULTS = {
+    profissao: '',
+    nicho: '',
+    tom: '',
+    publico: '',
+    identidade: '',
+    palavrasChave: [],
+    cores: ['#F5C518','#0D0D0F','#F5F4F0','#888888'],
+    redes: [],
+    referenciaVisual: '',
+    updatedAt: null
+  };
+
+  function clone(v) { return JSON.parse(JSON.stringify(v)); }
+  function normalizeHex(hex, fallback) {
+    const value = String(hex || '').trim();
+    return /^#[0-9a-fA-F]{6}$/.test(value) ? value.toUpperCase() : fallback;
+  }
+  function normalizeArray(arr) {
+    return Array.isArray(arr) ? arr.map(v => String(v || '').trim()).filter(Boolean) : [];
+  }
+  function normalizeBrand(input) {
+    const src = input || {};
+    const rawCores = Array.isArray(src.cores) ? src.cores : String(src.cores || '').split(',').map(s => s.trim()).filter(Boolean);
+    return {
+      profissao: String(src.profissao || '').trim(),
+      nicho: String(src.nicho || '').trim(),
+      tom: String(src.tom || '').trim(),
+      publico: String(src.publico || '').trim(),
+      identidade: String(src.identidade || '').trim(),
+      palavrasChave: normalizeArray(src.palavrasChave),
+      cores: [
+        normalizeHex(rawCores[0], '#F5C518'),
+        normalizeHex(rawCores[1], '#0D0D0F'),
+        normalizeHex(rawCores[2], '#F5F4F0'),
+        normalizeHex(rawCores[3], '#888888')
+      ],
+      redes: normalizeArray(src.redes),
+      referenciaVisual: String(src.referenciaVisual || '').trim(),
+      updatedAt: src.updatedAt || new Date().toISOString()
+    };
+  }
+
+  let state = null;
+
+  function readStorage() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) return normalizeBrand(JSON.parse(raw));
+    } catch(e) {}
+    try {
+      const legacy = localStorage.getItem(LEGACY_KEY);
+      if (legacy) return normalizeBrand(JSON.parse(legacy));
+    } catch(e) {}
+    return normalizeBrand(DEFAULTS);
+  }
+
+  function persist() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(LEGACY_KEY, JSON.stringify(state));
+  }
+
+  function get() {
+    if (!state) state = readStorage();
+    return clone(state);
+  }
+
+  function save(partial) {
+    const current = get();
+    state = normalizeBrand(Object.assign({}, current, partial || {}));
+    persist();
+    return clone(state);
+  }
+
+  function replaceAll(nextState) {
+    state = normalizeBrand(nextState || {});
+    persist();
+    return clone(state);
+  }
+
+  function reset() {
+    state = normalizeBrand(DEFAULTS);
+    persist();
+    return clone(state);
+  }
+
+  function getPalette() {
+    const c = get().cores || DEFAULTS.cores;
+    return {
+      primaria: c[0] || '#F5C518',
+      secundaria: c[1] || '#0D0D0F',
+      terciaria: c[2] || '#F5F4F0',
+      quaternaria: c[3] || '#888888'
+    };
+  }
+
+  function bindSettingsPanel() {
+    const brand = get();
+    const map = {
+      profissao: 'brand-profissao',
+      nicho: 'brand-nicho',
+      tom: 'brand-tom',
+      publico: 'brand-publico',
+      identidade: 'brand-identidade'
+    };
+    Object.keys(map).forEach(function(key) {
+      const el = document.getElementById(map[key]);
+      if (el) el.value = brand[key] || '';
+    });
+    ['1','2','3','4'].forEach(function(n, i) {
+      const inp = document.getElementById('brand-c' + n);
+      if (inp) inp.value = brand.cores[i] || DEFAULTS.cores[i];
+    });
+    syncColorSwatches();
+    return brand;
+  }
+
+  function collectFromSettingsPanel() {
+    return {
+      profissao: document.getElementById('brand-profissao')?.value || '',
+      nicho: document.getElementById('brand-nicho')?.value || '',
+      tom: document.getElementById('brand-tom')?.value || '',
+      publico: document.getElementById('brand-publico')?.value || '',
+      identidade: document.getElementById('brand-identidade')?.value || '',
+      cores: [
+        document.getElementById('brand-c1')?.value || '#F5C518',
+        document.getElementById('brand-c2')?.value || '#0D0D0F',
+        document.getElementById('brand-c3')?.value || '#F5F4F0',
+        document.getElementById('brand-c4')?.value || '#888888'
+      ]
+    };
+  }
+
+  function syncColorSwatches() {
+    ['1','2','3','4'].forEach(function(n) {
+      const inp  = document.getElementById('brand-c' + n);
+      const fill = document.getElementById('brand-c' + n + '-fill');
+      const hex  = document.getElementById('brand-c' + n + '-hex');
+      const val = inp?.value || '';
+      if (fill && val) fill.style.background = val;
+      if (hex && val) hex.textContent = val.toUpperCase();
+    });
+  }
+
+  function saveFromSettingsPanel() {
+    const saved = save(collectFromSettingsPanel());
+    syncColorSwatches();
+    return saved;
+  }
+
+  function toGenerationPayload(extra) {
+    const brand = get();
+    return Object.assign({}, brand, {
+      cores: brand.cores.join(', '),
+      brandPalette: getPalette()
+    }, extra || {});
+  }
+
+  return {
+    get,
+    save,
+    replaceAll,
+    reset,
+    getPalette,
+    bindSettingsPanel,
+    collectFromSettingsPanel,
+    saveFromSettingsPanel,
+    syncColorSwatches,
+    toGenerationPayload
+  };
+})();
+
 function getBrand() {
-  try { const s=localStorage.getItem('gerai_brand'); if(s) return JSON.parse(s); } catch(e){}
-  return { cores:['#F5C518','#0D0D0F','#F5F4F0'] };
+  return BrandProfileModule.get();
 }
 
-function saveBrand(b) { localStorage.setItem('gerai_brand', JSON.stringify(b)); }
+function saveBrand(b) {
+  return BrandProfileModule.save(b || {});
+}
 
 // Settings: brand color change handler
 function onBrandColorChange() {
-  const c1 = document.getElementById('brand-c1')?.value || '#F5C518';
-  const c2 = document.getElementById('brand-c2')?.value || '#0D0D0F';
-  const c3 = document.getElementById('brand-c3')?.value || '#F5F4F0';
-  const c4 = document.getElementById('brand-c4')?.value || '#888888';
-  ['1','2','3','4'].forEach(n => {
-    const fill = document.getElementById('brand-c'+n+'-fill');
-    const hex  = document.getElementById('brand-c'+n+'-hex');
-    const val  = document.getElementById('brand-c'+n)?.value;
-    if (fill && val) fill.style.background = val;
-    if (hex  && val) hex.textContent = val.toUpperCase();
-  });
-  saveBrand({ cores:[c1,c2,c3,c4] });
-  _renderBrandModelPreviews([c1,c2,c3,c4]);
+  BrandProfileModule.save(Object.assign({}, BrandProfileModule.get(), {
+    cores: [
+      document.getElementById('brand-c1')?.value || '#F5C518',
+      document.getElementById('brand-c2')?.value || '#0D0D0F',
+      document.getElementById('brand-c3')?.value || '#F5F4F0',
+      document.getElementById('brand-c4')?.value || '#888888'
+    ]
+  }));
+  BrandProfileModule.syncColorSwatches();
+  _renderBrandModelPreviews(BrandProfileModule.get().cores);
 }
 
 function _renderBrandModelPreviews(cores) {
@@ -6682,8 +6937,8 @@ function _renderBrandModelPreviews(cores) {
   }).join('');
 }
 
-function applyPreset(c1, c2, c3) {
-  const inputs = [['brand-c1',c1],['brand-c2',c2],['brand-c3',c3]];
+function applyPreset(c1, c2, c3, c4) {
+  const inputs = [['brand-c1',c1],['brand-c2',c2],['brand-c3',c3],['brand-c4',c4 || '#888888']];
   inputs.forEach(function(pair) {
     const el = document.getElementById(pair[0]);
     if (el) el.value = pair[1];
@@ -6692,25 +6947,14 @@ function applyPreset(c1, c2, c3) {
 }
 
 function saveBrandSettings() {
-  const c1 = document.getElementById('brand-c1')?.value || '#F5C518';
-  const c2 = document.getElementById('brand-c2')?.value || '#0D0D0F';
-  const c3 = document.getElementById('brand-c3')?.value || '#F5F4F0';
-  saveBrand({ cores:[c1,c2,c3] });
-  toast('Identidade de marca salva!', 'ok');
+  const brand = BrandProfileModule.saveFromSettingsPanel();
+  _renderBrandModelPreviews(brand.cores);
+  toast('Perfil de marca salvo!', 'ok');
 }
 
 function _loadBrandSettingsPanel() {
-  const brand = getBrand();
-  const cores = brand.cores || ['#F5C518','#0D0D0F','#F5F4F0'];
-  ['1','2','3'].forEach(function(n,i) {
-    const inp  = document.getElementById('brand-c'+n);
-    const fill = document.getElementById('brand-c'+n+'-fill');
-    const hex  = document.getElementById('brand-c'+n+'-hex');
-    if (inp)  inp.value = cores[i] || '#000000';
-    if (fill) fill.style.background = cores[i] || '#000000';
-    if (hex)  hex.textContent = (cores[i] || '#000000').toUpperCase();
-  });
-  _renderBrandModelPreviews(cores);
+  const brand = BrandProfileModule.bindSettingsPanel();
+  _renderBrandModelPreviews(brand.cores || ['#F5C518','#0D0D0F','#F5F4F0','#888888']);
 }
 // ════════════════════════════════════════════════════════════════════════════
 function _renderPostPreviews(kit) {
