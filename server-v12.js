@@ -885,27 +885,53 @@ REGRAS dos prompts:
 - No text, no watermarks, no logos`;
 }
 
-function getRefineSkill(user) {
+function getRefineSkill(user, opts) {
   const p = user || {};
-  return `Você é um especialista em marketing e copy. Sua única função é expandir e enriquecer o CONTEÚDO do input do usuário.
+  const modelN    = opts?.modelN    || '';
+  const modelName = opts?.modelName || '';
+  const modelSvg  = opts?.modelSvg  || '';
+  const bp        = opts?.brandPalette || {};
 
-PERFIL DO USUÁRIO (use apenas para entender contexto e tom — NUNCA para definir design):
+  // Extract text placeholders from model SVG
+  let modelTextSlots = '';
+  if (modelSvg) {
+    const matches = [...modelSvg.matchAll(/>([^<\n]{2,60})</g)]
+      .map(m => m[1].trim())
+      .filter(t => {
+        if (t.length < 2) return false;
+        if (/^[\d\s\.\-\,\%px·]+$/.test(t)) return false;
+        if (/^(IBM Plex|Bebas|Playfair|Cormorant|DM Sans|Syne|Regular|Bold|Light|Black|Italic|Mono|Sans|Serif)/i.test(t)) return false;
+        return true;
+      });
+    const unique = [...new Set(matches)].slice(0, 14);
+    if (unique.length) modelTextSlots = '\nTEXTOS DO MODELO (substitua cada um pelo conteúdo real do tema):\n' + unique.map((t,i) => `${i+1}. "${t}"`).join('\n');
+  }
+
+  const paletteCtx = (bp.primaria || bp.secundaria)
+    ? `\nPALETA DA MARCA:\n- Primária (destaque/accent): ${bp.primaria || '#F5C518'}\n- Secundária (fundo principal): ${bp.secundaria || '#0D0D0F'}\n- Terciária (texto/contraste): ${bp.terciaria || '#F5F4F0'}\n- Quaternária (suporte): ${bp.quaternaria || '#888888'}`
+    : '';
+
+  const modelCtx = modelN
+    ? `\nMODELO SELECIONADO: ${modelN} — ${modelName}${modelTextSlots}`
+    : '';
+
+  return `Você é um especialista em marketing, copy e direção de arte para redes sociais.
+Sua função é refinar o input em um prompt rico que a IA usará para gerar a imagem final.
+
+PERFIL DO USUÁRIO:
 - Profissão: ${p.profissao || 'criador de conteúdo'}
 - Nicho: ${p.nicho || 'negócios'}
 - Tom de voz: ${p.tom || 'autoridade'}
-- Público-alvo: ${p.publico || 'profissionais'}
+- Público-alvo: ${p.publico || 'profissionais'}${paletteCtx}${modelCtx}
 
-REGRAS ABSOLUTAS — VIOLÁ-LAS INVALIDA SUA RESPOSTA:
-1. NUNCA mencione cores, fontes, estilos visuais, layouts, hierarquia visual ou design de qualquer tipo.
-2. NUNCA dite como o post deve ser organizado visualmente (colunas, cards, seções, etc.).
-3. Foque 100% em: CONTEÚDO, DADOS EXATOS, NARRATIVA e COPY.
-4. Preserve todos os números e dados fornecidos pelo usuário sem alteração.
-5. Expanda o contexto emocional e de negócio por trás da ideia.
-6. Retorne APENAS o prompt refinado em 2-4 frases. ZERO introduções ou explicações.
-
-Responda sempre à pergunta: Qual é a história por trás disso? Que emoção deve ser transmitida? Que dados precisam aparecer?`;
+REGRAS ABSOLUTAS:
+1. O prompt refinado DEVE mencionar as cores da paleta nos contextos corretos (destaque, fundo, texto).
+2. Inclua conteúdo real para cada slot de texto do modelo (se houver).
+3. Preserve todos os números e dados do usuário sem alteração.
+4. Expanda narrativa, emoção e contexto de negócio.
+5. Retorne APENAS o prompt refinado em 3-5 frases. ZERO introduções ou explicações.
+6. O resultado deve ser rico o suficiente para a IA replicar o modelo escolhido com o conteúdo e cores corretos.`;
 }
-
 // ─────────────────────────────────────────────
 // HTTP UTILS
 // ─────────────────────────────────────────────
@@ -1207,20 +1233,24 @@ route('DELETE', '/api/user/calendar/:id', async (req, res, params) => {
 
 route('POST', '/api/user/refine-prompt', async (req, res) => {
   const payload = requireAuth(req, res); if (!payload) return;
-  const { input, format, network, refImageBase64 } = await parseBody(req);
+  const { input, format, network, refImageBase64, modelSvg, modelN, modelName, brandPalette } = await parseBody(req);
   if (!input) return err(res, 'input obrigatório');
   const user = db.getUserById(payload.id);
+  const refineOpts = { modelSvg, modelN, modelName, brandPalette };
   try {
     let messages;
+    const userMsg = modelN
+      ? `Input bruto: "${input}"\n\nModelo selecionado: ${modelN} — ${modelName}\nExpanda o conteúdo com narrativa e dados reais para cada slot de texto do modelo. Inclua as cores da paleta da marca no contexto. Retorne apenas o prompt refinado:`
+      : `Input bruto: "${input}"\n\nExpanda o conteúdo, a narrativa e os dados. Retorne apenas o prompt refinado:`;
     if (refImageBase64) {
       messages = [{ role:'user', content:[
         { type:'image', source:{ type:'base64', media_type:'image/jpeg', data:refImageBase64 }},
-        { type:'text', text:`Input bruto: "${input}"\n\nConsidere esta imagem como referência de CONTEÚDO (não de estilo visual). Expanda a narrativa e os dados. Retorne apenas o prompt refinado:` }
+        { type:'text', text:userMsg }
       ]}];
     } else {
-      messages = [{ role:'user', content:`Input bruto: "${input}"\n\nExpanda o conteúdo, a narrativa e os dados. Retorne apenas o prompt refinado:` }];
+      messages = [{ role:'user', content:userMsg }];
     }
-    const refined = await callClaudeMessages({ system: getRefineSkill(user), messages, maxTokens:300 });
+    const refined = await callClaudeMessages({ system: getRefineSkill(user, refineOpts), messages, maxTokens:500 });
     ok(res, { refined_prompt: refined.trim(), original: input });
   } catch {
     const p = user || {};
@@ -1445,50 +1475,68 @@ Responda SOMENTE com este JSON (sem mais nada):
         svg = svg.replace(new RegExp(`(>\\s*)${safe}(\\s*<)`, 'g'), `$1${novo}$2`);
       }
 
-      // 2b. Substituir cores ACCENT (amarelo-ouro padrão → COR PRIMÁRIA da marca)
-      const ACCENT_COLORS = [
-        '#F5C518','#E6A800','#C87800','#FFD740','#C8960A',
-        '#A08030','#D4A520','#C8A850','#FFE040','#F5C51',
-        '#F5C518'.slice(0,7), // garante match exato
-      ];
-      for (const c of ACCENT_COLORS) {
-        const safe = c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        svg = svg.replace(new RegExp(safe, 'gi'), brandPrimaria);
+      // ─── 2b-2d. Substituição de cores por papel semântico ─────────────────────────
+      // Estratégia: extrair todas as cores únicas do SVG, classificar por luminância,
+      // depois mapear: accent → Primária, fundo → Secundária, texto claro/branco → Terciária.
+      // Isso evita listas hardcoded que podem não cobrir o modelo escolhido.
+
+      function hexToRgb(hex) {
+        const h = hex.replace('#','');
+        const r = parseInt(h.substr(0,2),16), g = parseInt(h.substr(2,2),16), b = parseInt(h.substr(4,2),16);
+        return [r,g,b];
+      }
+      function relativeLuminance([r,g,b]) {
+        const srgb = [r,g,b].map(c => { c/=255; return c<=0.04045 ? c/12.92 : Math.pow((c+0.055)/1.055,2.4); });
+        return 0.2126*srgb[0] + 0.7152*srgb[1] + 0.0722*srgb[2];
+      }
+      function hexSaturation([r,g,b]) {
+        const max=Math.max(r,g,b)/255, min=Math.min(r,g,b)/255;
+        return max===0 ? 0 : (max-min)/max;
       }
 
-      // 2c. Substituir fundos ESCUROS → COR SECUNDÁRIA da marca
-      if (!isLightBg) {
-        const DARK_COLORS = [
-          '#0A0A0A','#080808','#0C0C0C','#111111','#050505',
-          '#04040A','#0A0806','#18140E','#100C08','#080C08',
-          '#0C100C','#0A0E12','#080C10','#0E0E0E','#141414',
-          '#0A0A10','#080810','#0A0A12','#0E120E','#111811',
-          '#0D0D0F','#0D0D0D','#101010','#121212',
-        ];
-        for (const c of DARK_COLORS) {
-          const safe = c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          svg = svg.replace(new RegExp(safe, 'gi'), brandSecundaria);
-        }
-      } else {
-        // Modelos claros: substituir brancos/cremes → COR SECUNDÁRIA (fundo claro da marca)
-        const LIGHT_COLORS = [
-          '#FAF6EE','#F0E8D5','#FAFAF5','#F0EBE0','#FFFFFF','#FAFAFA',
-          '#F7F7F5','#F5F5F5','#FFFFF0',
-        ];
-        for (const c of LIGHT_COLORS) {
-          const safe = c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          svg = svg.replace(new RegExp(safe, 'gi'), brandSecundaria);
-        }
+      // Extrair todas as cores hex do SVG
+      const svgHexColors = [...new Set([...svg.matchAll(/#([0-9A-Fa-f]{6})/g)].map(m => '#'+m[1].toUpperCase()))];
+
+      // Classificar cada cor por luminância e saturação
+      const colorMeta = svgHexColors.map(hex => {
+        const rgb = hexToRgb(hex);
+        return { hex, lum: relativeLuminance(rgb), sat: hexSaturation(rgb) };
+      });
+
+      // ACCENT: cores com saturação alta e luminância média-alta (não são preto/branco/cinza)
+      // Geralmente o amarelo-dourado padrão dos templates
+      const accentColors = colorMeta
+        .filter(c => c.sat > 0.3 && c.lum > 0.05 && c.lum < 0.85)
+        .sort((a,b) => b.sat - a.sat);
+
+      // FUNDO: cores mais escuras (lum < 0.05) se modelo escuro, ou mais claras (lum > 0.85) se modelo claro
+      const bgColors = isLightBg
+        ? colorMeta.filter(c => c.lum > 0.80 && c.sat < 0.15).sort((a,b) => b.lum - a.lum)
+        : colorMeta.filter(c => c.lum < 0.05 && c.sat < 0.15).sort((a,b) => a.lum - b.lum);
+
+      // TEXTO: cores claras neutras (lum 0.55–0.95, baixa saturação) em modelos escuros
+      //        ou cores escuras neutras em modelos claros
+      const textColors = isLightBg
+        ? colorMeta.filter(c => c.lum < 0.10 && c.sat < 0.15).sort((a,b) => a.lum - b.lum)
+        : colorMeta.filter(c => c.lum > 0.55 && c.lum <= 0.95 && c.sat < 0.15).sort((a,b) => b.lum - a.lum);
+
+      function safeReplace(svgStr, colorHex, replacement) {
+        if (!colorHex || !replacement || colorHex.toUpperCase() === replacement.toUpperCase()) return svgStr;
+        const esc = colorHex.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return svgStr.replace(new RegExp(esc, 'gi'), replacement);
       }
 
-      // 2d-extra. Substituir cinzas de texto → COR TERCIÁRIA da marca
-      const TEXT_GRAY_COLORS = [
-        '#F5F4F0','#F2F0EC','#EEEDE8','#E8E6E0','#E0DDD5',
-        '#FAFAFA','#F5F5F5',
-      ];
-      for (const c of TEXT_GRAY_COLORS) {
-        const safe = c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        svg = svg.replace(new RegExp(safe, 'gi'), brandTerciaria);
+      // Aplicar substituições: accent → Primária
+      for (const { hex } of accentColors) {
+        svg = safeReplace(svg, hex, brandPrimaria);
+      }
+      // Aplicar substituições: fundo → Secundária
+      for (const { hex } of bgColors) {
+        svg = safeReplace(svg, hex, brandSecundaria);
+      }
+      // Aplicar substituições: texto neutro → Terciária
+      for (const { hex } of textColors.slice(0, 4)) {
+        svg = safeReplace(svg, hex, brandTerciaria);
       }
 
       // 2d. Garantir xmlns e viewBox

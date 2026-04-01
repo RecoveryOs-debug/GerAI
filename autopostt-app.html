@@ -3280,7 +3280,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                     </div>
                   </label>
                 </div>
-<div class="cmd-box" id="cmd-out" data-prompt="" style="word-break:break-word;font-size:11px"><span id="cmd-out-txt" style="color:var(--t3);font-style:italic">O prompt refinado aparecerá aqui após gerar</span><button class="cp-btn" onclick="cpElById('cmd-out')">Copiar</button></div>
+<div class="cmd-box" id="cmd-out" data-prompt="" style="word-break:break-word;font-size:11px"><span id="cmd-out-txt" style="color:var(--t3);font-style:italic">Selecione um modelo acima para refinar o prompt automaticamente</span><button class="cp-btn" onclick="cpElById('cmd-out')">Copiar</button></div>
                 <button id="btn-gerar-img" onclick="gerarImagem()" style="width:100%;margin-top:12px;background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:var(--f);font-size:14px;font-weight:700;color:#fff;letter-spacing:-.02em;box-shadow:0 4px 20px rgba(243,107,42,.3);transition:all .15s">
                   <svg style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                   Gerar imagem com IA
@@ -3388,94 +3388,6 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
           </div>
         </div>
         <div>
-          <div class="pb" style="margin-bottom:12px">
-            <div class="pb-title">Identidade visual</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:18px">
-              <div><label style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px">Primária</label>
-                <div style="position:relative;width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);overflow:hidden;cursor:pointer">
-                  <input type="color" id="brand-c1" value="#F5C518" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
-                  <div id="brand-c1-fill" style="position:absolute;inset:0;background:#F5C518;pointer-events:none"></div>
-                </div>
-                <div id="brand-c1-hex" style="font-size:11px;font-weight:600;color:var(--t0);font-family:monospace;margin-top:4px">#F5C518</div>
-              </div>
-              <div><label style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px">Secundária</label>
-                <div style="position:relative;width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);overflow:hidden;cursor:pointer">
-                  <input type="color" id="brand-c2" value="#0D0D0F" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
-                  <div id="brand-c2-fill" style="position:absolute;inset:0;background:#0D0D0F;pointer-events:none"></div>
-                </div>
-                <div id="brand-c2-hex" style="font-size:11px;font-weight:600;color:var(--t0);font-family:monospace;margin-top:4px">#0D0D0F</div>
-              </div>
-              <div><label style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px">Terciária</label>
-                <div style="position:relative;width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);overflow:hidden;cursor:pointer">
-                  <input type="color" id="brand-c3" value="#F5F4F0" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
-                  <div id="brand-c3-fill" style="position:absolute;inset:0;background:#F5F4F0;pointer-events:none"></div>
-                </div>
-                <div id="brand-c3-hex" style="font-size:11px;font-weight:600;color:var(--t0);font-family:monospace;margin-top:4px">#F5F4F0</div>
-              </div>
-              <div><label style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px">Quaternária</label>
-                <div style="position:relative;width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);overflow:hidden;cursor:pointer">
-                  <input type="color" id="brand-c4" value="#888888" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
-                  <div id="brand-c4-fill" style="position:absolute;inset:0;background:#888888;pointer-events:none"></div>
-                </div>
-                <div id="brand-c4-hex" style="font-size:11px;font-weight:600;color:var(--t0);font-family:monospace;margin-top:4px">#888888</div>
-              </div>
-            </div>
-            <div style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;display:flex;align-items:center;gap:5px">
-              <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:none;stroke:var(--amber);stroke-width:2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              Preview ao vivo
-            </div>
-            <div id="brand-model-previews" style="display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;margin-bottom:18px"></div>
-            <div style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Paletas rápidas</div>
-            <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px">
-              <button class="btn btn-g btn-sm" onclick="applyPreset('#F5C518','#0D0D0F','#F5F4F0')">AutoPostt</button>
-              <button class="btn btn-g btn-sm" onclick="applyPreset('#E8302A','#0A0A0A','#F5F5F5')">Sangue Frio</button>
-              <button class="btn btn-g btn-sm" onclick="applyPreset('#00A86B','#0D1117','#F0FFF4')">Matrix Verde</button>
-              <button class="btn btn-g btn-sm" onclick="applyPreset('#8B5CF6','#0F0A1E','#FAF5FF')">Neon Violeta</button>
-              <button class="btn btn-g btn-sm" onclick="applyPreset('#F97316','#1C1C1E','#FAFAFA')">Laranja Obsessão</button>
-              <button class="btn btn-g btn-sm" onclick="applyPreset('#06B6D4','#030712','#F0F9FF')">Gelo Cibernético</button>
-              <button class="btn btn-g btn-sm" onclick="applyPreset('#EC4899','#1A0010','#FFF0F7')">Rosa Brutalista</button>
-            </div>
-            <div class="form-row"><label>Estilo visual</label><select id="prof-estilo"><option value="Dark Luxury">Dark Luxury</option><option value="Minimalista">Minimalista</option><option value="Editorial">Editorial</option><option value="Futurista">Futurista</option></select></div>
-            <div class="form-row"><label>Redes integradas</label>
-              <div id="prof-redes-integrations">
-                <!-- populated by loadProfile() -->
-                <div style="font-size:12px;color:var(--tx-2);margin-bottom:10px">
-                  Conecte suas redes para publicar diretamente pela plataforma.
-                </div>
-                <div style="display:flex;flex-direction:column;gap:8px" id="redes-status-list">
-                  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--ink-3);border:1px solid var(--line-1);border-radius:8px">
-                    <div style="display:flex;align-items:center;gap:8px">
-                      <svg style="width:14px;height:14px;fill:none;stroke:var(--tx-2);stroke-width:1.8" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-                      <span style="font-size:12.5px;color:var(--tx-1)">Instagram</span>
-                    </div>
-                    <button class="btn btn-s btn-sm" onclick="nav('settings')" style="font-size:11px">Integrar →</button>
-                  </div>
-                  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--ink-3);border:1px solid var(--line-1);border-radius:8px">
-                    <div style="display:flex;align-items:center;gap:8px">
-                      <svg style="width:14px;height:14px;fill:none;stroke:var(--tx-2);stroke-width:1.8" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-                      <span style="font-size:12.5px;color:var(--tx-1)">LinkedIn</span>
-                    </div>
-                    <button class="btn btn-s btn-sm" onclick="nav('settings')" style="font-size:11px">Integrar →</button>
-                  </div>
-                  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--ink-3);border:1px solid var(--line-1);border-radius:8px">
-                    <div style="display:flex;align-items:center;gap:8px">
-                      <svg style="width:14px;height:14px;fill:none;stroke:var(--tx-2);stroke-width:1.8" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
-                      <span style="font-size:12.5px;color:var(--tx-1)">YouTube</span>
-                    </div>
-                    <button class="btn btn-s btn-sm" onclick="nav('settings')" style="font-size:11px">Integrar →</button>
-                  </div>
-                  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--ink-3);border:1px solid var(--line-1);border-radius:8px">
-                    <div style="display:flex;align-items:center;gap:8px">
-                      <svg style="width:14px;height:14px;fill:none;stroke:var(--tx-2);stroke-width:1.8" viewBox="0 0 24 24"><path d="M9 12a3 3 0 1 0 6 0 3 3 0 0 0-6 0M15 8h.01M19 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/></svg>
-                      <span style="font-size:12.5px;color:var(--tx-1)">TikTok</span>
-                    </div>
-                    <button class="btn btn-s btn-sm" onclick="nav('settings')" style="font-size:11px">Integrar →</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <button class="btn btn-p btn-sm" style="margin-top:4px" onclick="saveProfile()">Salvar</button>
-          </div>
           <div class="plan-box">
             <div class="plan-name" id="prof-plan-name">—</div>
             <div class="plan-renew" id="prof-plan-renew"></div>
@@ -4858,9 +4770,21 @@ function startGenPipeline() {
   const input = (document.getElementById('gen-in').value || '').trim();
   if (!input) { toast('Descreva sua ideia antes de gerar'); return; }
 
-  // Guarda o input bruto para o gerarImagem usar
+  // Guarda o input bruto; limpa refinamento anterior (modelo novo = refinamento novo)
   window._rawInput = input;
   window._refinedPrompt = '';
+
+  // Limpa o bloco de prompt refinado
+  const wrap = document.getElementById('refined-prompt-wrap');
+  const box  = document.getElementById('refined-prompt-box');
+  if (wrap) wrap.style.display = 'none';
+  if (box)  box.textContent = '';
+
+  // Reset cmd-out
+  const cmdEl  = document.getElementById('cmd-out');
+  const cmdTxt = document.getElementById('cmd-out-txt');
+  if (cmdEl)  cmdEl.dataset.prompt = '';
+  if (cmdTxt) cmdTxt.textContent = 'Selecione um modelo para refinar o prompt';
 
   // Limpa seleção de modelo anterior
   window._selectedModel = null;
@@ -4959,6 +4883,10 @@ async function gerarImagem() {
   const model = window._selectedModel;
   const p = me || {};
 
+  // Usa prompt já refinado pelo _refineWithModel (chamado ao selecionar o modelo)
+  // Se por algum motivo não tiver refinado, usa o raw
+  const refined = (window._refinedPrompt || '').trim() || rawInput;
+
   // Paleta da marca: Primária, Secundária, Terciária, Quaternária
   const brandParts = (p.cores || '#F5C518,#0D0D0F,#F5F4F0,#888888').split(',').map(s => s.trim());
   const brandPalette = {
@@ -4975,34 +4903,13 @@ async function gerarImagem() {
 
   let si = 0;
   const stageEl = document.getElementById('img-gen-stage');
-  const IMG_STAGES = ['Refinando conteúdo...','Aplicando modelo selecionado...','Mapeando paleta de marca...','Substituindo textos...','Aplicando cores...','Finalizando...'];
-  const iv = setInterval(() => { if (si < IMG_STAGES.length) stageEl.textContent = IMG_STAGES[si++]; }, 900);
+  const IV_STAGES = ['Aplicando modelo ' + model.n + '...','Mapeando paleta de marca...','Substituindo textos...','Aplicando cores da marca...','Ajustando tipografia...','Finalizando...'];
+  const iv = setInterval(() => { if (si < IV_STAGES.length) stageEl.textContent = IV_STAGES[si++]; }, 900);
 
   try {
-    // PASSO 1 — Refinar o prompt AGORA, com o modelo já escolhido
-    // O backend recebe o SVG do modelo para entender o contexto do layout
-    const refineBody = {
-      input: rawInput,
-      format: _currentFmt,
-      network: _netMap[_currentNet] || 'instagram',
-      modelName: model.name,
-      modelN: model.n,
-      brandPalette
-    };
-    if (window._refImageB64) refineBody.refImageBase64 = window._refImageB64;
-
-    const refineData = await api('POST', '/api/user/refine-prompt', refineBody);
-    const refined = refineData.refined_prompt || rawInput;
-
-    // Atualiza o painel de prompt refinado visualmente
-    window._refinedPrompt = refined;
-    const wrap = document.getElementById('refined-prompt-wrap');
-    const box  = document.getElementById('refined-prompt-box');
-    if (wrap && box) { box.textContent = refined; wrap.style.display = 'block'; }
-
-    // PASSO 2 — Gerar imagem com o modelo obrigatório + paleta correta
+    // Gerar imagem com o modelo obrigatório + prompt refinado + paleta correta
     const body = {
-      prompt: rawInput + '\nPROMPT REFINADO: ' + refined,
+      prompt: refined,
       format:  _currentFmt,
       network: _netMap[_currentNet] || 'instagram',
       imgMode: 'model',
@@ -5011,13 +4918,11 @@ async function gerarImagem() {
         nicho:       p.nicho,
         tom:         p.tom,
         publico:     p.publico,
-        estilo:      p.estilo,
-        // Paleta nomeada — o backend sabe qual é qual
         cores:       p.cores,
         brandPalette,
         modelN:    model.n,
         modelName: model.name,
-        modelSvg:  model.svg   // SVG obrigatório do modelo escolhido
+        modelSvg:  model.svg
       }
     };
 
@@ -5048,8 +4953,35 @@ function openImgModal() {
   const bg = document.getElementById('img-modal-bg');
   const body = document.getElementById('img-modal-body');
   if (!bg || !body) { toast('Modal não encontrado', 'err'); return; }
-  body.innerHTML = svg;
-  bg.classList.add('open');
+  // Render SVG to canvas for crisp fullscreen display
+  const vbMatch = svg.match(/viewBox=["']([^"']+)["']/);
+  let W = 1080, H = 1350;
+  if (vbMatch) { const p = vbMatch[1].trim().split(/[\s,]+/); if (p.length===4){W=parseFloat(p[2])||1080;H=parseFloat(p[3])||1350;} }
+  const blob = new Blob([svg], {type:'image/svg+xml;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const tmpImg = new Image();
+  tmpImg.onload = function() {
+    const canvas = document.createElement('canvas');
+    canvas.width = W * 2; canvas.height = H * 2;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(2,2);
+    const brandParts = (me?.cores||'#F5C518,#0D0D0F').split(',').map(s=>s.trim());
+    ctx.fillStyle = brandParts[1] || '#0D0D0F';
+    ctx.fillRect(0,0,W,H);
+    ctx.drawImage(tmpImg,0,0,W,H);
+    URL.revokeObjectURL(url);
+    const img = document.createElement('img');
+    img.style.cssText = 'max-width:100%;max-height:calc(100vh - 120px);height:auto;display:block;border-radius:8px;object-fit:contain';
+    canvas.toBlob(b => {
+      if (!b) { body.innerHTML = svg; bg.classList.add('open'); return; }
+      img.src = URL.createObjectURL(b);
+      body.innerHTML = '';
+      body.appendChild(img);
+      bg.classList.add('open');
+    }, 'image/jpeg', 0.97);
+  };
+  tmpImg.onerror = function() { URL.revokeObjectURL(url); body.innerHTML = svg; bg.classList.add('open'); };
+  tmpImg.src = url;
 }
 function closeImgModal() {
   const bg = document.getElementById('img-modal-bg');
@@ -5679,74 +5611,7 @@ function clearRefImage(e) {
   toast('Imagem removida', 'ok');
 }
 
-// Real gerarImagem override — uses ref image if available
-const _origGerarImagem = gerarImagem;
-async function gerarImagem() {
-  // Build the richest possible prompt: raw input + refined + selected concept
-  const cmdEl = document.getElementById('cmd-out');
-  const conceptPrompt = (cmdEl?.dataset?.prompt || document.getElementById('cmd-out-txt')?.textContent || '').trim();
-  const rawInput = (document.getElementById('gen-in')?.value || '').trim();
-  const refinedPrompt = (window._refinedPrompt || '').trim();
-  
-  // Use whatever we have — concept prompt is primary, fall back to raw/refined
-  const bestPrompt = conceptPrompt && conceptPrompt !== '—' && conceptPrompt !== 'Selecione um conceito acima'
-    ? conceptPrompt
-    : refinedPrompt || rawInput;
-  
-  if (!bestPrompt) {
-    toast('Descreva sua ideia na aba de conceitos primeiro', 'err'); return;
-  }
-  
-  // Combine all context for richest generation
-  const parts = [];
-  if (rawInput) parts.push(`IDEIA ORIGINAL: ${rawInput}`);
-  if (refinedPrompt && refinedPrompt !== rawInput) parts.push(`PROMPT REFINADO: ${refinedPrompt}`);
-  if (conceptPrompt && conceptPrompt !== '—') parts.push(`CONCEITO VISUAL: ${conceptPrompt}`);
-  const fullPrompt = parts.length > 0 ? parts.join(' | ') : bestPrompt;
-  const prompt = fullPrompt;
-  switchOutTab('imagem');
-  document.getElementById('img-preview-empty').style.display = 'none';
-  document.getElementById('img-preview-wrap')?.classList.remove('vis');
-  document.getElementById('img-gen-loading').style.display = 'flex';
-  let si = 0;
-  const stageEl = document.getElementById('img-gen-stage');
-  const stages = ['Lendo perfil da marca...','Definindo composição...','Aplicando cores...','Construindo SVG...','Refinando elementos...','Finalizando imagem...'];
-  const iv = setInterval(() => { if (stageEl && si < stages.length) stageEl.textContent = stages[si++]; }, 1000);
-  const p = me || {};
-  const brandColors = (p.cores || '#F06B28,#0A0D10').split(',').map(s=>s.trim()).filter(Boolean);
-  try {
-    const body = {
-      prompt: fullPrompt || prompt,
-      format: _currentFmt || 'post',
-      network: _netMap?.[_currentNet] || 'instagram',
-      brandColors,
-      profileData: { nicho: p.nicho, estilo: p.estilo, tom: p.tom, profissao: p.profissao }
-    };
-    if (window._refImageB64) body.refImageBase64 = window._refImageB64;
-    const data = await api('POST', '/api/user/generate-image', body);
-    clearInterval(iv);
-    const svgCode = data.svg;
-    if (!svgCode || svgCode.length < 100) throw new Error('Servidor não retornou SVG válido. Verifique a ANTHROPIC_API_KEY no Railway.');
-    window._currentSVG = svgCode;
-    _currentSVG = svgCode;
-    _currentImgName = 'autopostt-' + (_currentFmt||'post') + '-' + Date.now();
-    const thumbEl = document.getElementById('img-preview-thumb');
-    if (thumbEl) thumbEl.innerHTML = svgCode;
-    document.getElementById('img-gen-loading').style.display = 'none';
-    document.getElementById('img-preview-wrap')?.classList.add('vis');
-    toast('Imagem gerada com sucesso!', 'ok');
-    if (me) { me.quota_used = (me.quota_used||0)+1; updateQuota(); }
-  } catch(e) {
-    clearInterval(iv);
-    document.getElementById('img-gen-loading').style.display = 'none';
-    document.getElementById('img-preview-empty').style.display = 'flex';
-    document.getElementById('img-preview-empty').innerHTML = 
-      '<svg style="width:28px;height:28px;fill:none;stroke:var(--err);stroke-width:1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
-      '<span style="color:var(--err);font-size:12px;text-align:center;max-width:220px">' + esc(e.message) + '</span>' +
-      '<button class="btn btn-g btn-sm" onclick="gerarImagem()">Tentar novamente</button>';
-    toast(e.message, 'err');
-  }
-}
+
 function addColorDot() {
   const dots = document.getElementById('prof-color-dots');
   if (!dots) return;
@@ -7693,6 +7558,7 @@ function _getModelDesc(n) {
 
 function selectModel(idx) {
   _selectedModel = models[idx];
+  window._selectedModel = _selectedModel;
   document.querySelectorAll('#modelo-grid > div').forEach((c, i) => {
     const on = i === idx;
     c.style.borderColor = on ? 'var(--amber)' : 'var(--line-1)';
@@ -7701,6 +7567,8 @@ function selectModel(idx) {
     if (chk) chk.style.display = on ? 'block' : 'none';
   });
   _updateModelInfo();
+  // Após selecionar o modelo, disparar refinamento automaticamente
+  _refineWithModel(_selectedModel);
 }
 
 function _updateModelInfo() {
@@ -7708,6 +7576,73 @@ function _updateModelInfo() {
   const name = document.getElementById('modelo-selected-name');
   if (info) info.style.display = _selectedModel ? 'block' : 'none';
   if (name && _selectedModel) name.textContent = _selectedModel.n + ' — ' + _selectedModel.name;
+}
+
+// Refina o prompt assim que o modelo é selecionado, mostra resultado ao usuário
+async function _refineWithModel(model) {
+  const rawInput = (window._rawInput || document.getElementById('gen-in')?.value || '').trim();
+  if (!rawInput || !model) return;
+
+  // Paleta da marca
+  const p = me || {};
+  const brandParts = (p.cores || '#F5C518,#0D0D0F,#F5F4F0,#888888').split(',').map(s => s.trim());
+  const brandPalette = {
+    primaria:    brandParts[0] || '#F5C518',
+    secundaria:  brandParts[1] || '#0D0D0F',
+    terciaria:   brandParts[2] || '#F5F4F0',
+    quaternaria: brandParts[3] || '#888888'
+  };
+
+  // Mostra estado "refinando..." no cmd-out
+  const cmdEl   = document.getElementById('cmd-out');
+  const cmdTxt  = document.getElementById('cmd-out-txt');
+  const btnGerar = document.getElementById('btn-gerar-img');
+  if (cmdTxt) cmdTxt.textContent = '✦ Refinando prompt com o modelo ' + model.n + '…';
+  if (cmdEl)  cmdEl.dataset.prompt = '';
+  if (btnGerar) btnGerar.disabled = true;
+
+  // Mostra o bloco de prompt refinado com loading
+  const wrap = document.getElementById('refined-prompt-wrap');
+  const box  = document.getElementById('refined-prompt-box');
+  if (wrap) wrap.style.display = 'block';
+  if (box)  box.textContent = '⏳ Refinando com base no modelo ' + model.n + ' — ' + model.name + '...';
+
+  try {
+    const body = {
+      input: rawInput,
+      modelN:    model.n,
+      modelName: model.name,
+      modelSvg:  model.svg,
+      brandPalette
+    };
+    if (window._refImageB64) body.refImageBase64 = window._refImageB64;
+
+    const data = await api('POST', '/api/user/refine-prompt', body);
+    const refined = data.refined_prompt || rawInput;
+    window._refinedPrompt = refined;
+
+    // Atualiza UI com prompt refinado
+    if (box)    box.textContent = refined;
+    if (cmdTxt) cmdTxt.textContent = refined;
+    if (cmdEl)  cmdEl.dataset.prompt = refined;
+    if (btnGerar) { btnGerar.disabled = false; btnGerar.textContent = ''; }
+
+    // Recompor o botão com ícone + texto
+    if (btnGerar) {
+      btnGerar.innerHTML = `<svg style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Gerar imagem com IA`;
+    }
+
+    toast('Prompt refinado! Clique em "Gerar imagem" para continuar.', 'ok');
+  } catch(e) {
+    window._refinedPrompt = rawInput;
+    if (box)    box.textContent = rawInput;
+    if (cmdTxt) cmdTxt.textContent = rawInput;
+    if (cmdEl)  cmdEl.dataset.prompt = rawInput;
+    if (btnGerar) {
+      btnGerar.disabled = false;
+      btnGerar.innerHTML = `<svg style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Gerar imagem com IA`;
+    }
+  }
 }
 
 // Show/hide img-mode-box based on ref image
