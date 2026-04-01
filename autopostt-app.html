@@ -3274,6 +3274,287 @@ tbody tr:hover{background:rgba(255,255,255,.025)}
 [data-theme="light"] .card,[data-theme="light"] .kpi,[data-theme="light"] .hist-card,[data-theme="light"] .out-panel,[data-theme="light"] .agent-input-panel,[data-theme="light"] .agent-out-panel,[data-theme="light"] .agent-result,[data-theme="light"] .tip-card,[data-theme="light"] .profile-card,[data-theme="light"] .sett-nav,[data-theme="light"] .sett-panel .card{background:transparent!important;border-color:rgba(0,0,0,.10)!important;box-shadow:none!important}
 [data-theme="light"] .plan-box,[data-theme="light"] .profile-plan-wrap .plan-box{background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.88)), radial-gradient(circle at top right, rgba(245,197,24,.16), transparent 42%)!important;border-color:rgba(245,197,24,.20)!important;box-shadow:0 14px 40px rgba(0,0,0,.08)!important}
 
+
+
+/* ═══════════════════════════════════════════════════════════
+   AUTOPOSTT — LIGHT MODE PARITY v6
+   Same dark-mode design language, inverted colors only
+═══════════════════════════════════════════════════════════ */
+[data-theme="light"]{
+  --ink-0:#F5F4F0;
+  --ink-1:#EFEBE2;
+  --ink-2:#E6DFD2;
+  --ink-3:#DDD3C3;
+  --ink-4:#D0C3AF;
+  --ink-5:#C1B39B;
+  --ink-6:#AD9D82;
+  --ink-7:#97876C;
+
+  --line-0:rgba(17,17,22,0.03);
+  --line-1:rgba(17,17,22,0.07);
+  --line-2:rgba(17,17,22,0.11);
+  --line-3:rgba(17,17,22,0.16);
+  --line-4:rgba(17,17,22,0.24);
+
+  --tx-0:#111116;
+  --tx-1:#25252F;
+  --tx-2:#5E5C54;
+  --tx-3:#8E897E;
+
+  --amber-10:rgba(245,197,24,0.10);
+  --amber-18:rgba(245,197,24,0.18);
+  --amber-30:rgba(245,197,24,0.28);
+
+  --bg:var(--ink-1);
+  --bg1:var(--ink-2);
+  --bg2:var(--ink-3);
+  --bg3:var(--ink-4);
+  --surface:var(--ink-3);
+  --surface2:var(--ink-4);
+  --b0:var(--line-0);
+  --b1:var(--line-1);
+  --b2:var(--line-2);
+  --b3:var(--line-3);
+  --t0:var(--tx-0);
+  --t1:var(--tx-1);
+  --t2:var(--tx-2);
+  --t3:var(--tx-3);
+  --adim:var(--amber-10);
+  --adim2:var(--amber-18);
+  --a:var(--amber);
+}
+
+[data-theme="light"] body,
+[data-theme="light"] #sc-app{
+  background: var(--ink-0) !important;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E") !important;
+}
+
+[data-theme="light"] .tb,
+[data-theme="light"] .sb{
+  background: var(--ink-1) !important;
+  border-color: var(--line-1) !important;
+  backdrop-filter: blur(12px);
+}
+
+[data-theme="light"] .card,
+[data-theme="light"] .kpi,
+[data-theme="light"] .hist-card,
+[data-theme="light"] .auth-card,
+[data-theme="light"] .tip-card,
+[data-theme="light"] .sett-nav,
+[data-theme="light"] .sb-content,
+[data-theme="light"] .modal-box,
+[data-theme="light"] .cmd-box,
+[data-theme="light"] .cpt,
+[data-theme="light"] .out-panel,
+[data-theme="light"] .agent-out-panel,
+[data-theme="light"] .agent-input-panel,
+[data-theme="light"] .agent-result,
+[data-theme="light"] .agent-result-content,
+[data-theme="light"] .drop-zone,
+[data-theme="light"] .fmt,
+[data-theme="light"] .net,
+[data-theme="light"] .qa{
+  background: var(--ink-2) !important;
+  border: 1px solid var(--line-1) !important;
+  box-shadow: none !important;
+}
+
+[data-theme="light"] .out-tabs,
+[data-theme="light"] .out-tab,
+[data-theme="light"] .agent-tab,
+[data-theme="light"] .sett-tabs{
+  background: var(--ink-2) !important;
+  border-color: var(--line-1) !important;
+}
+
+[data-theme="light"] input,
+[data-theme="light"] textarea,
+[data-theme="light"] select{
+  background: var(--ink-1) !important;
+  border-color: var(--line-2) !important;
+  color: var(--tx-0) !important;
+}
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder{color: var(--tx-3) !important;}
+[data-theme="light"] input:focus,
+[data-theme="light"] textarea:focus,
+[data-theme="light"] select:focus{
+  background: var(--ink-1) !important;
+  border-color: var(--amber) !important;
+  box-shadow: 0 0 0 3px var(--amber-10) !important;
+}
+
+[data-theme="light"] .fmt,
+[data-theme="light"] .net,
+[data-theme="light"] .qa,
+[data-theme="light"] .ni,
+[data-theme="light"] .btn-g,
+[data-theme="light"] .btn-s,
+[data-theme="light"] .mic-btn,
+[data-theme="light"] .agent-attach-btn,
+[data-theme="light"] .theme-btn,
+[data-theme="light"] .act-ico,
+[data-theme="light"] .kpi-icon,
+[data-theme="light"] .kpi-ico,
+[data-theme="light"] .fmt-ico,
+[data-theme="light"] .net-ico,
+[data-theme="light"] .qa-ico{
+  color: var(--tx-2) !important;
+}
+
+[data-theme="light"] .fmt-ico,
+[data-theme="light"] .net-ico,
+[data-theme="light"] .qa-ico,
+[data-theme="light"] .kpi-icon,
+[data-theme="light"] .kpi-ico,
+[data-theme="light"] .act-ico,
+[data-theme="light"] .theme-btn,
+[data-theme="light"] .btn-g,
+[data-theme="light"] .btn-s,
+[data-theme="light"] .mic-btn,
+[data-theme="light"] .agent-attach-btn{
+  background: var(--ink-3) !important;
+  border: 1px solid var(--line-1) !important;
+}
+
+[data-theme="light"] .fmt svg,
+[data-theme="light"] .net svg,
+[data-theme="light"] .qa svg,
+[data-theme="light"] .act-ico svg,
+[data-theme="light"] .kpi svg,
+[data-theme="light"] .kpi-icon svg,
+[data-theme="light"] .kpi-ico svg,
+[data-theme="light"] .ni-ico svg,
+[data-theme="light"] .theme-btn svg,
+[data-theme="light"] .mic-btn svg,
+[data-theme="light"] .agent-attach-btn svg,
+[data-theme="light"] .ico{
+  color: currentColor !important;
+  stroke: currentColor !important;
+  fill: none !important;
+}
+
+[data-theme="light"] .fmt:hover,
+[data-theme="light"] .net:hover,
+[data-theme="light"] .qa:hover,
+[data-theme="light"] .ni:hover,
+[data-theme="light"] .btn-g:hover,
+[data-theme="light"] .btn-s:hover,
+[data-theme="light"] .mic-btn:hover,
+[data-theme="light"] .agent-attach-btn:hover,
+[data-theme="light"] .theme-btn:hover{
+  background: var(--ink-3) !important;
+  border-color: var(--line-3) !important;
+  color: var(--tx-0) !important;
+}
+
+[data-theme="light"] .fmt.on,
+[data-theme="light"] .net.on,
+[data-theme="light"] .ni.on,
+[data-theme="light"] .out-tab.on,
+[data-theme="light"] .agent-tab.on,
+[data-theme="light"] .sett-tab.on,
+[data-theme="light"] .cpt.on{
+  background: var(--amber-10) !important;
+  border-color: var(--amber) !important;
+  color: var(--amber) !important;
+  box-shadow: inset 0 0 0 1px var(--amber-18) !important;
+}
+
+[data-theme="light"] .fmt.on .fmt-name,
+[data-theme="light"] .net.on .net-name,
+[data-theme="light"] .ni.on .ni-txt,
+[data-theme="light"] .ni.on{
+  color: var(--amber) !important;
+}
+
+[data-theme="light"] .fmt.on .fmt-ico,
+[data-theme="light"] .net.on .net-ico,
+[data-theme="light"] .ni.on .ni-ico,
+[data-theme="light"] .out-tab.on,
+[data-theme="light"] .agent-tab.on,
+[data-theme="light"] .sett-tab.on{
+  background: var(--amber-18) !important;
+}
+
+[data-theme="light"] .sec-lbl,
+[data-theme="light"] .sb-lbl,
+[data-theme="light"] label,
+[data-theme="light"] .tip-lbl,
+[data-theme="light"] .pg-sub,
+[data-theme="light"] .agent-sub,
+[data-theme="light"] .tb-crumb-base,
+[data-theme="light"] .tb-crumb-sep{
+  color: var(--tx-2) !important;
+}
+
+[data-theme="light"] .sec-lbl,
+[data-theme="light"] .sb-lbl,
+[data-theme="light"] label,
+[data-theme="light"] .tip-lbl{
+  color: var(--amber) !important;
+}
+
+[data-theme="light"] .pg-title,
+[data-theme="light"] .tb-crumb-cur,
+[data-theme="light"] .sb-wordmark-name,
+[data-theme="light"] .act-name,
+[data-theme="light"] .qa-lbl,
+[data-theme="light"] .fmt-name,
+[data-theme="light"] .net-name,
+[data-theme="light"] .sb-uname{
+  color: var(--tx-0) !important;
+}
+
+[data-theme="light"] .sb-uplan,
+[data-theme="light"] .quota-pill,
+[data-theme="light"] .quota-pill strong{
+  color: var(--tx-1) !important;
+}
+
+[data-theme="light"] .quota-pill{background: var(--ink-2) !important; border-color: var(--line-1) !important;}
+[data-theme="light"] .sb-av{background: var(--amber-grd) !important; color: #fff !important;}
+
+/* exact same dashboard composition, just inverted */
+[data-theme="light"] #pg-dashboard .kpi-row{
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  margin-bottom: 28px !important;
+}
+[data-theme="light"] #pg-dashboard .kpi{
+  min-height: auto !important;
+  padding: 20px !important;
+  display: block !important;
+}
+[data-theme="light"] #pg-dashboard .kpi-val{font-size:30px !important; line-height:1 !important;}
+[data-theme="light"] #pg-dashboard .kpi-lbl{font-size:10.5px !important; letter-spacing:.08em !important; color: var(--tx-2) !important;}
+[data-theme="light"] #pg-dashboard .kpi-delta{color: var(--tx-2) !important;}
+[data-theme="light"] #pg-dashboard .g-dash{
+  display:grid !important;
+  grid-template-columns: 1fr 288px !important;
+  gap:16px !important;
+  align-items:start !important;
+}
+[data-theme="light"] #pg-dashboard .g-dash > *{min-width:0 !important; max-width:100% !important;}
+[data-theme="light"] #pg-dashboard .qa-grid{
+  grid-template-columns: repeat(3, minmax(0,1fr)) !important;
+  gap: 7px !important;
+}
+[data-theme="light"] #pg-dashboard .qa{
+  min-height: auto !important;
+  padding: 12px !important;
+}
+
+@media (max-width: 1100px){
+  [data-theme="light"] #pg-dashboard .g-dash{grid-template-columns:1fr !important;}
+  [data-theme="light"] #pg-dashboard .kpi-row{grid-template-columns:repeat(2,minmax(0,1fr)) !important;}
+}
+@media (max-width: 700px){
+  [data-theme="light"] #pg-dashboard .kpi-row{grid-template-columns:1fr !important;}
+  [data-theme="light"] #pg-dashboard .qa-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;}
+}
 </style>
 
 <style id="autopostt-premium-final-pass">
