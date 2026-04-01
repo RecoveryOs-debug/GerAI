@@ -3999,6 +3999,213 @@ body.sidebar-collapsed .sb-av{
   .sb-collapse-toggle{display:none !important;}
 }
 
+
+/* === v8.4 sidebar behavior patch === */
+.sb{
+  background:rgba(8,8,10,.42)!important;
+  -webkit-backdrop-filter:blur(26px) saturate(150%)!important;
+  backdrop-filter:blur(26px) saturate(150%)!important;
+}
+.tb{
+  background:rgba(8,8,10,.34)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(145%)!important;
+  backdrop-filter:blur(24px) saturate(145%)!important;
+}
+.sb-top{
+  height:auto!important;
+  min-height:96px!important;
+  padding:14px 16px 12px!important;
+  gap:12px!important;
+  justify-content:center!important;
+}
+.sb-brand-wrap{
+  width:100%!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+}
+.sb-logo-mark--brand{
+  width:54px!important;
+  height:54px!important;
+  border-radius:18px!important;
+}
+.sb-logo-img{
+  width:44px!important;
+  height:44px!important;
+}
+.sb-wordmark{
+  align-items:center!important;
+}
+.sb-wordmark-name{
+  font-size:14px!important;
+  text-align:center!important;
+}
+.sb-wordmark-tag{
+  display:none!important;
+}
+.sb-collapse-toggle{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:10px!important;
+  min-width:44px!important;
+  height:44px!important;
+  border-radius:14px!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  background:rgba(255,255,255,.045)!important;
+  color:var(--t1)!important;
+  cursor:pointer!important;
+  transition:all .2s ease!important;
+}
+.sb-collapse-toggle:hover{
+  background:rgba(255,255,255,.08)!important;
+  color:var(--t0)!important;
+  border-color:rgba(255,255,255,.14)!important;
+}
+.sb-collapse-toggle svg{
+  width:18px!important;
+  height:18px!important;
+  fill:none!important;
+  stroke:currentColor!important;
+  stroke-width:2.2!important;
+}
+.sb-collapse-toggle--top{
+  display:none!important;
+}
+.sb-toggle-zone{
+  padding:8px 12px 12px!important;
+}
+.sb-collapse-toggle--bottom{
+  width:100%!important;
+  padding:0 14px!important;
+}
+body.sidebar-collapsed .sb{
+  width:96px!important;
+}
+body.sidebar-collapsed .sb-top{
+  padding:12px 10px 10px!important;
+  min-height:auto!important;
+}
+body.sidebar-collapsed .sb-brand-wrap{
+  width:100%!important;
+}
+body.sidebar-collapsed .sb-logo-mark--brand{
+  width:44px!important;
+  height:44px!important;
+  border-radius:14px!important;
+}
+body.sidebar-collapsed .sb-logo-img{
+  width:34px!important;
+  height:34px!important;
+}
+body.sidebar-collapsed .sb-wordmark{
+  display:flex!important;
+  align-items:center!important;
+}
+body.sidebar-collapsed .sb-wordmark-name{
+  display:block!important;
+  font-size:10px!important;
+  line-height:1.05!important;
+  text-align:center!important;
+  max-width:72px!important;
+  white-space:normal!important;
+}
+body.sidebar-collapsed .sb-collapse-toggle--bottom{
+  display:none!important;
+}
+body.sidebar-collapsed .sb-toggle-zone{
+  display:none!important;
+}
+body.sidebar-collapsed .sb-collapse-toggle--top{
+  display:inline-flex!important;
+  width:52px!important;
+  min-width:52px!important;
+  height:52px!important;
+  padding:0!important;
+  border-radius:18px!important;
+  margin:0 auto 6px!important;
+}
+body.sidebar-collapsed .sb-collapse-toggle--top .sb-collapse-toggle-text{
+  display:none!important;
+}
+body.sidebar-collapsed .sb-lbl,
+body.sidebar-collapsed .ni > :not(.ni-ico):not(.ni-badge){
+  display:none!important;
+}
+body.sidebar-collapsed .ni{
+  justify-content:center!important;
+  align-items:center!important;
+  padding:0!important;
+  min-height:64px!important;
+  height:64px!important;
+  border-radius:20px!important;
+  width:72px!important;
+  margin:0 auto 10px!important;
+}
+body.sidebar-collapsed .ni-ico{
+  width:28px!important;
+  height:28px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  margin:0 auto!important;
+}
+body.sidebar-collapsed .ni-ico svg{
+  width:24px!important;
+  height:24px!important;
+  stroke-width:2.15!important;
+}
+body.sidebar-collapsed .ni.on{
+  background:linear-gradient(180deg, rgba(245,197,24,.14), rgba(245,197,24,.08))!important;
+  border:1px solid rgba(245,197,24,.18)!important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+body.sidebar-collapsed .ni.on::after{
+  left:50%!important;
+  right:auto!important;
+  top:auto!important;
+  bottom:8px!important;
+  transform:translateX(-50%)!important;
+  width:22px!important;
+  height:4px!important;
+  border-radius:999px!important;
+}
+body.sidebar-collapsed .ni-badge{
+  display:none!important;
+}
+body.sidebar-collapsed .sb-sect{
+  margin-bottom:6px!important;
+}
+body.sidebar-collapsed .sb-body{
+  padding:6px 8px 8px!important;
+}
+body.sidebar-collapsed .sb-user{
+  justify-content:center!important;
+  padding:8px 0!important;
+}
+body.sidebar-collapsed .sb-uname,
+body.sidebar-collapsed .sb-uplan{
+  display:none!important;
+}
+body.sidebar-collapsed .btn.btn-g.btn-full.btn-sm{
+  width:72px!important;
+  min-width:72px!important;
+  margin:8px auto 0!important;
+  padding:12px 0!important;
+  border-radius:18px!important;
+}
+body.sidebar-collapsed .btn.btn-g.btn-full.btn-sm .ico{
+  margin:0 auto!important;
+}
+body.sidebar-collapsed .btn.btn-g.btn-full.btn-sm{
+  font-size:0!important;
+}
+body.sidebar-collapsed .btn.btn-g.btn-full.btn-sm svg{
+  width:22px!important;
+  height:22px!important;
+}
+
 </style>
 
 <style id="autopostt-premium-final-pass">
@@ -5070,7 +5277,7 @@ body.sidebar-collapsed .sb-av{
   <!-- sidebar -->
   <nav class="sb">
     <div class="sb-top">
-      <button class="sb-collapse-toggle" id="sb-collapse-toggle" type="button" onclick="toggleSidebarCollapse()" aria-label="Minimizar menu lateral">
+      <button class="sb-collapse-toggle sb-collapse-toggle--top" id="sb-collapse-toggle" type="button" onclick="toggleSidebarCollapse()" aria-label="Minimizar menu lateral">
         <span class="sb-collapse-toggle-ico">
           <svg viewBox="0 0 24 24"><path d="M13 6l-6 6 6 6"/><path d="M19 6l-6 6 6 6"/></svg>
         </span>
@@ -5141,6 +5348,16 @@ body.sidebar-collapsed .sb-av{
         Configurações
       </div>
     </div>
+
+      <div class="sb-toggle-zone">
+        <button class="sb-collapse-toggle sb-collapse-toggle--bottom" type="button" onclick="toggleSidebarCollapse()" aria-label="Minimizar menu lateral">
+          <span class="sb-collapse-toggle-ico">
+            <svg viewBox="0 0 24 24"><path d="M13 6l-6 6 6 6"/><path d="M19 6l-6 6 6 6"/></svg>
+          </span>
+          <span class="sb-collapse-toggle-text">Minimizar</span>
+        </button>
+      </div>
+
     <div class="sb-bot">
       <div class="sb-user" onclick="navP('settings')">
         <div class="sb-av" id="sb-av">—</div>
