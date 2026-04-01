@@ -1452,7 +1452,7 @@ Responda SOMENTE com este JSON (sem mais nada):
         '#F5C518'.slice(0,7), // garante match exato
       ];
       for (const c of ACCENT_COLORS) {
-        const safe = c.replace(/[.*+?^${}()|[\]\]/g, '\$&');
+        const safe = c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         svg = svg.replace(new RegExp(safe, 'gi'), brandPrimaria);
       }
 
@@ -1466,7 +1466,7 @@ Responda SOMENTE com este JSON (sem mais nada):
           '#0D0D0F','#0D0D0D','#101010','#121212',
         ];
         for (const c of DARK_COLORS) {
-          const safe = c.replace(/[.*+?^${}()|[\]\]/g, '\$&');
+          const safe = c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
           svg = svg.replace(new RegExp(safe, 'gi'), brandSecundaria);
         }
       } else {
@@ -1476,7 +1476,7 @@ Responda SOMENTE com este JSON (sem mais nada):
           '#F7F7F5','#F5F5F5','#FFFFF0',
         ];
         for (const c of LIGHT_COLORS) {
-          const safe = c.replace(/[.*+?^${}()|[\]\]/g, '\$&');
+          const safe = c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
           svg = svg.replace(new RegExp(safe, 'gi'), brandSecundaria);
         }
       }
@@ -1487,7 +1487,7 @@ Responda SOMENTE com este JSON (sem mais nada):
         '#FAFAFA','#F5F5F5',
       ];
       for (const c of TEXT_GRAY_COLORS) {
-        const safe = c.replace(/[.*+?^${}()|[\]\]/g, '\$&');
+        const safe = c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         svg = svg.replace(new RegExp(safe, 'gi'), brandTerciaria);
       }
 
