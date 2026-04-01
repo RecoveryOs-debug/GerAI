@@ -3706,6 +3706,129 @@ body.sidebar-collapsed .ni.on::after {
   }
 }
 
+
+/* === PATCH V2: stronger glass + sidebar-native collapse control === */
+.sb, .tb {
+  background: rgba(8, 8, 10, 0.34) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(165%);
+  backdrop-filter: blur(28px) saturate(165%);
+}
+.sb {
+  box-shadow: inset -1px 0 0 rgba(255,255,255,0.05), 16px 0 40px rgba(0,0,0,0.10);
+}
+.tb {
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.05);
+}
+.sb-top {
+  justify-content: space-between !important;
+  gap: 10px !important;
+}
+.sb-collapse-toggle {
+  min-width: 42px;
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  color: var(--t1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: .22s ease;
+  flex-shrink: 0;
+}
+.sb-collapse-toggle:hover {
+  background: rgba(255,255,255,0.07);
+  color: var(--t0);
+  border-color: rgba(255,255,255,0.12);
+}
+.sb-collapse-toggle-ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.sb-collapse-toggle svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+}
+.sb-collapse-toggle-text {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+}
+body.sidebar-collapsed .sb {
+  width: 94px !important;
+}
+body.sidebar-collapsed .sb-top {
+  justify-content: center !important;
+  padding-inline: 8px !important;
+}
+body.sidebar-collapsed .sb-logo-mark,
+body.sidebar-collapsed .sb-wordmark {
+  display: none !important;
+}
+body.sidebar-collapsed .sb-collapse-toggle {
+  width: 52px;
+  min-width: 52px;
+  height: 52px;
+  padding: 0;
+  border-radius: 16px;
+}
+body.sidebar-collapsed .sb-collapse-toggle-text {
+  display: none !important;
+}
+body.sidebar-collapsed .sb-collapse-toggle svg {
+  width: 24px;
+  height: 24px;
+}
+body.sidebar-collapsed .ni {
+  min-height: 56px !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+body.sidebar-collapsed .ni-ico {
+  width: 28px !important;
+  height: 28px !important;
+}
+body.sidebar-collapsed .ni-ico svg {
+  width: 24px !important;
+  height: 24px !important;
+  stroke-width: 2.2 !important;
+}
+body.sidebar-collapsed .ni-badge {
+  display: none !important;
+}
+body.sidebar-collapsed .sb-body {
+  padding-inline: 10px !important;
+}
+body.sidebar-collapsed .sb-sect {
+  margin-bottom: 8px !important;
+}
+body.sidebar-collapsed .sb-lbl,
+body.sidebar-collapsed .sb-wordmark,
+body.sidebar-collapsed .ni span:not(.ni-badge),
+body.sidebar-collapsed .sb-uname,
+body.sidebar-collapsed .sb-uplan {
+  display: none !important;
+}
+body.sidebar-collapsed .sb-user {
+  justify-content: center !important;
+  padding-inline: 0 !important;
+}
+body.sidebar-collapsed .sb-av {
+  width: 38px !important;
+  height: 38px !important;
+  font-size: 14px !important;
+}
+@media (max-width: 820px) {
+  .sb-collapse-toggle { display: none !important; }
+}
+
 </style>
 
 <style id="autopostt-premium-final-pass">
@@ -4782,6 +4905,12 @@ body.sidebar-collapsed .ni.on::after {
       </div>
       <div class="sb-wordmark">
         <div class="sb-wordmark-name">Auto<b>Postt</b></div>
+      <button class="sb-collapse-toggle" id="sb-collapse-toggle" type="button" onclick="toggleSidebarCollapse()" aria-label="Minimizar menu lateral">
+        <span class="sb-collapse-toggle-ico">
+          <svg viewBox="0 0 24 24"><path d="M13 6l-6 6 6 6"/><path d="M19 6l-6 6 6 6"/></svg>
+        </span>
+        <span class="sb-collapse-toggle-text">Minimizar</span>
+      </button>
         <span class="sb-wordmark-tag">Studio</span>
       </div>
     </div>
@@ -4860,11 +4989,7 @@ body.sidebar-collapsed .ni.on::after {
         <span class="tb-crumb-sep">/</span>
         <span class="tb-crumb-cur" id="tb-cur">Dashboard</span>
       </div>
-      <div class="tb-right">
-          <button class="sidebar-toggle-btn" id="sidebar-toggle-btn" type="button" onclick="toggleSidebarCollapse()" aria-label="Ocultar menu lateral">
-            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/><path d="M21 5v14"/><rect x="3" y="5" width="12" height="14" rx="2"/></svg>
-          </button>
-          <div class="quota-pill" id="quota-tag">
+      <div class="tb-right"><div class="quota-pill" id="quota-tag">
             <div class="quota-pill-dot" id="quota-dot"></div>
             <strong id="quota-used">—</strong><span style="color:var(--tx-2);margin:0 2px">de</span><span id="quota-limit">—</span>
           </div>
@@ -11302,6 +11427,33 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('DOMContentLoaded', applyState);
   } else {
     applyState();
+  }
+})();
+</script>
+
+
+<script>
+(function(){
+  const root = document.body;
+  const syncCollapseButtonLabel = () => {
+    const btn = document.getElementById('sb-collapse-toggle');
+    if (!btn) return;
+    const collapsed = root.classList.contains('sidebar-collapsed');
+    btn.setAttribute('aria-label', collapsed ? 'Expandir menu lateral' : 'Minimizar menu lateral');
+    const txt = btn.querySelector('.sb-collapse-toggle-text');
+    if (txt) txt.textContent = collapsed ? 'Expandir' : 'Minimizar';
+  };
+  const orig = window.toggleSidebarCollapse;
+  if (typeof orig === 'function') {
+    window.toggleSidebarCollapse = function(){
+      orig();
+      syncCollapseButtonLabel();
+    };
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', syncCollapseButtonLabel);
+  } else {
+    syncCollapseButtonLabel();
   }
 })();
 </script>
