@@ -322,6 +322,13 @@ html,body { height:100%; background:var(--bg); color:var(--tx0); font-family:var
     <div class="tb">
       <div class="tb-title" id="tb-title">Dashboard</div>
       <div class="tb-right">
+        <div id="fx-badge"
+          onclick="fetchExchangeRate().then(()=>loadCurrentPage())"
+          title="Cotação ao vivo — clique para atualizar"
+          style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;cursor:pointer;white-space:nowrap">
+          <svg style="width:12px;height:12px;fill:none;stroke:var(--tx2);stroke-width:2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          <span style="font-size:11px;color:var(--tx2)">carregando...</span>
+        </div>
         <button class="btn btn-g btn-sm" onclick="loadCurrentPage()">
           <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
           Atualizar
@@ -616,13 +623,41 @@ html,body { height:100%; background:var(--bg); color:var(--tx0); font-family:var
 
 <script>
 const API = '';
-const USD_BRL = 5.20;          // taxa de câmbio
+let USD_BRL = 5.20;            // atualizado em tempo real
 const PRICE_INPUT  = 3.00;     // USD por 1M tokens input  (Sonnet)
 const PRICE_OUTPUT = 15.00;    // USD por 1M tokens output (Sonnet)
 
 let adminToken = '';
 let _stats = null;
 let _users = [];
+
+// ── Câmbio USD/BRL em tempo real ───────────────────────────────
+let _fxData = { rate: 5.20, source: '...', pctChange: '0', high: 0, low: 0 };
+
+async function fetchExchangeRate() {
+  try {
+    const d = await aApi('GET', '/api/admin/exchange-rate');
+    if (d?.exchange?.rate) {
+      USD_BRL  = d.exchange.rate;
+      _fxData  = d.exchange;
+      _renderFxBadge();
+    }
+  } catch(e) { console.warn('FX falhou:', e.message); }
+}
+
+function _renderFxBadge() {
+  const el = document.getElementById('fx-badge');
+  if (!el) return;
+  const pct   = parseFloat(_fxData.pctChange || 0);
+  const up    = pct >= 0;
+  const clr   = up ? '#e05' : '#0a0';  // vermelho se dólar subiu (pior p/ você), verde se caiu
+  const arrow = up ? '▲' : '▼';
+  el.innerHTML =
+    '<span style="font-size:10px;color:var(--tx2);margin-right:2px">USD/BRL</span>' +
+    '<span style="font-size:14px;font-weight:700;font-family:monospace;color:var(--tx0)">R$ ' + USD_BRL.toFixed(4) + '</span>' +
+    '<span style="font-size:10px;color:' + clr + ';font-weight:600;margin-left:4px">' + arrow + ' ' + Math.abs(pct).toFixed(2) + '%</span>' +
+    '<span style="font-size:9px;color:var(--tx3);margin-left:5px">' + (_fxData.source||'') + '</span>';
+}
 let _allGens = [];
 let _currentGensFilter = '';
 
@@ -650,6 +685,7 @@ async function doAdminLogin() {
     document.getElementById('auth-screen').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
     document.getElementById('sb-av').textContent = (d.user.name || 'A')[0].toUpperCase();
+    fetchExchangeRate();
     loadDashboard();
   } catch(e) { showErr(e.message); }
   btn.textContent = 'Entrar no painel →'; btn.disabled = false;
@@ -849,9 +885,11 @@ async function loadCosts() {
   try {
     let report = [], s = {};
     try { const d = await aApi('GET', '/api/admin/cost-report'); report = d.report || []; } catch { report = []; }
+    await fetchExchangeRate().catch(()=>{});
     try { const d = await aApi('GET', '/api/admin/stats'); s = d.stats || {}; } catch { s = {}; }
 
     const costUsd    = s.total_cost_usd || 0;
+    await fetchExchangeRate().catch(()=>{});
     const costBrl    = costUsd * USD_BRL;
     const totalTok   = s.total_tokens || 0;
     const totalGens  = s.total_generations || 0;
@@ -861,7 +899,7 @@ async function loadCosts() {
 
     document.getElementById('kpi-costs').innerHTML =
       kpi('Custo total USD', fmtUsd(costUsd), 'R$' + costBrl.toFixed(2), svgCost()) +
-      kpi('Custo total BRL', 'R$' + costBrl.toFixed(2), 'taxa ×' + USD_BRL, svgMoney()) +
+      kpi('Custo total BRL', 'R\$' + costBrl.toFixed(2), 'R\$ ' + USD_BRL.toFixed(4) + ' · ' + (_fxData.source||'cotação'), svgMoney()) +
       kpi('Total tokens', totalTok.toLocaleString('pt-BR'), 'input + output', svgPulse()) +
       kpi('Custo médio/geração', fmtUsd(avgCostUsd), 'por chamada de IA', svgCost()) +
       kpi('Feature mais cara', topFeat ? topFeat[0] : '—', topFeat ? fmtUsd(topFeat[1].cost_usd||0) : '—', svgMoney());

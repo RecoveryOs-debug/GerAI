@@ -1241,109 +1241,236 @@ route('POST', '/api/user/generate-content', async (req, res) => {
 
 route('POST', '/api/user/generate-image', async (req, res) => {
   const payload = requireAuth(req, res); if (!payload) return;
-  const body = await parseBody(req);
+  const body     = await parseBody(req);
   const { prompt, format, network, imgMode, brandProfile } = body;
   if (!prompt) return err(res, 'prompt obrigatório');
+
   const user = db.getUserById(payload.id);
   if (user.quota_used >= user.quota_limit) return err(res, 'Cota mensal esgotada.');
 
-  const cores = (brandProfile?.cores || user.cores || '#F06B28,#0A0D10').split(',').map(s => s.trim());
-  const cor1 = cores[0]||'#F06B28', cor2 = cores[1]||'#0A0D10', cor3 = cores[2]||cor1;
-  const nicho = brandProfile?.nicho || user.nicho || 'marketing digital';
+  // ── Cores da marca ──────────────────────────────────────────
+  const rawCores   = (brandProfile?.cores || user.cores || '#F06B28,#0A0D10').split(',').map(s => s.trim());
+  const brandAccent = rawCores[0] || '#F06B28';
+  const brandBg     = rawCores[1] || '#0A0D10';
+
+  const nicho     = brandProfile?.nicho     || user.nicho     || 'marketing digital';
   const profissao = brandProfile?.profissao || user.profissao || 'criador de conteúdo';
-  const estilo = brandProfile?.estilo || user.estilo || 'moderno e profissional';
-  const memoria = brandProfile?.visualMemory?.notes || '';
-  const isInclude = imgMode === 'include';
+  const estilo    = brandProfile?.estilo    || user.estilo    || 'moderno e profissional';
 
-  const system = `Você é um especialista em design gráfico SVG para redes sociais. Sua única saída é código SVG válido.
+  // ── Dados do modelo escolhido ───────────────────────────────
+  const modelSvg  = brandProfile?.modelSvg  || '';
+  const modelN    = brandProfile?.modelN    || '';
+  const modelName = brandProfile?.modelName || '';
 
-REGRAS ABSOLUTAS — NUNCA VIOLE:
-1. Responda SOMENTE com SVG puro. Comece com <svg e termine com </svg>
-2. ZERO texto antes ou depois. Sem markdown. Sem explicações.
-3. viewBox="0 0 1080 1350" xmlns="http://www.w3.org/2000/svg"
-4. Preserve todos os elementos <defs> (gradientes, filtros, clipPaths, patterns) do template
-5. Preserve TODA a estrutura geométrica: rects, polygons, circles, lines, paths decorativos
-6. Preserve EXATAMENTE as mesmas fontes, tamanhos, pesos e posições (x,y) dos textos
-7. Substitua APENAS o conteúdo dos textos pelo tema do prompt — mantendo hierarquia e comprimento aproximado
-8. Substitua as cores fixas do template pelas cores da marca conforme mapeamento fornecido
-9. NUNCA invente elementos novos nem remova elementos existentes do template
-
-IDENTIDADE DA MARCA:
-- Cor primária: ${cor1}
-- Cor de fundo/base: ${cor2}
-- Cor de destaque: ${cor3}
-- Nicho: ${nicho}
-- Profissão: ${profissao}
-- Estilo visual: ${estilo}
-${memoria ? '- Preferências: ' + memoria : ''}
-
-SISTEMA DE DESIGN:
-1. Background: rect 1080x1080 com ${cor2}
-2. Elemento geométrico: grid, linhas, formas em ${cor1} opacidade 0.1-0.3
-3. Bloco/shape de destaque em ${cor1}: 30-40% do espaço
-4. Tipografia PRINCIPAL: 80-140px Bold branco ou ${cor1}
-5. Tipografia suporte: 28-48px cinza claro
-6. Hierarquia 60/30/10
-
-${isInclude ? 'Crie espaço/moldura no SVG para a foto do usuário.' : 'Use imagem de referência apenas como inspiração de estilo.'}
-
-QUALIDADE: Designer profissional de agência tier-1.`;
+  // Modelos com fundo claro (não substituir background por cor escura)
+  const LIGHT_BG_MODELS = new Set(['02','06','09','12','14','18','20']);
+  const isLightBg = LIGHT_BG_MODELS.has(modelN);
 
   try {
-    // Extrair SVG do modelo e cores da marca do brandProfile
-    const modelSvg   = brandProfile?.modelSvg   || '';
-    const modelN     = brandProfile?.modelN     || '';
-    const modelName  = brandProfile?.modelName  || '';
+    let finalSvg = '';
+    let tokensIn = 0, tokensOut = 0;
 
-    // Mapeamento de cores: substitui dourado/accent do template pelas cores da marca
-    const brandCor1  = (cor1 || '#F5C518').trim();  // cor primária/accent
-    const brandCor2  = (cor2 || '#0A0A0A').trim();  // cor de fundo/base
-    const brandCor3  = (cor3 || brandCor1).trim();  // cor de destaque
+    if (modelSvg) {
+      // ════════════════════════════════════════════════════════
+      // PASSO 1 — IA gera apenas os TEXTOS de substituição (JSON)
+      // ════════════════════════════════════════════════════════
+      const textMatches = [...modelSvg.matchAll(/>([^<\n]{2,60})</g)]
+        .map(m => m[1].trim())
+        .filter(t => {
+          if (t.length < 2) return false;
+          if (/^[\d\s\.\-\,\%px·]+$/.test(t)) return false;           // só números/unidades
+          if (/^(IBM Plex|Bebas|Playfair|Cormorant|DM Sans|Syne)/i.test(t)) return false; // nomes de fonte
+          if (/^(Regular|Bold|Light|Black|Italic|Mono|Sans|Serif)/i.test(t)) return false;
+          return true;
+        });
+      const uniqueTexts = [...new Set(textMatches)].slice(0, 18);
 
-    const templateSection = modelSvg
-      ? `TEMPLATE SVG (modelo ${modelN} — ${modelName}):
-Você DEVE usar este SVG como template base. Preserve TODO o layout, estrutura, elementos decorativos, fontes e posicionamento.
-Faça APENAS duas mudanças:
-1. Substitua os textos de demonstração pelo conteúdo do prompt (mantenha a hierarquia e tamanhos)
-2. Substitua as cores do template pelas cores da marca:
-   - Cor accent/dourado (#F5C518, #E6A800, #C87800, #FFD740, #C8960A, #A08030) → ${brandCor1}
-   - Cor fundo escuro (#0A0A0A, #080808, #0C0C0C, #111111, #050505, #04040A) → ${brandCor2}
-   - Cor fundo claro (#FAFAF7, #FAF6EE, #F2EDE3, #F0E8D5, #FAF5EB) → quando modelo claro, mantenha ou adapte levemente
-   - Texto branco/claro (#F5F0E8, #FFFFFF, #F8F8F6) → mantenha branco/claro se fundo escuro, ou use ${brandCor2} se fundo claro
+      const sysTexts = `Você é um copywriter de design gráfico. Responda APENAS com JSON válido, sem markdown, sem texto extra.`;
+      const msgTexts = `Tema do post: "${prompt}"
+Profissão: ${profissao} | Nicho: ${nicho}
+Modelo de design: ${modelN} — ${modelName}
 
-SVG DO TEMPLATE:
-${modelSvg}`
-      : `Crie um design profissional para redes sociais no estilo dark luxury.`;
+Substitua cada texto-placeholder abaixo por um texto real relacionado ao tema.
+Regras: (1) mantenha comprimento similar, (2) não substitua nomes de fontes, (3) não substitua valores puramente técnicos.
 
-    const userMsg = `TEMA/PROMPT: "${prompt}"
-FORMATO: ${format||'post'} para ${network||'instagram'}
-MARCA: ${nicho} | ${profissao} | estilo ${estilo}
-COR PRIMÁRIA DA MARCA: ${brandCor1}
-COR BASE DA MARCA: ${brandCor2}
+Textos originais:
+${uniqueTexts.map((t, i) => `${i + 1}. "${t}"`).join('\n')}
 
-${templateSection}
+Responda SOMENTE com este JSON (sem mais nada):
+{"r":{"texto_original":"texto_novo"}}`;
 
-Gere o SVG final agora. Comece com <svg`;
+      let replacements = {};
+      try {
+        const { text: jr, inputTokens: ti, outputTokens: to } = await callClaude({
+          system: sysTexts, userMsg: msgTexts, maxTokens: 1200
+        });
+        tokensIn  += ti;
+        tokensOut += to;
+        const clean  = jr.replace(/```[\w]*\n?/g, '').trim();
+        const parsed = JSON.parse(clean);
+        replacements = parsed.r || parsed.replacements || parsed;
+      } catch (e) {
+        console.error('[gen-img] texto JSON falhou:', e.message);
+      }
 
-    const { text: rawSvg, inputTokens: svgInp, outputTokens: svgOut } = await callClaude({ system, userMsg, maxTokens: 6000 });
-    let svg = '';
-    if (rawSvg.trim().startsWith('<svg')) svg = rawSvg.trim();
-    else {
-      const m = rawSvg.match(/<svg[\s\S]*?<\/svg>/i);
-      if (m) svg = m[0];
-      else { const md = rawSvg.match(/```(?:svg|xml)?\s*([\s\S]*?)```/i); if (md && md[1].trim().startsWith('<svg')) svg = md[1].trim(); }
+      // ════════════════════════════════════════════════════════
+      // PASSO 2 — Substituição PROGRAMÁTICA no SVG (100% fiel ao modelo)
+      // ════════════════════════════════════════════════════════
+      let svg = modelSvg;
+
+      // 2a. Substituir textos
+      for (const [orig, novo] of Object.entries(replacements)) {
+        if (!orig || !novo || typeof novo !== 'string') continue;
+        if (/^(IBM Plex|Bebas|Playfair|Cormorant|DM Sans|Syne)/i.test(orig)) continue;
+        const safe = orig.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        svg = svg.replace(new RegExp(`(>\\s*)${safe}(\\s*<)`, 'g'), `$1${novo}$2`);
+      }
+
+      // 2b. Substituir cores ACCENT (dourado → cor primária da marca)
+      const ACCENT_COLORS = [
+        '#F5C518','#E6A800','#C87800','#FFD740','#C8960A',
+        '#A08030','#D4A520','#C8A850','#FFE040','#F5C51',
+      ];
+      for (const c of ACCENT_COLORS) {
+        svg = svg.replace(new RegExp(c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), brandAccent);
+      }
+
+      // 2c. Substituir fundos ESCUROS → cor base da marca (só modelos dark)
+      if (!isLightBg) {
+        const DARK_COLORS = [
+          '#0A0A0A','#080808','#0C0C0C','#111111','#050505',
+          '#04040A','#0A0806','#18140E','#100C08','#080C08',
+          '#0C100C','#0A0E12','#080C10','#0E0E0E','#141414',
+          '#0A0A10','#080810','#0A0A12','#0E120E','#111811',
+        ];
+        for (const c of DARK_COLORS) {
+          svg = svg.replace(new RegExp(c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), brandBg);
+        }
+      }
+
+      // 2d. Garantir xmlns e viewBox
+      if (!svg.includes('xmlns=')) svg = svg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+      if (!svg.includes('viewBox')) svg = svg.replace('<svg', '<svg viewBox="0 0 1080 1350"');
+
+      finalSvg = svg;
+
+    } else {
+      // ── Fallback: sem modelo selecionado — gera SVG livre ──
+      const sysFree = `Você é um designer SVG. Responda SOMENTE com SVG puro, começando com <svg.`;
+      const msgFree = `Post para redes sociais. viewBox="0 0 1080 1350". Tema: "${prompt}". Cores: fundo ${brandBg}, destaque ${brandAccent}. Nicho: ${nicho}. Comece com <svg`;
+      const { text: rawFree, inputTokens: ti, outputTokens: to } = await callClaude({ system: sysFree, userMsg: msgFree, maxTokens: 4000 });
+      tokensIn  += ti;
+      tokensOut += to;
+      finalSvg = rawFree.trim().startsWith('<svg')
+        ? rawFree.trim()
+        : (rawFree.match(/<svg[\s\S]*?<\/svg>/i)?.[0] || '');
+      if (!finalSvg.includes('xmlns=')) finalSvg = finalSvg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
     }
-    if (!svg || svg.length < 100) throw new Error('A IA não gerou um SVG válido. Tente reformular o conceito.');
-    if (!svg.includes('xmlns=')) svg = svg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
-    db.updateUser(payload.id, { quota_used:(user.quota_used||0)+1 });
-    db.addGeneration({ user_id:payload.id, feature:'gerar-imagem', format:format||'post', network:network||'instagram', concept_name:prompt.slice(0,60), prompt:prompt.slice(0,200), svg_data:svg, credits_used:1, input_tokens:svgInp, output_tokens:svgOut });
-    ok(res, { svg });
+
+    if (!finalSvg || finalSvg.length < 200)
+      throw new Error('SVG inválido ou muito curto. Tente novamente.');
+
+    // ── Salvar geração com tokens e custo corretos ─────────────
+    db.updateUser(payload.id, { quota_used: (user.quota_used || 0) + 1 });
+    db.addGeneration({
+      user_id:      payload.id,
+      feature:      'gerar-imagem',
+      format:       format  || 'post',
+      network:      network || 'instagram',
+      concept_name: (modelName || prompt).slice(0, 60),
+      prompt:       prompt.slice(0, 200),
+      svg_data:     finalSvg,
+      credits_used: 1,
+      input_tokens:  tokensIn,
+      output_tokens: tokensOut,
+    });
+
+    ok(res, { svg: finalSvg });
+
   } catch (e) { err(res, e.message); }
 });
 
 // ─────────────────────────────────────────────
 // ROUTES — ADMIN (preservados do v12)
 // ─────────────────────────────────────────────
+
+// ─────────────────────────────────────────────
+// CÂMBIO USD/BRL — AwesomeAPI + BCB PTAX (fallback)
+// ─────────────────────────────────────────────
+
+let _fxCache = { rate: 5.20, source: 'fallback', pctChange: '0', high: 0, low: 0, updatedAt: null };
+
+function _fxRequest(opts, cb) {
+  const req = https.request(opts, res => {
+    let d = '';
+    res.on('data', c => d += c);
+    res.on('end', () => { try { cb(null, JSON.parse(d)); } catch(e) { cb(e); } });
+  });
+  req.on('error', cb);
+  req.on('timeout', () => { req.destroy(); cb(new Error('timeout')); });
+  req.setTimeout(6000);
+  req.end();
+}
+
+function fetchAwesome() {
+  return new Promise(resolve => {
+    _fxRequest({
+      hostname: 'economia.awesomeapi.com.br',
+      path: '/json/last/USD-BRL',
+      method: 'GET',
+      headers: { 'User-Agent': 'AutoPostt/1.0' }
+    }, (err, p) => {
+      if (err || !p?.USDBRL?.bid) return resolve(null);
+      const rate = parseFloat(p.USDBRL.bid);
+      if (!rate || rate < 1) return resolve(null);
+      resolve({
+        rate:       parseFloat(rate.toFixed(4)),
+        source:     'AwesomeAPI',
+        pctChange:  p.USDBRL.pctChange || '0',
+        high:       parseFloat(p.USDBRL.high || 0),
+        low:        parseFloat(p.USDBRL.low  || 0),
+        updatedAt:  new Date().toISOString()
+      });
+    });
+  });
+}
+
+function fetchBcb() {
+  return new Promise(resolve => {
+    const d    = new Date();
+    const mm   = String(d.getMonth() + 1).padStart(2, '0');
+    const dd   = String(d.getDate()).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    _fxRequest({
+      hostname: 'olinda.bcb.gov.br',
+      path:     `/olinda/servico/PTAX/versao/v1/odata/CotacaoDolarDia(dataCotacao=@dataCotacao)?@dataCotacao='${mm}-${dd}-${yyyy}'&$format=json&$select=cotacaoVenda`,
+      method:   'GET',
+      headers:  { Accept: 'application/json' }
+    }, (err, p) => {
+      if (err) return resolve(null);
+      const rate = p?.value?.[0]?.cotacaoVenda;
+      if (!rate || rate < 1) return resolve(null);
+      resolve({ rate: parseFloat(rate.toFixed(4)), source: 'BCB-PTAX', pctChange: '0', high: 0, low: 0, updatedAt: new Date().toISOString() });
+    });
+  });
+}
+
+async function getExchangeRate() {
+  if (_fxCache.updatedAt && (Date.now() - new Date(_fxCache.updatedAt).getTime()) < 10 * 60 * 1000) {
+    return _fxCache;
+  }
+  const result = (await fetchAwesome()) || (await fetchBcb());
+  if (result) _fxCache = result;
+  return _fxCache;
+}
+
+route('GET', '/api/admin/exchange-rate', async (req, res) => {
+  const payload = requireAdmin(req, res); if (!payload) return;
+  try {
+    const fx = await getExchangeRate();
+    ok(res, { exchange: fx });
+  } catch(e) { err(res, e.message); }
+});
 
 route('GET', '/api/admin/stats', async (req, res) => {
   const payload = requireAdmin(req, res); if (!payload) return;
