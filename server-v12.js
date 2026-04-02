@@ -1419,127 +1419,98 @@ route('POST', '/api/user/generate-image', async (req, res) => {
     let tokensIn = 0, tokensOut = 0;
 
     if (modelSvg) {
-      // ════════════════════════════════════════════════════════
-      // PASSO 1 — IA gera apenas os TEXTOS de substituição (JSON)
-      // ════════════════════════════════════════════════════════
-      const textMatches = [...modelSvg.matchAll(/>([^<\n]{2,60})</g)]
-        .map(m => m[1].trim())
-        .filter(t => {
-          if (t.length < 2) return false;
-          if (/^[\d\s\.\-\,\%px·]+$/.test(t)) return false;           // só números/unidades
-          if (/^(IBM Plex|Bebas|Playfair|Cormorant|DM Sans|Syne)/i.test(t)) return false; // nomes de fonte
-          if (/^(Regular|Bold|Light|Black|Italic|Mono|Sans|Serif)/i.test(t)) return false;
-          return true;
-        });
-      const uniqueTexts = [...new Set(textMatches)].slice(0, 18);
+      // The AI receives the full model SVG and rewrites ONLY the text content
+      // Structure, positions, fonts and colors are preserved intact.
 
-      const sysTexts = `Você é um copywriter de design gráfico. Responda APENAS com JSON válido, sem markdown, sem texto extra.`;
-      const msgTexts = `Tema do post: "${prompt}"
-Profissão: ${profissao} | Nicho: ${nicho}
-Modelo de design: ${modelN} — ${modelName}
+      const sysRewrite = `Você é um especialista em SVG e copywriting para redes sociais.
+Sua tarefa é receber um SVG template e reescrever APENAS os textos internos com conteúdo novo baseado no tema fornecido.
 
-IMPORTANTE: As cores já serão aplicadas programaticamente. Foque apenas nos TEXTOS.
-Substitua cada texto-placeholder abaixo por um texto real relacionado ao tema.
-Regras: (1) mantenha comprimento similar, (2) não substitua nomes de fontes, (3) não substitua valores puramente técnicos, (4) preserve números e dados exatos do tema.
+REGRAS ABSOLUTAS — VIOLÁ-LAS DESTRÓI O RESULTADO:
+1. Retorne SOMENTE o SVG completo. Zero texto antes ou depois. Comece com <svg.
+2. Preserve INTEGRALMENTE: viewBox, xmlns, todos os elementos visuais (rect, line, circle, path, polygon, defs, gradients, filters), todos os atributos (x, y, font-family, font-size, font-weight, font-style, fill, stroke, letter-spacing, text-anchor, opacity, transform).
+3. Altere SOMENTE o conteúdo textual dentro das tags <text>...</text>.
+4. NÃO adicione, remova ou reordene nenhum elemento SVG.
+5. NÃO altere nenhuma cor, nenhum gradiente, nenhuma fonte, nenhum tamanho, nenhuma posição.
+6. Respeite o comprimento aproximado de cada texto original para não quebrar o layout.
+7. Para textos que são claramente nomes de fontes ou especificações tipográficas (ex: "Playfair Display", "IBM Plex Mono · 14PX", "Bold 700", "48px"), substitua por conteúdo real do tema com comprimento similar.`;
 
-Textos originais:
-${uniqueTexts.map((t, i) => `${i + 1}. "${t}"`).join('\n')}
+      const msgRewrite = `TEMA DO POST: "${prompt}"
+PROFISSÃO: ${profissao} | NICHO: ${nicho}
+MODELO: ${modelN} — ${modelName}
 
-Responda SOMENTE com este JSON (sem mais nada):
-{"r":{"texto_original":"texto_novo"}}`;
+INSTRUÇÕES:
+- Reescreva os textos do SVG abaixo com conteúdo sobre o tema acima.
+- Mantenha o mesmo número de linhas de texto e comprimento aproximado por linha.
+- Preserve dados numéricos se existirem no tema.
+- Retorne APENAS o SVG, começando com <svg.
 
-      let replacements = {};
+SVG DO MODELO:
+${modelSvg}`;
+
+      let svgRewritten = '';
       try {
-        const { text: jr, inputTokens: ti, outputTokens: to } = await callClaude({
-          system: sysTexts, userMsg: msgTexts, maxTokens: 1200
+        const { text: rawSvg, inputTokens: ti, outputTokens: to } = await callClaude({
+          system: sysRewrite,
+          userMsg: msgRewrite,
+          maxTokens: 6000
         });
         tokensIn  += ti;
         tokensOut += to;
-        const clean  = jr.replace(/```[\w]*\n?/g, '').trim();
-        const parsed = JSON.parse(clean);
-        replacements = parsed.r || parsed.replacements || parsed;
+        const svgMatch = rawSvg.match(/<svg[\s\S]*<\/svg>/i);
+        svgRewritten = svgMatch ? svgMatch[0] : (rawSvg.trim().startsWith('<svg') ? rawSvg.trim() : '');
       } catch (e) {
-        console.error('[gen-img] texto JSON falhou:', e.message);
+        console.error('[gen-img] rewrite falhou:', e.message);
       }
 
-      // ════════════════════════════════════════════════════════
-      // PASSO 2 — Substituição PROGRAMÁTICA no SVG (100% fiel ao modelo)
-      // ════════════════════════════════════════════════════════
-      let svg = modelSvg;
-
-      // 2a. Substituir textos
-      for (const [orig, novo] of Object.entries(replacements)) {
-        if (!orig || !novo || typeof novo !== 'string') continue;
-        if (/^(IBM Plex|Bebas|Playfair|Cormorant|DM Sans|Syne)/i.test(orig)) continue;
-        const safe = orig.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        svg = svg.replace(new RegExp(`(>\\s*)${safe}(\\s*<)`, 'g'), `$1${novo}$2`);
+      if (!svgRewritten || svgRewritten.length < 200) {
+        throw new Error('SVG inválido ou muito curto. Tente novamente.');
       }
 
-      // ─── 2b-2d. Substituição de cores por papel semântico ─────────────────────────
-      // Estratégia: extrair todas as cores únicas do SVG, classificar por luminância,
-      // depois mapear: accent → Primária, fundo → Secundária, texto claro/branco → Terciária.
-      // Isso evita listas hardcoded que podem não cobrir o modelo escolhido.
+      if (!svgRewritten.includes('xmlns=')) svgRewritten = svgRewritten.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+      if (!svgRewritten.includes('viewBox')) svgRewritten = svgRewritten.replace('<svg', '<svg viewBox="0 0 1080 1350"');
+
+      // Apply brand palette programmatically (colors only, not texts)
+      let svg = svgRewritten;
 
       function hexToRgb(hex) {
         const h = hex.replace('#','');
-        const r = parseInt(h.substr(0,2),16), g = parseInt(h.substr(2,2),16), b = parseInt(h.substr(4,2),16);
-        return [r,g,b];
+        return [parseInt(h.substr(0,2),16), parseInt(h.substr(2,2),16), parseInt(h.substr(4,2),16)];
       }
       function relativeLuminance([r,g,b]) {
-        const srgb = [r,g,b].map(c => { c/=255; return c<=0.04045 ? c/12.92 : Math.pow((c+0.055)/1.055,2.4); });
-        return 0.2126*srgb[0] + 0.7152*srgb[1] + 0.0722*srgb[2];
+        const s = [r,g,b].map(c => { c/=255; return c<=0.04045 ? c/12.92 : Math.pow((c+0.055)/1.055,2.4); });
+        return 0.2126*s[0] + 0.7152*s[1] + 0.0722*s[2];
       }
       function hexSaturation([r,g,b]) {
-        const max=Math.max(r,g,b)/255, min=Math.min(r,g,b)/255;
-        return max===0 ? 0 : (max-min)/max;
+        const mx=Math.max(r,g,b)/255, mn=Math.min(r,g,b)/255;
+        return mx===0 ? 0 : (mx-mn)/mx;
+      }
+      function safeReplaceColor(str, hex, rep) {
+        if (!hex || !rep || hex.toUpperCase() === rep.toUpperCase()) return str;
+        const esc = hex.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return str.replace(new RegExp(esc, 'gi'), rep);
       }
 
-      // Extrair todas as cores hex do SVG
-      const svgHexColors = [...new Set([...svg.matchAll(/#([0-9A-Fa-f]{6})/g)].map(m => '#'+m[1].toUpperCase()))];
+      const svgHexColors = [...new Set([...svg.matchAll(/#([0-9A-Fa-f]{6})\b/g)].map(m => '#'+m[1].toUpperCase()))];
+      const colorMeta = svgHexColors.map(hex => ({
+        hex, lum: relativeLuminance(hexToRgb(hex)), sat: hexSaturation(hexToRgb(hex))
+      }));
 
-      // Classificar cada cor por luminância e saturação
-      const colorMeta = svgHexColors.map(hex => {
-        const rgb = hexToRgb(hex);
-        return { hex, lum: relativeLuminance(rgb), sat: hexSaturation(rgb) };
-      });
+      // Accent (saturated) → Primária
+      const accentColors = colorMeta.filter(c => c.sat > 0.3 && c.lum > 0.05 && c.lum < 0.85).sort((a,b) => b.sat - a.sat);
+      for (const { hex } of accentColors) svg = safeReplaceColor(svg, hex, brandPrimaria);
 
-      // ACCENT: cores com saturação alta e luminância média-alta (não são preto/branco/cinza)
-      // Geralmente o amarelo-dourado padrão dos templates
-      const accentColors = colorMeta
-        .filter(c => c.sat > 0.3 && c.lum > 0.05 && c.lum < 0.85)
-        .sort((a,b) => b.sat - a.sat);
-
-      // FUNDO: cores mais escuras (lum < 0.05) se modelo escuro, ou mais claras (lum > 0.85) se modelo claro
+      // Background → Secundária
       const bgColors = isLightBg
         ? colorMeta.filter(c => c.lum > 0.80 && c.sat < 0.15).sort((a,b) => b.lum - a.lum)
         : colorMeta.filter(c => c.lum < 0.05 && c.sat < 0.15).sort((a,b) => a.lum - b.lum);
+      for (const { hex } of bgColors) svg = safeReplaceColor(svg, hex, brandSecundaria);
 
-      // TEXTO: cores claras neutras (lum 0.55–0.95, baixa saturação) em modelos escuros
-      //        ou cores escuras neutras em modelos claros
+      // Neutral text → Terciária
       const textColors = isLightBg
         ? colorMeta.filter(c => c.lum < 0.10 && c.sat < 0.15).sort((a,b) => a.lum - b.lum)
         : colorMeta.filter(c => c.lum > 0.55 && c.lum <= 0.95 && c.sat < 0.15).sort((a,b) => b.lum - a.lum);
+      for (const { hex } of textColors.slice(0, 4)) svg = safeReplaceColor(svg, hex, brandTerciaria);
 
-      function safeReplace(svgStr, colorHex, replacement) {
-        if (!colorHex || !replacement || colorHex.toUpperCase() === replacement.toUpperCase()) return svgStr;
-        const esc = colorHex.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        return svgStr.replace(new RegExp(esc, 'gi'), replacement);
-      }
-
-      // Aplicar substituições: accent → Primária
-      for (const { hex } of accentColors) {
-        svg = safeReplace(svg, hex, brandPrimaria);
-      }
-      // Aplicar substituições: fundo → Secundária
-      for (const { hex } of bgColors) {
-        svg = safeReplace(svg, hex, brandSecundaria);
-      }
-      // Aplicar substituições: texto neutro → Terciária
-      for (const { hex } of textColors.slice(0, 4)) {
-        svg = safeReplace(svg, hex, brandTerciaria);
-      }
-
-      // 2d. Garantir xmlns e viewBox
       if (!svg.includes('xmlns=')) svg = svg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
       if (!svg.includes('viewBox')) svg = svg.replace('<svg', '<svg viewBox="0 0 1080 1350"');
 
