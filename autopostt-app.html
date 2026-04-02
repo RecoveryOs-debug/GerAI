@@ -4417,6 +4417,171 @@ body.sidebar-collapsed .btn.btn-g.btn-full.btn-sm svg{
   margin:0 auto !important;
 }
 
+
+/* === v8.6 sidebar collapse hard-fix === */
+/* Toggle: ALWAYS bottom, NEVER top */
+.sb-collapse-toggle--top,
+body.sidebar-collapsed .sb-collapse-toggle--top{
+  display:none !important;
+}
+.sb-toggle-zone{
+  display:block !important;
+  padding:10px 12px 12px !important;
+  margin-top:auto !important;
+}
+.sb-collapse-toggle--bottom,
+body.sidebar-collapsed .sb-collapse-toggle--bottom{
+  display:inline-flex !important;
+  width:100% !important;
+  min-width:0 !important;
+  height:46px !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:10px !important;
+  border-radius:16px !important;
+}
+body.sidebar-collapsed .sb-collapse-toggle--bottom{
+  width:68px !important;
+  min-width:68px !important;
+  height:52px !important;
+  padding:0 !important;
+  margin:0 auto !important;
+}
+body.sidebar-collapsed .sb-collapse-toggle--bottom .sb-collapse-toggle-text{
+  display:none !important;
+}
+
+/* Logo stays visible in both states */
+body.sidebar-collapsed .sb-top{
+  padding:12px 8px 10px !important;
+  min-height:auto !important;
+}
+body.sidebar-collapsed .sb-brand-wrap{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:6px !important;
+  width:100% !important;
+  flex:unset !important;
+}
+body.sidebar-collapsed .sb-logo-mark--brand{
+  width:44px !important;
+  height:44px !important;
+  border-radius:14px !important;
+}
+body.sidebar-collapsed .sb-logo-img{
+  width:34px !important;
+  height:34px !important;
+}
+body.sidebar-collapsed .sb-wordmark{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+body.sidebar-collapsed .sb-wordmark-name{
+  display:block !important;
+  max-width:72px !important;
+  font-size:10px !important;
+  line-height:1.02 !important;
+  text-align:center !important;
+  white-space:normal !important;
+}
+body.sidebar-collapsed .sb-wordmark-tag{
+  display:none !important;
+}
+
+/* Collapsed menu: icons only, yellow, centered */
+body.sidebar-collapsed .sb{
+  width:92px !important;
+}
+body.sidebar-collapsed .sb-body{
+  padding:8px 8px 10px !important;
+}
+body.sidebar-collapsed .sb-lbl,
+body.sidebar-collapsed .ni > :not(.ni-ico):not(.ni-badge),
+body.sidebar-collapsed .sb-uname,
+body.sidebar-collapsed .sb-uplan{
+  display:none !important;
+}
+body.sidebar-collapsed .ni{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:68px !important;
+  min-width:68px !important;
+  height:64px !important;
+  min-height:64px !important;
+  margin:0 auto 10px !important;
+  padding:0 !important;
+  border-radius:20px !important;
+  overflow:hidden !important;
+  color:rgba(245,197,24,.88) !important;
+}
+body.sidebar-collapsed .ni-ico{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:30px !important;
+  height:30px !important;
+  margin:0 auto !important;
+  opacity:1 !important;
+  flex-shrink:0 !important;
+}
+body.sidebar-collapsed .ni-ico svg{
+  display:block !important;
+  width:24px !important;
+  height:24px !important;
+  fill:none !important;
+  stroke:currentColor !important;
+  color:rgba(245,197,24,.92) !important;
+  stroke-width:2.15 !important;
+}
+body.sidebar-collapsed .ni.on{
+  background:linear-gradient(180deg, rgba(245,197,24,.14), rgba(245,197,24,.08)) !important;
+  border:1px solid rgba(245,197,24,.18) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.03) !important;
+  color:#F5C518 !important;
+}
+body.sidebar-collapsed .ni.on .ni-ico svg{
+  color:#F5C518 !important;
+}
+body.sidebar-collapsed .ni.on::after{
+  left:50% !important;
+  right:auto !important;
+  top:auto !important;
+  bottom:8px !important;
+  transform:translateX(-50%) !important;
+  width:22px !important;
+  height:4px !important;
+  border-radius:999px !important;
+}
+body.sidebar-collapsed .ni-badge{
+  display:none !important;
+}
+body.sidebar-collapsed .sb-user{
+  justify-content:center !important;
+  padding:8px 0 !important;
+}
+body.sidebar-collapsed .btn.btn-g.btn-full.btn-sm{
+  width:68px !important;
+  min-width:68px !important;
+  padding:12px 0 !important;
+  border-radius:18px !important;
+  font-size:0 !important;
+  margin:8px auto 0 !important;
+}
+body.sidebar-collapsed .btn.btn-g.btn-full.btn-sm svg{
+  width:22px !important;
+  height:22px !important;
+  margin:0 auto !important;
+}
+
+/* Keep layout stable */
+body.sidebar-collapsed .sb-bot{
+  padding-top:8px !important;
+}
+
 </style>
 
 <style id="autopostt-premium-final-pass">
