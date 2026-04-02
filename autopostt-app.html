@@ -533,6 +533,7 @@ body {
 
 /* ── BUTTONS ── */
 .btn {
+  padding: 6px 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -593,7 +594,7 @@ body {
 
 /* Sizes */
 .btn-xs  { padding: 4px 10px; font-size: 11.5px; }
-.btn-sm  { padding: 6px 11px; font-size: 12px; }
+.btn-sm  { padding: 5px 9px; font-size: 11.5px; }
 .btn-lg  { padding: 11px 20px; font-size: 14px; font-weight: 700; }
 .btn-xl  { padding: 14px 28px; font-size: 15px; font-weight: 700; border-radius: var(--r3); }
 .btn-full{ width: 100%; justify-content: center; }
@@ -1333,36 +1334,17 @@ tr:hover .td-actions { opacity: 1; }
 ══════════════════════════════════════════════ */
 #img-modal-bg {
   display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,.96); z-index: 2000;
+  background: rgba(0,0,0,.92); z-index: 2000;
   align-items: center; justify-content: center;
-  flex-direction: column; gap: 16px; padding: 16px;
-  overflow: hidden;
+  flex-direction: column; gap: 20px; padding: 24px;
 }
 #img-modal-bg.open { display: flex; animation: fadeIn var(--t-base) var(--ease-out); }
-#img-modal-inner {
-  display: flex; flex-direction: column; align-items: center;
-  gap: 14px; width: 100%; height: 100%;
-  max-width: 600px;
-}
-#img-modal-x {
-  position: fixed; top: 16px; right: 16px; z-index: 2001;
-  background: rgba(255,255,255,.1); border: none; color: #fff;
-  width: 36px; height: 36px; border-radius: 50%; font-size: 16px;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  transition: background .15s;
-}
-#img-modal-x:hover { background: rgba(255,255,255,.2); }
 #img-modal-body {
-  flex: 1; width: 100%; display: flex; align-items: center; justify-content: center;
-  overflow: hidden; border-radius: var(--r3);
-  min-height: 0;
+  max-width: min(90vw, 800px); max-height: 80vh;
+  overflow: auto; border-radius: var(--r3);
 }
-#img-modal-body svg {
-  width: auto; height: 100%; max-height: calc(100vh - 120px);
-  max-width: 100%; display: block; border-radius: var(--r3);
-}
-#img-modal-body img { max-width: 100%; max-height: calc(100vh - 120px); height: auto; display: block; border-radius: var(--r3); }
-.img-modal-actions { display: flex; gap: 10px; flex-shrink: 0; }
+#img-modal-body svg, #img-modal-body img { max-width: 100%; height: auto; display: block; }
+.img-modal-actions { display: flex; gap: 10px; }
 
 /* ══════════════════════════════════════════════
    UTILITY
@@ -2173,18 +2155,18 @@ tr:hover .td-actions { opacity: 1; }
 .fmt-name{font-size:11px;font-weight:600;color:var(--t2)}
 .fmt.on .fmt-name{color:var(--a)}
 
-.net-row{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.net-row{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
 .net{
   background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r2);
-  padding:9px 7px;text-align:center;cursor:pointer;transition:all .12s;
+  padding:6px 5px;text-align:center;cursor:pointer;transition:all .12s;
 }
 .net:hover{border-color:var(--b2)}
 .net.on{background:var(--adim);border-color:rgba(243,107,42,.3)}
 .net-ico{
-  width:20px;height:20px;border-radius:var(--r);background:var(--surface2);
-  display:flex;align-items:center;justify-content:center;margin:0 auto 5px;
+  width:16px;height:16px;border-radius:var(--r);background:var(--surface2);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 4px;
 }
-.net-name{font-size:10px;font-weight:600;color:var(--t2)}
+.net-name{font-size:9px;font-weight:600;color:var(--t2)}
 .net.on .net-name{color:var(--a)}
 
 .ta-wrap{position:relative}
@@ -2631,161 +2613,123 @@ label, .form-row > label, .agent-lbl, .out-lbl{color:var(--a)!important}
   color:var(--amber,#F5C518); font-weight:600;
 }
 </style>
+<style>
+/* ══ AGENT OVERLAY — bloqueia tela durante geração ══ */
+#agent-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(8,8,10,.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  cursor: not-allowed;
+  user-select: none;
+}
+#agent-overlay.active { display: flex; }
 
-<style id="refine-lock-patch">
-/* === PATCH: fluxo de refinamento travado + prompt abaixo dos modelos === */
-#cmd-out{display:none !important;}
-
-#refined-prompt-wrap.refine-below-models{
-  margin:14px 0 0 !important;
-  padding:14px !important;
-  background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
-  border:1px solid var(--line-2);
-  border-radius:12px;
+/* Canvas do agente */
+#agent-canvas-wrap {
+  position: relative;
+  width: 260px;
+  height: 260px;
 }
-#refined-prompt-wrap.refine-below-models .sec-lbl{
-  margin-bottom:10px !important;
-}
-#refined-prompt-box.refining-state{
-  background:var(--bg3) !important;
-  border:1px solid rgba(245,197,24,.18) !important;
-  border-radius:10px !important;
-  padding:14px !important;
-  font-size:12px !important;
-  color:var(--t1) !important;
-  line-height:1.7 !important;
-  font-family:monospace !important;
-  position:relative !important;
-  overflow:hidden !important;
-}
-#refined-prompt-box.refining-state::before{
-  content:'';
-  position:absolute;
-  inset:0;
-  background:linear-gradient(90deg, transparent, rgba(245,197,24,.08), transparent);
-  transform:translateX(-100%);
-  animation:refineSweep 1.25s linear infinite;
-}
-@keyframes refineSweep{
-  to{transform:translateX(100%);}
-}
-.refine-loading-title{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  margin-bottom:12px;
-  color:var(--a);
-  font-weight:700;
-}
-.refine-loading-dot{
-  width:7px;
-  height:7px;
-  border-radius:999px;
-  background:var(--a);
-  box-shadow:0 0 10px rgba(245,197,24,.35);
-  animation:refinePulse 1.2s ease-in-out infinite;
-}
-@keyframes refinePulse{
-  0%,100%{opacity:.5;transform:scale(.95)}
-  50%{opacity:1;transform:scale(1.08)}
-}
-.refine-skeleton{
-  display:grid;
-  gap:8px;
-}
-.refine-skeleton .sk-line{
-  height:10px;
-  border-radius:999px;
-  background:linear-gradient(90deg, rgba(255,255,255,.05), rgba(245,197,24,.11), rgba(255,255,255,.05));
-  background-size:200% 100%;
-  animation:refineShimmer 1.15s linear infinite;
-}
-.refine-skeleton .sk-line:nth-child(1){width:94%}
-.refine-skeleton .sk-line:nth-child(2){width:88%}
-.refine-skeleton .sk-line:nth-child(3){width:92%}
-.refine-skeleton .sk-line:nth-child(4){width:73%}
-@keyframes refineShimmer{
-  from{background-position:200% 0}
-  to{background-position:-200% 0}
+#agent-canvas {
+  width: 260px;
+  height: 260px;
 }
 
-#gen-refine-lock{
-  position:fixed;
-  inset:0;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
-  background:rgba(8,8,10,.68);
-  -webkit-backdrop-filter:blur(12px);
-  backdrop-filter:blur(12px);
+/* Textos do overlay */
+.agent-ov-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: #F5C518;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-top: 8px;
+  text-align: center;
 }
-#gen-refine-lock.open{display:flex;}
-#gen-refine-lock .lock-card{
-  width:min(520px, calc(100vw - 32px));
-  background:linear-gradient(180deg, rgba(23,23,29,.96), rgba(13,13,15,.98));
-  border:1px solid rgba(245,197,24,.16);
-  border-radius:18px;
-  box-shadow:0 24px 80px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.03);
-  padding:22px 20px 18px;
+.agent-ov-stage {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: #888;
+  margin-top: 6px;
+  text-align: center;
+  min-height: 18px;
+  transition: opacity .3s;
 }
-#gen-refine-lock .lock-eyebrow{
-  font-size:10px;
-  font-weight:700;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-  color:var(--a);
-  margin-bottom:10px;
+.agent-ov-progress {
+  width: 220px;
+  height: 2px;
+  background: rgba(245,197,24,.12);
+  border-radius: 2px;
+  margin-top: 18px;
+  overflow: hidden;
 }
-#gen-refine-lock .lock-title{
-  font-family:var(--f-display);
-  font-size:22px;
-  font-weight:800;
-  letter-spacing:-.03em;
-  color:var(--t0);
-  margin-bottom:8px;
+.agent-ov-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #F5C518, #ff8c00);
+  border-radius: 2px;
+  width: 0%;
+  transition: width .8s ease;
+  box-shadow: 0 0 8px rgba(245,197,24,.4);
 }
-#gen-refine-lock .lock-sub{
-  color:var(--t1);
-  font-size:13px;
-  line-height:1.6;
-  margin-bottom:16px;
-}
-#gen-refine-lock .lock-bars{
-  display:grid;
-  gap:10px;
-}
-#gen-refine-lock .lock-bar{
-  height:12px;
-  border-radius:999px;
-  background:linear-gradient(90deg, rgba(255,255,255,.05), rgba(245,197,24,.12), rgba(255,255,255,.05));
-  background-size:200% 100%;
-  animation:refineShimmer 1.1s linear infinite;
-}
-#gen-refine-lock .lock-bar:nth-child(1){width:100%}
-#gen-refine-lock .lock-bar:nth-child(2){width:95%}
-#gen-refine-lock .lock-bar:nth-child(3){width:82%}
-#gen-refine-lock .lock-foot{
-  margin-top:16px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  color:var(--a);
-  font-size:12px;
-  font-weight:700;
-}
-#gen-refine-lock .lock-foot .refine-loading-dot{width:8px;height:8px}
 
-body.refine-locked{
-  overflow:hidden !important;
+/* Partículas que o agente "joga" */
+.agent-particle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #F5C518;
+  pointer-events: none;
+  animation: particle-fly 1.2s ease-out forwards;
 }
-body.refine-locked .main,
-body.refine-locked .sb{
-  pointer-events:none !important;
-  user-select:none !important;
+@keyframes particle-fly {
+  0%   { opacity:1; transform: translate(0,0) scale(1); }
+  100% { opacity:0; transform: translate(var(--dx),var(--dy)) scale(0); }
+}
+
+/* ── Overlay de refinamento (trava só o painel esq) ── */
+#refine-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  background: rgba(8,8,10,.7);
+  backdrop-filter: blur(3px);
+  border-radius: inherit;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: not-allowed;
+}
+#refine-overlay.active { display: flex; }
+.refine-ov-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #F5C518;
+  animation: refine-pulse 1s ease-in-out infinite;
+}
+@keyframes refine-pulse {
+  0%,100% { transform: scale(1); opacity:.8; }
+  50% { transform: scale(1.4); opacity:1; box-shadow: 0 0 12px #F5C518; }
+}
+.refine-ov-txt {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; color: #F5C518; letter-spacing:.1em;
+  text-transform: uppercase;
+}
+.refine-ov-sub {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px; color: #666;
 }
 </style>
-
 </head>
 <body>
 
@@ -3340,8 +3284,8 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
             </div>
           </div>
 
-          <!-- prompt refinado (aparece após refinamento) -->
-          <div id="refined-prompt-wrap" style="display:none;margin-bottom:18px">
+          <!-- prompt refinado — hidden visually, kept for backend logic -->
+          <div id="refined-prompt-wrap" style="display:none;margin-bottom:0;visibility:hidden;height:0;overflow:hidden">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
               <div class="sec-lbl" style="margin-bottom:0">Prompt refinado pelo agente</div>
               <button class="btn btn-g btn-sm" onclick="editRefined()" style="font-size:10px">Editar</button>
@@ -3435,7 +3379,15 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                     </div>
                   </label>
                 </div>
-<div class="cmd-box" id="cmd-out" data-prompt="" style="word-break:break-word;font-size:11px"><span id="cmd-out-txt" style="color:var(--t3);font-style:italic">Selecione um modelo acima para refinar o prompt automaticamente</span><button class="cp-btn" onclick="cpElById('cmd-out')">Copiar</button></div>
+<!-- ── PROMPT REFINADO PELO AGENTE — exibido abaixo dos modelos (imagem 2) ── -->
+                <div id="refined-prompt-display" style="display:none;margin:12px 0">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                    <div style="font-size:9px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.12em">Prompt refinado pelo agente</div>
+                    <button class="btn btn-g btn-sm" onclick="editRefinedInline()" style="font-size:9px;padding:3px 8px">Editar</button>
+                  </div>
+                  <div id="refined-prompt-display-box" style="background:var(--bg3);border:1px solid rgba(243,107,42,.15);border-radius:var(--r2);padding:12px 14px;font-size:11.5px;color:var(--t1);line-height:1.75;font-family:'IBM Plex Mono',monospace;word-break:break-word;max-height:160px;overflow-y:auto;scrollbar-width:thin"></div>
+                </div>
+                <div class="cmd-box" id="cmd-out" data-prompt="" style="display:none;word-break:break-word;font-size:11px"><span id="cmd-out-txt" style="color:var(--t3);font-style:italic">O prompt refinado aparecerá aqui após gerar</span><button class="cp-btn" onclick="cpElById('cmd-out')">Copiar</button></div>
                 <button id="btn-gerar-img" onclick="gerarImagem()" style="width:100%;margin-top:12px;background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:var(--f);font-size:14px;font-weight:700;color:#fff;letter-spacing:-.02em;box-shadow:0 4px 20px rgba(243,107,42,.3);transition:all .15s">
                   <svg style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                   Gerar imagem com IA
@@ -3543,6 +3495,87 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
           </div>
         </div>
         <div>
+          <div class="pb" style="margin-bottom:12px">
+            <div class="pb-title">Identidade visual</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:18px">
+              <div><label style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px">Primária</label>
+                <div style="position:relative;width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);overflow:hidden;cursor:pointer">
+                  <input type="color" id="brand-c1" value="#F5C518" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
+                  <div id="brand-c1-fill" style="position:absolute;inset:0;background:#F5C518;pointer-events:none"></div>
+                </div>
+                <div id="brand-c1-hex" style="font-size:11px;font-weight:600;color:var(--t0);font-family:monospace;margin-top:4px">#F5C518</div>
+              </div>
+              <div><label style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px">Fundo</label>
+                <div style="position:relative;width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);overflow:hidden;cursor:pointer">
+                  <input type="color" id="brand-c2" value="#0D0D0F" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
+                  <div id="brand-c2-fill" style="position:absolute;inset:0;background:#0D0D0F;pointer-events:none"></div>
+                </div>
+                <div id="brand-c2-hex" style="font-size:11px;font-weight:600;color:var(--t0);font-family:monospace;margin-top:4px">#0D0D0F</div>
+              </div>
+              <div><label style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px">Texto</label>
+                <div style="position:relative;width:44px;height:44px;border-radius:8px;border:2px solid var(--line-2);overflow:hidden;cursor:pointer">
+                  <input type="color" id="brand-c3" value="#F5F4F0" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;opacity:0" oninput="onBrandColorChange()">
+                  <div id="brand-c3-fill" style="position:absolute;inset:0;background:#F5F4F0;pointer-events:none"></div>
+                </div>
+                <div id="brand-c3-hex" style="font-size:11px;font-weight:600;color:var(--t0);font-family:monospace;margin-top:4px">#F5F4F0</div>
+              </div>
+            </div>
+            <div style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;display:flex;align-items:center;gap:5px">
+              <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:none;stroke:var(--amber);stroke-width:2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              Preview ao vivo
+            </div>
+            <div id="brand-model-previews" style="display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;margin-bottom:18px"></div>
+            <div style="font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Paletas rápidas</div>
+            <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px">
+              <button class="btn btn-g btn-sm" onclick="applyPreset('#F5C518','#0D0D0F','#F5F4F0')">AutoPostt</button>
+              <button class="btn btn-g btn-sm" onclick="applyPreset('#E8302A','#0A0A0A','#F5F5F5')">Sangue Frio</button>
+              <button class="btn btn-g btn-sm" onclick="applyPreset('#00A86B','#0D1117','#F0FFF4')">Matrix Verde</button>
+              <button class="btn btn-g btn-sm" onclick="applyPreset('#8B5CF6','#0F0A1E','#FAF5FF')">Neon Violeta</button>
+              <button class="btn btn-g btn-sm" onclick="applyPreset('#F97316','#1C1C1E','#FAFAFA')">Laranja Obsessão</button>
+              <button class="btn btn-g btn-sm" onclick="applyPreset('#06B6D4','#030712','#F0F9FF')">Gelo Cibernético</button>
+              <button class="btn btn-g btn-sm" onclick="applyPreset('#EC4899','#1A0010','#FFF0F7')">Rosa Brutalista</button>
+            </div>
+            <div class="form-row"><label>Estilo visual</label><select id="prof-estilo"><option value="Dark Luxury">Dark Luxury</option><option value="Minimalista">Minimalista</option><option value="Editorial">Editorial</option><option value="Futurista">Futurista</option></select></div>
+            <div class="form-row"><label>Redes integradas</label>
+              <div id="prof-redes-integrations">
+                <!-- populated by loadProfile() -->
+                <div style="font-size:12px;color:var(--tx-2);margin-bottom:10px">
+                  Conecte suas redes para publicar diretamente pela plataforma.
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px" id="redes-status-list">
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--ink-3);border:1px solid var(--line-1);border-radius:8px">
+                    <div style="display:flex;align-items:center;gap:8px">
+                      <svg style="width:14px;height:14px;fill:none;stroke:var(--tx-2);stroke-width:1.8" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                      <span style="font-size:12.5px;color:var(--tx-1)">Instagram</span>
+                    </div>
+                    <button class="btn btn-s btn-sm" onclick="nav('settings')" style="font-size:11px">Integrar →</button>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--ink-3);border:1px solid var(--line-1);border-radius:8px">
+                    <div style="display:flex;align-items:center;gap:8px">
+                      <svg style="width:14px;height:14px;fill:none;stroke:var(--tx-2);stroke-width:1.8" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                      <span style="font-size:12.5px;color:var(--tx-1)">LinkedIn</span>
+                    </div>
+                    <button class="btn btn-s btn-sm" onclick="nav('settings')" style="font-size:11px">Integrar →</button>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--ink-3);border:1px solid var(--line-1);border-radius:8px">
+                    <div style="display:flex;align-items:center;gap:8px">
+                      <svg style="width:14px;height:14px;fill:none;stroke:var(--tx-2);stroke-width:1.8" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
+                      <span style="font-size:12.5px;color:var(--tx-1)">YouTube</span>
+                    </div>
+                    <button class="btn btn-s btn-sm" onclick="nav('settings')" style="font-size:11px">Integrar →</button>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--ink-3);border:1px solid var(--line-1);border-radius:8px">
+                    <div style="display:flex;align-items:center;gap:8px">
+                      <svg style="width:14px;height:14px;fill:none;stroke:var(--tx-2);stroke-width:1.8" viewBox="0 0 24 24"><path d="M9 12a3 3 0 1 0 6 0 3 3 0 0 0-6 0M15 8h.01M19 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/></svg>
+                      <span style="font-size:12.5px;color:var(--tx-1)">TikTok</span>
+                    </div>
+                    <button class="btn btn-s btn-sm" onclick="nav('settings')" style="font-size:11px">Integrar →</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-p btn-sm" style="margin-top:4px" onclick="saveProfile()">Salvar</button>
+          </div>
           <div class="plan-box">
             <div class="plan-name" id="prof-plan-name">—</div>
             <div class="plan-renew" id="prof-plan-renew"></div>
@@ -4725,20 +4758,13 @@ async function loadProfile() {
     c.classList.toggle('on', me.redes && me.redes.toLowerCase().includes(net));
   });
 
-  // colors — brand palette (Primária, Secundária, Terciária, Quaternária)
+  // colors
   if (me.cores) {
     const parts = me.cores.split(',').map(s => s.trim()).filter(Boolean);
-    ['1','2','3','4'].forEach((n, i) => {
-      const inp  = document.getElementById('brand-c' + n);
-      const fill = document.getElementById('brand-c' + n + '-fill');
-      const hex  = document.getElementById('brand-c' + n + '-hex');
-      if (parts[i]) {
-        if (inp)  inp.value = parts[i];
-        if (fill) fill.style.background = parts[i];
-        if (hex)  hex.textContent = parts[i].toUpperCase();
-      }
-    });
-    _renderBrandModelPreviews(parts);
+    const c1 = document.getElementById('prof-c1');
+    const c2 = document.getElementById('prof-c2');
+    if (c1 && parts[0]) c1.style.background = parts[0];
+    if (c2 && parts[1]) c2.style.background = parts[1];
   }
 
   // plan info
@@ -4919,55 +4945,41 @@ function fmtIcon(format) {
 // ─────────────────────────────────────────────────
 // PIPELINE COM REFINADOR — chama backend (IA no servidor)
 // ─────────────────────────────────────────────────
-// NOVO FLUXO: Botão principal apenas mostra a grade de modelos.
-// O refinamento acontece dentro de gerarImagem(), após o modelo ser escolhido.
-function startGenPipeline() {
+async function startGenPipeline() {
   const input = (document.getElementById('gen-in').value || '').trim();
   if (!input) { toast('Descreva sua ideia antes de gerar'); return; }
-
-  // Guarda o input bruto; limpa refinamento anterior (modelo novo = refinamento novo)
-  window._rawInput = input;
-  window._refinedPrompt = '';
-
-  // Limpa o bloco de prompt refinado
-  const wrap = document.getElementById('refined-prompt-wrap');
-  const box  = document.getElementById('refined-prompt-box');
-  if (wrap) wrap.style.display = 'none';
-  if (box)  box.textContent = '';
-
-  // Reset cmd-out
-  const cmdEl  = document.getElementById('cmd-out');
-  const cmdTxt = document.getElementById('cmd-out-txt');
-  if (cmdEl)  cmdEl.dataset.prompt = '';
-  if (cmdTxt) cmdTxt.textContent = 'Selecione um modelo para refinar o prompt';
-
-  // Limpa seleção de modelo anterior
-  window._selectedModel = null;
-  _selectedModel = null;
-  document.querySelectorAll('.model-card').forEach(c => c.classList.remove('on'));
-  const info = document.getElementById('modelo-selected-info');
-  if (info) info.style.display = 'none';
-
-  // Mostra a aba de modelos
-  const tabModelos = document.getElementById('tab-conceitos');
-  const tabContent = document.getElementById('out-tab-conceitos');
-  if (tabModelos) tabModelos.style.display = '';
-  if (tabContent) tabContent.style.display = 'block';
-
+  const btn = document.getElementById('btn-gen-main');
+  const origHTML = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<svg style="width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2;animation:spin .8s linear infinite" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Refinando...';
   document.getElementById('out-e').style.display = 'none';
-  document.getElementById('sk-w').classList.remove('vis');
-  document.getElementById('out-r').classList.add('vis');
-
-  // Reset aba imagem
-  document.getElementById('img-preview-wrap')?.classList.remove('vis');
-  const emptyEl = document.getElementById('img-preview-empty');
-  if (emptyEl) {
-    emptyEl.style.display = 'flex';
-    emptyEl.innerHTML = `<svg style="width:28px;height:28px;fill:none;stroke:var(--t3);stroke-width:1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Escolha um modelo abaixo e clique em "Gerar imagem"`;
+  document.getElementById('out-r').classList.remove('vis');
+  document.getElementById('sk-w').classList.add('vis');
+  document.getElementById('sk-t').textContent = 'Agente refinando seu input...';
+  // ── Mostrar overlay de refinamento (trava o card) ──
+  showRefineOverlay('Agente refinando seu prompt...');
+  try {
+    const refineBody = { input, format: _currentFmt, network: _netMap[_currentNet] || 'instagram' };
+    if (window._refImageB64) refineBody.refImageBase64 = window._refImageB64;
+    const refineData = await api('POST', '/api/user/refine-prompt', refineBody);
+    const refined = refineData.refined_prompt || input;
+    // Salvar no hidden box (backend)
+    const box = document.getElementById('refined-prompt-box');
+    if (box) box.textContent = refined;
+    window._refinedPrompt = refined;
+    // Atualizar painel visual abaixo dos modelos
+    updateRefinedDisplay(refined);
+    document.getElementById('sk-t').textContent = 'Escolha um modelo abaixo...';
+    await runGen(refined);
+  } catch(e) {
+    toast(e.message, 'err');
+    document.getElementById('sk-w').classList.remove('vis');
+    document.getElementById('out-e').style.display = 'flex';
+  } finally {
+    hideRefineOverlay();
+    btn.disabled = false;
+    btn.innerHTML = origHTML;
   }
-
-  switchOutTab('conceitos');
-  toast('Escolha o modelo e clique em "Gerar imagem".', 'ok');
 }
 
 function regenWithCredit() {
@@ -5031,71 +5043,92 @@ REGRAS ABSOLUTAS:
 const IMG_STAGES = ['Lendo perfil da marca...','Definindo composição...','Aplicando cores...','Construindo SVG...','Refinando...','Finalizando...'];
 
 async function gerarImagem() {
-  const rawInput = (window._rawInput || document.getElementById('gen-in')?.value || '').trim();
-  if (!rawInput) { toast('Descreva sua ideia antes de gerar','err'); return; }
+  const refinedPrompt = document.getElementById('refined-prompt-box')?.textContent?.trim() || '';
+  const rawInput = (document.getElementById('gen-in')?.value || '').trim();
+  const prompt = refinedPrompt || rawInput;
+  if (!prompt) { toast('Refine o prompt primeiro clicando em "Gerar conteúdo com IA"','err'); return; }
   if (!window._selectedModel) { toast('Escolha um modelo antes de gerar a imagem','err'); return; }
-
-  const model = window._selectedModel;
-  const p = me || {};
-
-  // Usa prompt já refinado pelo _refineWithModel (chamado ao selecionar o modelo)
-  // Se por algum motivo não tiver refinado, usa o raw
-  const refined = (window._refinedPrompt || '').trim() || rawInput;
-
-  // Paleta da marca: Primária, Secundária, Terciária, Quaternária
-  const brandParts = (p.cores || '#F5C518,#0D0D0F,#F5F4F0,#888888').split(',').map(s => s.trim());
-  const brandPalette = {
-    primaria:    brandParts[0] || '#F5C518',
-    secundaria:  brandParts[1] || '#0D0D0F',
-    terciaria:   brandParts[2] || '#F5F4F0',
-    quaternaria: brandParts[3] || '#888888'
-  };
-
-  switchOutTab('imagem');
-  document.getElementById('img-preview-empty').style.display = 'none';
-  document.getElementById('img-preview-wrap')?.classList.remove('vis');
-  document.getElementById('img-gen-loading').style.display = 'flex';
-
+  
+  const imgMode = document.querySelector('input[name="img-mode"]:checked')?.value || 'reference';
+  
+  // ── Mostrar agent overlay bloqueante ──
+  showAgentOverlay(window._selectedModel.name);
+  
+  const STAGES = [
+    'Lendo seu prompt refinado...',
+    'Aplicando modelo ' + window._selectedModel.name + '...',
+    'Substituindo textos pelo conteúdo...',
+    'Aplicando cores da marca...',
+    'Montando a composição final...',
+    'Finalizando o post...'
+  ];
   let si = 0;
+  const iv = setInterval(() => {
+    if (si < STAGES.length) setAgentStage(STAGES[si++]);
+  }, 1100);
+  
+  // Manter as variáveis para compatibilidade
   const stageEl = document.getElementById('img-gen-stage');
-  const IV_STAGES = ['Aplicando modelo ' + model.n + '...','Mapeando paleta de marca...','Substituindo textos...','Aplicando cores da marca...','Ajustando tipografia...','Finalizando...'];
-  const iv = setInterval(() => { if (si < IV_STAGES.length) stageEl.textContent = IV_STAGES[si++]; }, 900);
-
+  const p = me || {};
+  
   try {
-    // Gerar imagem com o modelo obrigatório + prompt refinado + paleta correta
+    // O modelo SVG é enviado via brandProfile.modelSvg — não precisa duplicar no prompt
+    const rawInput = (document.getElementById('gen-in')?.value || '').trim();
+    const fullPrompt = [
+      rawInput ? 'IDEIA ORIGINAL: ' + rawInput : '',
+      'PROMPT REFINADO: ' + prompt
+    ].filter(Boolean).join('\n');
     const body = {
-      prompt: refined,
-      format:  _currentFmt,
-      network: _netMap[_currentNet] || 'instagram',
-      imgMode: 'model',
+      prompt: fullPrompt,
+      format: _currentFmt,
+      network: _netMap[_currentNet]||'instagram',
+      imgMode,
+      refImageBase64: window._refImageB64 || null,
       brandProfile: {
-        profissao:   p.profissao,
-        nicho:       p.nicho,
-        tom:         p.tom,
-        publico:     p.publico,
-        cores:       p.cores,
-        brandPalette,
-        modelN:    model.n,
-        modelName: model.name,
-        modelSvg:  model.svg
+        profissao: p.profissao,
+        nicho: p.nicho,
+        cores: p.cores,
+        estilo: p.estilo,
+        tom: p.tom,
+        publico: p.publico,
+        logoData: window._logoData || null,
+        visualMemory: window._visualMemory || null,
+        modelN:    window._selectedModel?.n    || '',
+        modelName: window._selectedModel?.name || '',
+        modelSvg:  window._selectedModel?.svg  || ''
       }
     };
-
     const data = await api('POST', '/api/user/generate-image', body);
     clearInterval(iv);
     const svgCode = data.svg;
     if (!svgCode) throw new Error('Sem SVG na resposta');
     window._currentSVG = svgCode;
     _currentSVG = svgCode;
-    _currentImgName = 'autopostt-' + model.n + '-' + Date.now();
+    _currentImgName = 'autopostt-' + _currentFmt + '-' + Date.now();
     const thumb = document.getElementById('img-preview-thumb');
     if (thumb) thumb.innerHTML = svgCode;
     document.getElementById('img-gen-loading').style.display = 'none';
     document.getElementById('img-preview-wrap')?.classList.add('vis');
-    toast('Imagem gerada! Modelo: ' + model.name, 'ok');
+    hideAgentOverlay(true);
+    switchOutTab('imagem');
+    toast('✓ Post gerado no modelo ' + (window._selectedModel?.name || ''), 'ok');
+    // Save to local history
+    try {
+      const hist = JSON.parse(localStorage.getItem('autopostt_img_hist') || '[]');
+      hist.unshift({
+        id: Date.now(),
+        concept_name: prompt.slice(0, 60),
+        format: _currentFmt,
+        network: _netMap[_currentNet] || 'instagram',
+        svg_data: svgCode,
+        created_at: new Date().toISOString()
+      });
+      localStorage.setItem('autopostt_img_hist', JSON.stringify(hist.slice(0, 50)));
+    } catch(e) {}
     if (me) { me.quota_used = (me.quota_used||0)+1; updateQuota(); }
   } catch(e) {
     clearInterval(iv);
+    hideAgentOverlay(false);
     document.getElementById('img-gen-loading').style.display = 'none';
     document.getElementById('img-preview-empty').style.display = 'flex';
     document.getElementById('img-preview-empty').innerHTML = `<span style="color:var(--red);text-align:center;font-size:12px">${esc(e.message)}</span><button class="btn btn-g btn-sm" onclick="gerarImagem()">Tentar novamente</button>`;
@@ -5108,35 +5141,8 @@ function openImgModal() {
   const bg = document.getElementById('img-modal-bg');
   const body = document.getElementById('img-modal-body');
   if (!bg || !body) { toast('Modal não encontrado', 'err'); return; }
-  // Render SVG to canvas for crisp fullscreen display
-  const vbMatch = svg.match(/viewBox=["']([^"']+)["']/);
-  let W = 1080, H = 1350;
-  if (vbMatch) { const p = vbMatch[1].trim().split(/[\s,]+/); if (p.length===4){W=parseFloat(p[2])||1080;H=parseFloat(p[3])||1350;} }
-  const blob = new Blob([svg], {type:'image/svg+xml;charset=utf-8'});
-  const url  = URL.createObjectURL(blob);
-  const tmpImg = new Image();
-  tmpImg.onload = function() {
-    const canvas = document.createElement('canvas');
-    canvas.width = W * 2; canvas.height = H * 2;
-    const ctx = canvas.getContext('2d');
-    ctx.scale(2,2);
-    const brandParts = (me?.cores||'#F5C518,#0D0D0F').split(',').map(s=>s.trim());
-    ctx.fillStyle = brandParts[1] || '#0D0D0F';
-    ctx.fillRect(0,0,W,H);
-    ctx.drawImage(tmpImg,0,0,W,H);
-    URL.revokeObjectURL(url);
-    const img = document.createElement('img');
-    img.style.cssText = 'max-width:100%;max-height:calc(100vh - 120px);height:auto;display:block;border-radius:8px;object-fit:contain';
-    canvas.toBlob(b => {
-      if (!b) { body.innerHTML = svg; bg.classList.add('open'); return; }
-      img.src = URL.createObjectURL(b);
-      body.innerHTML = '';
-      body.appendChild(img);
-      bg.classList.add('open');
-    }, 'image/jpeg', 0.97);
-  };
-  tmpImg.onerror = function() { URL.revokeObjectURL(url); body.innerHTML = svg; bg.classList.add('open'); };
-  tmpImg.src = url;
+  body.innerHTML = svg;
+  bg.classList.add('open');
 }
 function closeImgModal() {
   const bg = document.getElementById('img-modal-bg');
@@ -5144,54 +5150,42 @@ function closeImgModal() {
   const body = document.getElementById('img-modal-body');
   if (body) body.innerHTML = '';
 }
+function closeImgModal() {
+  const bg = document.getElementById('img-modal-bg');
+  if (bg) bg.style.display = 'none';
+}
+function closeImgModal() { document.getElementById('img-modal-bg').classList.remove('open'); }
 function downloadImg() {
   const svg = window._currentSVG || _currentSVG;
   if (!svg) { toast('Nenhuma imagem para baixar','err'); return; }
   toast('Gerando JPG...','ok');
-
-  // Extrai viewBox para dimensões corretas
-  const vbMatch = svg.match(/viewBox=["']([^"']+)["']/);
-  let W = 1080, H = 1350;
-  if (vbMatch) {
-    const parts = vbMatch[1].trim().split(/[\s,]+/);
-    if (parts.length === 4) { W = parseFloat(parts[2])||1080; H = parseFloat(parts[3])||1350; }
-  }
-
-  // Usa a cor secundária da marca como fundo do canvas (garante que fundo SVG transparente fique certo)
-  const brandParts = (me?.cores || '#F5C518,#0D0D0F,#F5F4F0').split(',').map(s=>s.trim());
-  const bgColor = brandParts[1] || '#0D0D0F';
-
   const blob = new Blob([svg], {type:'image/svg+xml;charset=utf-8'});
-  const url  = URL.createObjectURL(blob);
-  const img  = new Image();
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
   img.onload = function() {
     const canvas = document.createElement('canvas');
-    canvas.width  = W * 2; // 2x para alta qualidade
-    canvas.height = H * 2;
+    canvas.width = img.naturalWidth || 1080;
+    canvas.height = img.naturalHeight || 1080;
     const ctx = canvas.getContext('2d');
-    ctx.scale(2, 2);
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, W, H);
-    ctx.drawImage(img, 0, 0, W, H);
+    ctx.fillStyle = '#0A0D10';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(img,0,0);
     URL.revokeObjectURL(url);
     canvas.toBlob(function(b){
-      if (!b) { toast('Erro na conversão. Tente novamente.','err'); return; }
+      if (!b) { toast('Erro na conversão','err'); return; }
       const a = document.createElement('a');
       a.href = URL.createObjectURL(b);
-      a.download = (_currentImgName || 'autopostt-imagem') + '.jpg';
+      a.download = (_currentImgName||'autopostt-imagem')+'.jpg';
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      URL.revokeObjectURL(a.href);
-      toast('JPG baixado! (' + W + 'x' + H + ')','ok');
-    }, 'image/jpeg', 0.96);
+      toast('JPG baixado!','ok');
+    },'image/jpeg',0.95);
   };
   img.onerror = function(){
     URL.revokeObjectURL(url);
-    // Fallback: tenta via canvas com Blob URL diferente
-    toast('Erro ao renderizar. Baixando SVG como fallback.','');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));
-    a.download = (_currentImgName||'autopostt') + '.svg';
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    a.download = (_currentImgName||'autopostt')+'.svg';
+    a.click(); toast('Baixado como SVG','ok');
   };
   img.src = url;
 }
@@ -5766,7 +5760,7 @@ function clearRefImage(e) {
   toast('Imagem removida', 'ok');
 }
 
-
+// gerarImagem override removed — single implementation above
 function addColorDot() {
   const dots = document.getElementById('prof-color-dots');
   if (!dots) return;
@@ -6805,16 +6799,14 @@ function onBrandColorChange() {
   const c1 = document.getElementById('brand-c1')?.value || '#F5C518';
   const c2 = document.getElementById('brand-c2')?.value || '#0D0D0F';
   const c3 = document.getElementById('brand-c3')?.value || '#F5F4F0';
-  const c4 = document.getElementById('brand-c4')?.value || '#888888';
-  ['1','2','3','4'].forEach(n => {
+  ['1','2','3'].forEach(n => {
     const fill = document.getElementById('brand-c'+n+'-fill');
     const hex  = document.getElementById('brand-c'+n+'-hex');
     const val  = document.getElementById('brand-c'+n)?.value;
-    if (fill && val) fill.style.background = val;
-    if (hex  && val) hex.textContent = val.toUpperCase();
+    if (fill) fill.style.background = val;
+    if (hex)  hex.textContent = val.toUpperCase();
   });
-  saveBrand({ cores:[c1,c2,c3,c4] });
-  _renderBrandModelPreviews([c1,c2,c3,c4]);
+  _renderBrandModelPreviews([c1,c2,c3]);
 }
 
 function _renderBrandModelPreviews(cores) {
@@ -7713,7 +7705,6 @@ function _getModelDesc(n) {
 
 function selectModel(idx) {
   _selectedModel = models[idx];
-  window._selectedModel = _selectedModel;
   document.querySelectorAll('#modelo-grid > div').forEach((c, i) => {
     const on = i === idx;
     c.style.borderColor = on ? 'var(--amber)' : 'var(--line-1)';
@@ -7722,8 +7713,11 @@ function selectModel(idx) {
     if (chk) chk.style.display = on ? 'block' : 'none';
   });
   _updateModelInfo();
-  // Após selecionar o modelo, disparar refinamento automaticamente
-  _refineWithModel(_selectedModel);
+  // ── Após selecionar modelo, gerar imagem automaticamente ──
+  // Pequeno delay para o usuário ver qual modelo foi selecionado
+  setTimeout(() => {
+    if (window._selectedModel) gerarImagem();
+  }, 280);
 }
 
 function _updateModelInfo() {
@@ -7731,73 +7725,6 @@ function _updateModelInfo() {
   const name = document.getElementById('modelo-selected-name');
   if (info) info.style.display = _selectedModel ? 'block' : 'none';
   if (name && _selectedModel) name.textContent = _selectedModel.n + ' — ' + _selectedModel.name;
-}
-
-// Refina o prompt assim que o modelo é selecionado, mostra resultado ao usuário
-async function _refineWithModel(model) {
-  const rawInput = (window._rawInput || document.getElementById('gen-in')?.value || '').trim();
-  if (!rawInput || !model) return;
-
-  // Paleta da marca
-  const p = me || {};
-  const brandParts = (p.cores || '#F5C518,#0D0D0F,#F5F4F0,#888888').split(',').map(s => s.trim());
-  const brandPalette = {
-    primaria:    brandParts[0] || '#F5C518',
-    secundaria:  brandParts[1] || '#0D0D0F',
-    terciaria:   brandParts[2] || '#F5F4F0',
-    quaternaria: brandParts[3] || '#888888'
-  };
-
-  // Mostra estado "refinando..." no cmd-out
-  const cmdEl   = document.getElementById('cmd-out');
-  const cmdTxt  = document.getElementById('cmd-out-txt');
-  const btnGerar = document.getElementById('btn-gerar-img');
-  if (cmdTxt) cmdTxt.textContent = '✦ Refinando prompt com o modelo ' + model.n + '…';
-  if (cmdEl)  cmdEl.dataset.prompt = '';
-  if (btnGerar) btnGerar.disabled = true;
-
-  // Mostra o bloco de prompt refinado com loading
-  const wrap = document.getElementById('refined-prompt-wrap');
-  const box  = document.getElementById('refined-prompt-box');
-  if (wrap) wrap.style.display = 'block';
-  if (box)  box.textContent = '⏳ Refinando com base no modelo ' + model.n + ' — ' + model.name + '...';
-
-  try {
-    const body = {
-      input: rawInput,
-      modelN:    model.n,
-      modelName: model.name,
-      modelSvg:  model.svg,
-      brandPalette
-    };
-    if (window._refImageB64) body.refImageBase64 = window._refImageB64;
-
-    const data = await api('POST', '/api/user/refine-prompt', body);
-    const refined = data.refined_prompt || rawInput;
-    window._refinedPrompt = refined;
-
-    // Atualiza UI com prompt refinado
-    if (box)    box.textContent = refined;
-    if (cmdTxt) cmdTxt.textContent = refined;
-    if (cmdEl)  cmdEl.dataset.prompt = refined;
-    if (btnGerar) { btnGerar.disabled = false; btnGerar.textContent = ''; }
-
-    // Recompor o botão com ícone + texto
-    if (btnGerar) {
-      btnGerar.innerHTML = `<svg style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Gerar imagem com IA`;
-    }
-
-    toast('Prompt refinado! Clique em "Gerar imagem" para continuar.', 'ok');
-  } catch(e) {
-    window._refinedPrompt = rawInput;
-    if (box)    box.textContent = rawInput;
-    if (cmdTxt) cmdTxt.textContent = rawInput;
-    if (cmdEl)  cmdEl.dataset.prompt = rawInput;
-    if (btnGerar) {
-      btnGerar.disabled = false;
-      btnGerar.innerHTML = `<svg style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Gerar imagem com IA`;
-    }
-  }
 }
 
 // Show/hide img-mode-box based on ref image
@@ -8870,7 +8797,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="ob2-color-hex" id="ob2-c1-hex">#F5C518</div>
               </div>
               <div class="ob2-color-item">
-                <label>Cor Secundária</label>
+                <label>Cor de fundo</label>
                 <div class="ob2-color-swatch" style="background:#0D0D0F">
                   <input type="color" id="ob2-c2" value="#0D0D0F" oninput="ob2ColorUpdate(this,'ob2-c2')">
                   <div class="ob2-color-fill" id="ob2-c2-fill" style="background:#0D0D0F"></div>
@@ -8878,20 +8805,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="ob2-color-hex" id="ob2-c2-hex">#0D0D0F</div>
               </div>
               <div class="ob2-color-item">
-                <label>Cor Terciária</label>
+                <label>Cor de texto</label>
                 <div class="ob2-color-swatch" style="background:#F5F4F0">
                   <input type="color" id="ob2-c3" value="#F5F4F0" oninput="ob2ColorUpdate(this,'ob2-c3')">
                   <div class="ob2-color-fill" id="ob2-c3-fill" style="background:#F5F4F0"></div>
                 </div>
                 <div class="ob2-color-hex" id="ob2-c3-hex">#F5F4F0</div>
-              </div>
-              <div class="ob2-color-item">
-                <label>Cor Quaternária</label>
-                <div class="ob2-color-swatch" style="background:#888888">
-                  <input type="color" id="ob2-c4" value="#888888" oninput="ob2ColorUpdate(this,'ob2-c4')">
-                  <div class="ob2-color-fill" id="ob2-c4-fill" style="background:#888888"></div>
-                </div>
-                <div class="ob2-color-hex" id="ob2-c4-hex">#888888</div>
               </div>
             </div>
             <div style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Paletas prontas</div>
@@ -8904,7 +8823,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="ob2-nav">
               <button class="ob2-nav btn-back" onclick="ob2Back(4)">←</button>
-              <button class="btn btn-p" onclick="ob2Next(4,{cores:document.getElementById('ob2-c1').value+', '+document.getElementById('ob2-c2').value+', '+document.getElementById('ob2-c3').value+', '+(document.getElementById('ob2-c4')?.value||'#888888')})">Continuar →</button>
+              <button class="btn btn-p" onclick="ob2Next(4,{cores:document.getElementById('ob2-c1').value+', '+document.getElementById('ob2-c2').value+', '+document.getElementById('ob2-c3').value})">Continuar →</button>
             </div>
           </div>
 
@@ -9226,122 +9145,342 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 
-<div id="gen-refine-lock" aria-hidden="true">
-  <div class="lock-card">
-    <div class="lock-eyebrow">Agente refinador</div>
-    <div class="lock-title">Refinando seu prompt</div>
-    <div class="lock-sub">A IA está aplicando o modelo selecionado e a identidade da sua marca. Aguarde um instante.</div>
-    <div class="lock-bars">
-      <div class="lock-bar"></div>
-      <div class="lock-bar"></div>
-      <div class="lock-bar"></div>
-    </div>
-    <div class="lock-foot"><span class="refine-loading-dot"></span><span>Processando e travando a tela durante o refinamento</span></div>
+<!-- ══ AGENT OVERLAY — fullscreen bloqueante ══ -->
+<div id="agent-overlay" role="dialog" aria-modal="true" aria-label="Agente gerando imagem">
+  <div id="agent-canvas-wrap">
+    <canvas id="agent-canvas" width="520" height="520"></canvas>
+  </div>
+  <div class="agent-ov-title" id="agent-ov-title">Agente trabalhando...</div>
+  <div class="agent-ov-stage" id="agent-ov-stage">Iniciando...</div>
+  <div class="agent-ov-progress">
+    <div class="agent-ov-bar" id="agent-ov-bar"></div>
   </div>
 </div>
 
+<!-- ══ REFINE OVERLAY — bloqueia só o card esquerdo durante refinamento ══ -->
+<div id="refine-overlay">
+  <div class="refine-ov-dot"></div>
+  <div class="refine-ov-txt" id="refine-ov-txt">Refinando seu prompt...</div>
+  <div class="refine-ov-sub" id="refine-ov-sub">Aguarde, o agente está trabalhando</div>
+</div>
+<script>
 
-<script id="refine-lock-script">
-(function(){
-  const STATE = { active:false };
-  const $ = (id) => document.getElementById(id);
+// ══════════════════════════════════════════════════════
+// AGENT ANIMATOR — bichinho que desenha e pula
+// ══════════════════════════════════════════════════════
+const AgentAnim = (() => {
+  let _raf = null, _canvas = null, _ctx = null;
+  let _t = 0;
 
-  function moveRefinedWrapBelowModels(){
-    const wrap = $('refined-prompt-wrap');
-    const section = $('modelo-picker-section');
-    if(!wrap || !section) return;
-    if(!wrap.classList.contains('refine-below-models')){
-      wrap.classList.add('refine-below-models');
+  // Estado do agente
+  const agent = {
+    x: 130, y: 180,
+    vy: 0, vx: 1.2,
+    onGround: false,
+    phase: 'walk', // walk | jump | draw | spin
+    phaseT: 0,
+    pencilAngle: 0,
+    drawX: 60, drawY: 220,
+    drawDir: 1,
+    sparkles: [],
+    trail: [],
+    postProgress: 0, // 0→1 simula o post sendo "desenhado"
+  };
+
+  // Cores
+  const C = {
+    body:   '#F5C518',
+    eye:    '#0A0A0A',
+    pencil: '#FF6B35',
+    spark:  '#FFD740',
+    post:   'rgba(245,197,24,',
+    bg:     'rgba(18,18,22,',
+  };
+
+  function _drawAgent(ctx, x, y, t) {
+    ctx.save();
+    ctx.translate(x, y);
+
+    // Sombra
+    ctx.fillStyle = 'rgba(0,0,0,.25)';
+    ctx.beginPath();
+    ctx.ellipse(0, 14, 14, 4, 0, 0, Math.PI*2);
+    ctx.fill();
+
+    // Bounce vertical
+    const bounce = Math.abs(Math.sin(t * 0.08)) * -8;
+    ctx.translate(0, bounce);
+
+    // Corpo
+    ctx.fillStyle = C.body;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 16, 18, 0, 0, Math.PI*2);
+    ctx.fill();
+
+    // Brilho
+    ctx.fillStyle = 'rgba(255,255,255,.18)';
+    ctx.beginPath();
+    ctx.ellipse(-4, -7, 6, 4, -0.5, 0, Math.PI*2);
+    ctx.fill();
+
+    // Olhos
+    const eyeBlinkH = (Math.sin(t * 0.03) > 0.97) ? 1 : 5;
+    ctx.fillStyle = C.eye;
+    ctx.beginPath(); ctx.ellipse(-5, -4, 3, eyeBlinkH, 0, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(5, -4, 3, eyeBlinkH, 0, 0, Math.PI*2); ctx.fill();
+    // Brilho olho
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.ellipse(-4, -6, 1, 1, 0, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(6, -6, 1, 1, 0, 0, Math.PI*2); ctx.fill();
+
+    // Sorriso
+    ctx.strokeStyle = C.eye;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(0, 3, 6, 0.2, Math.PI - 0.2);
+    ctx.stroke();
+
+    // Braços / lápis
+    const armSwing = Math.sin(t * 0.1) * 15;
+    // Braço esquerdo com lápis
+    ctx.save();
+    ctx.translate(-16, 2);
+    ctx.rotate((-30 + armSwing) * Math.PI/180);
+    // Braço
+    ctx.fillStyle = C.body;
+    ctx.beginPath(); ctx.ellipse(0, 6, 4, 9, 0, 0, Math.PI*2); ctx.fill();
+    // Lápis
+    ctx.save();
+    ctx.translate(0, 14);
+    ctx.rotate(0.4);
+    ctx.fillStyle = C.pencil;
+    ctx.fillRect(-3, 0, 6, 18);
+    ctx.fillStyle = '#FFD740';
+    ctx.beginPath(); ctx.moveTo(-3,0); ctx.lineTo(3,0); ctx.lineTo(0,-6); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#aaa';
+    ctx.fillRect(-3, 16, 6, 4);
+    ctx.restore();
+    ctx.restore();
+
+    // Braço direito
+    ctx.save();
+    ctx.translate(16, 2);
+    ctx.rotate((30 - armSwing) * Math.PI/180);
+    ctx.fillStyle = C.body;
+    ctx.beginPath(); ctx.ellipse(0, 6, 4, 9, 0, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+
+    // Perninhas
+    const legSwing = Math.sin(t * 0.1) * 12;
+    ctx.fillStyle = C.body;
+    ctx.save(); ctx.translate(-6, 16); ctx.rotate(legSwing * Math.PI/180);
+    ctx.beginPath(); ctx.ellipse(0,6,4,8,0,0,Math.PI*2); ctx.fill(); ctx.restore();
+    ctx.save(); ctx.translate(6, 16); ctx.rotate(-legSwing * Math.PI/180);
+    ctx.beginPath(); ctx.ellipse(0,6,4,8,0,0,Math.PI*2); ctx.fill(); ctx.restore();
+
+    ctx.restore();
+  }
+
+  function _drawPost(ctx, progress) {
+    const px = 50, py = 40, pw = 160, ph = 180;
+    // Fundo do post sendo "revelado"
+    ctx.fillStyle = 'rgba(30,30,35,0.9)';
+    ctx.strokeStyle = 'rgba(245,197,24,.3)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(px, py, pw, ph * progress, 6);
+    ctx.fill(); ctx.stroke();
+
+    if (progress > 0.1) {
+      // Linha de título
+      ctx.fillStyle = `rgba(245,197,24,${Math.min(1, (progress-0.1)*4)})`;
+      ctx.fillRect(px+10, py+14, (pw-20) * Math.min(1, (progress-0.1)*3), 8);
     }
-    if (wrap.previousElementSibling !== section) {
-      section.insertAdjacentElement('afterend', wrap);
-    }
-  }
-
-  function setRefiningMock(model){
-    const wrap = $('refined-prompt-wrap');
-    const box = $('refined-prompt-box');
-    const info = $('modelo-selected-info');
-    if (wrap) wrap.style.display = 'block';
-    if (info) info.style.display = 'block';
-    if (box){
-      box.classList.add('refining-state');
-      box.innerHTML = `
-        <div class="refine-loading-title">
-          <span class="refine-loading-dot"></span>
-          <span>Refinando seu prompt com o modelo ${model?.n || 'selecionado'}${model?.name ? ' — ' + model.name : ''}</span>
-        </div>
-        <div class="refine-skeleton">
-          <div class="sk-line"></div>
-          <div class="sk-line"></div>
-          <div class="sk-line"></div>
-          <div class="sk-line"></div>
-        </div>
-      `;
-    }
-  }
-
-  function clearRefiningMock(){
-    const box = $('refined-prompt-box');
-    if (box) box.classList.remove('refining-state');
-  }
-
-  function showLock(){
-    const lock = $('gen-refine-lock');
-    document.body.classList.add('refine-locked');
-    if (lock) lock.classList.add('open');
-    STATE.active = true;
-  }
-
-  function hideLock(){
-    const lock = $('gen-refine-lock');
-    document.body.classList.remove('refine-locked');
-    if (lock) lock.classList.remove('open');
-    STATE.active = false;
-  }
-
-  function enforceSingleOutput(){
-    const cmd = $('cmd-out');
-    if (cmd) cmd.style.display = 'none';
-    moveRefinedWrapBelowModels();
-  }
-
-  function scrollToRefined(){
-    const wrap = $('refined-prompt-wrap');
-    if (wrap) {
-      wrap.scrollIntoView({behavior:'smooth', block:'nearest'});
-    }
-  }
-
-  const originalRefine = window._refineWithModel;
-  window._refineWithModel = async function(model){
-    if (STATE.active) return;
-    enforceSingleOutput();
-    showLock();
-    setRefiningMock(model);
-    try{
-      if (typeof originalRefine === 'function') {
-        await originalRefine(model);
+    if (progress > 0.3) {
+      // Linhas de texto
+      for (let i = 0; i < 4; i++) {
+        const lp = Math.min(1, (progress - 0.3 - i*0.12) * 5);
+        if (lp <= 0) break;
+        ctx.fillStyle = `rgba(160,160,170,${lp * 0.6})`;
+        ctx.fillRect(px+10, py+32+i*14, (pw-20-(i%2)*20) * lp, 5);
       }
-    } finally {
-      clearRefiningMock();
-      hideLock();
-      enforceSingleOutput();
-      scrollToRefined();
+    }
+    if (progress > 0.7) {
+      // CTA / botão
+      const bp = Math.min(1, (progress - 0.7) * 5);
+      ctx.fillStyle = `rgba(245,197,24,${bp * 0.85})`;
+      ctx.beginPath();
+      ctx.roundRect(px+10, py+ph*0.75, 80, 20, 4);
+      ctx.fill();
+    }
+  }
+
+  function _spawnSparkle(ctx) {
+    const n = Math.random() * 3 | 0;
+    for (let i = 0; i < n; i++) {
+      agent.sparkles.push({
+        x: agent.x + (Math.random()-0.5)*30,
+        y: agent.y - 10 + (Math.random()-0.5)*20,
+        vx: (Math.random()-0.5)*3,
+        vy: -(Math.random()*2+1),
+        life: 1,
+        r: Math.random()*3+1,
+      });
+    }
+  }
+
+  function _tick() {
+    if (!_canvas || !_ctx) return;
+    const W = _canvas.width, H = _canvas.height;
+    _t++;
+
+    const ctx = _ctx;
+    ctx.clearRect(0, 0, W, H);
+
+    // Post sendo criado ao fundo
+    agent.postProgress = Math.min(1, agent.postProgress + 0.004);
+    _drawPost(ctx, agent.postProgress);
+
+    // Movimento do agente — caminha sobre o post
+    agent.x += agent.vx;
+    if (agent.x > W - 40) { agent.vx = -Math.abs(agent.vx); }
+    if (agent.x < 40)     { agent.vx =  Math.abs(agent.vx); }
+
+    // Pulo periódico
+    if (_t % 90 === 0) {
+      agent.vy = -8;
+    }
+    agent.vy += 0.5;
+    agent.y += agent.vy;
+    if (agent.y >= 185) { agent.y = 185; agent.vy = 0; }
+
+    // Sparkles ao "desenhar"
+    if (_t % 8 === 0) _spawnSparkle(ctx);
+
+    // Atualizar e desenhar sparkles
+    agent.sparkles = agent.sparkles.filter(s => s.life > 0);
+    for (const s of agent.sparkles) {
+      s.x += s.vx; s.y += s.vy; s.vy += 0.1; s.life -= 0.04;
+      ctx.globalAlpha = s.life;
+      ctx.fillStyle = C.spark;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+
+    // Desenhar agente
+    _drawAgent(ctx, agent.x, agent.y, _t);
+
+    _raf = requestAnimationFrame(_tick);
+  }
+
+  return {
+    start() {
+      _canvas = document.getElementById('agent-canvas');
+      if (!_canvas) return;
+      _ctx = _canvas.getContext('2d');
+      agent.x = 130; agent.y = 185; agent.vy = 0;
+      agent.postProgress = 0; agent.sparkles = [];
+      _t = 0;
+      if (_raf) cancelAnimationFrame(_raf);
+      _raf = requestAnimationFrame(_tick);
+    },
+    stop() {
+      if (_raf) { cancelAnimationFrame(_raf); _raf = null; }
     }
   };
-
-  const originalStart = window.startGenPipeline;
-  window.startGenPipeline = function(){
-    enforceSingleOutput();
-    if (typeof originalStart === 'function') return originalStart.apply(this, arguments);
-  };
-
-  document.addEventListener('DOMContentLoaded', function(){
-    enforceSingleOutput();
-  });
 })();
-</script>
 
+// ── Mostrar/esconder agent overlay (geração de imagem) ──────────
+function showAgentOverlay(modelName) {
+  const ov = document.getElementById('agent-overlay');
+  if (!ov) return;
+  document.getElementById('agent-ov-title').textContent =
+    'Agente criando seu post' + (modelName ? ' · ' + modelName : '') + '...';
+  document.getElementById('agent-ov-stage').textContent = 'Preparando composição...';
+  document.getElementById('agent-ov-bar').style.width = '0%';
+  ov.classList.add('active');
+  AgentAnim.start();
+  // Animar barra de progresso
+  let prog = 0;
+  window._agentBarInterval = setInterval(() => {
+    prog = Math.min(92, prog + (Math.random() * 3 + 0.5));
+    document.getElementById('agent-ov-bar').style.width = prog + '%';
+  }, 600);
+}
+
+function hideAgentOverlay(success) {
+  clearInterval(window._agentBarInterval);
+  const bar = document.getElementById('agent-ov-bar');
+  if (bar) bar.style.width = '100%';
+  setTimeout(() => {
+    const ov = document.getElementById('agent-overlay');
+    if (ov) ov.classList.remove('active');
+    AgentAnim.stop();
+  }, success ? 400 : 0);
+}
+
+function setAgentStage(txt) {
+  const el = document.getElementById('agent-ov-stage');
+  if (el) { el.style.opacity='0'; setTimeout(() => { el.textContent=txt; el.style.opacity='1'; }, 200); }
+}
+
+// ── Mostrar/esconder refine overlay (refinamento de prompt) ─────
+function showRefineOverlay(txt) {
+  // Posicionar o overlay relativo ao card esquerdo
+  const card = document.querySelector('#pg-generate .card.p-20');
+  if (card) {
+    const ov = document.getElementById('refine-overlay');
+    if (ov) {
+      // Mover para dentro do card
+      if (ov.parentElement !== card) {
+        card.style.position = 'relative';
+        card.appendChild(ov);
+      }
+      document.getElementById('refine-ov-txt').textContent = txt || 'Refinando seu prompt...';
+      ov.classList.add('active');
+    }
+  }
+}
+
+function hideRefineOverlay() {
+  const ov = document.getElementById('refine-overlay');
+  if (ov) ov.classList.remove('active');
+}
+
+// ── Atualizar painel de prompt refinado abaixo dos modelos ──────
+function updateRefinedDisplay(text) {
+  const panel = document.getElementById('refined-prompt-display');
+  const box   = document.getElementById('refined-prompt-display-box');
+  if (panel && box) {
+    box.textContent = text;
+    panel.style.display = 'block';
+  }
+}
+
+function editRefinedInline() {
+  const box = document.getElementById('refined-prompt-display-box');
+  if (!box) return;
+  const ta = document.createElement('textarea');
+  ta.value = box.textContent;
+  ta.rows = 5;
+  ta.style.cssText = 'width:100%;background:var(--bg);border:1px solid var(--a);color:var(--t0);border-radius:var(--r2);padding:10px;font-size:11.5px;font-family:monospace;resize:none;outline:none';
+  box.replaceWith(ta);
+  ta.focus();
+  ta.addEventListener('blur', () => {
+    const nb = document.createElement('div');
+    nb.id = 'refined-prompt-display-box';
+    nb.style.cssText = box.style.cssText;
+    nb.textContent = ta.value;
+    ta.replaceWith(nb);
+    // Sync com o hidden refined-prompt-box
+    window._refinedPrompt = ta.value;
+    const hiddenBox = document.getElementById('refined-prompt-box');
+    if (hiddenBox) hiddenBox.textContent = ta.value;
+  });
+}
+
+</script>
 </body>
 </html>
