@@ -5297,6 +5297,110 @@ body.image-agent-refining #image-agent-refine-overlay{
 }
 </style>
 
+
+<style id="calendar-liquidglass-auth-logo-patch">
+/* ===== Calendar editorial → liquidglass ===== */
+#pg-calendar .card,
+#pg-calendar .tbl-wrap,
+#pg-calendar .hist-card,
+#pg-calendar .tip-card,
+#pg-calendar .sett-card,
+#pg-calendar .cal-shell,
+#pg-calendar .cal-card,
+#pg-calendar .calendar-wrap,
+#pg-calendar .calendar-grid,
+#pg-calendar .calendar-panel,
+#pg-calendar .calendar-sidebar,
+#pg-calendar .calendar-main,
+#pg-calendar .calendar-editorial,
+#pg-calendar .calendar-list,
+#pg-calendar .calendar-header,
+#pg-calendar .calendar-toolbar {
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015)) !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 12px 36px rgba(0,0,0,.18);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  backdrop-filter: blur(18px) saturate(140%);
+  border-radius: 16px !important;
+}
+#pg-calendar .sec-lbl::after,
+#pg-calendar .divider,
+#pg-calendar .card-hd,
+#pg-calendar thead,
+#pg-calendar th,
+#pg-calendar td {
+  border-color: rgba(255,255,255,.08) !important;
+  background: transparent !important;
+}
+#pg-calendar .btn-g,
+#pg-calendar .btn-s,
+#pg-calendar .btn-icon,
+#pg-calendar .theme-btn {
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)) !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(135%);
+  backdrop-filter: blur(14px) saturate(135%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.03), 0 8px 22px rgba(0,0,0,.14);
+}
+#pg-calendar .btn-g:hover,
+#pg-calendar .btn-s:hover,
+#pg-calendar .btn-icon:hover {
+  border-color: rgba(245,197,24,.18) !important;
+  background: linear-gradient(180deg, rgba(245,197,24,.08), rgba(255,255,255,.03)) !important;
+}
+#pg-calendar .cal-day,
+#pg-calendar .day,
+#pg-calendar [class*="day-cell"],
+#pg-calendar [class*="calendar-day"]{
+  background: linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,.01)) !important;
+  border: 1px solid rgba(255,255,255,.06) !important;
+  border-radius: 12px !important;
+}
+#pg-calendar .cal-day:hover,
+#pg-calendar .day:hover,
+#pg-calendar [class*="day-cell"]:hover,
+#pg-calendar [class*="calendar-day"]:hover{
+  border-color: rgba(245,197,24,.18) !important;
+  background: linear-gradient(180deg, rgba(245,197,24,.08), rgba(255,255,255,.015)) !important;
+}
+#pg-calendar .event,
+#pg-calendar .calendar-event,
+#pg-calendar .chip,
+#pg-calendar .badge,
+#pg-calendar .tag{
+  border-radius: 999px !important;
+  -webkit-backdrop-filter: blur(12px) saturate(130%);
+  backdrop-filter: blur(12px) saturate(130%);
+}
+#pg-calendar .pg-title,
+#pg-calendar .card-hd-title {
+  letter-spacing: -.03em;
+}
+
+/* ===== Login / Signup logo replacement ===== */
+.auth-brand-logo,
+.auth-logo-img-wrap{
+  width:72px;
+  height:72px;
+  border-radius:22px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  border:1px solid rgba(245,197,24,.14);
+  box-shadow: 0 18px 46px rgba(0,0,0,.22), 0 0 32px rgba(245,197,24,.08), inset 0 1px 0 rgba(255,255,255,.04);
+  margin:0 auto 14px;
+}
+.auth-brand-logo img,
+.auth-logo-img-wrap img{
+  width:44px;
+  height:44px;
+  object-fit:contain;
+  display:block;
+  filter: drop-shadow(0 8px 16px rgba(245,197,24,.20));
+}
+</style>
+
 </head>
 <body>
 
