@@ -1233,15 +1233,21 @@ route('DELETE', '/api/user/calendar/:id', async (req, res, params) => {
 
 route('POST', '/api/user/refine-prompt', async (req, res) => {
   const payload = requireAuth(req, res); if (!payload) return;
-  const { input, format, network, refImageBase64, modelSvg, modelN, modelName, brandPalette } = await parseBody(req);
+  const body = await parseBody(req);
+  const { input, format, network, refImageBase64, modelSvg, modelN, modelName, brandPalette } = body;
   if (!input) return err(res, 'input obrigatório');
   const user = db.getUserById(payload.id);
   const refineOpts = { modelSvg, modelN, modelName, brandPalette };
   try {
     let messages;
+    const slideCount = parseInt(body.slideCount) || 0;
+    const isCarrossel = (body.format === 'carrossel');
+    const carrosselCtx = isCarrossel
+      ? `\n\nFORMATO: CARROSSEL${slideCount > 0 ? ' de ' + slideCount + ' slides' : ' (quantidade definida pela IA — entre 3 e 7 slides)'}.\nEstruture o prompt para que o agente de imagem saiba como dividir o conteúdo em slides individuais. Cada slide = 1 ideia central. Indique claramente o arco narrativo: capa → desenvolvimento → fechamento.`
+      : '';
     const userMsg = modelN
-      ? `Input bruto: "${input}"\n\nModelo selecionado: ${modelN} — ${modelName}\nExpanda o conteúdo com narrativa e dados reais para cada slot de texto do modelo. Inclua as cores da paleta da marca no contexto. Retorne apenas o prompt refinado:`
-      : `Input bruto: "${input}"\n\nExpanda o conteúdo, a narrativa e os dados. Retorne apenas o prompt refinado:`;
+      ? \`Input bruto: "${input}"\n\nModelo selecionado: ${modelN} — ${modelName}\nExpanda o conteúdo com narrativa e dados reais.\${carrosselCtx}\nRetorne apenas o prompt refinado:\`
+      : \`Input bruto: "${input}"\n\nExpanda o conteúdo, a narrativa e os dados.\${carrosselCtx}\nRetorne apenas o prompt refinado:\`;
     if (refImageBase64) {
       messages = [{ role:'user', content:[
         { type:'image', source:{ type:'base64', media_type:'image/jpeg', data:refImageBase64 }},
@@ -1382,7 +1388,7 @@ route('POST', '/api/user/generate-content', async (req, res) => {
 route('POST', '/api/user/generate-image', async (req, res) => {
   const payload = requireAuth(req, res); if (!payload) return;
   const body     = await parseBody(req);
-  const { prompt, format, network, imgMode, brandProfile } = body;
+  const { prompt, format, network, imgMode, brandProfile, slideIndex, totalSlides, isCarrossel } = body;
   if (!prompt) return err(res, 'prompt obrigatório');
 
   const user = db.getUserById(payload.id);
@@ -1403,7 +1409,6 @@ route('POST', '/api/user/generate-image', async (req, res) => {
   const tom       = brandProfile?.tom       || user.tom       || 'autoridade';
   const publico   = brandProfile?.publico   || user.publico   || 'profissionais';
 
-  // Modelo escolhido (referência de estilo visual, não template)
   const modelN    = brandProfile?.modelN    || '';
   const modelName = brandProfile?.modelName || '';
 
@@ -1415,83 +1420,122 @@ route('POST', '/api/user/generate-image', async (req, res) => {
 
   // DNA visual por número de modelo
   const STYLE_DNA = {
-    '01': 'fundo ultra-escuro #0A0A0A, acento dourado, linha vertical esquerda decorativa, tipografia DM Sans bold, hierarquia: dado grande > título > subtítulo > CTA mono',
-    '02': 'fundo branco editorial #FAFAF8, barra preta no topo/rodapé, tipografia Playfair serifada grande, citação itálica, estilo revista premium',
-    '03': 'split color: metade superior na cor primária, metade inferior escura, tipografia Syne ultra-bold, divisão cromática dramática',
-    '04': 'fundo escuro com grid de linhas sutis, barra vertical acento esquerda, DM Sans bold, botão CTA sólido no rodapé',
-    '05': 'fundo preto, IBM Plex Mono tamanho extremo, pseudo-código como elemento visual, tech minimalista',
-    '06': 'fundo creme #FAF6EE, bordas douradas finas top/bottom, Playfair centrado, paleta warm luxuosa',
-    '07': 'fundo escuro data-viz, barras de gráfico como elemento visual, Syne bold para números e métricas',
-    '08': 'fundo preto, Bebas Neue com glow neon na cor primária, cantos decorativos geométricos, energia digital',
-    '09': 'fundo branco puro, barra lateral na cor primária, espaço negativo generoso, DM Sans clean e arejado',
-    '10': 'fundo escuro, Cormorant Garamond itálico, aspas decorativas gigantes, storytelling visual emocional',
-    '11': 'fundo sólido na cor primária, Syne 800 em cor escura, máxima presença e contraste de autoridade',
-    '12': 'fundo claro com grid de linhas como textura, barra lateral vertical, estrutura sistemática e ordenada',
-    '13': 'fundo preto absoluto, Bebas Neue gigante, linha horizontal branca de separação, brutalismo tipográfico',
-    '14': 'fundo creme #FDF8F2, círculos decorativos em acento baixa opacidade, Cormorant itálico, delicado',
-    '15': 'fundo verde terminal #050F05, IBM Plex Mono com glow verde #00FF41, linhas de comando, estética hacker',
-    '16': 'fundo branco, barra magazine colorida no topo/rodapé, Syne 800 editorial, estética revista impressa',
-    '17': 'fundo azul-escuro #0C0C14, círculo e triângulo geométrico decorativo, Syne com acento roxo #8B5CF6',
-    '18': 'fundo dourado sólido, Bebas Neue em marrom escuro, linhas horizontais espessas, retro bold anos 70',
-    '19': 'fundo azul-noite #06080F, caixa glass com borda translúcida, acento azul elétrico #60A5FA com glow',
-    '20': 'fundo off-white #F8F7F4, DM Serif Display itálico, linha horizontal dourada mínima, máximo minimalismo',
+    '01': 'fundo ultra-escuro #0A0A0A, acento dourado, linha vertical esquerda decorativa, DM Sans bold',
+    '02': 'fundo branco editorial #FAFAF8, barra preta topo/rodapé, Playfair serifada grande, citação itálica',
+    '03': 'split color: metade superior na cor primária, metade inferior escura, Syne ultra-bold',
+    '04': 'fundo escuro com grid de linhas sutis, barra vertical acento esquerda, DM Sans bold, botão CTA no rodapé',
+    '05': 'fundo preto, IBM Plex Mono tamanho extremo, pseudo-código como elemento visual',
+    '06': 'fundo creme #FAF6EE, bordas douradas finas topo/rodapé, Playfair centrado, paleta warm',
+    '07': 'fundo escuro, barras de gráfico como elemento visual, Syne bold para métricas',
+    '08': 'fundo preto, Bebas Neue com glow neon na cor primária, cantos decorativos',
+    '09': 'fundo branco puro, barra lateral na cor primária, DM Sans clean e arejado',
+    '10': 'fundo escuro, Cormorant Garamond itálico, aspas decorativas gigantes, storytelling',
+    '11': 'fundo sólido na cor primária, Syne 800 em cor escura, máxima presença',
+    '12': 'fundo claro com grid de linhas como textura, barra lateral vertical, estrutura sistemática',
+    '13': 'fundo preto absoluto, Bebas Neue gigante, linha horizontal branca de separação, brutalismo',
+    '14': 'fundo creme #FDF8F2, círculos decorativos em acento baixa opacidade, Cormorant itálico',
+    '15': 'fundo verde terminal #050F05, IBM Plex Mono com glow verde #00FF41, estética hacker',
+    '16': 'fundo branco, barra magazine colorida topo/rodapé, Syne 800 editorial',
+    '17': 'fundo azul-escuro #0C0C14, círculo e triângulo geométrico, Syne com acento roxo',
+    '18': 'fundo dourado sólido, Bebas Neue em marrom escuro, linhas horizontais espessas, retro',
+    '19': 'fundo azul-noite #06080F, caixa glass borda translúcida, acento azul elétrico com glow',
+    '20': 'fundo off-white #F8F7F4, DM Serif Display itálico, linha horizontal dourada mínima',
   };
   const styleDNA = modelN ? (STYLE_DNA[modelN] || '') : '';
 
-  const fmtLabels = { post:'Post quadrado', carrossel:'Capa de carrossel', anuncio:'Anúncio', story:'Story vertical', reels:'Capa de Reels', thumb:'Thumbnail', banner:'Banner de capa' };
+  const fmtLabels = { post:'Post quadrado', carrossel:'Carrossel', anuncio:'Anúncio', story:'Story vertical', reels:'Reels', thumb:'Thumbnail', banner:'Banner' };
   const netLabels = { instagram:'Instagram', linkedin:'LinkedIn', youtube:'YouTube', tiktok:'TikTok', facebook:'Facebook' };
 
-  const systemPrompt = `Você é o DESIGN AGENT do AutoPostt — o melhor especialista em criar posts para redes sociais em SVG do Brasil.
+  // ── Carousel mode: decide total slides on slide 1 ───────────────────────────
+  let resolvedTotal = totalSlides || null;
+  if (isCarrossel && slideIndex === 1 && !totalSlides) {
+    // IA decides — default smart range based on content
+    resolvedTotal = 5; // will be overridden by IA if possible
+  }
+  if (!resolvedTotal) resolvedTotal = totalSlides || 1;
 
-Você cria imagens únicas do zero. Você NÃO usa templates. Cada geração é 100% original.
+  // ── System prompt ────────────────────────────────────────────────────────────
+  const systemPrompt = `Você é o DESIGN AGENT do AutoPostt — especialista em criar posts para redes sociais em SVG do zero.
 
 REGRAS DE OUTPUT — INVIOLÁVEIS:
 1. Retorne SOMENTE o SVG completo. Zero texto antes ou depois. Comece com <svg.
 2. Use xmlns="http://www.w3.org/2000/svg" na tag raiz.
 3. NUNCA use <image> com href externo.
-4. NUNCA use @import de fontes. Declare font-family nos atributos SVG.
+4. NUNCA use @import de fontes. Declare font-family direto nos atributos SVG.
 5. Todo SVG deve ter viewBox declarado.
 6. Feche todos os elementos corretamente.
 
-FONTES DISPONÍVEIS (use exatamente estes nomes):
+FONTES DISPONÍVEIS:
 'DM Sans', sans-serif | 'IBM Plex Mono', monospace | 'Playfair Display', serif
 'Cormorant Garamond', serif | 'Syne', sans-serif | 'Bebas Neue', sans-serif
 
 ESTRUTURA OBRIGATÓRIA:
-1. GANCHO — headline de impacto, 4-6 palavras, fonte grande (80-140px para 1080×1080)
-2. DESENVOLVIMENTO — 1-3 linhas de suporte com informação real e específica
-3. CTA — call to action direto, imperativo, sem rodeios
+1. GANCHO — headline de impacto, 4-7 palavras, fonte grande
+2. DESENVOLVIMENTO — informação real e específica
+3. CTA — call to action direto
 4. IDENTIDADE — @handle ou nome da marca no rodapé`;
 
-  const userPrompt = `BRIEF DO POST:
+  // ── User prompt — adapts for carousel slides ─────────────────────────────────
+  let userPrompt;
+
+  if (isCarrossel) {
+    const slideCtx = slideIndex === 1
+      ? `SLIDE 1 DE ${resolvedTotal} — CAPA DE ABERTURA:\nEste é o primeiro slide do carrossel. Deve ser o mais impactante — é o gancho visual que faz a pessoa parar o scroll e querer ver o resto. Deve conter o tema central e uma promessa clara do que vem a seguir.`
+      : slideIndex === resolvedTotal
+      ? `SLIDE ${slideIndex} DE ${resolvedTotal} — SLIDE DE FECHAMENTO / CTA:\nÉste é o último slide do carrossel. Deve fechar a narrativa, reforçar a mensagem central e ter um CTA forte e direto. Pode incluir contato, @handle, convite para seguir ou oferta.`
+      : `SLIDE ${slideIndex} DE ${resolvedTotal} — SLIDE DE DESENVOLVIMENTO:\nEste slide está no meio do carrossel. Deve apresentar UMA ideia, dado ou argumento específico que aprofunda o tema. Mantenha consistência visual com os outros slides (mesmas cores e estilo). Seja direto — uma ideia por slide.`;
+
+    userPrompt = `BRIEF DO CARROSSEL:
+
+TEMA GERAL: "${prompt}"
+${slideCtx}
+
+FORMATO: Carrossel para ${netLabels[network] || 'Instagram'}
+DIMENSÕES: ${dim.w}x${dim.h}px | viewBox="0 0 ${dim.w} ${dim.h}"
+
+IDENTIDADE DE MARCA:
+Profissão: ${profissao} | Nicho: ${nicho} | Tom: ${tom} | Público: ${publico}
+
+PALETA (use EXATAMENTE estas cores):
+- Primária / acento: ${brandPrimaria}
+- Secundária / fundo: ${brandSecundaria}
+- Terciária / texto: ${brandTerciaria}
+- Quaternária / suporte: ${brandQuaternaria}
+
+${styleDNA ? `ESTILO DE REFERÊNCIA (${modelN} — ${modelName}): ${styleDNA}\n\n` : ''}REGRAS:
+1. Fundo rect cobrindo todo o viewBox com cor secundária.
+2. Consistência visual obrigatória entre todos os slides — mesmas cores, mesma família tipográfica.
+3. Margens internas mínimas de 60-80px.
+4. Hierarquia: headline 80-120px, subtítulo 30-50px, corpo 20-32px.
+5. Elemento numérico de slide: mostre "${slideIndex}/${resolvedTotal}" discretamente no canto (font-size 20-24px, cor quaternária).
+6. TODOS os textos devem ser conteúdo REAL sobre o tema — zero placeholders.
+
+Crie o slide ${slideIndex} do carrossel. Comece com <svg:`;
+  } else {
+    userPrompt = `BRIEF:
 
 TEMA: "${prompt}"
 FORMATO: ${fmtLabels[format] || 'Post'} para ${netLabels[network] || 'Instagram'}
 DIMENSÕES: ${dim.w}x${dim.h}px | viewBox="0 0 ${dim.w} ${dim.h}"
 
-IDENTIDADE DE MARCA:
-Profissão: ${profissao} | Nicho: ${nicho} | Tom: ${tom} | Público: ${publico} | Estilo: ${estilo}
+MARCA: Profissão: ${profissao} | Nicho: ${nicho} | Tom: ${tom} | Público: ${publico} | Estilo: ${estilo}
 
-PALETA DE CORES (use EXATAMENTE estas, nenhuma outra):
-- Primária / acento / destaque: ${brandPrimaria}
-- Secundária / fundo principal: ${brandSecundaria}
-- Terciária / texto principal: ${brandTerciaria}
-- Quaternária / texto suporte: ${brandQuaternaria}
+PALETA (use EXATAMENTE estas cores, nenhuma outra):
+- Primária / acento: ${brandPrimaria}
+- Secundária / fundo: ${brandSecundaria}
+- Terciária / texto: ${brandTerciaria}
+- Quaternária / suporte: ${brandQuaternaria}
 
-${styleDNA ? `REFERÊNCIA VISUAL (estilo ${modelN} — ${modelName}):
-${styleDNA}
+${styleDNA ? `ESTILO DE REFERÊNCIA (${modelN} — ${modelName}): ${styleDNA}\n\n` : ''}REGRAS:
+1. Rect de fundo cobrindo todo o viewBox com cor secundária.
+2. Primária para acentos, bordas, elementos decorativos.
+3. Terciária para headlines; quaternária para suporte.
+4. Margens mínimas 60-80px. Hierarquia: headline 80-140px, subtítulo 30-50px, corpo 20-32px.
+5. Pelo menos 1 elemento visual de destaque geométrico.
+6. Textos 100% reais sobre o tema.
 
-` : ''}REGRAS DE DESIGN:
-1. Rect de fundo preenchendo todo o viewBox com a cor secundária (ou gradiente baseado nela).
-2. Cor primária para acentos, bordas decorativas, elementos geométricos e destaques.
-3. Cor terciária para headlines e textos principais.
-4. Cor quaternária para textos de suporte e metadados.
-5. Margens internas mínimas de 60-80px de cada lado.
-6. Hierarquia: headline 80-140px, subtítulo 30-50px, corpo 20-32px.
-7. Pelo menos 1 elemento visual de destaque (número grande, shape geométrico, barra decorativa).
-8. TODOS os textos devem ser conteúdo REAL sobre o tema — zero placeholders.
-
-Crie agora o SVG do zero — único, impactante, pronto para publicar. Comece com <svg:`;
+Crie o SVG do zero. Comece com <svg:`;
+  }
 
   try {
     const { text: rawSvg, inputTokens: ti, outputTokens: to } = await callClaude({
@@ -1511,11 +1555,11 @@ Crie agora o SVG do zero — único, impactante, pronto para publicar. Comece co
       finalSvg = finalSvg.replace('<svg', `<svg viewBox="0 0 ${dim.w} ${dim.h}"`);
 
     if (!finalSvg || finalSvg.length < 200)
-      throw new Error('Agente retornou SVG inválido. Tente novamente.');
+      throw new Error('SVG inválido. Tente novamente.');
 
     db.addGeneration({
       user_id:      payload.id,
-      feature:      'gerar-imagem',
+      feature:      isCarrossel ? 'carrossel-slide' : 'gerar-imagem',
       format:       format  || 'post',
       network:      network || 'instagram',
       concept_name: (modelName || prompt).slice(0, 60),
@@ -1526,7 +1570,10 @@ Crie agora o SVG do zero — único, impactante, pronto para publicar. Comece co
       output_tokens: to,
     });
 
-    ok(res, { svg: finalSvg });
+    const responsePayload = { svg: finalSvg };
+    if (isCarrossel && slideIndex === 1) responsePayload.totalSlides = resolvedTotal;
+
+    ok(res, responsePayload);
 
   } catch (e) { err(res, e.message); }
 });
