@@ -1246,8 +1246,8 @@ route('POST', '/api/user/refine-prompt', async (req, res) => {
       ? `\n\nFORMATO: CARROSSEL${slideCount > 0 ? ' de ' + slideCount + ' slides' : ' (quantidade definida pela IA — entre 3 e 7 slides)'}.\nEstruture o prompt para que o agente de imagem saiba como dividir o conteúdo em slides individuais. Cada slide = 1 ideia central. Indique claramente o arco narrativo: capa → desenvolvimento → fechamento.`
       : '';
     const userMsg = modelN
-      ? \`Input bruto: "${input}"\n\nModelo selecionado: ${modelN} — ${modelName}\nExpanda o conteúdo com narrativa e dados reais.\${carrosselCtx}\nRetorne apenas o prompt refinado:\`
-      : \`Input bruto: "${input}"\n\nExpanda o conteúdo, a narrativa e os dados.\${carrosselCtx}\nRetorne apenas o prompt refinado:\`;
+      ? `Input bruto: "${input}"\n\nModelo selecionado: ${modelN} — ${modelName}\nExpanda o conteúdo com narrativa e dados reais.${carrosselCtx}\nRetorne apenas o prompt refinado:`
+      : `Input bruto: "${input}"\n\nExpanda o conteúdo, a narrativa e os dados.${carrosselCtx}\nRetorne apenas o prompt refinado:`;
     if (refImageBase64) {
       messages = [{ role:'user', content:[
         { type:'image', source:{ type:'base64', media_type:'image/jpeg', data:refImageBase64 }},
