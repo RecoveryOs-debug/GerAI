@@ -1388,151 +1388,131 @@ route('POST', '/api/user/generate-image', async (req, res) => {
   const user = db.getUserById(payload.id);
   try { db.consumeQuota(payload.id); } catch(e) { return err(res, e.message); }
 
-  // ── Paleta da marca (Primária, Secundária, Terciária, Quaternária) ─────────────
-  // O frontend envia brandProfile.brandPalette com nomes semânticos quando disponível
+  // ── Paleta da marca ──────────────────────────────────────────────────────────
   const bp = brandProfile?.brandPalette;
   const rawCores = (brandProfile?.cores || user.cores || '#F5C518,#0D0D0F,#F5F4F0,#888888')
     .split(',').map(s => s.trim()).filter(Boolean);
-  const brandPrimaria    = bp?.primaria    || rawCores[0] || '#F5C518'; // accent / destaques
-  const brandSecundaria  = bp?.secundaria  || rawCores[1] || '#0D0D0F'; // fundo principal
-  const brandTerciaria   = bp?.terciaria   || rawCores[2] || '#F5F4F0'; // texto / contraste
-  const brandQuaternaria = bp?.quaternaria || rawCores[3] || '#888888'; // subtítulos / suporte
-  // Aliases para compatibilidade com código legado abaixo
-  const brandAccent = brandPrimaria;
-  const brandBg     = brandSecundaria;
+  const brandPrimaria    = bp?.primaria    || rawCores[0] || '#F5C518';
+  const brandSecundaria  = bp?.secundaria  || rawCores[1] || '#0D0D0F';
+  const brandTerciaria   = bp?.terciaria   || rawCores[2] || '#F5F4F0';
+  const brandQuaternaria = bp?.quaternaria || rawCores[3] || '#888888';
 
-  const nicho     = brandProfile?.nicho     || user.nicho     || 'marketing digital';
+  const nicho     = brandProfile?.nicho     || user.nicho     || 'negócios';
   const profissao = brandProfile?.profissao || user.profissao || 'criador de conteúdo';
   const estilo    = brandProfile?.estilo    || user.estilo    || 'moderno e profissional';
+  const tom       = brandProfile?.tom       || user.tom       || 'autoridade';
+  const publico   = brandProfile?.publico   || user.publico   || 'profissionais';
 
-  // ── Dados do modelo escolhido ───────────────────────────────
-  const modelSvg  = brandProfile?.modelSvg  || '';
+  // Modelo escolhido (referência de estilo visual, não template)
   const modelN    = brandProfile?.modelN    || '';
   const modelName = brandProfile?.modelName || '';
 
-  // Modelos com fundo claro (não substituir background por cor escura)
-  const LIGHT_BG_MODELS = new Set(['02','06','09','12','14','18','20']);
-  const isLightBg = LIGHT_BG_MODELS.has(modelN);
+  // Dimensões por formato
+  const dim = (format === 'story' || format === 'reels') ? { w: 1080, h: 1920 }
+    : format === 'thumb'  ? { w: 1280, h: 720  }
+    : format === 'banner' ? { w: 1584, h: 396  }
+    : { w: 1080, h: 1080 };
+
+  // DNA visual por número de modelo
+  const STYLE_DNA = {
+    '01': 'fundo ultra-escuro #0A0A0A, acento dourado, linha vertical esquerda decorativa, tipografia DM Sans bold, hierarquia: dado grande > título > subtítulo > CTA mono',
+    '02': 'fundo branco editorial #FAFAF8, barra preta no topo/rodapé, tipografia Playfair serifada grande, citação itálica, estilo revista premium',
+    '03': 'split color: metade superior na cor primária, metade inferior escura, tipografia Syne ultra-bold, divisão cromática dramática',
+    '04': 'fundo escuro com grid de linhas sutis, barra vertical acento esquerda, DM Sans bold, botão CTA sólido no rodapé',
+    '05': 'fundo preto, IBM Plex Mono tamanho extremo, pseudo-código como elemento visual, tech minimalista',
+    '06': 'fundo creme #FAF6EE, bordas douradas finas top/bottom, Playfair centrado, paleta warm luxuosa',
+    '07': 'fundo escuro data-viz, barras de gráfico como elemento visual, Syne bold para números e métricas',
+    '08': 'fundo preto, Bebas Neue com glow neon na cor primária, cantos decorativos geométricos, energia digital',
+    '09': 'fundo branco puro, barra lateral na cor primária, espaço negativo generoso, DM Sans clean e arejado',
+    '10': 'fundo escuro, Cormorant Garamond itálico, aspas decorativas gigantes, storytelling visual emocional',
+    '11': 'fundo sólido na cor primária, Syne 800 em cor escura, máxima presença e contraste de autoridade',
+    '12': 'fundo claro com grid de linhas como textura, barra lateral vertical, estrutura sistemática e ordenada',
+    '13': 'fundo preto absoluto, Bebas Neue gigante, linha horizontal branca de separação, brutalismo tipográfico',
+    '14': 'fundo creme #FDF8F2, círculos decorativos em acento baixa opacidade, Cormorant itálico, delicado',
+    '15': 'fundo verde terminal #050F05, IBM Plex Mono com glow verde #00FF41, linhas de comando, estética hacker',
+    '16': 'fundo branco, barra magazine colorida no topo/rodapé, Syne 800 editorial, estética revista impressa',
+    '17': 'fundo azul-escuro #0C0C14, círculo e triângulo geométrico decorativo, Syne com acento roxo #8B5CF6',
+    '18': 'fundo dourado sólido, Bebas Neue em marrom escuro, linhas horizontais espessas, retro bold anos 70',
+    '19': 'fundo azul-noite #06080F, caixa glass com borda translúcida, acento azul elétrico #60A5FA com glow',
+    '20': 'fundo off-white #F8F7F4, DM Serif Display itálico, linha horizontal dourada mínima, máximo minimalismo',
+  };
+  const styleDNA = modelN ? (STYLE_DNA[modelN] || '') : '';
+
+  const fmtLabels = { post:'Post quadrado', carrossel:'Capa de carrossel', anuncio:'Anúncio', story:'Story vertical', reels:'Capa de Reels', thumb:'Thumbnail', banner:'Banner de capa' };
+  const netLabels = { instagram:'Instagram', linkedin:'LinkedIn', youtube:'YouTube', tiktok:'TikTok', facebook:'Facebook' };
+
+  const systemPrompt = `Você é o DESIGN AGENT do AutoPostt — o melhor especialista em criar posts para redes sociais em SVG do Brasil.
+
+Você cria imagens únicas do zero. Você NÃO usa templates. Cada geração é 100% original.
+
+REGRAS DE OUTPUT — INVIOLÁVEIS:
+1. Retorne SOMENTE o SVG completo. Zero texto antes ou depois. Comece com <svg.
+2. Use xmlns="http://www.w3.org/2000/svg" na tag raiz.
+3. NUNCA use <image> com href externo.
+4. NUNCA use @import de fontes. Declare font-family nos atributos SVG.
+5. Todo SVG deve ter viewBox declarado.
+6. Feche todos os elementos corretamente.
+
+FONTES DISPONÍVEIS (use exatamente estes nomes):
+'DM Sans', sans-serif | 'IBM Plex Mono', monospace | 'Playfair Display', serif
+'Cormorant Garamond', serif | 'Syne', sans-serif | 'Bebas Neue', sans-serif
+
+ESTRUTURA OBRIGATÓRIA:
+1. GANCHO — headline de impacto, 4-6 palavras, fonte grande (80-140px para 1080×1080)
+2. DESENVOLVIMENTO — 1-3 linhas de suporte com informação real e específica
+3. CTA — call to action direto, imperativo, sem rodeios
+4. IDENTIDADE — @handle ou nome da marca no rodapé`;
+
+  const userPrompt = `BRIEF DO POST:
+
+TEMA: "${prompt}"
+FORMATO: ${fmtLabels[format] || 'Post'} para ${netLabels[network] || 'Instagram'}
+DIMENSÕES: ${dim.w}x${dim.h}px | viewBox="0 0 ${dim.w} ${dim.h}"
+
+IDENTIDADE DE MARCA:
+Profissão: ${profissao} | Nicho: ${nicho} | Tom: ${tom} | Público: ${publico} | Estilo: ${estilo}
+
+PALETA DE CORES (use EXATAMENTE estas, nenhuma outra):
+- Primária / acento / destaque: ${brandPrimaria}
+- Secundária / fundo principal: ${brandSecundaria}
+- Terciária / texto principal: ${brandTerciaria}
+- Quaternária / texto suporte: ${brandQuaternaria}
+
+${styleDNA ? `REFERÊNCIA VISUAL (estilo ${modelN} — ${modelName}):
+${styleDNA}
+
+` : ''}REGRAS DE DESIGN:
+1. Rect de fundo preenchendo todo o viewBox com a cor secundária (ou gradiente baseado nela).
+2. Cor primária para acentos, bordas decorativas, elementos geométricos e destaques.
+3. Cor terciária para headlines e textos principais.
+4. Cor quaternária para textos de suporte e metadados.
+5. Margens internas mínimas de 60-80px de cada lado.
+6. Hierarquia: headline 80-140px, subtítulo 30-50px, corpo 20-32px.
+7. Pelo menos 1 elemento visual de destaque (número grande, shape geométrico, barra decorativa).
+8. TODOS os textos devem ser conteúdo REAL sobre o tema — zero placeholders.
+
+Crie agora o SVG do zero — único, impactante, pronto para publicar. Comece com <svg:`;
 
   try {
+    const { text: rawSvg, inputTokens: ti, outputTokens: to } = await callClaude({
+      system: systemPrompt,
+      userMsg: userPrompt,
+      maxTokens: 8000,
+    });
+
     let finalSvg = '';
-    let tokensIn = 0, tokensOut = 0;
+    const svgMatch = rawSvg.match(/<svg[\s\S]*<\/svg>/i);
+    if (svgMatch) finalSvg = svgMatch[0];
+    else if (rawSvg.trim().startsWith('<svg')) finalSvg = rawSvg.trim();
 
-    if (modelSvg) {
-      // The AI receives the full model SVG and rewrites ONLY the text content
-      // Structure, positions, fonts and colors are preserved intact.
-
-      const sysRewrite = `Você é um especialista em SVG e copywriting para redes sociais.
-Sua tarefa é receber um SVG template e reescrever APENAS os textos internos com conteúdo novo baseado no tema fornecido.
-
-REGRAS ABSOLUTAS — VIOLÁ-LAS DESTRÓI O RESULTADO:
-1. Retorne SOMENTE o SVG completo. Zero texto antes ou depois. Comece com <svg.
-2. Preserve INTEGRALMENTE: viewBox, xmlns, todos os elementos visuais (rect, line, circle, path, polygon, defs, gradients, filters), todos os atributos (x, y, font-family, font-size, font-weight, font-style, fill, stroke, letter-spacing, text-anchor, opacity, transform).
-3. Altere SOMENTE o conteúdo textual dentro das tags <text>...</text>.
-4. NÃO adicione, remova ou reordene nenhum elemento SVG.
-5. NÃO altere nenhuma cor, nenhum gradiente, nenhuma fonte, nenhum tamanho, nenhuma posição.
-6. Respeite o comprimento aproximado de cada texto original para não quebrar o layout.
-7. Para textos que são claramente nomes de fontes ou especificações tipográficas (ex: "Playfair Display", "IBM Plex Mono · 14PX", "Bold 700", "48px"), substitua por conteúdo real do tema com comprimento similar.`;
-
-      const msgRewrite = `TEMA DO POST: "${prompt}"
-PROFISSÃO: ${profissao} | NICHO: ${nicho}
-MODELO: ${modelN} — ${modelName}
-
-INSTRUÇÕES:
-- Reescreva os textos do SVG abaixo com conteúdo sobre o tema acima.
-- Mantenha o mesmo número de linhas de texto e comprimento aproximado por linha.
-- Preserve dados numéricos se existirem no tema.
-- Retorne APENAS o SVG, começando com <svg.
-
-SVG DO MODELO:
-${modelSvg}`;
-
-      let svgRewritten = '';
-      try {
-        const { text: rawSvg, inputTokens: ti, outputTokens: to } = await callClaude({
-          system: sysRewrite,
-          userMsg: msgRewrite,
-          maxTokens: 6000
-        });
-        tokensIn  += ti;
-        tokensOut += to;
-        const svgMatch = rawSvg.match(/<svg[\s\S]*<\/svg>/i);
-        svgRewritten = svgMatch ? svgMatch[0] : (rawSvg.trim().startsWith('<svg') ? rawSvg.trim() : '');
-      } catch (e) {
-        console.error('[gen-img] rewrite falhou:', e.message);
-      }
-
-      if (!svgRewritten || svgRewritten.length < 200) {
-        throw new Error('SVG inválido ou muito curto. Tente novamente.');
-      }
-
-      if (!svgRewritten.includes('xmlns=')) svgRewritten = svgRewritten.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
-      if (!svgRewritten.includes('viewBox')) svgRewritten = svgRewritten.replace('<svg', '<svg viewBox="0 0 1080 1350"');
-
-      // Apply brand palette programmatically (colors only, not texts)
-      let svg = svgRewritten;
-
-      function hexToRgb(hex) {
-        const h = hex.replace('#','');
-        return [parseInt(h.substr(0,2),16), parseInt(h.substr(2,2),16), parseInt(h.substr(4,2),16)];
-      }
-      function relativeLuminance([r,g,b]) {
-        const s = [r,g,b].map(c => { c/=255; return c<=0.04045 ? c/12.92 : Math.pow((c+0.055)/1.055,2.4); });
-        return 0.2126*s[0] + 0.7152*s[1] + 0.0722*s[2];
-      }
-      function hexSaturation([r,g,b]) {
-        const mx=Math.max(r,g,b)/255, mn=Math.min(r,g,b)/255;
-        return mx===0 ? 0 : (mx-mn)/mx;
-      }
-      function safeReplaceColor(str, hex, rep) {
-        if (!hex || !rep || hex.toUpperCase() === rep.toUpperCase()) return str;
-        const esc = hex.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        return str.replace(new RegExp(esc, 'gi'), rep);
-      }
-
-      const svgHexColors = [...new Set([...svg.matchAll(/#([0-9A-Fa-f]{6})\b/g)].map(m => '#'+m[1].toUpperCase()))];
-      const colorMeta = svgHexColors.map(hex => ({
-        hex, lum: relativeLuminance(hexToRgb(hex)), sat: hexSaturation(hexToRgb(hex))
-      }));
-
-      // Accent (saturated) → Primária
-      const accentColors = colorMeta.filter(c => c.sat > 0.3 && c.lum > 0.05 && c.lum < 0.85).sort((a,b) => b.sat - a.sat);
-      for (const { hex } of accentColors) svg = safeReplaceColor(svg, hex, brandPrimaria);
-
-      // Background → Secundária
-      const bgColors = isLightBg
-        ? colorMeta.filter(c => c.lum > 0.80 && c.sat < 0.15).sort((a,b) => b.lum - a.lum)
-        : colorMeta.filter(c => c.lum < 0.05 && c.sat < 0.15).sort((a,b) => a.lum - b.lum);
-      for (const { hex } of bgColors) svg = safeReplaceColor(svg, hex, brandSecundaria);
-
-      // Neutral text → Terciária
-      const textColors = isLightBg
-        ? colorMeta.filter(c => c.lum < 0.10 && c.sat < 0.15).sort((a,b) => a.lum - b.lum)
-        : colorMeta.filter(c => c.lum > 0.55 && c.lum <= 0.95 && c.sat < 0.15).sort((a,b) => b.lum - a.lum);
-      for (const { hex } of textColors.slice(0, 4)) svg = safeReplaceColor(svg, hex, brandTerciaria);
-
-      if (!svg.includes('xmlns=')) svg = svg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
-      if (!svg.includes('viewBox')) svg = svg.replace('<svg', '<svg viewBox="0 0 1080 1350"');
-
-      finalSvg = svg;
-
-    } else {
-      // ── Fallback: sem modelo selecionado — gera SVG livre ──
-      const sysFree = `Você é um designer SVG. Responda SOMENTE com SVG puro, começando com <svg.`;
-      const msgFree = `Post para redes sociais. viewBox="0 0 1080 1350". Tema: "${prompt}". Cores: fundo ${brandBg}, destaque ${brandAccent}. Nicho: ${nicho}. Comece com <svg`;
-      const { text: rawFree, inputTokens: ti, outputTokens: to } = await callClaude({ system: sysFree, userMsg: msgFree, maxTokens: 4000 });
-      tokensIn  += ti;
-      tokensOut += to;
-      finalSvg = rawFree.trim().startsWith('<svg')
-        ? rawFree.trim()
-        : (rawFree.match(/<svg[\s\S]*?<\/svg>/i)?.[0] || '');
-      if (!finalSvg.includes('xmlns=')) finalSvg = finalSvg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
-    }
+    if (!finalSvg.includes('xmlns='))
+      finalSvg = finalSvg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+    if (!finalSvg.includes('viewBox'))
+      finalSvg = finalSvg.replace('<svg', `<svg viewBox="0 0 ${dim.w} ${dim.h}"`);
 
     if (!finalSvg || finalSvg.length < 200)
-      throw new Error('SVG inválido ou muito curto. Tente novamente.');
+      throw new Error('Agente retornou SVG inválido. Tente novamente.');
 
-    // ── Salvar geração com tokens e custo corretos ─────────────
     db.addGeneration({
       user_id:      payload.id,
       feature:      'gerar-imagem',
@@ -1542,8 +1522,8 @@ ${modelSvg}`;
       prompt:       prompt.slice(0, 200),
       svg_data:     finalSvg,
       credits_used: 1,
-      input_tokens:  tokensIn,
-      output_tokens: tokensOut,
+      input_tokens:  ti,
+      output_tokens: to,
     });
 
     ok(res, { svg: finalSvg });
