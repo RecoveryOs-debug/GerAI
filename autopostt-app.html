@@ -7335,6 +7335,16 @@ function selFmt(f) {
   document.querySelectorAll('.fmt').forEach(c => c.classList.remove('on'));
   const el = document.getElementById('f-' + f);
   if (el) { el.classList.add('on'); el.querySelector('svg').style.color='var(--a)'; }
+  // Mostra seletor de slides só para carrossel
+  var sc = document.getElementById('slide-count-row');
+  if (sc) sc.style.display = (f === 'carrossel') ? 'flex' : 'none';
+  // Reset contagem ao trocar formato
+  if (f !== 'carrossel') {
+    _slideCount = 0;
+    document.querySelectorAll('.sc-btn').forEach(function(b) { b.classList.remove('on'); });
+    var first = document.querySelector('.sc-btn[data-n="0"]');
+    if (first) first.classList.add('on');
+  }
 }
 
 // Slide count state
