@@ -5513,179 +5513,6 @@ body.image-agent-refining #image-agent-refine-overlay{
       .fb-btn:hover { border-color: var(--line-2); }
       .fb-btn.pos.on { background: rgba(34,211,122,.12); border-color: rgba(34,211,122,.3); color: #22D37A; }
       .fb-btn.neg.on { background: rgba(255,68,68,.1); border-color: rgba(255,68,68,.2); color: #FF4444; }
-
-      /* History text items */
-      .hist-txt-item {
-        padding: 14px 16px; background: var(--bg2); border: 1px solid var(--b1);
-        border-radius: 10px; cursor: pointer; transition: border-color .12s;
-      }
-      .hist-txt-item:hover { border-color: var(--b2); background: var(--bg3); }
-
-      /* Generate page new layout */
-      .gen-out-panel {
-        background: var(--bg1); border: 1px solid var(--b1); border-radius: var(--r3);
-        padding: 16px;
-      }
-      .gen-steps {
-        display: flex; align-items: center; gap: 0;
-        margin-bottom: 16px; padding-bottom: 16px;
-        border-bottom: 1px solid var(--b1);
-      }
-      .gen-step {
-        display: flex; align-items: center; gap: 6px;
-        font-size: 11px; font-weight: 600; color: var(--t3);
-        flex-shrink: 0;
-      }
-      .gen-step.active { color: var(--a); }
-      .gen-step.done { color: var(--t2); }
-      .gstep-num {
-        width: 20px; height: 20px; border-radius: 50%;
-        background: var(--b1); color: var(--t3);
-        display: flex; align-items: center; justify-content: center;
-        font-size: 10px; font-weight: 700; flex-shrink: 0;
-      }
-      .gen-step.active .gstep-num { background: var(--a); color: #fff; }
-      .gen-step.done .gstep-num { background: rgba(34,211,122,.15); color: #22D37A; }
-      .gstep-line { flex: 1; height: 1px; background: var(--b1); margin: 0 8px; }
-      .gen-step-hd {
-        display: flex; align-items: center; justify-content: space-between;
-        margin-bottom: 10px;
-      }
-
-      /* ── Generate page left column ── */
-      .gen-left-card {
-        background: var(--bg1); border: 1px solid var(--b1);
-        border-radius: var(--r3); padding: 20px;
-        display: flex; flex-direction: column; gap: 0;
-      }
-      .gen-section { margin-bottom: 20px; }
-      .gen-section:last-of-type { margin-bottom: 0; }
-      .gen-lbl {
-        font-size: 10px; font-weight: 700; color: var(--t2);
-        text-transform: uppercase; letter-spacing: .1em;
-        margin-bottom: 8px;
-      }
-
-      /* Format buttons */
-      .gen-fmt-row {
-        display: flex; flex-wrap: wrap; gap: 6px;
-      }
-      .gen-fmt-btn {
-        display: flex; align-items: center; gap: 6px;
-        padding: 7px 12px; border-radius: 8px;
-        border: 1px solid var(--b1); background: var(--bg2);
-        color: var(--t2); font-family: var(--f); font-size: 12px;
-        font-weight: 500; cursor: pointer; transition: all .12s;
-        white-space: nowrap;
-      }
-      .gen-fmt-btn svg { flex-shrink: 0; }
-      .gen-fmt-btn:hover { border-color: var(--b2); color: var(--t0); }
-      .gen-fmt-btn.on {
-        background: rgba(243,107,42,.1); border-color: rgba(243,107,42,.4);
-        color: var(--a); font-weight: 600;
-      }
-      .gen-fmt-btn.on svg { stroke: var(--a); }
-
-      /* Network buttons */
-      .gen-net-row { display: flex; gap: 6px; flex-wrap: wrap; }
-      .gen-net-btn {
-        display: flex; align-items: center; gap: 6px;
-        padding: 7px 14px; border-radius: 8px;
-        border: 1px solid var(--b1); background: var(--bg2);
-        color: var(--t2); font-family: var(--f); font-size: 12px;
-        font-weight: 500; cursor: pointer; transition: all .12s;
-        white-space: nowrap;
-      }
-      .gen-net-btn:hover { border-color: var(--b2); color: var(--t0); }
-      .gen-net-btn.on {
-        background: rgba(243,107,42,.1); border-color: rgba(243,107,42,.4);
-        color: var(--a); font-weight: 600;
-      }
-      .gen-net-btn.on svg { stroke: var(--a); }
-
-      /* CTA button */
-      .gen-cta-btn {
-        flex: 1; background: var(--a); border: none;
-        border-radius: 10px; padding: 14px 20px;
-        cursor: pointer; display: flex; align-items: center;
-        justify-content: center; gap: 10px;
-        font-family: var(--f); font-size: 14px; font-weight: 700;
-        color: #fff; letter-spacing: -.02em;
-        transition: opacity .15s; box-shadow: 0 4px 20px rgba(243,107,42,.25);
-      }
-      .gen-cta-btn:hover { opacity: .9; }
-      .gen-cta-btn:active { opacity: .8; transform: scale(.99); }
-
-      /* Agent refinement animation overlay */
-      #agent-refine-overlay {
-        display: none; position: fixed; inset: 0;
-        background: rgba(0,0,0,.7); backdrop-filter: blur(8px);
-        z-index: 8000; align-items: center; justify-content: center;
-      }
-      #agent-refine-overlay.open { display: flex; }
-      .agent-bubble {
-        background: var(--bg1); border: 1px solid var(--b2);
-        border-radius: 16px; padding: 28px 32px;
-        max-width: 480px; width: 90%;
-        box-shadow: 0 24px 80px rgba(0,0,0,.6);
-        animation: bubble-in .3s cubic-bezier(.34,1.56,.64,1);
-      }
-      @keyframes bubble-in {
-        from { opacity: 0; transform: scale(.9) translateY(16px); }
-        to   { opacity: 1; transform: scale(1) translateY(0); }
-      }
-      .agent-avatar {
-        width: 48px; height: 48px; border-radius: 50%;
-        background: rgba(243,107,42,.15); border: 1px solid rgba(243,107,42,.3);
-        display: flex; align-items: center; justify-content: center;
-        margin-bottom: 16px; font-size: 22px;
-      }
-      .agent-msg {
-        font-size: 15px; line-height: 1.65; color: var(--t0);
-        font-weight: 500; margin-bottom: 20px;
-        letter-spacing: -.01em;
-      }
-      .agent-msg .highlight { color: var(--a); font-weight: 700; }
-      .agent-typing {
-        display: flex; align-items: center; gap: 10px;
-        font-size: 11px; color: var(--t2); font-weight: 600;
-        text-transform: uppercase; letter-spacing: .08em;
-      }
-      .agent-typing-dots { display: flex; gap: 4px; }
-      .agent-typing-dots span {
-        width: 5px; height: 5px; border-radius: 50%;
-        background: var(--a); animation: dot-pulse 1.2s ease-in-out infinite;
-      }
-      .agent-typing-dots span:nth-child(2) { animation-delay: .2s; }
-      .agent-typing-dots span:nth-child(3) { animation-delay: .4s; }
-      @keyframes dot-pulse { 0%,80%,100% { opacity:.2; transform:scale(.8); } 40% { opacity:1; transform:scale(1); } }
-
-      /* Agent image generation animation */
-      #agent-gen-overlay {
-        display: none; position: fixed; inset: 0;
-        background: rgba(0,0,0,.75); backdrop-filter: blur(8px);
-        z-index: 8000; align-items: center; justify-content: center;
-      }
-      #agent-gen-overlay.open { display: flex; }
-      .agent-gen-bubble {
-        background: var(--bg1); border: 1px solid var(--b2);
-        border-radius: 16px; padding: 28px 32px;
-        max-width: 480px; width: 90%;
-        box-shadow: 0 24px 80px rgba(0,0,0,.6);
-        animation: bubble-in .3s cubic-bezier(.34,1.56,.64,1);
-      }
-      .agent-progress-bar {
-        height: 3px; background: var(--b1); border-radius: 2px;
-        margin-top: 16px; overflow: hidden;
-      }
-      .agent-progress-fill {
-        height: 100%; width: 0%; background: var(--a);
-        border-radius: 2px; transition: width .4s ease;
-        animation: progress-wave 2s ease-in-out infinite;
-      }
-      @keyframes progress-wave {
-        0% { width: 5%; } 50% { width: 75%; } 100% { width: 5%; }
-      }
 </style>
 
 </head>
@@ -6208,6 +6035,19 @@ body.image-agent-refining #image-agent-refine-overlay{
               <div class="fmt" id="f-thumb" onclick="selFmt('thumb')"><div class="fmt-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg></div><div class="fmt-name">Thumbnail</div></div>
               <div class="fmt" id="f-banner" onclick="selFmt('banner')"><div class="fmt-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><div class="fmt-name">Banner</div></div>
             </div>
+          <!-- Slide count selector — only visible when format = carrossel -->
+          <div id="slide-count-row" style="display:none;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap">
+            <span style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">Qtd. de slides</span>
+            <div style="display:flex;gap:4px;flex-wrap:wrap">
+              <button class="sc-btn on" data-n="0" onclick="selSlides(this,0)">IA decide</button>
+              <button class="sc-btn" data-n="2" onclick="selSlides(this,2)">2</button>
+              <button class="sc-btn" data-n="3" onclick="selSlides(this,3)">3</button>
+              <button class="sc-btn" data-n="4" onclick="selSlides(this,4)">4</button>
+              <button class="sc-btn" data-n="5" onclick="selSlides(this,5)">5</button>
+              <button class="sc-btn" data-n="6" onclick="selSlides(this,6)">6</button>
+              <button class="sc-btn" data-n="7" onclick="selSlides(this,7)">7</button>
+            </div>
+          </div>
           </div>
           <!-- network -->
           <div style="margin-bottom:18px">
@@ -6274,182 +6114,147 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
 
         <!-- output -->
         <div>
-          <div class="out-panel" style="padding:16px">
-
-            <!-- Step indicator -->
-            <div id="gen-steps" style="display:flex;align-items:center;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--b1)">
-              <div id="gstep-1" style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--a)">
-                <div style="width:20px;height:20px;border-radius:50%;background:var(--a);color:#000;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">1</div>
-                Estilo
-              </div>
-              <div style="flex:1;height:1px;background:var(--b1);margin:0 8px"></div>
-              <div id="gstep-2" style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--t3)">
-                <div style="width:20px;height:20px;border-radius:50%;background:var(--b1);color:var(--t3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">2</div>
-                Gerar
-              </div>
-              <div style="flex:1;height:1px;background:var(--b1);margin:0 8px"></div>
-              <div id="gstep-3" style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--t3)">
-                <div style="width:20px;height:20px;border-radius:50%;background:var(--b1);color:var(--t3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">3</div>
-                Resultado
-              </div>
+          <div class="out-panel">
+            <!-- tabs -->
+            <div class="out-tabs">
+              <div class="out-tab on" id="tab-conceitos" onclick="switchOutTab('conceitos')" style="display:none">Modelos</div>
+              <div class="out-tab" id="tab-imagem" onclick="switchOutTab('imagem')">Imagem gerada</div>
             </div>
 
-            <!-- Initial state (before clicking generate) -->
-            <div id="gen-initial-state" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;gap:10px">
-              <svg style="width:36px;height:36px;fill:none;stroke:var(--t3);stroke-width:1.2;opacity:.5" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              <div style="font-size:13px;font-weight:600;color:var(--t2)">Descreva sua ideia</div>
-              <div style="font-size:11px;color:var(--t3);max-width:180px;line-height:1.6">Preencha os campos ao lado e clique em <b style="color:var(--t2)">Gerar conteúdo com IA</b></div>
-            </div>
+            <!-- tab: modelos + conceitos -->
+            <div id="out-tab-conceitos" style="display:none">
 
-            <!-- STEP 1: Model picker -->
-            <div id="gen-step-models" style="display:none">
-              <div id="modelo-picker-section">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-                  <div id="fmt-active-badge" style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em">20 estilos</div>
-                  <button class="btn btn-g btn-sm" style="font-size:10px" onclick="startGenPipeline()">
-                    <svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
-                    Mudar ideia
-                  </button>
+              <!-- ── MODELO PICKER ── -->
+              <div id="modelo-picker-section" style="margin-bottom:14px">
+                <div style="font-size:10px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">Escolha um modelo</div>
+                <div id="modelo-grid" style="display:flex;flex-direction:column;gap:10px;max-height:520px;overflow-y:auto;padding-right:4px;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent"></div>
+                <div id="modelo-selected-info" style="display:none;margin-top:8px;padding:7px 10px;background:var(--ink-3);border:1px solid var(--amber-18);border-radius:6px">
+                  <div style="font-size:10px;color:var(--t2)">Modelo selecionado</div>
+                  <div style="font-size:12px;font-weight:700;color:var(--a)" id="modelo-selected-name">—</div>
                 </div>
-                <div id="modelo-grid" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto;padding-right:2px;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent"></div>
               </div>
-              <div id="modelo-selected-info" style="display:none;margin-top:12px">
-                <div style="padding:8px 12px;background:rgba(245,197,24,.06);border:1px solid rgba(245,197,24,.18);border-radius:8px;margin-bottom:10px">
-                  <div style="font-size:10px;color:var(--t2);margin-bottom:2px">Estilo selecionado</div>
-                  <div style="font-size:13px;font-weight:700;color:var(--amber)" id="modelo-selected-name">—</div>
-                </div>
-                <div id="refined-prompt-wrap" style="display:none;margin-bottom:10px">
-                  <div style="font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center">
-                    <span>Prompt refinado</span>
-                    <button class="btn btn-g btn-sm" onclick="editRefined()" style="font-size:10px;padding:2px 8px">Editar</button>
-                  </div>
-                  <div id="refined-prompt-box" style="background:var(--bg3);border:1px solid var(--b1);border-radius:7px;padding:9px 11px;font-size:11px;color:var(--t1);line-height:1.7;font-family:monospace;max-height:90px;overflow-y:auto"></div>
-                </div>
-                <button id="btn-gerar-img" onclick="gerarImagem()" style="width:100%;background:var(--a);border:none;border-radius:8px;padding:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--f);font-size:14px;font-weight:700;color:#fff;letter-spacing:-.02em;transition:opacity .15s">
-                  <svg style="width:17px;height:17px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                  Gerar imagem
-                </button>
-              </div>
-              <div id="out-e" style="display:none;text-align:center;padding:24px 12px;color:var(--t3)">
-                <div style="font-size:12px">Escolha um estilo acima</div>
+              <div class="divider" style="margin:0 0 12px"></div>
+
+              <div class="out-empty" id="out-e">
+                <div class="out-empty-ico"><svg class="ico" style="color:var(--t3)" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+                <div class="out-empty-txt">Descreva sua ideia e clique em Gerar</div>
               </div>
               <div class="sk-wrap" id="sk-w">
-                <div class="sk-txt"><span class="sk-dot"></span><span id="sk-t">Refinando...</span></div>
-                <div class="sk" style="height:40px;margin-top:8px"></div>
-                <div class="sk" style="height:40px;margin-top:6px"></div>
+                <div class="sk-txt"><span class="sk-dot"></span><span id="sk-t">Interpretando sua ideia...</span></div>
+                <div class="sk" style="height:60px"></div>
+                <div class="sk" style="height:60px"></div>
+                <div class="sk" style="height:60px"></div>
+              </div>
+              <div class="out-res" id="out-r">
+                <div class="out-hd" id="out-hd-conceitos" style="display:none">
+                  <span style="font-size:10px;font-weight:700;color:var(--a);letter-spacing:.08em;text-transform:uppercase" id="out-hd-lbl">Escolha um modelo</span>
+                  <button class="btn btn-g btn-sm" onclick="regenWithCredit()" title="Consome 1 crédito">
+                    <svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
+                    Regerar <span style="color:var(--a);font-size:10px">−1</span>
+                  </button>
+                </div>
+                
+                <div id="img-mode-box" style="display:none;margin-top:12px;padding:12px;background:var(--ink-3);border:1px solid var(--line-1);border-radius:8px">
+                  <div style="font-size:11px;font-weight:700;color:var(--a);letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px">Modo da imagem enviada</div>
+                  <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:8px">
+                    <input type="radio" name="img-mode" value="reference" id="img-mode-ref" checked style="width:auto;margin-top:2px;accent-color:var(--a)">
+                    <div>
+                      <div style="font-size:12.5px;font-weight:600;color:var(--t0)">Usar como referência de design</div>
+                      <div style="font-size:11px;color:var(--t2)">A IA copia o estilo visual (cores, layout, tipografia) mas usa o conteúdo do prompt</div>
+                    </div>
+                  </label>
+                  <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
+                    <input type="radio" name="img-mode" value="include" id="img-mode-inc" style="width:auto;margin-top:2px;accent-color:var(--a)">
+                    <div>
+                      <div style="font-size:12.5px;font-weight:600;color:var(--t0)">Incluir imagem no design</div>
+                      <div style="font-size:11px;color:var(--t2)">A IA incorpora sua foto no layout gerado (ex: foto da nutricionista com texto ao redor)</div>
+                    </div>
+                  </label>
+                </div>
+<div class="cmd-box" id="cmd-out" data-prompt="" style="word-break:break-word;font-size:11px"><span id="cmd-out-txt" style="color:var(--t3);font-style:italic">Selecione um modelo acima para refinar o prompt automaticamente</span><button class="cp-btn" onclick="cpElById('cmd-out')">Copiar</button></div>
+                <button id="btn-gerar-img" onclick="gerarImagem()" style="width:100%;margin-top:12px;background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:var(--f);font-size:14px;font-weight:700;color:#fff;letter-spacing:-.02em;box-shadow:0 4px 20px rgba(243,107,42,.3);transition:all .15s">
+                  <svg style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  Gerar imagem com IA
+                </button>
               </div>
             </div>
 
-            <!-- STEP 2-3: Result -->
-            <div id="gen-step-result" style="display:none">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-                <button class="btn btn-g btn-sm" onclick="backToModels()" style="font-size:11px">
-                  <svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-                  Trocar estilo
-                </button>
-                <div style="display:flex;gap:6px">
-                  <button class="btn btn-g btn-sm btn-icon" onclick="gerarImagem()" title="Regerar">
-                    <svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
-                  </button>
-                  <button class="btn btn-g btn-sm btn-icon" onclick="openImgModal()" title="Tela cheia">
+            <!-- tab: imagem gerada -->
+            <div id="out-tab-imagem" style="display:none">
+              <div class="img-preview-empty" id="img-preview-empty">
+                <svg style="width:28px;height:28px;fill:none;stroke:var(--t3);stroke-width:1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                Gere uma imagem na aba Conceitos
+              </div>
+              <div class="img-preview-wrap" id="img-preview-wrap">
+                <div class="img-preview-thumb" id="img-preview-thumb" onclick="openImgModal()">
+                  <!-- SVG/Canvas renderizado aqui -->
+                </div>
+                <div style="display:flex;gap:7px;margin-top:2px;flex-wrap:wrap">
+                  <button class="btn btn-p btn-sm" style="flex:1" onclick="openImgModal()">
                     <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    Ver em tela cheia
                   </button>
-                  <button class="btn btn-p btn-sm" onclick="downloadImg()">
+                  <button class="btn btn-s btn-sm" onclick="downloadImg()">
                     <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     Baixar
                   </button>
+                  <button class="btn btn-s btn-sm btn-icon" onclick="gerarImagem()" title="Regerar imagem">
+                    <svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
+                  </button>
+                  <button class="btn btn-s btn-sm" onclick="saveImageToMemoryBank()" title="Salvar no banco de memória visual" style="background:var(--amber-10);border-color:var(--amber-18);color:var(--amber)">
+                    <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                    Salvar no banco
+                  </button>
                 </div>
               </div>
-              <div id="img-gen-loading" style="display:none;flex-direction:column;align-items:center;padding:40px 16px;gap:12px">
-                <div style="width:32px;height:32px;border:3px solid var(--b1);border-top-color:var(--a);border-radius:50%;animation:spin .7s linear infinite"></div>
-                <div id="img-gen-stage" style="font-size:12px;font-weight:600;color:var(--t1);text-align:center">Criando composição...</div>
-              </div>
-              <div id="carousel-slides-wrap" style="display:none"></div>
-              <div id="img-preview-wrap" style="display:none">
-                <div id="img-preview-thumb" onclick="openImgModal()" style="cursor:pointer;border-radius:10px;overflow:hidden;border:1px solid var(--b1);background:var(--bg)"></div>
-                <button onclick="saveImageToMemoryBank()" style="width:100%;margin-top:8px;background:rgba(245,197,24,.06);border:1px solid rgba(245,197,24,.18);border-radius:8px;padding:8px;cursor:pointer;font-family:var(--f);font-size:11px;font-weight:600;color:var(--amber);display:flex;align-items:center;justify-content:center;gap:6px">
-                  <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-                  Salvar no banco visual
-                </button>
-              </div>
-              <div id="img-preview-empty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 12px;color:var(--t3);gap:8px;text-align:center">
-                <svg style="width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                <div style="font-size:12px">Gere uma imagem</div>
+              <!-- loading state -->
+              <div class="img-gen-loading" id="img-gen-loading" style="display:none">
+                <div class="img-gen-spin"></div>
+                <div class="img-gen-txt">Gerando imagem com IA...</div>
+                <div class="img-gen-stage" id="img-gen-stage">Aplicando identidade da marca...</div>
               </div>
             </div>
 
-            <!-- Legacy stubs -->
-            <div id="out-tab-conceitos" style="display:none"></div>
-            <div id="out-tab-imagem" style="display:none"></div>
-            <div id="out-hd-conceitos" style="display:none"></div>
-            <div id="out-r" style="display:none"></div>
-            <div id="img-mode-box" style="display:none"></div>
-            <div id="cmd-out" data-prompt="" style="display:none"><span id="cmd-out-txt"></span></div>
           </div>
         </div>
+      </div>
+    </div>
 
     <!-- history -->
     <div class="pg" id="pg-history">
       <div class="pg-hd">
         <div>
           <div class="pg-title">Histórico</div>
-          <div class="pg-sub">Todo conteúdo gerado — acesse, copie ou baixe</div>
+          <div class="pg-sub">Todos os conteúdos gerados</div>
         </div>
         <div style="display:flex;gap:8px">
-          <button id="hist-tab-img" class="btn btn-p btn-sm" onclick="switchHistTab('img')">Imagens</button>
-          <button id="hist-tab-txt" class="btn btn-g btn-sm" onclick="switchHistTab('txt')">Textos</button>
+          <button id="hist-tab-img" class="btn btn-p btn-sm" onclick="switchHistTab('img')">Imagens geradas</button>
+          <button id="hist-tab-txt" class="btn btn-g btn-sm" onclick="switchHistTab('txt')">Conteúdo escrito</button>
         </div>
       </div>
       <div class="hist-filt" id="hist-filt-img">
-        <button class="btn btn-p btn-sm" onclick="histFilter(this,'','')">Todos</button>
-        <button class="btn btn-g btn-sm" onclick="histFilter(this,'post','')">Post</button>
-        <button class="btn btn-g btn-sm" onclick="histFilter(this,'carrossel','')">Carrossel</button>
-        <button class="btn btn-g btn-sm" onclick="histFilter(this,'anuncio','')">Anúncio</button>
-        <button class="btn btn-g btn-sm" onclick="histFilter(this,'story','')">Story</button>
-        <button class="btn btn-g btn-sm" onclick="histFilter(this,'','instagram')">Instagram</button>
-        <button class="btn btn-g btn-sm" onclick="histFilter(this,'','linkedin')">LinkedIn</button>
+        <button class="btn btn-p btn-sm">Todos</button>
+        <button class="btn btn-g btn-sm">Post</button>
+        <button class="btn btn-g btn-sm">Carrossel</button>
+        <button class="btn btn-g btn-sm">Anúncio</button>
+        <button class="btn btn-g btn-sm">Instagram</button>
+        <button class="btn btn-g btn-sm">LinkedIn</button>
       </div>
-      <div id="hist-sect-img">
-        <div class="g-hist" id="hist-img-grid">
-          <div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:16px 0;color:var(--t3)">
-            <div style="width:14px;height:14px;border:2px solid var(--b2);border-top-color:var(--a);border-radius:50%;animation:spin .7s linear infinite"></div>
-            Carregando...
-          </div>
-        </div>
-      </div>
+      <div id="hist-sect-img"><div class="g-hist" id="hist-img-grid">
+        <div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:16px 0;color:var(--t3)"><div style="width:14px;height:14px;border:2px solid var(--b2);border-top-color:var(--a);border-radius:50%;animation:spin .7s linear infinite"></div></div>
+      <div id="hist-sect-img" style="display:block"></div>
       <div id="hist-sect-txt" style="display:none">
-        <div id="hist-txt-list" style="display:flex;flex-direction:column;gap:8px;margin-top:4px"></div>
-      </div>
-    </div>
-
-    <!-- History detail modal -->
-    <div id="hist-modal-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(6px);z-index:9800;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .2s">
-      <div style="background:var(--bg1);border:1px solid var(--b2);border-radius:14px;width:100%;max-width:680px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.6)">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--b1);flex-shrink:0">
-          <div>
-            <div style="font-size:10px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.07em" id="hm-badge">—</div>
-            <div style="font-size:15px;font-weight:700;letter-spacing:-.3px;margin-top:2px" id="hm-title">—</div>
-          </div>
-          <div style="display:flex;gap:6px">
-            <button id="hm-dl-btn" class="btn btn-p btn-sm" onclick="histModalDownload()" style="display:none">
-              <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Baixar JPG
-            </button>
-            <button id="hm-copy-btn" class="btn btn-g btn-sm" onclick="histModalCopy()" style="display:none">
-              <svg class="ico ico-sm" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              Copiar
-            </button>
-            <button class="btn btn-g btn-sm" onclick="closeHistModal()" style="font-size:16px;font-weight:300">×</button>
+        <div class="sec-lbl" style="margin-top:16px">Conteúdo escrito gerado pelos agentes</div>
+        <div id="hist-txt-grid" class="g-hist" style="margin-top:0">
+          <div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--t3);font-size:12px">
+            Nenhum conteúdo escrito no histórico ainda.
+            Use os Agentes de Conteúdo para gerar legendas, roteiros e posts.
           </div>
         </div>
-        <div id="hm-body" style="overflow-y:auto;flex:1;padding:20px"></div>
-        <div style="padding:12px 20px;border-top:1px solid var(--b1);display:flex;gap:8px;align-items:center;flex-shrink:0">
-          <div style="font-size:10px;color:var(--t3);flex:1" id="hm-meta"></div>
-          <button class="btn btn-g btn-sm" onclick="closeHistModal()">Fechar</button>
-        </div>
+      </div>
+ Carregando histórico...</div>
       </div>
     </div>
-
 
     <!-- profile -->
     <div class="pg" id="pg-profile">
@@ -7615,25 +7420,6 @@ function selSlides(el, n) {
   document.querySelectorAll('.sc-btn').forEach(function(b) { b.classList.remove('on'); });
   el.classList.add('on');
 }
-function _setGenStep(n) {
-  for (var i = 1; i <= 3; i++) {
-    var el = document.getElementById('gstep-' + i);
-    if (!el) continue;
-    el.classList.remove('active', 'done');
-    if (i < n) el.classList.add('done');
-    else if (i === n) el.classList.add('active');
-  }
-}
-
-function backToModels() {
-  var stepModels = document.getElementById('gen-step-models');
-  var stepResult = document.getElementById('gen-step-result');
-  if (stepModels) stepModels.style.display = 'block';
-  if (stepResult) stepResult.style.display = 'none';
-  _setGenStep(1);
-}
-
-
 async function sendFeedback(slug, rating, btnEl) {
   try {
     const genId = (window._lastGenId && window._lastGenId[slug]) || '';
@@ -7768,125 +7554,26 @@ async function loadHistory() {
 
 
 function openHistCard(el, name, format, network, svgData, textResult) {
-  // Store data globally to avoid inline onclick issues
-  window._histItems = window._histItems || {};
-  var key = 'h' + Date.now() + Math.random().toString(36).slice(2);
-  window._histItems[key] = { name: name, format: format, network: network, svgData: svgData, textResult: textResult };
-  openHistModal(key);
-}
-
-function openHistModal(key) {
-  var item = (window._histItems || {})[key];
-  if (!item) return;
-
-  var modal  = document.getElementById('hist-modal-bg');
-  var hmTitle = document.getElementById('hm-title');
-  var hmBadge = document.getElementById('hm-badge');
-  var hmBody  = document.getElementById('hm-body');
-  var hmMeta  = document.getElementById('hm-meta');
-  var hmDl    = document.getElementById('hm-dl-btn');
-  var hmCopy  = document.getElementById('hm-copy-btn');
-  if (!modal) return;
-
-  hmTitle.textContent = item.name || item.format || 'Geração';
-  hmBadge.textContent = (item.format || '').toUpperCase() + (item.network ? ' · ' + item.network.toUpperCase() : '');
-
-  if (item.svgData && item.svgData.trim().startsWith('<svg')) {
-    window._histModalSvg = item.svgData;
-    hmBody.innerHTML = '<div style="border-radius:10px;overflow:hidden;border:1px solid var(--b1)">' + item.svgData + '</div>';
-    if (hmDl) { hmDl.style.display = 'flex'; }
-    if (hmCopy) { hmCopy.style.display = 'none'; }
-    if (hmMeta) hmMeta.textContent = 'Clique em Baixar para salvar em JPG';
-  } else if (item.textResult) {
-    window._histModalText = item.textResult;
-    hmBody.innerHTML = '<div style="font-size:13px;line-height:1.85;color:var(--t1);white-space:pre-wrap">' + esc(item.textResult) + '</div>';
-    if (hmDl) { hmDl.style.display = 'none'; }
-    if (hmCopy) { hmCopy.style.display = 'flex'; }
-    if (hmMeta) hmMeta.textContent = (item.format || '') + ' · ' + (item.network || '');
-  } else {
-    hmBody.innerHTML = '<div style="color:var(--t3);text-align:center;padding:40px;font-size:13px">Conteúdo não disponível neste registro.</div>';
-    if (hmDl) hmDl.style.display = 'none';
-    if (hmCopy) hmCopy.style.display = 'none';
-  }
-
-  modal.style.display = 'flex';
-}
-
-function closeHistModal() {
-  var modal = document.getElementById('hist-modal-bg');
-  if (modal) modal.style.display = 'none';
-}
-
-function histModalDownload() {
-  var svg = window._histModalSvg;
-  if (!svg) return;
-  window._currentSVG = svg; _currentSVG = svg;
-  _currentImgName = 'autopostt-hist-' + Date.now();
-  downloadImg();
-}
-
-function histModalCopy() {
-  var txt = window._histModalText;
-  if (!txt) return;
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(txt).then(function() { toast('Copiado!', 'ok'); });
-  } else {
-    var ta = document.createElement('textarea');
-    ta.value = txt; document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); document.body.removeChild(ta);
-    toast('Copiado!', 'ok');
+  if (svgData && svgData.trim().startsWith('<svg')) {
+    // Image generation — show in modal
+    window._currentSVG = svgData;
+    _currentSVG = svgData;
+    _currentImgName = 'autopostt-hist-' + Date.now();
+    openImgModal();
+  } else if (textResult) {
+    // Text agent result — show in a simple overlay
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9800;display:flex;align-items:center;justify-content:center;padding:24px';
+    overlay.innerHTML = `<div style="background:var(--ink-3,#151a1f);border:1px solid var(--line-2,rgba(255,255,255,.1));border-radius:12px;padding:28px;max-width:640px;width:100%;max-height:80vh;overflow-y:auto;position:relative">
+      <button onclick="this.closest('[style]').remove()" style="position:absolute;top:12px;right:12px;background:rgba(255,255,255,.1);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:18px">×</button>
+      <div style="font-size:10px;font-weight:700;color:var(--a,#F06B28);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">${esc(format)} · ${esc(network)}</div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:16px;letter-spacing:-.2px">${esc(name)}</div>
+      <div style="font-size:13px;line-height:1.8;color:var(--t1,#9ba3ad);white-space:pre-wrap">${esc(textResult)}</div>
+    </div>`;
+    overlay.onclick = function(e){ if(e.target===overlay) overlay.remove(); };
+    document.body.appendChild(overlay);
   }
 }
-
-function histFilter(btn, format, network) {
-  document.querySelectorAll('.hist-filt .btn').forEach(function(b) { b.className = 'btn btn-g btn-sm'; });
-  btn.className = 'btn btn-p btn-sm';
-  _histFilter = {};
-  if (format) _histFilter.format = format;
-  if (network) _histFilter.network = network;
-  renderHistory();
-}
-
-
-function closeHistModal() {
-  const modal = document.getElementById('hist-modal-bg');
-  if (modal) modal.style.display = 'none';
-}
-
-function histModalDownload() {
-  const svg = window._histModalSvg;
-  if (!svg) return;
-  window._currentSVG = svg;
-  _currentSVG = svg;
-  _currentImgName = 'autopostt-hist-' + Date.now();
-  downloadImg();
-}
-
-function histModalCopy() {
-  const txt = window._histModalText;
-  if (!txt) return;
-  navigator.clipboard.writeText(txt).then(function() {
-    toast('Texto copiado!', 'ok');
-  }).catch(function() {
-    const ta = document.createElement('textarea');
-    ta.value = txt;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    toast('Texto copiado!', 'ok');
-  });
-}
-
-function histFilter(btn, format, network) {
-  document.querySelectorAll('.hist-filt .btn').forEach(function(b) { b.className = 'btn btn-g btn-sm'; });
-  btn.className = 'btn btn-p btn-sm';
-  _histFilter = {};
-  if (format) _histFilter.format = format;
-  if (network) _histFilter.network = network;
-  renderHistory();
-}
-
 
 function switchHistTab(tab) {
   document.getElementById('hist-tab-img').className = tab==='img' ? 'btn btn-p btn-sm' : 'btn btn-g btn-sm';
@@ -7897,84 +7584,39 @@ function switchHistTab(tab) {
   if (txtSection) txtSection.style.display = tab==='txt' ? 'block' : 'none';
 }
 function renderHistory() {
-  window._histItems = window._histItems || {};
-  var grid = document.getElementById('hist-img-grid');
-  var txtList = document.getElementById('hist-txt-list');
-  var gens = (_histAll || []).slice();
-  if (_histFilter && _histFilter.format) gens = gens.filter(function(g) { return g.format === _histFilter.format; });
-  if (_histFilter && _histFilter.network) gens = gens.filter(function(g) { return g.network === _histFilter.network; });
+  const grid = document.querySelector('#pg-history .g-hist');
+  let gens = _histAll;
+  if (_histFilter.format) gens = gens.filter(g => g.format === _histFilter.format);
+  if (_histFilter.network) gens = gens.filter(g => g.network === _histFilter.network);
 
-  var imgGens = gens.filter(function(g) { return g.svg_data && g.svg_data.trim().startsWith('<svg'); });
-  var txtGens = gens.filter(function(g) { return !g.svg_data || !g.svg_data.trim().startsWith('<svg'); });
-
-  // Store all items in global map
-  imgGens.concat(txtGens).forEach(function(g) {
-    if (!g._hkey) {
-      g._hkey = 'h' + (g.id || Date.now() + Math.random().toString(36).slice(2));
-      window._histItems[g._hkey] = {
-        name: g.concept_name || g.feature || g.format || 'Geração',
-        format: g.format || g.feature || '',
-        network: g.network || '',
-        svgData: g.svg_data || '',
-        textResult: g.text_result || ''
-      };
-    }
-  });
-
-  // Image grid
-  if (grid) {
-    if (!imgGens.length) {
-      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px 0;color:var(--t3)">'
-        + '<div style="font-size:13px;margin-bottom:12px">Nenhuma imagem encontrada</div>'
-        + '<button class="btn btn-p btn-sm" onclick="navP(&quot;generate&quot;)">Criar agora</button></div>';
-    } else {
-      grid.innerHTML = imgGens.slice(0, 24).map(function(g) {
-        var svg  = g.svg_data || '';
-        var key  = g._hkey;
-        var name = esc(g.concept_name || g.format || '');
-        var fmt  = g.format || '';
-        var net  = g.network || '';
-        return '<div class="hist-card" style="cursor:pointer" onclick=\'openHistModal(\' + key + \')">'
-          + '<div class="hist-thumb" style="position:relative;overflow:hidden">'
-          + '<div class="hist-thumb-inner hist-thumb-svg" style="transform:scale(0.18);transform-origin:top left;width:556%;height:556%;pointer-events:none">' + svg + '</div>'
-          + '</div>'
-          + '<div class="hist-info">'
-          + '<div class="hist-name">' + name + '</div>'
-          + '<div class="hist-meta"><span class="badge ' + fmtBadge(fmt) + '">' + fmt + '</span>'
-          + '<span class="badge bdg-n">' + net + '</span>'
-          + '<span class="hist-time">' + timeAgo(g.created_at) + '</span></div>'
-          + '</div></div>';
-      }).join('');
-    }
+  if (!gens.length) {
+    grid.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:48px 0;color:var(--t3)">
+        <div style="font-size:13px;margin-bottom:12px">Nenhuma geração encontrada</div>
+        <button class="btn btn-p btn-sm" onclick="navP('generate')">Criar agora</button>
+      </div>
+    `;
+    return;
   }
 
-  // Text list
-  if (txtList) {
-    if (!txtGens.length) {
-      txtList.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t3);font-size:12px">Nenhum conteúdo de texto ainda.</div>';
-    } else {
-      txtList.innerHTML = txtGens.slice(0, 30).map(function(g) {
-        var key  = g._hkey;
-        var name = esc(g.concept_name || g.feature || g.format || 'Conteúdo');
-        var fmt  = g.format || g.feature || '';
-        var net  = g.network || '';
-        var preview = esc((g.text_result || g.prompt || '').slice(0, 140));
-        return '<div class="hist-txt-item" onclick=\'openHistModal(\' + key + \')">'
-          + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">'
-          + '<div style="flex:1;min-width:0">'
-          + '<div style="font-size:13px;font-weight:600;color:var(--t0);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + name + '</div>'
-          + '<div style="font-size:12px;color:var(--t2);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">' + preview + '</div>'
-          + '</div>'
-          + '<div style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px">'
-          + '<div style="display:flex;gap:4px"><span class="badge ' + fmtBadge(fmt) + '">' + fmt + '</span><span class="badge bdg-n">' + net + '</span></div>'
-          + '<span style="font-size:10px;color:var(--t3)">' + timeAgo(g.created_at) + '</span>'
-          + '</div></div></div>';
-      }).join('');
-    }
-  }
+  grid.innerHTML = gens.slice(0, 18).map(g => `
+    <div class="hist-card" style="cursor:pointer" onclick="openHistCard(this,'${esc(g.concept_name||g.format)}','${g.format}','${g.network}','${esc(g.svg_data||'')}','${esc(g.text_result||'')}')">
+      <div class="hist-thumb" style="position:relative;overflow:hidden">
+        ${g.svg_data
+          ? `<div class="hist-thumb-inner hist-thumb-svg" style="transform:scale(0.18);transform-origin:top left;width:556%;height:556%;pointer-events:none">${g.svg_data}</div>`
+          : `<div class="hist-thumb-inner">${fmtIcon(g.format)}</div>`}
+      </div>
+      <div class="hist-info">
+        <div class="hist-name">${esc(g.concept_name || g.format)}</div>
+        <div class="hist-meta">
+          <span class="badge ${fmtBadge(g.format)}">${g.format}</span>
+          <span class="badge bdg-n">${g.network}</span>
+          <span class="hist-time">${timeAgo(g.created_at)}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
 }
-
-
 
 // wire up history filter buttons
 document.addEventListener('DOMContentLoaded', () => {
@@ -8254,35 +7896,111 @@ function startGenPipeline() {
   const input = (document.getElementById('gen-in').value || '').trim();
   if (!input) { toast('Descreva sua ideia antes de gerar'); return; }
 
+  // Guarda o input bruto; limpa refinamento anterior (modelo novo = refinamento novo)
   window._rawInput = input;
   window._refinedPrompt = '';
+
+  // Limpa o bloco de prompt refinado
+  const wrap = document.getElementById('refined-prompt-wrap');
+  const box  = document.getElementById('refined-prompt-box');
+  if (wrap) wrap.style.display = 'none';
+  if (box)  box.textContent = '';
+
+  // Reset cmd-out
+  const cmdEl  = document.getElementById('cmd-out');
+  const cmdTxt = document.getElementById('cmd-out-txt');
+  if (cmdEl)  cmdEl.dataset.prompt = '';
+  if (cmdTxt) cmdTxt.textContent = 'Selecione um modelo para refinar o prompt';
+
+  // Limpa seleção de modelo anterior
   window._selectedModel = null;
   _selectedModel = null;
-
-  // Reset refined prompt box
-  const box = document.getElementById('refined-prompt-box');
-  if (box) box.textContent = '';
-  const wrap = document.getElementById('refined-prompt-wrap');
-  if (wrap) wrap.style.display = 'none';
-
-  // Reset model selection info
+  document.querySelectorAll('.model-card').forEach(c => c.classList.remove('on'));
   const info = document.getElementById('modelo-selected-info');
   if (info) info.style.display = 'none';
 
-  // Hide initial state
-  const ini = document.getElementById('gen-initial-state');
-  if (ini) ini.style.display = 'none';
+  // Mostra a aba de modelos
+  const tabModelos = document.getElementById('tab-conceitos');
+  const tabContent = document.getElementById('out-tab-conceitos');
+  if (tabModelos) tabModelos.style.display = '';
+  if (tabContent) tabContent.style.display = 'block';
 
-  // Show model picker, hide result
-  const stepModels = document.getElementById('gen-step-models');
-  const stepResult = document.getElementById('gen-step-result');
-  if (stepResult) stepResult.style.display = 'none';
-  if (stepModels) stepModels.style.display = 'block';
-  _setGenStep(1);
+  document.getElementById('out-e').style.display = 'none';
+  document.getElementById('sk-w').classList.remove('vis');
+  document.getElementById('out-r').classList.add('vis');
 
-  renderModelGrid();
+  // Reset aba imagem
+  document.getElementById('img-preview-wrap')?.classList.remove('vis');
+  const emptyEl = document.getElementById('img-preview-empty');
+  if (emptyEl) {
+    emptyEl.style.display = 'flex';
+    emptyEl.innerHTML = `<svg style="width:28px;height:28px;fill:none;stroke:var(--t3);stroke-width:1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Escolha um modelo abaixo e clique em "Gerar imagem"`;
+  }
+
+  _ensureModelGrid();
+  switchOutTab('conceitos');
+  toast('Escolha o modelo e clique em "Gerar imagem".', 'ok');
 }
 
+function regenWithCredit() {
+  const box = document.getElementById('refined-prompt-box');
+  const raw = document.getElementById('gen-in').value || '';
+  const input = (box?.textContent || raw).trim();
+  if (!input) { toast('Nenhum input para regerar'); return; }
+  toast('Refinando novamente... −1 crédito', 'ok');
+  startGenPipeline();
+}
+
+function editRefined() {
+  const box = document.getElementById('refined-prompt-box');
+  if (!box) return;
+  const inp = document.createElement('textarea');
+  inp.value = box.textContent; inp.rows = 4;
+  inp.style.cssText = 'width:100%;background:var(--bg);border:1px solid var(--a);color:var(--t0);border-radius:var(--r2);padding:10px;font-size:12px;font-family:monospace;resize:none;outline:none';
+  box.replaceWith(inp); inp.focus();
+  inp.addEventListener('blur', () => {
+    const nb = document.createElement('div');
+    nb.id = 'refined-prompt-box';
+    nb.style.cssText = 'background:var(--bg3);border:1px solid rgba(243,107,42,.2);border-radius:var(--r2);padding:11px 13px;font-size:12px;color:var(--t1);line-height:1.7;font-family:monospace;word-break:break-word';
+    nb.textContent = inp.value; inp.replaceWith(nb);
+  });
+}
+
+function clearGenForm() {
+  document.getElementById('gen-in').value = ''; ucc();
+  const w = document.getElementById('refined-prompt-wrap');
+  if (w) w.style.display = 'none';
+  document.getElementById('out-e').style.display = 'flex';
+  document.getElementById('out-r').classList.remove('vis');
+  // Esconder aba Modelos novamente
+  const tabModelos = document.getElementById('tab-conceitos');
+  const tabContent = document.getElementById('out-tab-conceitos');
+  const outHd = document.getElementById('out-hd-conceitos');
+  if (tabModelos) tabModelos.style.display = 'none';
+  if (tabContent) tabContent.style.display = 'none';
+  if (outHd) outHd.style.display = 'none';
+  window._refinedPrompt = '';
+  // Resetar cmd-out
+  const cmdEl = document.getElementById('cmd-out');
+  if (cmdEl) { cmdEl.dataset.prompt = ''; const sp = document.getElementById('cmd-out-txt'); if (sp) sp.textContent = 'Selecione um modelo acima'; }
+}
+
+// ─────────────────────────────────────────────────
+// GERAR IMAGEM SVG — chama backend + Claude gera SVG
+// ─────────────────────────────────────────────────
+let _currentSVG = null, _currentImgName = 'autopostt-imagem';
+
+const IMG_SKILL_SYSTEM = `Você é diretor de arte especialista em criação de imagens SVG para redes sociais.
+REGRAS ABSOLUTAS:
+1. Responda APENAS com código SVG puro. Zero texto antes ou depois.
+2. Sem markdown, sem blocos de código, sem explicações.
+3. Comece com <svg e termine com </svg>
+4. viewBox="0 0 1080 1080" | xmlns="http://www.w3.org/2000/svg" obrigatório
+5. font-family explícito em todo elemento text
+6. Fundo dark. Hierarquia 3 pesos: dominante 60%, suporte 25%, accent 5-10%
+7. Use as CORES DO PERFIL fornecidas. Não substitua por paletas genéricas.`;
+
+const IMG_STAGES = ['Lendo perfil da marca...','Definindo composição...','Aplicando cores...','Construindo SVG...','Refinando...','Finalizando...'];
 
 async function gerarImagem() {
   const rawInput = (window._rawInput || document.getElementById('gen-in')?.value || '').trim();
@@ -8298,21 +8016,10 @@ async function gerarImagem() {
     modelN: model.n, modelName: model.name, modelSvg: model.svg
   });
 
-  // Switch to result panel first so loading div is in DOM and visible
-  var _stepR = document.getElementById('gen-step-result');
-  var _stepM = document.getElementById('gen-step-models');
-  if (_stepR) _stepR.style.display = 'block';
-  if (_stepM) _stepM.style.display = 'none';
-  _setGenStep(2);
-
   switchOutTab('imagem');
-  var _emptyEl = document.getElementById('img-preview-empty');
-  if (_emptyEl) _emptyEl.style.display = 'none';
-  var _wrapEl = document.getElementById('img-preview-wrap');
-  if (_wrapEl) { _wrapEl.style.display = 'none'; _wrapEl.classList.remove('vis'); }
+  document.getElementById('img-preview-empty').style.display = 'none';
+  document.getElementById('img-preview-wrap')?.classList.remove('vis');
   document.getElementById('img-gen-loading').style.display = 'flex';
-  showGenOverlay();
-
 
   const stageEl = document.getElementById('img-gen-stage');
 
@@ -8407,19 +8114,10 @@ async function gerarImagem() {
     const thumb = document.getElementById('img-preview-thumb');
     if (thumb) thumb.innerHTML = svgCode;
     document.getElementById('img-gen-loading').style.display = 'none';
-    var pw = document.getElementById('img-preview-wrap');
-    if (pw) { pw.style.display = 'block'; pw.classList.add('vis'); }
-    // Show result step
-    var stepResult = document.getElementById('gen-step-result');
-    if (stepResult) stepResult.style.display = 'block';
-    var stepModels = document.getElementById('gen-step-models');
-    if (stepModels) stepModels.style.display = 'none';
-    _setGenStep(3);
-    hideGenOverlay();
+    document.getElementById('img-preview-wrap')?.classList.add('vis');
     toast('Imagem gerada!', 'ok');
     if (me) { me.quota_used = (me.quota_used||0)+1; updateQuota(); }
   } catch(e) {
-    hideGenOverlay();
     clearInterval(iv);
     clearGenLoading();
     showGenError(e.message);
@@ -8442,12 +8140,6 @@ function showGenError(msg) {
 }
 
 function _showCarouselOutput(total) {
-  // Show result step
-  var stepResult = document.getElementById('gen-step-result');
-  var stepModels = document.getElementById('gen-step-models');
-  if (stepResult) stepResult.style.display = 'block';
-  if (stepModels) stepModels.style.display = 'none';
-  _setGenStep(3);
   var tab = document.getElementById('out-tab-imagem');
   var empty = document.getElementById('img-preview-empty');
   var wrap = document.getElementById('img-preview-wrap');
@@ -10597,97 +10289,6 @@ async function obFinish() {
 }
 
 
-
-
-
-
-// ─── AGENT PERSONALITY ────────────────────────────────────────────────────────
-
-var _AGENT_NET_NAMES = { ig:'Instagram', li:'LinkedIn', yt:'YouTube', tt:'TikTok' };
-
-var _REFINE_MSGS = [
-  'Deixa eu ver essa ideia... calma que to lendo.',
-  'Ok ok, entendi o que você quer. Me dá um segundo.',
-  'Boa ideia. Agora me deixa trabalhar em paz por um instante.',
-  'Acionando o estrategista interno. Segura as pontas.',
-  'Analisando... você podia ter me dado mais informação mas vai lá.',
-];
-var _REFINE_STAGES = ['Acionando estrategista','Analisando narrativa','Calibrando tom de voz','Ajustando para seu nicho'];
-
-var _GEN_MSGS_BY_FMT = {
-  post:[
-    'Olha eu novamente aqui, você não me dá descanso... Fica em paz, já estou gerando seu <b>post único</b> para o <b>{net}</b>, aguenta as pontas aí que eu não sou de ferro.',
-    'De novo? Tá bom... Gerando seu <b>post único</b> pro <b>{net}</b>. Vou fazer bonito.',
-    'Mais um <b>post único</b> pro <b>{net}</b>. Exatamente o que eu queria fazer agora. Bora.',
-  ],
-  carrossel:[
-    'Carrossel pro <b>{net}</b>? Vários slides de uma vez? Tá bom, sou fera nisso. Montando agora.',
-    'Um carrossel completo pro <b>{net}</b>. Gerando cada slide.',
-  ],
-  story:[
-    'Story pro <b>{net}</b>? Vertical, rápido, impactante. Boa escolha. Já to fazendo.',
-  ],
-  anuncio:[
-    'Anúncio pro <b>{net}</b>? Vou fazer um que a galera não consegue ignorar.',
-  ],
-  thumb:[
-    'Thumbnail pro <b>{net}</b>. Precisa parar o scroll né? Eu sei o que fazer.',
-  ],
-  banner:[
-    'Banner pro <b>{net}</b>. Profissional, elegante, na sua cara. Criando agora.',
-  ],
-};
-var _GEN_STAGES = ['Compondo layout','Aplicando paleta da marca','Ajustando tipografia','Refinando composição','Finalizando'];
-
-function _apick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-
-function showRefineOverlay() {
-  var o = document.getElementById('agent-refine-overlay');
-  var m = document.getElementById('agent-refine-msg');
-  var s = document.getElementById('agent-refine-stage');
-  if (!o) return;
-  if (m) m.textContent = _apick(_REFINE_MSGS);
-  if (s) s.textContent = _REFINE_STAGES[0];
-  o.style.display = 'flex';
-  var si = 0, iv = setInterval(function() {
-    si++; if (si >= _REFINE_STAGES.length) { clearInterval(iv); return; }
-    if (s) s.textContent = _REFINE_STAGES[si];
-  }, 900);
-  o._iv = iv;
-}
-
-function hideRefineOverlay() {
-  var o = document.getElementById('agent-refine-overlay');
-  if (!o) return;
-  if (o._iv) clearInterval(o._iv);
-  o.style.display = 'none';
-}
-
-function showGenOverlay() {
-  var fmt = (typeof _currentFmt !== 'undefined' ? _currentFmt : 'post') || 'post';
-  var net = (typeof _currentNet !== 'undefined' ? _currentNet : 'ig') || 'ig';
-  var o = document.getElementById('agent-gen-overlay');
-  var m = document.getElementById('agent-gen-msg');
-  var s = document.getElementById('agent-gen-stage');
-  if (!o) return;
-  var msgs = _GEN_MSGS_BY_FMT[fmt] || _GEN_MSGS_BY_FMT['post'];
-  var netName = _AGENT_NET_NAMES[net] || 'Instagram';
-  if (m) m.innerHTML = _apick(msgs).replace(/{net}/g, netName);
-  if (s) s.textContent = _GEN_STAGES[0];
-  o.style.display = 'flex';
-  var si = 0, iv = setInterval(function() {
-    si++; if (si >= _GEN_STAGES.length) { clearInterval(iv); return; }
-    if (s) s.textContent = _GEN_STAGES[si];
-  }, 1200);
-  o._iv = iv;
-}
-
-function hideGenOverlay() {
-  var o = document.getElementById('agent-gen-overlay');
-  if (!o) return;
-  if (o._iv) clearInterval(o._iv);
-  o.style.display = 'none';
-}
 </script>
 
   <!-- Image fullscreen modal -->
@@ -10840,32 +10441,43 @@ function renderModelGrid() {
 }
 
 function _updateFormatBadge() {
+  // Show/update a small badge above the grid indicating active format
+  var section = document.getElementById('modelo-picker-section');
+  if (!section) return;
   var badge = document.getElementById('fmt-active-badge');
-  if (!badge) return;
+  if (!badge) {
+    badge = document.createElement('div');
+    badge.id = 'fmt-active-badge';
+    badge.style.cssText = 'font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;'
+      + 'letter-spacing:.1em;margin-bottom:8px;display:flex;align-items:center;gap:6px;';
+    var lbl = section.querySelector('div[style*="Escolha um modelo"]');
+    if (lbl) lbl.after(badge);
+    else section.insertBefore(badge, section.firstChild);
+  }
   var fmtLabels = {
-    post_instagram:      'Post Instagram · 1:1',
-    carrossel_instagram: 'Carrossel Instagram · 1:1',
-    anuncio_instagram:   'Anúncio Instagram · 1:1',
-    story_instagram:     'Story Instagram · 9:16',
-    post_linkedin:       'Post LinkedIn · 1.91:1',
-    carrossel_linkedin:  'Carrossel LinkedIn · 1:1',
-    anuncio_linkedin:    'Anúncio LinkedIn · 1.91:1',
-    banner_linkedin:     'Banner LinkedIn · 4:1',
-    thumbnail_youtube:   'YouTube Thumbnail · 16:9',
-    thumbnail_tiktok:    'TikTok Thumbnail · 9:16',
+    post_instagram:      'Post Instagram \xb7 1:1',
+    carrossel_instagram: 'Carrossel Instagram \xb7 1:1',
+    anuncio_instagram:   'An\xfancio Instagram \xb7 1:1',
+    story_instagram:     'Story Instagram \xb7 9:16',
+    post_linkedin:       'Post LinkedIn \xb7 1.91:1',
+    carrossel_linkedin:  'Carrossel LinkedIn \xb7 1:1',
+    anuncio_linkedin:    'An\xfancio LinkedIn \xb7 1.91:1',
+    banner_linkedin:     'Banner LinkedIn \xb7 4:1',
+    thumbnail_youtube:   'YouTube Thumbnail \xb7 16:9',
+    thumbnail_tiktok:    'TikTok Thumbnail \xb7 9:16',
   };
-  badge.textContent = fmtLabels[_modelFmt] || _modelFmt;
+  var label = fmtLabels[_modelFmt] || _modelFmt;
+  badge.innerHTML = '<svg style="width:10px;height:10px;fill:none;stroke:var(--amber);stroke-width:2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> '
+    + label + ' <span style="font-weight:400;color:var(--t2)">\xe2\x80\x94 20 estilos</span>';
 }
+
+function _getModelDesc(n) { return _MODEL_DESCS[n] || ''; }
 
 function selectModel(idx) {
   var list = MODELS[_modelFmt] || [];
   _selectedModel        = list[idx];
   window._selectedModel = _selectedModel;
 
-  // Step indicator
-  _setGenStep(2);
-
-  // Highlight selected card
   var cards = document.querySelectorAll('#modelo-grid > div');
   for (var i = 0; i < cards.length; i++) {
     var on = (i === idx);
@@ -10883,8 +10495,8 @@ function _updateModelInfo() {
   var name = document.getElementById('modelo-selected-name');
   if (info) info.style.display = _selectedModel ? 'block' : 'none';
   if (name && _selectedModel)
-    name.textContent = _selectedModel.n + ' — ' + _selectedModel.name
-      + (_selectedModel.label ? ' · ' + _selectedModel.label : '');
+    name.textContent = _selectedModel.n + ' \u2014 ' + _selectedModel.name
+      + (_selectedModel.label ? ' \xb7 ' + _selectedModel.label : '');
 }
 
 function _ensureModelGrid() {
@@ -10898,8 +10510,6 @@ function _ensureModelGrid() {
 async function _refineWithModel(model) {
   const rawInput = (window._rawInput || document.getElementById('gen-in')?.value || '').trim();
   if (!rawInput || !model) return;
-
-  showRefineOverlay();
 
   // Paleta da marca
   const p = me || {};
@@ -10956,7 +10566,6 @@ async function _refineWithModel(model) {
 
     toast('Prompt refinado! Clique em "Gerar imagem" para continuar.', 'ok');
   } catch(e) {
-    hideRefineOverlay();
     window._refinedPrompt = rawInput;
     if (box)    box.textContent = rawInput;
     if (cmdTxt) cmdTxt.textContent = rawInput;
