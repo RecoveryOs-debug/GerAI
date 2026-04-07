@@ -7221,9 +7221,88 @@ let _histAll = []; // cached generations for history page
 let _histFilter = { format: '', network: '' };
 
 // ─────────────────────────────────────────────────
-// HTTP LAYER
+// LOCAL AUTH STORE (standalone mode — sem backend)
+// ─────────────────────────────────────────────────
+function _localUsers() {
+  try { return JSON.parse(localStorage.getItem('autopostt_users') || '[]'); } catch { return []; }
+}
+function _saveUsers(u) { localStorage.setItem('autopostt_users', JSON.stringify(u)); }
+function _makeToken(email) { return btoa(email + ':' + Date.now()); }
+function _defaultUser(name, email) {
+  return { id: Date.now(), name, email, plan: 'free', quota_used: 0, quota_limit: 30, profissao: '', nicho: '', publico: '', tom: '', estilo: '', redes: '' };
+}
+
+// ─────────────────────────────────────────────────
+// HTTP LAYER (com fallback local)
 // ─────────────────────────────────────────────────
 async function api(method, path, body) {
+  // ── LOCAL MOCK ROUTES ──────────────────────────
+  if (path === '/api/auth/login') {
+    const users = _localUsers();
+    const u = users.find(x => x.email === body.email && x.password === body.password);
+    if (!u) throw new Error('E-mail ou senha incorretos.');
+    const t = _makeToken(u.email);
+    localStorage.setItem('autopostt_session', JSON.stringify({ token: t, email: u.email }));
+    return { ok: true, token: t, user: { ...u, password: undefined } };
+  }
+  if (path === '/api/auth/register') {
+    const users = _localUsers();
+    if (users.find(x => x.email === body.email)) throw new Error('E-mail já cadastrado.');
+    const newUser = { ..._defaultUser(body.name, body.email), password: body.password };
+    users.push(newUser);
+    _saveUsers(users);
+    const t = _makeToken(newUser.email);
+    localStorage.setItem('autopostt_session', JSON.stringify({ token: t, email: newUser.email }));
+    return { ok: true, token: t, user: { ...newUser, password: undefined } };
+  }
+  if (path === '/api/auth/me') {
+    const sess = JSON.parse(localStorage.getItem('autopostt_session') || 'null');
+    if (!sess) throw new Error('Sessão expirada.');
+    const users = _localUsers();
+    const u = users.find(x => x.email === sess.email);
+    if (!u) throw new Error('Usuário não encontrado.');
+    return { ok: true, user: { ...u, password: undefined } };
+  }
+  if (path.startsWith('/api/user/profile') && method === 'PUT') {
+    const sess = JSON.parse(localStorage.getItem('autopostt_session') || 'null');
+    if (!sess) throw new Error('Sessão expirada.');
+    const users = _localUsers();
+    const idx = users.findIndex(x => x.email === sess.email);
+    if (idx < 0) throw new Error('Usuário não encontrado.');
+    Object.assign(users[idx], body);
+    _saveUsers(users);
+    me = { ...users[idx], password: undefined };
+    return { ok: true, user: me };
+  }
+  if (path.startsWith('/api/user/onboard-step') && method === 'POST') {
+    const sess = JSON.parse(localStorage.getItem('autopostt_session') || 'null');
+    if (sess) {
+      const users = _localUsers();
+      const idx = users.findIndex(x => x.email === sess.email);
+      if (idx >= 0) { Object.assign(users[idx], body); _saveUsers(users); me = { ...users[idx], password: undefined }; }
+    }
+    return { ok: true };
+  }
+  if (path.startsWith('/api/user/generations') && method === 'GET') {
+    return { ok: true, generations: JSON.parse(localStorage.getItem('autopostt_gens') || '[]') };
+  }
+  if (path.startsWith('/api/user/generate-content') && method === 'POST') {
+    if (me) { me.quota_used = (me.quota_used || 0) + 1; updateQuota(); }
+    return { ok: true, content: '(Modo offline — conecte o backend para geração real de conteúdo.)' };
+  }
+  if (path.startsWith('/api/user/calendar') && method === 'GET') {
+    return { ok: true, events: [] };
+  }
+  if (path.startsWith('/api/user/calendar') && (method === 'POST' || method === 'PUT')) {
+    return { ok: true, event: body };
+  }
+  if (path.startsWith('/api/user/calendar') && method === 'DELETE') {
+    return { ok: true };
+  }
+  if (path === '/api/plans') {
+    return { ok: true, plans: [] };
+  }
+  // ── REAL BACKEND FALLBACK ──────────────────────
   const opts = {
     method,
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
@@ -7231,7 +7310,7 @@ async function api(method, path, body) {
   if (body) opts.body = JSON.stringify(body);
   let r;
   try { r = await fetch(API + path, opts); }
-  catch { throw new Error('Servidor offline. Verifique se o backend está rodando.'); }
+  catch { throw new Error('Servidor offline. Modo local ativo — faça login para continuar.'); }
   const data = await r.json();
   if (!data.ok) throw new Error(data.error || 'Erro desconhecido');
   return data;
@@ -7256,15 +7335,21 @@ function go(s) {
   const _lpScreen = new URLSearchParams(window.location.search).get('screen');
   if (_lpScreen && document.getElementById('sc-' + _lpScreen)) {
     go(_lpScreen);
+    return;
   }
-  if (!token) return;
+  // Try restoring session from local store
+  const sess = JSON.parse(localStorage.getItem('autopostt_session') || 'null');
+  if (!token && !sess) { go('login'); return; }
   try {
     const data = await api('GET', '/api/auth/me');
     me = data.user;
+    token = sess ? sess.token : token;
     bootApp();
   } catch {
     token = '';
     localStorage.removeItem('gerai_token');
+    localStorage.removeItem('autopostt_session');
+    go('login');
   }
 })();
 
@@ -7355,7 +7440,11 @@ function doLogout() {
   token = ''; me = null;
   localStorage.removeItem('gerai_token');
   localStorage.removeItem('gerai_ob_done');
-  window.location.href = '/';
+  localStorage.removeItem('autopostt_session');
+  document.querySelectorAll('.sc').forEach(x => x.classList.remove('on'));
+  const loginSc = document.getElementById('sc-login');
+  if (loginSc) loginSc.classList.add('on');
+  window.scrollTo(0, 0);
 }
 
 // Enter key support on auth screens
@@ -7752,7 +7841,7 @@ function renderHistory() {
   // Render image grid
   if (grid) {
     if (!imgGens.length) {
-      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px 0;color:var(--t3)"><div style="font-size:13px;margin-bottom:12px">Nenhuma imagem encontrada</div><button class="btn btn-p btn-sm" onclick="navP('generate')">Criar agora</button></div>';
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px 0;color:var(--t3)"><div style="font-size:13px;margin-bottom:12px">Nenhuma imagem encontrada</div><button class="btn btn-p btn-sm" onclick="navP(\'generate\')">Criar agora</button></div>';
     } else {
       grid.innerHTML = imgGens.slice(0, 24).map(function(g) {
         var svg = g.svg_data || '';
@@ -7760,7 +7849,7 @@ function renderHistory() {
         var fmt  = g.format || '';
         var net  = g.network || '';
         var svgEsc = esc(svg);
-        return '<div class="hist-card" style="cursor:pointer" onclick="openHistCard(this,'' + name + '','' + fmt + '','' + net + '','' + svgEsc + '','')">'
+        return '<div class="hist-card" style="cursor:pointer" onclick="openHistCard(this,\'' + name + '\',\'' + fmt + '\',\'' + net + '\',\'' + svgEsc + '\',\'\')">'
           + '<div class="hist-thumb" style="position:relative;overflow:hidden">'
           + '<div class="hist-thumb-inner hist-thumb-svg" style="transform:scale(0.18);transform-origin:top left;width:556%;height:556%;pointer-events:none">' + svg + '</div>'
           + '</div>'
@@ -7784,7 +7873,7 @@ function renderHistory() {
         var net  = g.network || '';
         var txt  = esc(g.text_result || g.prompt || '');
         var preview = (g.text_result || g.prompt || '').slice(0, 120);
-        return '<div class="hist-txt-item" onclick="openHistCard(this,'' + name + '','' + fmt + '','' + net + '','','' + txt + '')">'
+        return '<div class="hist-txt-item" onclick="openHistCard(this,\'' + name + '\',\'' + fmt + '\',\'' + net + '\',\'\',\'' + txt + '\')">'
           + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">'
           + '<div style="flex:1;min-width:0">'
           + '<div style="font-size:13px;font-weight:600;color:var(--t0);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + name + '</div>'
