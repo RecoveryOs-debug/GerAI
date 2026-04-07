@@ -5513,6 +5513,44 @@ body.image-agent-refining #image-agent-refine-overlay{
       .fb-btn:hover { border-color: var(--line-2); }
       .fb-btn.pos.on { background: rgba(34,211,122,.12); border-color: rgba(34,211,122,.3); color: #22D37A; }
       .fb-btn.neg.on { background: rgba(255,68,68,.1); border-color: rgba(255,68,68,.2); color: #FF4444; }
+
+      /* History text items */
+      .hist-txt-item {
+        padding: 14px 16px; background: var(--bg2); border: 1px solid var(--b1);
+        border-radius: 10px; cursor: pointer; transition: border-color .12s;
+      }
+      .hist-txt-item:hover { border-color: var(--b2); background: var(--bg3); }
+
+      /* Generate page new layout */
+      .gen-out-panel {
+        background: var(--bg1); border: 1px solid var(--b1); border-radius: var(--r3);
+        padding: 16px;
+      }
+      .gen-steps {
+        display: flex; align-items: center; gap: 0;
+        margin-bottom: 16px; padding-bottom: 16px;
+        border-bottom: 1px solid var(--b1);
+      }
+      .gen-step {
+        display: flex; align-items: center; gap: 6px;
+        font-size: 11px; font-weight: 600; color: var(--t3);
+        flex-shrink: 0;
+      }
+      .gen-step.active { color: var(--a); }
+      .gen-step.done { color: var(--t2); }
+      .gstep-num {
+        width: 20px; height: 20px; border-radius: 50%;
+        background: var(--b1); color: var(--t3);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 10px; font-weight: 700; flex-shrink: 0;
+      }
+      .gen-step.active .gstep-num { background: var(--a); color: #fff; }
+      .gen-step.done .gstep-num { background: rgba(34,211,122,.15); color: #22D37A; }
+      .gstep-line { flex: 1; height: 1px; background: var(--b1); margin: 0 8px; }
+      .gen-step-hd {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 10px;
+      }
 </style>
 
 </head>
@@ -6114,147 +6152,190 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
 
         <!-- output -->
         <div>
-          <div class="out-panel">
-            <!-- tabs -->
-            <div class="out-tabs">
-              <div class="out-tab on" id="tab-conceitos" onclick="switchOutTab('conceitos')" style="display:none">Modelos</div>
-              <div class="out-tab" id="tab-imagem" onclick="switchOutTab('imagem')">Imagem gerada</div>
+          <div class="out-panel" style="padding:16px">
+
+            <!-- Step indicator -->
+            <div id="gen-steps" style="display:flex;align-items:center;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--b1)">
+              <div id="gstep-1" style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--a)">
+                <div style="width:20px;height:20px;border-radius:50%;background:var(--a);color:#000;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">1</div>
+                Estilo
+              </div>
+              <div style="flex:1;height:1px;background:var(--b1);margin:0 8px"></div>
+              <div id="gstep-2" style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--t3)">
+                <div style="width:20px;height:20px;border-radius:50%;background:var(--b1);color:var(--t3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">2</div>
+                Gerar
+              </div>
+              <div style="flex:1;height:1px;background:var(--b1);margin:0 8px"></div>
+              <div id="gstep-3" style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--t3)">
+                <div style="width:20px;height:20px;border-radius:50%;background:var(--b1);color:var(--t3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">3</div>
+                Resultado
+              </div>
             </div>
 
-            <!-- tab: modelos + conceitos -->
-            <div id="out-tab-conceitos" style="display:none">
-
-              <!-- ── MODELO PICKER ── -->
-              <div id="modelo-picker-section" style="margin-bottom:14px">
-                <div style="font-size:10px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">Escolha um modelo</div>
-                <div id="modelo-grid" style="display:flex;flex-direction:column;gap:10px;max-height:520px;overflow-y:auto;padding-right:4px;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent"></div>
-                <div id="modelo-selected-info" style="display:none;margin-top:8px;padding:7px 10px;background:var(--ink-3);border:1px solid var(--amber-18);border-radius:6px">
-                  <div style="font-size:10px;color:var(--t2)">Modelo selecionado</div>
-                  <div style="font-size:12px;font-weight:700;color:var(--a)" id="modelo-selected-name">—</div>
-                </div>
-              </div>
-              <div class="divider" style="margin:0 0 12px"></div>
-
-              <div class="out-empty" id="out-e">
-                <div class="out-empty-ico"><svg class="ico" style="color:var(--t3)" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
-                <div class="out-empty-txt">Descreva sua ideia e clique em Gerar</div>
-              </div>
-              <div class="sk-wrap" id="sk-w">
-                <div class="sk-txt"><span class="sk-dot"></span><span id="sk-t">Interpretando sua ideia...</span></div>
-                <div class="sk" style="height:60px"></div>
-                <div class="sk" style="height:60px"></div>
-                <div class="sk" style="height:60px"></div>
-              </div>
-              <div class="out-res" id="out-r">
-                <div class="out-hd" id="out-hd-conceitos" style="display:none">
-                  <span style="font-size:10px;font-weight:700;color:var(--a);letter-spacing:.08em;text-transform:uppercase" id="out-hd-lbl">Escolha um modelo</span>
-                  <button class="btn btn-g btn-sm" onclick="regenWithCredit()" title="Consome 1 crédito">
+            <!-- STEP 1: Model picker -->
+            <div id="gen-step-models" style="display:none">
+              <div id="modelo-picker-section">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                  <div id="fmt-active-badge" style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em">20 estilos</div>
+                  <button class="btn btn-g btn-sm" style="font-size:10px" onclick="startGenPipeline()">
                     <svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
-                    Regerar <span style="color:var(--a);font-size:10px">−1</span>
+                    Mudar ideia
                   </button>
                 </div>
-                
-                <div id="img-mode-box" style="display:none;margin-top:12px;padding:12px;background:var(--ink-3);border:1px solid var(--line-1);border-radius:8px">
-                  <div style="font-size:11px;font-weight:700;color:var(--a);letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px">Modo da imagem enviada</div>
-                  <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:8px">
-                    <input type="radio" name="img-mode" value="reference" id="img-mode-ref" checked style="width:auto;margin-top:2px;accent-color:var(--a)">
-                    <div>
-                      <div style="font-size:12.5px;font-weight:600;color:var(--t0)">Usar como referência de design</div>
-                      <div style="font-size:11px;color:var(--t2)">A IA copia o estilo visual (cores, layout, tipografia) mas usa o conteúdo do prompt</div>
-                    </div>
-                  </label>
-                  <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
-                    <input type="radio" name="img-mode" value="include" id="img-mode-inc" style="width:auto;margin-top:2px;accent-color:var(--a)">
-                    <div>
-                      <div style="font-size:12.5px;font-weight:600;color:var(--t0)">Incluir imagem no design</div>
-                      <div style="font-size:11px;color:var(--t2)">A IA incorpora sua foto no layout gerado (ex: foto da nutricionista com texto ao redor)</div>
-                    </div>
-                  </label>
+                <div id="modelo-grid" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto;padding-right:2px;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent"></div>
+              </div>
+
+              <!-- After model selected: show refined prompt + generate button -->
+              <div id="modelo-selected-info" style="display:none;margin-top:12px">
+                <div style="padding:8px 12px;background:rgba(245,197,24,.06);border:1px solid rgba(245,197,24,.18);border-radius:8px;margin-bottom:10px">
+                  <div style="font-size:10px;color:var(--t2);margin-bottom:2px">Estilo selecionado</div>
+                  <div style="font-size:13px;font-weight:700;color:var(--amber)" id="modelo-selected-name">—</div>
                 </div>
-<div class="cmd-box" id="cmd-out" data-prompt="" style="word-break:break-word;font-size:11px"><span id="cmd-out-txt" style="color:var(--t3);font-style:italic">Selecione um modelo acima para refinar o prompt automaticamente</span><button class="cp-btn" onclick="cpElById('cmd-out')">Copiar</button></div>
-                <button id="btn-gerar-img" onclick="gerarImagem()" style="width:100%;margin-top:12px;background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:var(--f);font-size:14px;font-weight:700;color:#fff;letter-spacing:-.02em;box-shadow:0 4px 20px rgba(243,107,42,.3);transition:all .15s">
-                  <svg style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                  Gerar imagem com IA
+                <div id="refined-prompt-wrap" style="display:none;margin-bottom:10px">
+                  <div style="font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center">
+                    <span>Prompt refinado</span>
+                    <button class="btn btn-g btn-sm" onclick="editRefined()" style="font-size:10px;padding:2px 8px">Editar</button>
+                  </div>
+                  <div id="refined-prompt-box" style="background:var(--bg3);border:1px solid var(--b1);border-radius:7px;padding:9px 11px;font-size:11px;color:var(--t1);line-height:1.7;font-family:monospace;max-height:90px;overflow-y:auto"></div>
+                </div>
+                <button id="btn-gerar-img" onclick="gerarImagem()" style="width:100%;background:var(--a);border:none;border-radius:8px;padding:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--f);font-size:14px;font-weight:700;color:#fff;letter-spacing:-.02em;transition:opacity .15s">
+                  <svg style="width:17px;height:17px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  Gerar imagem
                 </button>
               </div>
+
+              <!-- Empty state -->
+              <div id="out-e" style="text-align:center;padding:32px 12px;color:var(--t3)">
+                <svg style="width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.5;display:block;margin:0 auto 8px" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <div style="font-size:12px">Escolha um estilo acima</div>
+              </div>
+
+              <!-- Skeleton -->
+              <div class="sk-wrap" id="sk-w">
+                <div class="sk-txt"><span class="sk-dot"></span><span id="sk-t">Refinando...</span></div>
+                <div class="sk" style="height:40px;margin-top:8px"></div>
+                <div class="sk" style="height:40px;margin-top:6px"></div>
+              </div>
             </div>
 
-            <!-- tab: imagem gerada -->
-            <div id="out-tab-imagem" style="display:none">
-              <div class="img-preview-empty" id="img-preview-empty">
-                <svg style="width:28px;height:28px;fill:none;stroke:var(--t3);stroke-width:1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                Gere uma imagem na aba Conceitos
-              </div>
-              <div class="img-preview-wrap" id="img-preview-wrap">
-                <div class="img-preview-thumb" id="img-preview-thumb" onclick="openImgModal()">
-                  <!-- SVG/Canvas renderizado aqui -->
-                </div>
-                <div style="display:flex;gap:7px;margin-top:2px;flex-wrap:wrap">
-                  <button class="btn btn-p btn-sm" style="flex:1" onclick="openImgModal()">
-                    <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    Ver em tela cheia
+            <!-- STEP 2→3: Result -->
+            <div id="gen-step-result" style="display:none">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                <button class="btn btn-g btn-sm" onclick="backToModels()" style="font-size:11px">
+                  <svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+                  Trocar estilo
+                </button>
+                <div style="display:flex;gap:6px">
+                  <button class="btn btn-g btn-sm btn-icon" onclick="gerarImagem()" title="Regerar">
+                    <svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
                   </button>
-                  <button class="btn btn-s btn-sm" onclick="downloadImg()">
+                  <button class="btn btn-g btn-sm btn-icon" onclick="openImgModal()" title="Tela cheia">
+                    <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                  <button class="btn btn-p btn-sm" onclick="downloadImg()">
                     <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     Baixar
                   </button>
-                  <button class="btn btn-s btn-sm btn-icon" onclick="gerarImagem()" title="Regerar imagem">
-                    <svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
-                  </button>
-                  <button class="btn btn-s btn-sm" onclick="saveImageToMemoryBank()" title="Salvar no banco de memória visual" style="background:var(--amber-10);border-color:var(--amber-18);color:var(--amber)">
-                    <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-                    Salvar no banco
-                  </button>
                 </div>
               </div>
-              <!-- loading state -->
-              <div class="img-gen-loading" id="img-gen-loading" style="display:none">
-                <div class="img-gen-spin"></div>
-                <div class="img-gen-txt">Gerando imagem com IA...</div>
-                <div class="img-gen-stage" id="img-gen-stage">Aplicando identidade da marca...</div>
+
+              <!-- Loading -->
+              <div id="img-gen-loading" style="display:none;flex-direction:column;align-items:center;padding:48px 16px;gap:12px">
+                <div style="width:32px;height:32px;border:3px solid var(--b1);border-top-color:var(--a);border-radius:50%;animation:spin .7s linear infinite"></div>
+                <div id="img-gen-stage" style="font-size:12px;font-weight:600;color:var(--t1);text-align:center">Criando composição...</div>
+              </div>
+
+              <!-- Carousel slides -->
+              <div id="carousel-slides-wrap" style="display:none"></div>
+
+              <!-- Single image -->
+              <div id="img-preview-wrap" style="display:none">
+                <div id="img-preview-thumb" onclick="openImgModal()" style="cursor:pointer;border-radius:10px;overflow:hidden;border:1px solid var(--b1);background:var(--bg)"></div>
+                <button onclick="saveImageToMemoryBank()" style="width:100%;margin-top:8px;background:rgba(245,197,24,.06);border:1px solid rgba(245,197,24,.18);border-radius:8px;padding:8px;cursor:pointer;font-family:var(--f);font-size:11px;font-weight:600;color:var(--amber);display:flex;align-items:center;justify-content:center;gap:6px">
+                  <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                  Salvar no banco visual
+                </button>
+              </div>
+
+              <!-- Empty state -->
+              <div id="img-preview-empty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 12px;color:var(--t3);gap:8px;text-align:center">
+                <svg style="width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <div style="font-size:12px">Gere uma imagem</div>
               </div>
             </div>
 
+            <!-- Legacy compatibility stubs -->
+            <div id="out-tab-conceitos" style="display:none"></div>
+            <div id="out-tab-imagem" style="display:none"></div>
+            <div id="out-hd-conceitos" style="display:none"></div>
+            <div id="out-r" style="display:none"></div>
+            <div id="img-mode-box" style="display:none"></div>
+            <div id="cmd-out" data-prompt="" style="display:none"><span id="cmd-out-txt"></span></div>
           </div>
         </div>
-      </div>
-    </div>
 
     <!-- history -->
     <div class="pg" id="pg-history">
       <div class="pg-hd">
         <div>
           <div class="pg-title">Histórico</div>
-          <div class="pg-sub">Todos os conteúdos gerados</div>
+          <div class="pg-sub">Todo conteúdo gerado — acesse, copie ou baixe</div>
         </div>
         <div style="display:flex;gap:8px">
-          <button id="hist-tab-img" class="btn btn-p btn-sm" onclick="switchHistTab('img')">Imagens geradas</button>
-          <button id="hist-tab-txt" class="btn btn-g btn-sm" onclick="switchHistTab('txt')">Conteúdo escrito</button>
+          <button id="hist-tab-img" class="btn btn-p btn-sm" onclick="switchHistTab('img')">Imagens</button>
+          <button id="hist-tab-txt" class="btn btn-g btn-sm" onclick="switchHistTab('txt')">Textos</button>
         </div>
       </div>
       <div class="hist-filt" id="hist-filt-img">
-        <button class="btn btn-p btn-sm">Todos</button>
-        <button class="btn btn-g btn-sm">Post</button>
-        <button class="btn btn-g btn-sm">Carrossel</button>
-        <button class="btn btn-g btn-sm">Anúncio</button>
-        <button class="btn btn-g btn-sm">Instagram</button>
-        <button class="btn btn-g btn-sm">LinkedIn</button>
+        <button class="btn btn-p btn-sm" onclick="histFilter(this,'','')">Todos</button>
+        <button class="btn btn-g btn-sm" onclick="histFilter(this,'post','')">Post</button>
+        <button class="btn btn-g btn-sm" onclick="histFilter(this,'carrossel','')">Carrossel</button>
+        <button class="btn btn-g btn-sm" onclick="histFilter(this,'anuncio','')">Anúncio</button>
+        <button class="btn btn-g btn-sm" onclick="histFilter(this,'story','')">Story</button>
+        <button class="btn btn-g btn-sm" onclick="histFilter(this,'','instagram')">Instagram</button>
+        <button class="btn btn-g btn-sm" onclick="histFilter(this,'','linkedin')">LinkedIn</button>
       </div>
-      <div id="hist-sect-img"><div class="g-hist" id="hist-img-grid">
-        <div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:16px 0;color:var(--t3)"><div style="width:14px;height:14px;border:2px solid var(--b2);border-top-color:var(--a);border-radius:50%;animation:spin .7s linear infinite"></div></div>
-      <div id="hist-sect-img" style="display:block"></div>
-      <div id="hist-sect-txt" style="display:none">
-        <div class="sec-lbl" style="margin-top:16px">Conteúdo escrito gerado pelos agentes</div>
-        <div id="hist-txt-grid" class="g-hist" style="margin-top:0">
-          <div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--t3);font-size:12px">
-            Nenhum conteúdo escrito no histórico ainda.
-            Use os Agentes de Conteúdo para gerar legendas, roteiros e posts.
+      <div id="hist-sect-img">
+        <div class="g-hist" id="hist-img-grid">
+          <div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:16px 0;color:var(--t3)">
+            <div style="width:14px;height:14px;border:2px solid var(--b2);border-top-color:var(--a);border-radius:50%;animation:spin .7s linear infinite"></div>
+            Carregando...
           </div>
         </div>
       </div>
- Carregando histórico...</div>
+      <div id="hist-sect-txt" style="display:none">
+        <div id="hist-txt-list" style="display:flex;flex-direction:column;gap:8px;margin-top:4px"></div>
       </div>
     </div>
+
+    <!-- History detail modal -->
+    <div id="hist-modal-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(6px);z-index:9800;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .2s">
+      <div style="background:var(--bg1);border:1px solid var(--b2);border-radius:14px;width:100%;max-width:680px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.6)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--b1);flex-shrink:0">
+          <div>
+            <div style="font-size:10px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.07em" id="hm-badge">—</div>
+            <div style="font-size:15px;font-weight:700;letter-spacing:-.3px;margin-top:2px" id="hm-title">—</div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <button id="hm-dl-btn" class="btn btn-p btn-sm" onclick="histModalDownload()" style="display:none">
+              <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Baixar JPG
+            </button>
+            <button id="hm-copy-btn" class="btn btn-g btn-sm" onclick="histModalCopy()" style="display:none">
+              <svg class="ico ico-sm" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copiar
+            </button>
+            <button class="btn btn-g btn-sm" onclick="closeHistModal()" style="font-size:16px;font-weight:300">×</button>
+          </div>
+        </div>
+        <div id="hm-body" style="overflow-y:auto;flex:1;padding:20px"></div>
+        <div style="padding:12px 20px;border-top:1px solid var(--b1);display:flex;gap:8px;align-items:center;flex-shrink:0">
+          <div style="font-size:10px;color:var(--t3);flex:1" id="hm-meta"></div>
+          <button class="btn btn-g btn-sm" onclick="closeHistModal()">Fechar</button>
+        </div>
+      </div>
+    </div>
+
 
     <!-- profile -->
     <div class="pg" id="pg-profile">
@@ -7420,6 +7501,25 @@ function selSlides(el, n) {
   document.querySelectorAll('.sc-btn').forEach(function(b) { b.classList.remove('on'); });
   el.classList.add('on');
 }
+function _setGenStep(n) {
+  for (var i = 1; i <= 3; i++) {
+    var el = document.getElementById('gstep-' + i);
+    if (!el) continue;
+    el.classList.remove('active', 'done');
+    if (i < n) el.classList.add('done');
+    else if (i === n) el.classList.add('active');
+  }
+}
+
+function backToModels() {
+  var stepModels = document.getElementById('gen-step-models');
+  var stepResult = document.getElementById('gen-step-result');
+  if (stepModels) stepModels.style.display = 'block';
+  if (stepResult) stepResult.style.display = 'none';
+  _setGenStep(1);
+}
+
+
 async function sendFeedback(slug, rating, btnEl) {
   try {
     const genId = (window._lastGenId && window._lastGenId[slug]) || '';
@@ -7554,26 +7654,81 @@ async function loadHistory() {
 
 
 function openHistCard(el, name, format, network, svgData, textResult) {
+  const modal = document.getElementById('hist-modal-bg');
+  const hmTitle = document.getElementById('hm-title');
+  const hmBadge = document.getElementById('hm-badge');
+  const hmBody  = document.getElementById('hm-body');
+  const hmMeta  = document.getElementById('hm-meta');
+  const hmDl    = document.getElementById('hm-dl-btn');
+  const hmCopy  = document.getElementById('hm-copy-btn');
+  if (!modal) return;
+
+  hmTitle.textContent = name || format;
+  hmBadge.textContent = (format || '').toUpperCase() + (network ? ' · ' + network.toUpperCase() : '');
+
   if (svgData && svgData.trim().startsWith('<svg')) {
-    // Image generation — show in modal
-    window._currentSVG = svgData;
-    _currentSVG = svgData;
-    _currentImgName = 'autopostt-hist-' + Date.now();
-    openImgModal();
+    // Image
+    window._histModalSvg = svgData;
+    hmBody.innerHTML = '<div style="border-radius:10px;overflow:hidden;border:1px solid var(--b1)">' + svgData + '</div>';
+    hmDl.style.display = 'flex';
+    hmCopy.style.display = 'none';
+    hmMeta.textContent = 'Clique em Baixar para salvar em JPG';
   } else if (textResult) {
-    // Text agent result — show in a simple overlay
-    const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9800;display:flex;align-items:center;justify-content:center;padding:24px';
-    overlay.innerHTML = `<div style="background:var(--ink-3,#151a1f);border:1px solid var(--line-2,rgba(255,255,255,.1));border-radius:12px;padding:28px;max-width:640px;width:100%;max-height:80vh;overflow-y:auto;position:relative">
-      <button onclick="this.closest('[style]').remove()" style="position:absolute;top:12px;right:12px;background:rgba(255,255,255,.1);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:18px">×</button>
-      <div style="font-size:10px;font-weight:700;color:var(--a,#F06B28);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">${esc(format)} · ${esc(network)}</div>
-      <div style="font-size:15px;font-weight:700;margin-bottom:16px;letter-spacing:-.2px">${esc(name)}</div>
-      <div style="font-size:13px;line-height:1.8;color:var(--t1,#9ba3ad);white-space:pre-wrap">${esc(textResult)}</div>
-    </div>`;
-    overlay.onclick = function(e){ if(e.target===overlay) overlay.remove(); };
-    document.body.appendChild(overlay);
+    // Text
+    window._histModalText = textResult;
+    hmBody.innerHTML = '<div style="font-size:13px;line-height:1.85;color:var(--t1);white-space:pre-wrap">' + esc(textResult) + '</div>';
+    hmDl.style.display = 'none';
+    hmCopy.style.display = 'flex';
+    hmMeta.textContent = format + ' · ' + network;
+  } else {
+    hmBody.innerHTML = '<div style="color:var(--t3);text-align:center;padding:40px;font-size:13px">Conteúdo não disponível neste registro.</div>';
+    hmDl.style.display = 'none';
+    hmCopy.style.display = 'none';
   }
+
+  modal.style.display = 'flex';
+  setTimeout(() => modal.style.opacity = '1', 10);
 }
+
+function closeHistModal() {
+  const modal = document.getElementById('hist-modal-bg');
+  if (modal) modal.style.display = 'none';
+}
+
+function histModalDownload() {
+  const svg = window._histModalSvg;
+  if (!svg) return;
+  window._currentSVG = svg;
+  _currentSVG = svg;
+  _currentImgName = 'autopostt-hist-' + Date.now();
+  downloadImg();
+}
+
+function histModalCopy() {
+  const txt = window._histModalText;
+  if (!txt) return;
+  navigator.clipboard.writeText(txt).then(function() {
+    toast('Texto copiado!', 'ok');
+  }).catch(function() {
+    const ta = document.createElement('textarea');
+    ta.value = txt;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    toast('Texto copiado!', 'ok');
+  });
+}
+
+function histFilter(btn, format, network) {
+  document.querySelectorAll('.hist-filt .btn').forEach(function(b) { b.className = 'btn btn-g btn-sm'; });
+  btn.className = 'btn btn-p btn-sm';
+  _histFilter = {};
+  if (format) _histFilter.format = format;
+  if (network) _histFilter.network = network;
+  renderHistory();
+}
+
 
 function switchHistTab(tab) {
   document.getElementById('hist-tab-img').className = tab==='img' ? 'btn btn-p btn-sm' : 'btn btn-g btn-sm';
@@ -7584,39 +7739,68 @@ function switchHistTab(tab) {
   if (txtSection) txtSection.style.display = tab==='txt' ? 'block' : 'none';
 }
 function renderHistory() {
-  const grid = document.querySelector('#pg-history .g-hist');
-  let gens = _histAll;
-  if (_histFilter.format) gens = gens.filter(g => g.format === _histFilter.format);
-  if (_histFilter.network) gens = gens.filter(g => g.network === _histFilter.network);
+  // Images
+  const grid = document.getElementById('hist-img-grid');
+  const txtList = document.getElementById('hist-txt-list');
+  let gens = _histAll || [];
+  if (_histFilter && _histFilter.format) gens = gens.filter(function(g) { return g.format === _histFilter.format; });
+  if (_histFilter && _histFilter.network) gens = gens.filter(function(g) { return g.network === _histFilter.network; });
 
-  if (!gens.length) {
-    grid.innerHTML = `
-      <div style="grid-column:1/-1;text-align:center;padding:48px 0;color:var(--t3)">
-        <div style="font-size:13px;margin-bottom:12px">Nenhuma geração encontrada</div>
-        <button class="btn btn-p btn-sm" onclick="navP('generate')">Criar agora</button>
-      </div>
-    `;
-    return;
+  const imgGens = gens.filter(function(g) { return g.svg_data && g.svg_data.trim().startsWith('<svg'); });
+  const txtGens = gens.filter(function(g) { return !g.svg_data || !g.svg_data.trim().startsWith('<svg'); });
+
+  // Render image grid
+  if (grid) {
+    if (!imgGens.length) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px 0;color:var(--t3)"><div style="font-size:13px;margin-bottom:12px">Nenhuma imagem encontrada</div><button class="btn btn-p btn-sm" onclick="navP('generate')">Criar agora</button></div>';
+    } else {
+      grid.innerHTML = imgGens.slice(0, 24).map(function(g) {
+        var svg = g.svg_data || '';
+        var name = esc(g.concept_name || g.format || '');
+        var fmt  = g.format || '';
+        var net  = g.network || '';
+        var svgEsc = esc(svg);
+        return '<div class="hist-card" style="cursor:pointer" onclick="openHistCard(this,'' + name + '','' + fmt + '','' + net + '','' + svgEsc + '','')">'
+          + '<div class="hist-thumb" style="position:relative;overflow:hidden">'
+          + '<div class="hist-thumb-inner hist-thumb-svg" style="transform:scale(0.18);transform-origin:top left;width:556%;height:556%;pointer-events:none">' + svg + '</div>'
+          + '</div>'
+          + '<div class="hist-info">'
+          + '<div class="hist-name">' + name + '</div>'
+          + '<div class="hist-meta"><span class="badge ' + fmtBadge(fmt) + '">' + fmt + '</span><span class="badge bdg-n">' + net + '</span><span class="hist-time">' + timeAgo(g.created_at) + '</span></div>'
+          + '</div>'
+          + '</div>';
+      }).join('');
+    }
   }
 
-  grid.innerHTML = gens.slice(0, 18).map(g => `
-    <div class="hist-card" style="cursor:pointer" onclick="openHistCard(this,'${esc(g.concept_name||g.format)}','${g.format}','${g.network}','${esc(g.svg_data||'')}','${esc(g.text_result||'')}')">
-      <div class="hist-thumb" style="position:relative;overflow:hidden">
-        ${g.svg_data
-          ? `<div class="hist-thumb-inner hist-thumb-svg" style="transform:scale(0.18);transform-origin:top left;width:556%;height:556%;pointer-events:none">${g.svg_data}</div>`
-          : `<div class="hist-thumb-inner">${fmtIcon(g.format)}</div>`}
-      </div>
-      <div class="hist-info">
-        <div class="hist-name">${esc(g.concept_name || g.format)}</div>
-        <div class="hist-meta">
-          <span class="badge ${fmtBadge(g.format)}">${g.format}</span>
-          <span class="badge bdg-n">${g.network}</span>
-          <span class="hist-time">${timeAgo(g.created_at)}</span>
-        </div>
-      </div>
-    </div>
-  `).join('');
+  // Render text list
+  if (txtList) {
+    if (!txtGens.length) {
+      txtList.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t3);font-size:12px">Nenhum conteúdo de texto ainda. Use os agentes para gerar.</div>';
+    } else {
+      txtList.innerHTML = txtGens.slice(0, 30).map(function(g) {
+        var name = esc(g.concept_name || g.feature || g.format || 'Conteúdo');
+        var fmt  = g.format || g.feature || '';
+        var net  = g.network || '';
+        var txt  = esc(g.text_result || g.prompt || '');
+        var preview = (g.text_result || g.prompt || '').slice(0, 120);
+        return '<div class="hist-txt-item" onclick="openHistCard(this,'' + name + '','' + fmt + '','' + net + '','','' + txt + '')">'
+          + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">'
+          + '<div style="flex:1;min-width:0">'
+          + '<div style="font-size:13px;font-weight:600;color:var(--t0);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + name + '</div>'
+          + '<div style="font-size:12px;color:var(--t2);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">' + esc(preview) + '</div>'
+          + '</div>'
+          + '<div style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px">'
+          + '<div style="display:flex;gap:4px"><span class="badge ' + fmtBadge(fmt) + '">' + fmt + '</span><span class="badge bdg-n">' + net + '</span></div>'
+          + '<span style="font-size:10px;color:var(--t3)">' + timeAgo(g.created_at) + '</span>'
+          + '</div>'
+          + '</div>'
+          + '</div>';
+      }).join('');
+    }
+  }
 }
+
 
 // wire up history filter buttons
 document.addEventListener('DOMContentLoaded', () => {
@@ -7938,8 +8122,16 @@ function startGenPipeline() {
   }
 
   _ensureModelGrid();
+
+  // Show new step-based UI
+  var stepModels = document.getElementById('gen-step-models');
+  var stepResult = document.getElementById('gen-step-result');
+  if (stepModels) stepModels.style.display = 'block';
+  if (stepResult) stepResult.style.display = 'none';
+  _setGenStep(1);
+
+  // Legacy compat
   switchOutTab('conceitos');
-  toast('Escolha o modelo e clique em "Gerar imagem".', 'ok');
 }
 
 function regenWithCredit() {
@@ -8114,7 +8306,14 @@ async function gerarImagem() {
     const thumb = document.getElementById('img-preview-thumb');
     if (thumb) thumb.innerHTML = svgCode;
     document.getElementById('img-gen-loading').style.display = 'none';
-    document.getElementById('img-preview-wrap')?.classList.add('vis');
+    var pw = document.getElementById('img-preview-wrap');
+    if (pw) { pw.style.display = 'block'; pw.classList.add('vis'); }
+    // Show result step
+    var stepResult = document.getElementById('gen-step-result');
+    if (stepResult) stepResult.style.display = 'block';
+    var stepModels = document.getElementById('gen-step-models');
+    if (stepModels) stepModels.style.display = 'none';
+    _setGenStep(3);
     toast('Imagem gerada!', 'ok');
     if (me) { me.quota_used = (me.quota_used||0)+1; updateQuota(); }
   } catch(e) {
@@ -8140,6 +8339,12 @@ function showGenError(msg) {
 }
 
 function _showCarouselOutput(total) {
+  // Show result step
+  var stepResult = document.getElementById('gen-step-result');
+  var stepModels = document.getElementById('gen-step-models');
+  if (stepResult) stepResult.style.display = 'block';
+  if (stepModels) stepModels.style.display = 'none';
+  _setGenStep(3);
   var tab = document.getElementById('out-tab-imagem');
   var empty = document.getElementById('img-preview-empty');
   var wrap = document.getElementById('img-preview-wrap');
@@ -10477,6 +10682,8 @@ function selectModel(idx) {
   var list = MODELS[_modelFmt] || [];
   _selectedModel        = list[idx];
   window._selectedModel = _selectedModel;
+  // Advance to step 2
+  _setGenStep(2);
 
   var cards = document.querySelectorAll('#modelo-grid > div');
   for (var i = 0; i < cards.length; i++) {
