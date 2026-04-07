@@ -6294,6 +6294,13 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
               </div>
             </div>
 
+            <!-- Initial state (before clicking generate) -->
+            <div id="gen-initial-state" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;gap:10px">
+              <svg style="width:36px;height:36px;fill:none;stroke:var(--t3);stroke-width:1.2;opacity:.5" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <div style="font-size:13px;font-weight:600;color:var(--t2)">Descreva sua ideia</div>
+              <div style="font-size:11px;color:var(--t3);max-width:180px;line-height:1.6">Preencha os campos ao lado e clique em <b style="color:var(--t2)">Gerar conteúdo com IA</b></div>
+            </div>
+
             <!-- STEP 1: Model picker -->
             <div id="gen-step-models" style="display:none">
               <div id="modelo-picker-section">
@@ -6306,8 +6313,6 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                 </div>
                 <div id="modelo-grid" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto;padding-right:2px;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent"></div>
               </div>
-
-              <!-- After model selected: show refined prompt + generate button -->
               <div id="modelo-selected-info" style="display:none;margin-top:12px">
                 <div style="padding:8px 12px;background:rgba(245,197,24,.06);border:1px solid rgba(245,197,24,.18);border-radius:8px;margin-bottom:10px">
                   <div style="font-size:10px;color:var(--t2);margin-bottom:2px">Estilo selecionado</div>
@@ -6325,14 +6330,9 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                   Gerar imagem
                 </button>
               </div>
-
-              <!-- Empty state -->
-              <div id="out-e" style="text-align:center;padding:32px 12px;color:var(--t3)">
-                <svg style="width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.5;display:block;margin:0 auto 8px" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <div id="out-e" style="display:none;text-align:center;padding:24px 12px;color:var(--t3)">
                 <div style="font-size:12px">Escolha um estilo acima</div>
               </div>
-
-              <!-- Skeleton -->
               <div class="sk-wrap" id="sk-w">
                 <div class="sk-txt"><span class="sk-dot"></span><span id="sk-t">Refinando...</span></div>
                 <div class="sk" style="height:40px;margin-top:8px"></div>
@@ -6340,7 +6340,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
               </div>
             </div>
 
-            <!-- STEP 2→3: Result -->
+            <!-- STEP 2-3: Result -->
             <div id="gen-step-result" style="display:none">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
                 <button class="btn btn-g btn-sm" onclick="backToModels()" style="font-size:11px">
@@ -6360,17 +6360,11 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                   </button>
                 </div>
               </div>
-
-              <!-- Loading -->
-              <div id="img-gen-loading" style="display:none;flex-direction:column;align-items:center;padding:48px 16px;gap:12px">
+              <div id="img-gen-loading" style="display:none;flex-direction:column;align-items:center;padding:40px 16px;gap:12px">
                 <div style="width:32px;height:32px;border:3px solid var(--b1);border-top-color:var(--a);border-radius:50%;animation:spin .7s linear infinite"></div>
                 <div id="img-gen-stage" style="font-size:12px;font-weight:600;color:var(--t1);text-align:center">Criando composição...</div>
               </div>
-
-              <!-- Carousel slides -->
               <div id="carousel-slides-wrap" style="display:none"></div>
-
-              <!-- Single image -->
               <div id="img-preview-wrap" style="display:none">
                 <div id="img-preview-thumb" onclick="openImgModal()" style="cursor:pointer;border-radius:10px;overflow:hidden;border:1px solid var(--b1);background:var(--bg)"></div>
                 <button onclick="saveImageToMemoryBank()" style="width:100%;margin-top:8px;background:rgba(245,197,24,.06);border:1px solid rgba(245,197,24,.18);border-radius:8px;padding:8px;cursor:pointer;font-family:var(--f);font-size:11px;font-weight:600;color:var(--amber);display:flex;align-items:center;justify-content:center;gap:6px">
@@ -6378,15 +6372,13 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                   Salvar no banco visual
                 </button>
               </div>
-
-              <!-- Empty state -->
               <div id="img-preview-empty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 12px;color:var(--t3);gap:8px;text-align:center">
                 <svg style="width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                 <div style="font-size:12px">Gere uma imagem</div>
               </div>
             </div>
 
-            <!-- Legacy compatibility stubs -->
+            <!-- Legacy stubs -->
             <div id="out-tab-conceitos" style="display:none"></div>
             <div id="out-tab-imagem" style="display:none"></div>
             <div id="out-hd-conceitos" style="display:none"></div>
@@ -8404,6 +8396,7 @@ async function gerarImagem() {
   var _wrapEl = document.getElementById('img-preview-wrap');
   if (_wrapEl) { _wrapEl.style.display = 'none'; _wrapEl.classList.remove('vis'); }
   document.getElementById('img-gen-loading').style.display = 'flex';
+  showGenOverlay();
 
 
   const stageEl = document.getElementById('img-gen-stage');
@@ -8507,9 +8500,11 @@ async function gerarImagem() {
     var stepModels = document.getElementById('gen-step-models');
     if (stepModels) stepModels.style.display = 'none';
     _setGenStep(3);
+    hideGenOverlay();
     toast('Imagem gerada!', 'ok');
     if (me) { me.quota_used = (me.quota_used||0)+1; updateQuota(); }
   } catch(e) {
+    hideGenOverlay();
     clearInterval(iv);
     clearGenLoading();
     showGenError(e.message);
@@ -10690,6 +10685,94 @@ async function obFinish() {
 
 
 
+
+// ─── AGENT PERSONALITY ────────────────────────────────────────────────────────
+
+var _AGENT_NET_NAMES = { ig:'Instagram', li:'LinkedIn', yt:'YouTube', tt:'TikTok' };
+
+var _REFINE_MSGS = [
+  'Deixa eu ver essa ideia... calma que to lendo.',
+  'Ok ok, entendi o que você quer. Me dá um segundo.',
+  'Boa ideia. Agora me deixa trabalhar em paz por um instante.',
+  'Acionando o estrategista interno. Segura as pontas.',
+  'Analisando... você podia ter me dado mais informação mas vai lá.',
+];
+var _REFINE_STAGES = ['Acionando estrategista','Analisando narrativa','Calibrando tom de voz','Ajustando para seu nicho'];
+
+var _GEN_MSGS_BY_FMT = {
+  post:[
+    'Olha eu novamente aqui, você não me dá descanso... Fica em paz, já estou gerando seu <b>post único</b> para o <b>{net}</b>, aguenta as pontas aí que eu não sou de ferro.',
+    'De novo? Tá bom... Gerando seu <b>post único</b> pro <b>{net}</b>. Vou fazer bonito.',
+    'Mais um <b>post único</b> pro <b>{net}</b>. Exatamente o que eu queria fazer agora. Bora.',
+  ],
+  carrossel:[
+    'Carrossel pro <b>{net}</b>? Vários slides de uma vez? Tá bom, sou fera nisso. Montando agora.',
+    'Um carrossel completo pro <b>{net}</b>. Gerando cada slide.',
+  ],
+  story:[
+    'Story pro <b>{net}</b>? Vertical, rápido, impactante. Boa escolha. Já to fazendo.',
+  ],
+  anuncio:[
+    'Anúncio pro <b>{net}</b>? Vou fazer um que a galera não consegue ignorar.',
+  ],
+  thumb:[
+    'Thumbnail pro <b>{net}</b>. Precisa parar o scroll né? Eu sei o que fazer.',
+  ],
+  banner:[
+    'Banner pro <b>{net}</b>. Profissional, elegante, na sua cara. Criando agora.',
+  ],
+};
+var _GEN_STAGES = ['Compondo layout','Aplicando paleta da marca','Ajustando tipografia','Refinando composição','Finalizando'];
+
+function _apick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function showRefineOverlay() {
+  var o = document.getElementById('agent-refine-overlay');
+  var m = document.getElementById('agent-refine-msg');
+  var s = document.getElementById('agent-refine-stage');
+  if (!o) return;
+  if (m) m.textContent = _apick(_REFINE_MSGS);
+  if (s) s.textContent = _REFINE_STAGES[0];
+  o.style.display = 'flex';
+  var si = 0, iv = setInterval(function() {
+    si++; if (si >= _REFINE_STAGES.length) { clearInterval(iv); return; }
+    if (s) s.textContent = _REFINE_STAGES[si];
+  }, 900);
+  o._iv = iv;
+}
+
+function hideRefineOverlay() {
+  var o = document.getElementById('agent-refine-overlay');
+  if (!o) return;
+  if (o._iv) clearInterval(o._iv);
+  o.style.display = 'none';
+}
+
+function showGenOverlay() {
+  var fmt = (typeof _currentFmt !== 'undefined' ? _currentFmt : 'post') || 'post';
+  var net = (typeof _currentNet !== 'undefined' ? _currentNet : 'ig') || 'ig';
+  var o = document.getElementById('agent-gen-overlay');
+  var m = document.getElementById('agent-gen-msg');
+  var s = document.getElementById('agent-gen-stage');
+  if (!o) return;
+  var msgs = _GEN_MSGS_BY_FMT[fmt] || _GEN_MSGS_BY_FMT['post'];
+  var netName = _AGENT_NET_NAMES[net] || 'Instagram';
+  if (m) m.innerHTML = _apick(msgs).replace(/{net}/g, netName);
+  if (s) s.textContent = _GEN_STAGES[0];
+  o.style.display = 'flex';
+  var si = 0, iv = setInterval(function() {
+    si++; if (si >= _GEN_STAGES.length) { clearInterval(iv); return; }
+    if (s) s.textContent = _GEN_STAGES[si];
+  }, 1200);
+  o._iv = iv;
+}
+
+function hideGenOverlay() {
+  var o = document.getElementById('agent-gen-overlay');
+  if (!o) return;
+  if (o._iv) clearInterval(o._iv);
+  o.style.display = 'none';
+}
 </script>
 
   <!-- Image fullscreen modal -->
@@ -10901,6 +10984,7 @@ async function _refineWithModel(model) {
   const rawInput = (window._rawInput || document.getElementById('gen-in')?.value || '').trim();
   if (!rawInput || !model) return;
 
+  showRefineOverlay();
 
   // Paleta da marca
   const p = me || {};
@@ -10957,6 +11041,7 @@ async function _refineWithModel(model) {
 
     toast('Prompt refinado! Clique em "Gerar imagem" para continuar.', 'ok');
   } catch(e) {
+    hideRefineOverlay();
     window._refinedPrompt = rawInput;
     if (box)    box.textContent = rawInput;
     if (cmdTxt) cmdTxt.textContent = rawInput;
