@@ -151,6 +151,29 @@ class Database {
     this.db.exec(`CREATE INDEX IF NOT EXISTS idx_cal_user ON calendar_posts(user_id)`);
     this.db.exec(`CREATE INDEX IF NOT EXISTS idx_cal_sched ON calendar_posts(scheduled_at)`);
 
+    // AGENT MEMORY
+    this.db.exec(`CREATE TABLE IF NOT EXISTS agent_memory (
+      user_id TEXT PRIMARY KEY,
+      summary TEXT DEFAULT '',
+      preferences TEXT DEFAULT '{}',
+      negative TEXT DEFAULT '[]',
+      positive TEXT DEFAULT '[]',
+      gen_count INTEGER DEFAULT 0,
+      last_updated TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )`);
+
+    // GENERATION FEEDBACK
+    this.db.exec(`CREATE TABLE IF NOT EXISTS generation_feedback (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      generation_id TEXT NOT NULL,
+      rating INTEGER NOT NULL,
+      note TEXT DEFAULT '',
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )`);
+
     // Seed default plans if empty
     const planCount = this.db.prepare('SELECT COUNT(*) as c FROM plans').get();
     if (planCount.c === 0) {
@@ -506,6 +529,44 @@ class Database {
 
 
   // ── QUOTA (atômico — sem race condition) ──
+  getMemory(userId) {
+    const row = this.db.prepare('SELECT * FROM agent_memory WHERE user_id = ?').get(userId);
+    if (!row) return { summary: '', preferences: {}, negative: [], positive: [], gen_count: 0 };
+    return {
+      summary:     row.summary || '',
+      preferences: this._safeJson(row.preferences, {}),
+      negative:    this._safeJson(row.negative, []),
+      positive:    this._safeJson(row.positive, []),
+      gen_count:   row.gen_count || 0,
+    };
+  }
+
+  _safeJson(str, fallback) {
+    try { return JSON.parse(str); } catch { return fallback; }
+  }
+
+  upsertMemory(userId, data) {
+    const existing = this.db.prepare('SELECT gen_count FROM agent_memory WHERE user_id = ?').get(userId);
+    const genCount = (existing ? (existing.gen_count || 0) : 0) + (data.incrementGen ? 1 : 0);
+    var upsertSql = "INSERT INTO agent_memory (user_id, summary, preferences, negative, positive, gen_count, last_updated) " +
+      "VALUES (?, ?, ?, ?, ?, ?, datetime('now')) " +
+      "ON CONFLICT(user_id) DO UPDATE SET summary=excluded.summary, preferences=excluded.preferences, " +
+      "negative=excluded.negative, positive=excluded.positive, gen_count=excluded.gen_count, last_updated=excluded.last_updated";
+    this.db.prepare(upsertSql).run(userId, data.summary || '', JSON.stringify(data.preferences || {}),
+      JSON.stringify(data.negative || []), JSON.stringify(data.positive || []), genCount);
+    return genCount;
+  }
+
+  addFeedback(userId, generationId, rating, note) {
+    this.db.prepare("INSERT INTO generation_feedback (id, user_id, generation_id, rating, note, created_at) VALUES (?, ?, ?, ?, ?, datetime('now'))").run(this._id(), userId, generationId, rating, note || '');
+  }
+
+  getRecentGenerations(userId, limit) {
+    return this.db.prepare(
+      'SELECT id, feature, format, network, concept_name, prompt, created_at FROM generations WHERE user_id = ? ORDER BY created_at DESC LIMIT ?'
+    ).all(userId, limit || 10);
+  }
+
   consumeQuota(userId) {
     const result = this.db.prepare(
       `UPDATE users SET quota_used = quota_used + 1, updated_at = datetime('now')
@@ -702,6 +763,100 @@ function callClaudeStream({ system, messages, maxTokens = 2500, onChunk, onDone,
 // ─────────────────────────────────────────────
 // AGENT SKILLS (mantido igual ao v12)
 // ─────────────────────────────────────────────
+
+// ─── AGENT MEMORY SYSTEM ──────────────────────────────────────────────────────
+
+function buildMemoryContext(memory) {
+  var parts = [];
+  if (memory.summary) parts.push('MEMORIA DO USUARIO (aprendizado acumulado):\n' + memory.summary);
+  var prefs = memory.preferences || {};
+  if (Object.keys(prefs).length > 0) {
+    var prefLines = Object.keys(prefs).map(function(k) { return '  - ' + k + ': ' + prefs[k]; }).join('\n');
+    parts.push('PREFERENCIAS APRENDIDAS:\n' + prefLines);
+  }
+  if (memory.positive && memory.positive.length > 0) {
+    var posLines = memory.positive.slice(-5).map(function(p) { return '  + ' + p; }).join('\n');
+    parts.push('O QUE FUNCIONA PARA ESTE USUARIO:\n' + posLines);
+  }
+  if (memory.negative && memory.negative.length > 0) {
+    var negLines = memory.negative.slice(-5).map(function(n) { return '  - ' + n; }).join('\n');
+    parts.push('O QUE NAO FUNCIONA (evite):\n' + negLines);
+  }
+  return parts.length > 0 ? ('\n\n--- CONTEXTO DE MEMORIA ---\n' + parts.join('\n\n') + '\n--- FIM DA MEMORIA ---') : '';
+}
+
+async function maybeSummarizeMemory(userId, genCount, recentGens) {
+  if (genCount % 5 !== 0 || genCount === 0) return;
+  if (!recentGens || recentGens.length < 3) return;
+  try {
+    var lines = recentGens.slice(0, 15).map(function(g) {
+      return '- ' + (g.feature || 'conteudo') + ' | ' + (g.format || '') + ' | ' + (g.network || '') + ' | tema: "' + ((g.prompt || '').slice(0, 80)) + '"';
+    }).join('\n');
+    var summary = await callClaudeMessages({
+      system: 'Voce e um analista de padroes de conteudo. Analise o historico e extraia insights sobre padroes, preferencias e estilo do usuario. Maximo 200 palavras. Responda em portugues.',
+      messages: [{ role: 'user', content: 'Historico:\n' + lines + '\n\nExtraia: formatos preferidos, temas recorrentes, redes usadas, padroes de conteudo.' }],
+      maxTokens: 300,
+    });
+    var currentMemory = db.getMemory(userId);
+    db.upsertMemory(userId, { summary: summary.trim(), preferences: currentMemory.preferences || {}, positive: currentMemory.positive || [], negative: currentMemory.negative || [], incrementGen: false });
+    console.log('[MEMORY] Summarized for user ' + userId);
+  } catch(e) { console.error('[MEMORY] Summary failed:', e.message); }
+}
+
+function getAgentStructure(slug) {
+  var structures = {
+    legenda: 'GERE UMA LEGENDA COMPLETA:\n\n GANCHOS (1-2 linhas): Frase que para o scroll. Numeros, contraste ou afirmacao polêmica.\n\n DESENVOLVIMENTO (3-5 paragrafos): Valor real, insight, dado concreto. Max 3 frases por paragrafo.\n\n VIRADA (1 paragrafo): O insight que muda a perspectiva.\n\n CTA (1-2 linhas): Acao especifica, nao generica.\n\n HASHTAGS (10-15): Mix nicho amplo, especifico, micro-nicho.',
+    'roteiro-reels': 'GERE ROTEIRO DE REELS (30-60s):\n\n[0-3s] GANCHO VISUAL+VERBAL: prende imediatamente\n[3-15s] PROBLEMA/CONTEXTO: dor que o publico reconhece\n[15-40s] DESENVOLVIMENTO: 3 pontos concisos com payoff\n[40-55s] VIRADA: insight principal\n[55-60s] CTA: call to action claro\n\nINCLUA indicacoes entre colchetes [camera, acao, texto na tela].',
+    'roteiro-yt': 'GERE ROTEIRO YOUTUBE:\n1. TITULO SEO (max 60 chars + variacao clickbait)\n2. THUMBNAIL CONCEPT\n3. ROTEIRO: Hook(0-30s) | Intro(30s-2min) | Desenvolvimento com timestamps | Conclusao+CTA\n4. DESCRICAO SEO com keywords e timestamps\n5. TAGS (20 relevantes)',
+    story: 'GERE SEQUENCIA DE STORIES (5-7 slides):\n\nPor slide:\nSLIDE X:\n- Tipo: [pergunta/afirmacao/revelacao/CTA]\n- Texto principal: (max 10 palavras)\n- Texto secundario: (max 15 palavras)\n- Elemento interativo: [enquete/pergunta/slider/link]\n- Visual: [cor sugerida, sticker]\n\nREGRA: cada slide cria curiosidade para o proximo.',
+    linkedin: 'GERE POST LINKEDIN:\n\nLINHA 1 (GANCHO): interrompe antes do "ver mais". Max 140 chars.\nPARAGRAFO 2: contexto ou historia que valida.\nDESENVOLVIMENTO: insights praticos, dados reais. Se lista: max 5 itens.\nCONCLUSAO: posicionamento claro, opiniao forte.\nENGAJAMENTO: pergunta que convida resposta genuina.',
+    tiktok: 'GERE ROTEIRO TIKTOK (15-60s):\n\n[0-3s] HOOK: primeiras palavras = tudo. Choca ou promete algo especifico.\n[3-20s] CONFLITO: situacao que o publico vive. Rapido. Direto.\n[20-50s] RESOLUCAO: solucao em 3 pontos, uma frase cada.\n[50-60s] CTA: "Segue para mais" ou "Comenta X se..."',
+  };
+  return structures[slug] || 'GERE O CONTEUDO SOLICITADO (' + slug + '):\nEstruture com gancho forte, desenvolvimento claro e CTA direto.';
+}
+
+async function runAgentPipeline(opts) {
+  var agent = opts.agent, input = opts.input, user = opts.user, memory = opts.memory;
+  var tomOverride = opts.tomOverride, mediaFiles = opts.mediaFiles;
+
+  var tom       = tomOverride || (user && user.tom)       || 'autoridade';
+  var nicho     = (user && user.nicho)     || 'negocios';
+  var profissao = (user && user.profissao) || 'criador de conteudo';
+  var publico   = (user && user.publico)   || 'profissionais';
+  var redes     = (user && user.redes)     || 'Instagram';
+  var estilo    = (user && user.estilo)    || 'moderno';
+  var memCtx    = buildMemoryContext(memory || { summary: '', preferences: {}, positive: [], negative: [] });
+
+  var sysStrategist = 'Voce e o ESTRATEGISTA do AutoPostt. Analisa o input e define a melhor abordagem ANTES de qualquer geracao.\n\n' +
+    'PERFIL: profissao=' + profissao + ' | nicho=' + nicho + ' | tom=' + tom + ' | publico=' + publico + ' | redes=' + redes + memCtx + '\n\n' +
+    'Entregue SEM introducoes:\nANGULO: [o angulo unico para este conteudo]\nGANCHO: [primeira linha que para o scroll, max 10 palavras]\nESTRUTURA: [como organizar para maximo impacto]\nTOM_ESPECIFICO: [nuances de tom para este conteudo]\nEVITAR: [o que nao fazer para este usuario especifico]';
+
+  var resultStrategist = await callClaude({ system: sysStrategist, userMsg: 'INPUT: "' + input + '"\nAGENTE: ' + agent + '\n\nDefina a estrategia:', maxTokens: 400 });
+  var brief = resultStrategist.text;
+
+  var sysCopywriter = 'Voce e o COPYWRITER do AutoPostt. Especialista em conteudo de alta conversao para redes sociais.\n\n' +
+    'PERFIL: profissao=' + profissao + ' | nicho=' + nicho + ' | tom=' + tom + ' | publico=' + publico + memCtx + '\n\n' +
+    'BRIEFING ESTRATEGICO (siga rigorosamente):\n' + brief + '\n\n' +
+    'REGRA: Entregue APENAS o conteudo final pronto para usar. Zero introducoes, zero explicacoes.';
+
+  var agentStructure = getAgentStructure(agent);
+  var userMsg = 'INPUT ORIGINAL: "' + input + '"\n\n' + agentStructure;
+  var messages;
+  if (mediaFiles && mediaFiles.length) {
+    var content = [];
+    mediaFiles.slice(0, 3).forEach(function(mf) {
+      if (mf.isVideo) content.push({ type: 'text', text: '[MIDIA: video "' + mf.name + '"]' });
+      else content.push({ type: 'image', source: { type: 'base64', media_type: mf.mime || 'image/jpeg', data: mf.base64 } });
+    });
+    content.push({ type: 'text', text: userMsg });
+    messages = [{ role: 'user', content: content }];
+  } else {
+    messages = [{ role: 'user', content: userMsg }];
+  }
+
+  var resultCopy = await callClaudeMessages({ system: sysCopywriter, messages: messages, maxTokens: 2500 });
+  return { content: resultCopy, brief: brief };
+}
 
 function getAgentSkill(slug, user, tomOverride) {
   const tom = tomOverride || user?.tom || 'autoridade';
@@ -1234,33 +1389,32 @@ route('DELETE', '/api/user/calendar/:id', async (req, res, params) => {
 route('POST', '/api/user/refine-prompt', async (req, res) => {
   const payload = requireAuth(req, res); if (!payload) return;
   const body = await parseBody(req);
-  const { input, format, network, refImageBase64, modelSvg, modelN, modelName, brandPalette } = body;
-  if (!input) return err(res, 'input obrigatório');
+  const { input, format, network, refImageBase64, modelSvg, modelN, modelName, brandPalette, slideCount } = body;
+  if (!input) return err(res, 'input obrigatorio');
   const user = db.getUserById(payload.id);
+  const memory = db.getMemory(payload.id);
+  const memCtx = buildMemoryContext(memory);
   const refineOpts = { modelSvg, modelN, modelName, brandPalette };
   try {
-    let messages;
-    const slideCount = parseInt(body.slideCount) || 0;
-    const isCarrossel = (body.format === 'carrossel');
+    const isCarrossel = (format === 'carrossel');
+    const nSlides = parseInt(slideCount) || 0;
     const carrosselCtx = isCarrossel
-      ? `\n\nFORMATO: CARROSSEL${slideCount > 0 ? ' de ' + slideCount + ' slides' : ' (quantidade definida pela IA — entre 3 e 7 slides)'}.\nEstruture o prompt para que o agente de imagem saiba como dividir o conteúdo em slides individuais. Cada slide = 1 ideia central. Indique claramente o arco narrativo: capa → desenvolvimento → fechamento.`
+      ? ('\n\nFORMATO: CARROSSEL' + (nSlides > 0 ? ' de ' + nSlides + ' slides' : ' (quantidade a ser definida, entre 3 e 7 slides)') + '.\nEstruture o conteudo como arco narrativo: CAPA (gancho impactante) → DESENVOLVIMENTO (uma ideia por slide) → FECHAMENTO (CTA forte). Indique claramente o que vai em cada slide.')
       : '';
     const userMsg = modelN
-      ? `Input bruto: "${input}"\n\nModelo selecionado: ${modelN} — ${modelName}\nExpanda o conteúdo com narrativa e dados reais.${carrosselCtx}\nRetorne apenas o prompt refinado:`
-      : `Input bruto: "${input}"\n\nExpanda o conteúdo, a narrativa e os dados.${carrosselCtx}\nRetorne apenas o prompt refinado:`;
+      ? ('Input bruto: "' + input + '"\n\nModelo selecionado: ' + modelN + ' — ' + modelName + '\nExpanda com narrativa e dados reais.' + carrosselCtx + '\nRetorne apenas o prompt refinado:')
+      : ('Input bruto: "' + input + '"\n\nExpanda o conteudo, a narrativa e os dados.' + carrosselCtx + '\nRetorne apenas o prompt refinado:');
+    let messages;
     if (refImageBase64) {
-      messages = [{ role:'user', content:[
-        { type:'image', source:{ type:'base64', media_type:'image/jpeg', data:refImageBase64 }},
-        { type:'text', text:userMsg }
-      ]}];
+      messages = [{ role: 'user', content: [{ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: refImageBase64 } }, { type: 'text', text: userMsg }] }];
     } else {
-      messages = [{ role:'user', content:userMsg }];
+      messages = [{ role: 'user', content: userMsg }];
     }
-    const refined = await callClaudeMessages({ system: getRefineSkill(user, refineOpts), messages, maxTokens:500 });
+    const refined = await callClaudeMessages({ system: getRefineSkill(user, refineOpts) + memCtx, messages, maxTokens: 600 });
     ok(res, { refined_prompt: refined.trim(), original: input });
-  } catch {
+  } catch(e) {
     const p = user || {};
-    ok(res, { refined_prompt: `${input} — contexto: ${p.nicho||'negócios'}, tom ${p.tom||'autoridade'}, público ${p.publico||'profissionais'}`, original: input });
+    ok(res, { refined_prompt: input + ' — contexto: ' + (p.nicho || 'negocios') + ', tom ' + (p.tom || 'autoridade') + ', publico ' + (p.publico || 'profissionais'), original: input });
   }
 });
 
@@ -1295,287 +1449,218 @@ route('POST', '/api/user/generate', async (req, res) => {
 route('POST', '/api/user/generate-content-stream', async (req, res) => {
   const payload = requireAuth(req, res); if (!payload) return;
   const { agent, input, tom, tipo, rede, mediaFiles } = await parseBody(req);
-  if (!agent || !input) { err(res, 'agent e input obrigatórios'); return; }
-
-  const user = db.getUserById(payload.id);
-  try { db.consumeQuota(payload.id); } catch(e) { err(res, e.message); return; }
-
-  // Setup SSE
-  cors(res);
-  res.writeHead(200, {
-    'Content-Type':  'text/event-stream',
-    'Cache-Control': 'no-cache',
-    'Connection':    'keep-alive',
-    'X-Accel-Buffering': 'no'
-  });
-
-  const sendEvent = (data) => {
-    try { res.write(`data: ${JSON.stringify(data)}\n\n`); }
-    catch { /* client disconnected */ }
-  };
-
-  sendEvent({ type: 'start', agent });
-
-  const system = getAgentSkill(agent, user, tom);
-  let messages;
-  if (mediaFiles && mediaFiles.length) {
-    const content = [];
-    mediaFiles.slice(0, 3).forEach(mf => {
-      if (mf.isVideo) {
-        content.push({ type:'text', text:`[MÍDIA ANEXADA: vídeo "${mf.name}"]` });
-      } else {
-        content.push({ type:'image', source:{ type:'base64', media_type: mf.mime||'image/jpeg', data: mf.base64 }});
-      }
-    });
-    content.push({ type:'text', text:input });
-    messages = [{ role:'user', content }];
-  } else {
-    messages = [{ role:'user', content:input }];
+  if (!agent || !input) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({ error: 'agent e input obrigatorios' }));
   }
+  const user   = db.getUserById(payload.id);
+  const memory = db.getMemory(payload.id);
+  res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive', 'Access-Control-Allow-Origin': '*' });
+  const send = function(type, data) {
+    const obj = Object.assign({ type: type }, data);
+    res.write('data: ' + JSON.stringify(obj) + '\n\n');
+  };
+  try {
+    try { db.consumeQuota(payload.id); } catch(e) { send('error', { message: e.message }); return res.end(); }
 
-  callClaudeStream({
-    system, messages, maxTokens: 2500,
-    onChunk(text) {
-      sendEvent({ type:'delta', text });
-    },
-    onDone(fullText, { inputTokens, outputTokens }) {
-      // Save to DB after stream completes
-      try {
-        db.addGeneration({
-          user_id: payload.id, feature: agent, format: tipo||agent,
-          network: rede||'instagram', concept_name: agent,
-          prompt: input.slice(0,200), credits_used: 1,
-          input_tokens: inputTokens, output_tokens: outputTokens
-        });
-      } catch (e) { console.error('Post-stream DB error:', e.message); }
-      sendEvent({ type:'done', length: fullText.length });
-      res.end();
-    },
-    onError(e) {
-      sendEvent({ type:'error', message: e.message });
-      res.end();
+    send('stage', { stage: 1, label: 'Estrategista analisando...' });
+
+    var tom2      = tom || (user && user.tom) || 'autoridade';
+    var nicho     = (user && user.nicho)     || 'negocios';
+    var profissao = (user && user.profissao) || 'criador de conteudo';
+    var publico   = (user && user.publico)   || 'profissionais';
+    var memCtx    = buildMemoryContext(memory);
+
+    var sysStrategist = 'Voce e o ESTRATEGISTA do AutoPostt.\nPERFIL: profissao=' + profissao + ' | nicho=' + nicho + ' | tom=' + tom2 + ' | publico=' + publico + memCtx + '\n\nEntregue SEM introducoes:\nANGULO: [angulo unico]\nGANCHO: [primeira linha, max 10 palavras]\nESTRUTURA: [como organizar]\nTOM_ESPECIFICO: [nuances de tom]\nEVITAR: [o que nao fazer]';
+
+    const stratResult = await callClaude({ system: sysStrategist, userMsg: 'INPUT: "' + input + '"\nAGENTE: ' + agent + '\n\nDefina a estrategia:', maxTokens: 400 });
+    const brief = stratResult.text;
+
+    send('stage', { stage: 2, label: 'Copywriter escrevendo...' });
+
+    var sysCopywriter = 'Voce e o COPYWRITER do AutoPostt.\nPERFIL: profissao=' + profissao + ' | nicho=' + nicho + ' | tom=' + tom2 + ' | publico=' + publico + memCtx + '\n\nBRIEFING ESTRATEGICO:\n' + brief + '\n\nREGRA: Entregue APENAS o conteudo final. Zero introducoes.';
+    var agentStructure = getAgentStructure(agent);
+    var userContent = 'INPUT ORIGINAL: "' + input + '"\n\n' + agentStructure;
+    var messages;
+    if (mediaFiles && mediaFiles.length) {
+      var parts = [];
+      mediaFiles.slice(0, 3).forEach(function(mf) {
+        if (mf.isVideo) parts.push({ type: 'text', text: '[MIDIA: "' + mf.name + '"]' });
+        else parts.push({ type: 'image', source: { type: 'base64', media_type: mf.mime || 'image/jpeg', data: mf.base64 } });
+      });
+      parts.push({ type: 'text', text: userContent });
+      messages = [{ role: 'user', content: parts }];
+    } else {
+      messages = [{ role: 'user', content: userContent }];
     }
-  });
+
+    const bodyStr = JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 2500, system: sysCopywriter, messages: messages, stream: true });
+    await new Promise(function(resolve, reject) {
+      const opts = {
+        hostname: 'api.anthropic.com', path: '/v1/messages', method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01', 'Content-Length': Buffer.byteLength(bodyStr) }
+      };
+      const req2 = https.request(opts, function(apiRes) {
+        let buf = '';
+        apiRes.on('data', function(chunk) {
+          buf += chunk.toString();
+          const lines = buf.split('\n');
+          buf = lines.pop();
+          lines.forEach(function(line) {
+            if (!line.startsWith('data: ')) return;
+            const raw = line.slice(6).trim();
+            if (raw === '[DONE]') return;
+            try {
+              const evt = JSON.parse(raw);
+              if (evt.type === 'content_block_delta' && evt.delta && evt.delta.text) {
+                send('delta', { text: evt.delta.text });
+              }
+            } catch(e) {}
+          });
+        });
+        apiRes.on('end', resolve);
+        apiRes.on('error', reject);
+      });
+      req2.on('error', reject);
+      req2.write(bodyStr);
+      req2.end();
+    });
+
+    send('done', { agent: agent, rede: rede, tipo: tipo });
+    res.end();
+
+    db.addGeneration({ user_id: payload.id, feature: agent, format: tipo || agent, network: rede || 'instagram', concept_name: agent, prompt: input.slice(0, 200), credits_used: 1 });
+    const newCount = db.upsertMemory(payload.id, { summary: memory.summary, preferences: memory.preferences, positive: memory.positive, negative: memory.negative, incrementGen: true });
+    if (newCount % 5 === 0) {
+      const recentGens = db.getRecentGenerations(payload.id, 15);
+      maybeSummarizeMemory(payload.id, newCount, recentGens).catch(function() {});
+    }
+  } catch(e) { send('error', { message: e.message }); res.end(); }
 });
 
 // BLOCO 1 — Non-streaming (preservado para compatibilidade)
 route('POST', '/api/user/generate-content', async (req, res) => {
   const payload = requireAuth(req, res); if (!payload) return;
-  const { agent, input, tom, tipo, rede, mediaFiles, visualMemoryNotes } = await parseBody(req);
-  if (!agent || !input) return err(res, 'agent e input obrigatórios');
+  const { agent, input, tom, tipo, rede, mediaFiles } = await parseBody(req);
+  if (!agent || !input) return err(res, 'agent e input obrigatorios');
   const user = db.getUserById(payload.id);
   try { db.consumeQuota(payload.id); } catch(e) { return err(res, e.message); }
+  const memory = db.getMemory(payload.id);
   try {
-    const system = getAgentSkill(agent, user, tom);
-    let messages;
-    if (mediaFiles && mediaFiles.length) {
-      const content = [];
-      mediaFiles.slice(0,3).forEach(mf => {
-        if (mf.isVideo) content.push({ type:'text', text:`[MÍDIA: vídeo "${mf.name}"]` });
-        else content.push({ type:'image', source:{ type:'base64', media_type:mf.mime||'image/jpeg', data:mf.base64 }});
-      });
-      content.push({ type:'text', text:input });
-      messages = [{ role:'user', content }];
-    } else {
-      messages = [{ role:'user', content:input }];
+    const { content: responseText } = await runAgentPipeline({ agent, input, user, memory, tomOverride: tom, mediaFiles });
+    db.addGeneration({ user_id: payload.id, feature: agent, format: tipo || agent, network: rede || 'instagram', concept_name: agent, prompt: input.slice(0, 200), credits_used: 1 });
+    const newCount = db.upsertMemory(payload.id, { summary: memory.summary, preferences: memory.preferences, positive: memory.positive, negative: memory.negative, incrementGen: true });
+    if (newCount % 5 === 0) {
+      const recentGens = db.getRecentGenerations(payload.id, 15);
+      maybeSummarizeMemory(payload.id, newCount, recentGens).catch(function() {});
     }
-    const responseText = await callClaudeMessages({ system, messages, maxTokens:2500 });
-    db.addGeneration({ user_id:payload.id, feature:agent, format:tipo||agent, network:rede||'instagram', concept_name:agent, prompt:input.slice(0,200), credits_used:1 });
-    ok(res, { content:responseText, agent, rede, tipo });
+    ok(res, { content: responseText, agent, rede, tipo });
   } catch (e) { err(res, e.message); }
 });
 
 route('POST', '/api/user/generate-image', async (req, res) => {
   const payload = requireAuth(req, res); if (!payload) return;
-  const body     = await parseBody(req);
-  const { prompt, format, network, imgMode, brandProfile, slideIndex, totalSlides, isCarrossel } = body;
-  if (!prompt) return err(res, 'prompt obrigatório');
-
+  const body = await parseBody(req);
+  const { prompt, format, network, brandProfile, slideIndex, totalSlides, isCarrossel } = body;
+  if (!prompt) return err(res, 'prompt obrigatorio');
   const user = db.getUserById(payload.id);
   try { db.consumeQuota(payload.id); } catch(e) { return err(res, e.message); }
 
-  // ── Paleta da marca ──────────────────────────────────────────────────────────
-  const bp = brandProfile?.brandPalette;
-  const rawCores = (brandProfile?.cores || user.cores || '#F5C518,#0D0D0F,#F5F4F0,#888888')
-    .split(',').map(s => s.trim()).filter(Boolean);
-  const brandPrimaria    = bp?.primaria    || rawCores[0] || '#F5C518';
-  const brandSecundaria  = bp?.secundaria  || rawCores[1] || '#0D0D0F';
-  const brandTerciaria   = bp?.terciaria   || rawCores[2] || '#F5F4F0';
-  const brandQuaternaria = bp?.quaternaria || rawCores[3] || '#888888';
+  const bp = brandProfile && brandProfile.brandPalette;
+  const rawCores = ((brandProfile && brandProfile.cores) || user.cores || '#F5C518,#0D0D0F,#F5F4F0,#888888').split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+  const brandPrimaria    = (bp && bp.primaria)    || rawCores[0] || '#F5C518';
+  const brandSecundaria  = (bp && bp.secundaria)  || rawCores[1] || '#0D0D0F';
+  const brandTerciaria   = (bp && bp.terciaria)   || rawCores[2] || '#F5F4F0';
+  const brandQuaternaria = (bp && bp.quaternaria) || rawCores[3] || '#888888';
+  const nicho     = (brandProfile && brandProfile.nicho)     || user.nicho     || 'negocios';
+  const profissao = (brandProfile && brandProfile.profissao) || user.profissao || 'criador de conteudo';
+  const estilo    = (brandProfile && brandProfile.estilo)    || user.estilo    || 'moderno';
+  const tom       = (brandProfile && brandProfile.tom)       || user.tom       || 'autoridade';
+  const publico   = (brandProfile && brandProfile.publico)   || user.publico   || 'profissionais';
+  const modelN    = (brandProfile && brandProfile.modelN)    || '';
+  const modelName = (brandProfile && brandProfile.modelName) || '';
 
-  const nicho     = brandProfile?.nicho     || user.nicho     || 'negócios';
-  const profissao = brandProfile?.profissao || user.profissao || 'criador de conteúdo';
-  const estilo    = brandProfile?.estilo    || user.estilo    || 'moderno e profissional';
-  const tom       = brandProfile?.tom       || user.tom       || 'autoridade';
-  const publico   = brandProfile?.publico   || user.publico   || 'profissionais';
-
-  const modelN    = brandProfile?.modelN    || '';
-  const modelName = brandProfile?.modelName || '';
-
-  // Dimensões por formato
   const dim = (format === 'story' || format === 'reels') ? { w: 1080, h: 1920 }
     : format === 'thumb'  ? { w: 1280, h: 720  }
     : format === 'banner' ? { w: 1584, h: 396  }
     : { w: 1080, h: 1080 };
 
-  // DNA visual por número de modelo
   const STYLE_DNA = {
-    '01': 'fundo ultra-escuro #0A0A0A, acento dourado, linha vertical esquerda decorativa, DM Sans bold',
-    '02': 'fundo branco editorial #FAFAF8, barra preta topo/rodapé, Playfair serifada grande, citação itálica',
-    '03': 'split color: metade superior na cor primária, metade inferior escura, Syne ultra-bold',
-    '04': 'fundo escuro com grid de linhas sutis, barra vertical acento esquerda, DM Sans bold, botão CTA no rodapé',
-    '05': 'fundo preto, IBM Plex Mono tamanho extremo, pseudo-código como elemento visual',
-    '06': 'fundo creme #FAF6EE, bordas douradas finas topo/rodapé, Playfair centrado, paleta warm',
-    '07': 'fundo escuro, barras de gráfico como elemento visual, Syne bold para métricas',
-    '08': 'fundo preto, Bebas Neue com glow neon na cor primária, cantos decorativos',
-    '09': 'fundo branco puro, barra lateral na cor primária, DM Sans clean e arejado',
-    '10': 'fundo escuro, Cormorant Garamond itálico, aspas decorativas gigantes, storytelling',
-    '11': 'fundo sólido na cor primária, Syne 800 em cor escura, máxima presença',
-    '12': 'fundo claro com grid de linhas como textura, barra lateral vertical, estrutura sistemática',
-    '13': 'fundo preto absoluto, Bebas Neue gigante, linha horizontal branca de separação, brutalismo',
-    '14': 'fundo creme #FDF8F2, círculos decorativos em acento baixa opacidade, Cormorant itálico',
-    '15': 'fundo verde terminal #050F05, IBM Plex Mono com glow verde #00FF41, estética hacker',
-    '16': 'fundo branco, barra magazine colorida topo/rodapé, Syne 800 editorial',
-    '17': 'fundo azul-escuro #0C0C14, círculo e triângulo geométrico, Syne com acento roxo',
-    '18': 'fundo dourado sólido, Bebas Neue em marrom escuro, linhas horizontais espessas, retro',
-    '19': 'fundo azul-noite #06080F, caixa glass borda translúcida, acento azul elétrico com glow',
-    '20': 'fundo off-white #F8F7F4, DM Serif Display itálico, linha horizontal dourada mínima',
+    '01': 'fundo ultra-escuro #0A0A0A, acento dourado, linha vertical esquerda, DM Sans bold',
+    '02': 'fundo branco editorial #FAFAF8, barra preta topo/rodape, Playfair serifada grande',
+    '03': 'split color: metade superior cor primaria, metade inferior escura, Syne ultra-bold',
+    '04': 'fundo escuro com grid de linhas, barra vertical acento esquerda, DM Sans bold',
+    '05': 'fundo preto, IBM Plex Mono tamanho extremo, pseudo-codigo como elemento visual',
+    '06': 'fundo creme #FAF6EE, bordas douradas finas, Playfair centrado, paleta warm',
+    '07': 'fundo escuro, barras de grafico como elemento visual, Syne bold para metricas',
+    '08': 'fundo preto, Bebas Neue com glow neon na cor primaria, cantos decorativos',
+    '09': 'fundo branco puro, barra lateral na cor primaria, DM Sans clean e arejado',
+    '10': 'fundo escuro, Cormorant Garamond italico, aspas decorativas gigantes',
+    '11': 'fundo solido na cor primaria, Syne 800 em cor escura, maxima presenca',
+    '12': 'fundo claro com grid de linhas como textura, barra lateral vertical',
+    '13': 'fundo preto absoluto, Bebas Neue gigante, linha horizontal branca, brutalismo',
+    '14': 'fundo creme #FDF8F2, circulos decorativos em acento, Cormorant italico',
+    '15': 'fundo verde terminal #050F05, IBM Plex Mono com glow verde #00FF41',
+    '16': 'fundo branco, barra magazine colorida topo/rodape, Syne 800 editorial',
+    '17': 'fundo azul-escuro #0C0C14, circulo e triangulo geometrico, Syne com acento roxo',
+    '18': 'fundo dourado solido, Bebas Neue em marrom escuro, linhas horizontais espessas',
+    '19': 'fundo azul-noite #06080F, caixa glass borda translucida, acento azul eletrico',
+    '20': 'fundo off-white #F8F7F4, DM Serif Display italico, linha horizontal dourada minima',
   };
   const styleDNA = modelN ? (STYLE_DNA[modelN] || '') : '';
+  const fmtLabel = ({ post:'Post', carrossel:'Carrossel', anuncio:'Anuncio', story:'Story', reels:'Reels', thumb:'Thumbnail', banner:'Banner' })[format] || 'Post';
+  const netLabel = ({ instagram:'Instagram', linkedin:'LinkedIn', youtube:'YouTube', tiktok:'TikTok', facebook:'Facebook' })[network] || 'Instagram';
 
-  const fmtLabels = { post:'Post quadrado', carrossel:'Carrossel', anuncio:'Anúncio', story:'Story vertical', reels:'Reels', thumb:'Thumbnail', banner:'Banner' };
-  const netLabels = { instagram:'Instagram', linkedin:'LinkedIn', youtube:'YouTube', tiktok:'TikTok', facebook:'Facebook' };
-
-  // ── Carousel mode: decide total slides on slide 1 ───────────────────────────
   let resolvedTotal = totalSlides || null;
-  if (isCarrossel && slideIndex === 1 && !totalSlides) {
-    // IA decides — default smart range based on content
-    resolvedTotal = 5; // will be overridden by IA if possible
-  }
-  if (!resolvedTotal) resolvedTotal = totalSlides || 1;
+  if (isCarrossel && slideIndex === 1 && !totalSlides) resolvedTotal = 5;
+  if (!resolvedTotal) resolvedTotal = 1;
 
-  // ── System prompt ────────────────────────────────────────────────────────────
-  const systemPrompt = `Você é o DESIGN AGENT do AutoPostt — especialista em criar posts para redes sociais em SVG do zero.
+  const systemPrompt = 'Voce e o DESIGN AGENT do AutoPostt — especialista em criar posts para redes sociais em SVG do zero.\n\n' +
+    'REGRAS INVIOLAVEIS:\n' +
+    '1. Retorne SOMENTE o SVG. Comece com <svg.\n' +
+    '2. Use xmlns="http://www.w3.org/2000/svg" na tag raiz.\n' +
+    '3. NUNCA use <image> com href externo.\n' +
+    '4. NUNCA use @import. Declare font-family nos atributos.\n' +
+    '5. Todo SVG deve ter viewBox declarado.\n\n' +
+    'FONTES: "DM Sans",sans-serif | "IBM Plex Mono",monospace | "Playfair Display",serif | "Cormorant Garamond",serif | "Syne",sans-serif | "Bebas Neue",sans-serif\n\n' +
+    'ESTRUTURA: 1.GANCHO(headline grande) 2.DESENVOLVIMENTO(informacao real) 3.CTA(direto) 4.IDENTIDADE(@handle no rodape)';
 
-REGRAS DE OUTPUT — INVIOLÁVEIS:
-1. Retorne SOMENTE o SVG completo. Zero texto antes ou depois. Comece com <svg.
-2. Use xmlns="http://www.w3.org/2000/svg" na tag raiz.
-3. NUNCA use <image> com href externo.
-4. NUNCA use @import de fontes. Declare font-family direto nos atributos SVG.
-5. Todo SVG deve ter viewBox declarado.
-6. Feche todos os elementos corretamente.
-
-FONTES DISPONÍVEIS:
-'DM Sans', sans-serif | 'IBM Plex Mono', monospace | 'Playfair Display', serif
-'Cormorant Garamond', serif | 'Syne', sans-serif | 'Bebas Neue', sans-serif
-
-ESTRUTURA OBRIGATÓRIA:
-1. GANCHO — headline de impacto, 4-7 palavras, fonte grande
-2. DESENVOLVIMENTO — informação real e específica
-3. CTA — call to action direto
-4. IDENTIDADE — @handle ou nome da marca no rodapé`;
-
-  // ── User prompt — adapts for carousel slides ─────────────────────────────────
   let userPrompt;
-
   if (isCarrossel) {
-    const slideCtx = slideIndex === 1
-      ? `SLIDE 1 DE ${resolvedTotal} — CAPA DE ABERTURA:\nEste é o primeiro slide do carrossel. Deve ser o mais impactante — é o gancho visual que faz a pessoa parar o scroll e querer ver o resto. Deve conter o tema central e uma promessa clara do que vem a seguir.`
+    const slideRole = slideIndex === 1
+      ? 'SLIDE 1 DE ' + resolvedTotal + ' — CAPA: mais impactante, para o scroll, promessa clara do que vem.'
       : slideIndex === resolvedTotal
-      ? `SLIDE ${slideIndex} DE ${resolvedTotal} — SLIDE DE FECHAMENTO / CTA:\nÉste é o último slide do carrossel. Deve fechar a narrativa, reforçar a mensagem central e ter um CTA forte e direto. Pode incluir contato, @handle, convite para seguir ou oferta.`
-      : `SLIDE ${slideIndex} DE ${resolvedTotal} — SLIDE DE DESENVOLVIMENTO:\nEste slide está no meio do carrossel. Deve apresentar UMA ideia, dado ou argumento específico que aprofunda o tema. Mantenha consistência visual com os outros slides (mesmas cores e estilo). Seja direto — uma ideia por slide.`;
-
-    userPrompt = `BRIEF DO CARROSSEL:
-
-TEMA GERAL: "${prompt}"
-${slideCtx}
-
-FORMATO: Carrossel para ${netLabels[network] || 'Instagram'}
-DIMENSÕES: ${dim.w}x${dim.h}px | viewBox="0 0 ${dim.w} ${dim.h}"
-
-IDENTIDADE DE MARCA:
-Profissão: ${profissao} | Nicho: ${nicho} | Tom: ${tom} | Público: ${publico}
-
-PALETA (use EXATAMENTE estas cores):
-- Primária / acento: ${brandPrimaria}
-- Secundária / fundo: ${brandSecundaria}
-- Terciária / texto: ${brandTerciaria}
-- Quaternária / suporte: ${brandQuaternaria}
-
-${styleDNA ? `ESTILO DE REFERÊNCIA (${modelN} — ${modelName}): ${styleDNA}\n\n` : ''}REGRAS:
-1. Fundo rect cobrindo todo o viewBox com cor secundária.
-2. Consistência visual obrigatória entre todos os slides — mesmas cores, mesma família tipográfica.
-3. Margens internas mínimas de 60-80px.
-4. Hierarquia: headline 80-120px, subtítulo 30-50px, corpo 20-32px.
-5. Elemento numérico de slide: mostre "${slideIndex}/${resolvedTotal}" discretamente no canto (font-size 20-24px, cor quaternária).
-6. TODOS os textos devem ser conteúdo REAL sobre o tema — zero placeholders.
-
-Crie o slide ${slideIndex} do carrossel. Comece com <svg:`;
+      ? 'SLIDE ' + slideIndex + ' DE ' + resolvedTotal + ' — FECHAMENTO: fecha narrativa, CTA forte e direto.'
+      : 'SLIDE ' + slideIndex + ' DE ' + resolvedTotal + ' — DESENVOLVIMENTO: UMA ideia especifica, aprofunda o tema.';
+    userPrompt = 'CARROSSEL: "' + prompt + '"\n' + slideRole + '\nFORMATO: Carrossel para ' + netLabel + '\nDIMENSOES: ' + dim.w + 'x' + dim.h + 'px viewBox="0 0 ' + dim.w + ' ' + dim.h + '"\n' +
+      'MARCA: ' + profissao + ' | nicho: ' + nicho + ' | tom: ' + tom + ' | publico: ' + publico + '\n' +
+      'PALETA: primaria=' + brandPrimaria + ' secundaria=' + brandSecundaria + ' terciaria=' + brandTerciaria + ' quaternaria=' + brandQuaternaria + '\n' +
+      (styleDNA ? 'ESTILO REF (' + modelN + '): ' + styleDNA + '\n' : '') +
+      'REGRAS: fundo rect cobrindo viewBox com cor secundaria. Consistencia entre slides. Margem 60-80px. Mostre "' + slideIndex + '/' + resolvedTotal + '" no canto. Textos 100% reais sobre o tema.\nComece com <svg:';
   } else {
-    userPrompt = `BRIEF:
-
-TEMA: "${prompt}"
-FORMATO: ${fmtLabels[format] || 'Post'} para ${netLabels[network] || 'Instagram'}
-DIMENSÕES: ${dim.w}x${dim.h}px | viewBox="0 0 ${dim.w} ${dim.h}"
-
-MARCA: Profissão: ${profissao} | Nicho: ${nicho} | Tom: ${tom} | Público: ${publico} | Estilo: ${estilo}
-
-PALETA (use EXATAMENTE estas cores, nenhuma outra):
-- Primária / acento: ${brandPrimaria}
-- Secundária / fundo: ${brandSecundaria}
-- Terciária / texto: ${brandTerciaria}
-- Quaternária / suporte: ${brandQuaternaria}
-
-${styleDNA ? `ESTILO DE REFERÊNCIA (${modelN} — ${modelName}): ${styleDNA}\n\n` : ''}REGRAS:
-1. Rect de fundo cobrindo todo o viewBox com cor secundária.
-2. Primária para acentos, bordas, elementos decorativos.
-3. Terciária para headlines; quaternária para suporte.
-4. Margens mínimas 60-80px. Hierarquia: headline 80-140px, subtítulo 30-50px, corpo 20-32px.
-5. Pelo menos 1 elemento visual de destaque geométrico.
-6. Textos 100% reais sobre o tema.
-
-Crie o SVG do zero. Comece com <svg:`;
+    userPrompt = 'BRIEF: "' + prompt + '"\nFORMATO: ' + fmtLabel + ' para ' + netLabel + '\nDIMENSOES: ' + dim.w + 'x' + dim.h + 'px viewBox="0 0 ' + dim.w + ' ' + dim.h + '"\n' +
+      'MARCA: ' + profissao + ' | nicho: ' + nicho + ' | tom: ' + tom + ' | publico: ' + publico + ' | estilo: ' + estilo + '\n' +
+      'PALETA: primaria=' + brandPrimaria + ' secundaria=' + brandSecundaria + ' terciaria=' + brandTerciaria + ' quaternaria=' + brandQuaternaria + '\n' +
+      (styleDNA ? 'ESTILO REF (' + modelN + '): ' + styleDNA + '\n' : '') +
+      'REGRAS: rect fundo cor secundaria. Primaria para acentos. Terciaria texto principal. Margem 60-80px. Hierarquia headline 80-140px. Elemento geometrico de destaque. Textos 100% reais.\nComece com <svg:';
   }
 
   try {
-    const { text: rawSvg, inputTokens: ti, outputTokens: to } = await callClaude({
-      system: systemPrompt,
-      userMsg: userPrompt,
-      maxTokens: 8000,
-    });
-
+    const result = await callClaude({ system: systemPrompt, userMsg: userPrompt, maxTokens: 8000 });
     let finalSvg = '';
-    const svgMatch = rawSvg.match(/<svg[\s\S]*<\/svg>/i);
+    const svgMatch = result.text.match(/<svg[\s\S]*<\/svg>/i);
     if (svgMatch) finalSvg = svgMatch[0];
-    else if (rawSvg.trim().startsWith('<svg')) finalSvg = rawSvg.trim();
+    else if (result.text.trim().startsWith('<svg')) finalSvg = result.text.trim();
+    if (!finalSvg.includes('xmlns=')) finalSvg = finalSvg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+    if (!finalSvg.includes('viewBox')) finalSvg = finalSvg.replace('<svg', '<svg viewBox="0 0 ' + dim.w + ' ' + dim.h + '"');
+    if (!finalSvg || finalSvg.length < 200) throw new Error('SVG invalido. Tente novamente.');
 
-    if (!finalSvg.includes('xmlns='))
-      finalSvg = finalSvg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
-    if (!finalSvg.includes('viewBox'))
-      finalSvg = finalSvg.replace('<svg', `<svg viewBox="0 0 ${dim.w} ${dim.h}"`);
-
-    if (!finalSvg || finalSvg.length < 200)
-      throw new Error('SVG inválido. Tente novamente.');
-
-    db.addGeneration({
-      user_id:      payload.id,
-      feature:      isCarrossel ? 'carrossel-slide' : 'gerar-imagem',
-      format:       format  || 'post',
-      network:      network || 'instagram',
-      concept_name: (modelName || prompt).slice(0, 60),
-      prompt:       prompt.slice(0, 200),
-      svg_data:     finalSvg,
-      credits_used: 1,
-      input_tokens:  ti,
-      output_tokens: to,
-    });
+    db.addGeneration({ user_id: payload.id, feature: isCarrossel ? 'carrossel-slide' : 'gerar-imagem', format: format || 'post', network: network || 'instagram', concept_name: (modelName || prompt).slice(0, 60), prompt: prompt.slice(0, 200), svg_data: finalSvg, credits_used: 1, input_tokens: result.inputTokens, output_tokens: result.outputTokens });
 
     const responsePayload = { svg: finalSvg };
     if (isCarrossel && slideIndex === 1) responsePayload.totalSlides = resolvedTotal;
-
     ok(res, responsePayload);
-
-  } catch (e) { err(res, e.message); }
+  } catch(e) { err(res, e.message); }
 });
 
 // ─────────────────────────────────────────────
@@ -1651,6 +1736,27 @@ async function getExchangeRate() {
   if (result) _fxCache = result;
   return _fxCache;
 }
+
+route('POST', '/api/user/feedback', async (req, res) => {
+  const payload = requireAuth(req, res); if (!payload) return;
+  const { generation_id, rating, positive_note, negative_note, note } = await parseBody(req);
+  if (!generation_id || rating === undefined) return err(res, 'generation_id e rating obrigatorios');
+  try {
+    db.addFeedback(payload.id, generation_id, rating, note || '');
+    const memory = db.getMemory(payload.id);
+    const positive = (memory.positive || []).slice();
+    const negative = (memory.negative || []).slice();
+    if (rating >= 1 && positive_note) { positive.push(positive_note); if (positive.length > 20) positive.shift(); }
+    if (rating <= -1 && negative_note) { negative.push(negative_note); if (negative.length > 20) negative.shift(); }
+    db.upsertMemory(payload.id, { summary: memory.summary, preferences: memory.preferences, positive: positive, negative: negative, incrementGen: false });
+    ok(res, { ok: true });
+  } catch(e) { err(res, e.message); }
+});
+
+route('GET', '/api/user/memory', async (req, res) => {
+  const payload = requireAuth(req, res); if (!payload) return;
+  ok(res, { memory: db.getMemory(payload.id) });
+});
 
 route('GET', '/api/admin/exchange-rate', async (req, res) => {
   const payload = requireAdmin(req, res); if (!payload) return;

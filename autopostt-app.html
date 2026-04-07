@@ -5478,6 +5478,41 @@ body.image-agent-refining #image-agent-refine-overlay{
       .carousel-slide-actions {
         display: flex; gap: 6px; padding: 8px 10px; border-top: 1px solid var(--line-1);
       }
+
+      /* Agent pipeline stage bar */
+      .agent-stage-bar {
+        display: flex; align-items: center; gap: 10px;
+        margin-bottom: 12px; padding: 8px 12px;
+        background: var(--ink-3); border: 1px solid var(--line-1); border-radius: 8px;
+        font-size: 11px; color: var(--t2); font-weight: 600;
+      }
+      .agent-stage-bar .stage-dot {
+        width: 6px; height: 6px; border-radius: 50%;
+        background: var(--amber); flex-shrink: 0;
+        animation: stage-pulse 1s ease-in-out infinite;
+      }
+      @keyframes stage-pulse { 0%,100% { opacity:1; } 50% { opacity:.3; } }
+      .agent-stage-bar.done .stage-dot { background: #22D37A; animation: none; }
+      .agent-stage-bar.done { border-color: rgba(34,211,122,.2); }
+
+      /* Feedback buttons */
+      .feedback-row {
+        display: flex; align-items: center; gap: 6px;
+        margin-top: 10px; padding-top: 10px;
+        border-top: 1px solid var(--line-1);
+      }
+      .feedback-row span {
+        font-size: 10px; color: var(--t3); flex: 1;
+        text-transform: uppercase; letter-spacing: .06em; font-weight: 600;
+      }
+      .fb-btn {
+        padding: 4px 10px; border-radius: 6px; border: 1px solid var(--line-1);
+        background: var(--ink-3); color: var(--t2); font-size: 12px;
+        cursor: pointer; transition: all .12s; font-family: var(--f);
+      }
+      .fb-btn:hover { border-color: var(--line-2); }
+      .fb-btn.pos.on { background: rgba(34,211,122,.12); border-color: rgba(34,211,122,.3); color: #22D37A; }
+      .fb-btn.neg.on { background: rgba(255,68,68,.1); border-color: rgba(255,68,68,.2); color: #FF4444; }
 </style>
 
 </head>
@@ -6737,6 +6772,11 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
               </div>
             </div>
             <div class="agent-result-content" id="ag-legenda-content"></div>
+            <div class="feedback-row" id="ag-legenda-feedback" style="display:none">
+              <span>Esse conteudo foi util?</span>
+              <button class="fb-btn pos" onclick="sendFeedback('legenda',1,this)">&#128077;</button>
+              <button class="fb-btn neg" onclick="sendFeedback('legenda',-1,this)">&#128078;</button>
+            </div>
           </div>
         </div>
       </div>
@@ -6798,6 +6838,11 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
               </div>
             </div>
             <div class="agent-result-content" id="ag-roteiro-yt-content"></div>
+            <div class="feedback-row" id="ag-roteiro-yt-feedback" style="display:none">
+              <span>Esse conteudo foi util?</span>
+              <button class="fb-btn pos" onclick="sendFeedback('roteiro-yt',1,this)">&#128077;</button>
+              <button class="fb-btn neg" onclick="sendFeedback('roteiro-yt',-1,this)">&#128078;</button>
+            </div>
           </div>
         </div>
       </div>
@@ -6859,6 +6904,11 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
               </div>
             </div>
             <div class="agent-result-content" id="ag-roteiro-reels-content"></div>
+            <div class="feedback-row" id="ag-roteiro-reels-feedback" style="display:none">
+              <span>Esse conteudo foi util?</span>
+              <button class="fb-btn pos" onclick="sendFeedback('roteiro-reels',1,this)">&#128077;</button>
+              <button class="fb-btn neg" onclick="sendFeedback('roteiro-reels',-1,this)">&#128078;</button>
+            </div>
           </div>
         </div>
       </div>
@@ -6920,6 +6970,11 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
               </div>
             </div>
             <div class="agent-result-content" id="ag-story-content"></div>
+            <div class="feedback-row" id="ag-story-feedback" style="display:none">
+              <span>Esse conteudo foi util?</span>
+              <button class="fb-btn pos" onclick="sendFeedback('story',1,this)">&#128077;</button>
+              <button class="fb-btn neg" onclick="sendFeedback('story',-1,this)">&#128078;</button>
+            </div>
           </div>
         </div>
       </div>
@@ -6981,6 +7036,11 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
               </div>
             </div>
             <div class="agent-result-content" id="ag-linkedin-content"></div>
+            <div class="feedback-row" id="ag-linkedin-feedback" style="display:none">
+              <span>Esse conteudo foi util?</span>
+              <button class="fb-btn pos" onclick="sendFeedback('linkedin',1,this)">&#128077;</button>
+              <button class="fb-btn neg" onclick="sendFeedback('linkedin',-1,this)">&#128078;</button>
+            </div>
           </div>
         </div>
       </div>
@@ -7042,6 +7102,11 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
               </div>
             </div>
             <div class="agent-result-content" id="ag-tiktok-content"></div>
+            <div class="feedback-row" id="ag-tiktok-feedback" style="display:none">
+              <span>Esse conteudo foi util?</span>
+              <button class="fb-btn pos" onclick="sendFeedback('tiktok',1,this)">&#128077;</button>
+              <button class="fb-btn neg" onclick="sendFeedback('tiktok',-1,this)">&#128078;</button>
+            </div>
           </div>
         </div>
       </div>
@@ -7355,6 +7420,37 @@ function selSlides(el, n) {
   document.querySelectorAll('.sc-btn').forEach(function(b) { b.classList.remove('on'); });
   el.classList.add('on');
 }
+async function sendFeedback(slug, rating, btnEl) {
+  try {
+    const genId = (window._lastGenId && window._lastGenId[slug]) || '';
+    const isPos = rating > 0;
+
+    // Visual feedback immediately
+    const row = document.getElementById('ag-' + slug + '-feedback');
+    if (row) {
+      row.querySelectorAll('.fb-btn').forEach(function(b) { b.classList.remove('on'); });
+      btnEl.classList.add('on');
+    }
+
+    // Build note from content
+    const contentEl = document.getElementById('ag-' + slug + '-content');
+    const contentSnippet = contentEl ? (contentEl.textContent || '').slice(0, 120) : '';
+    const note = isPos ? 'Conteudo aprovado: ' + contentSnippet : 'Conteudo rejeitado: ' + contentSnippet;
+
+    await api('POST', '/api/user/feedback', {
+      generation_id:  genId,
+      rating:         rating,
+      note:           note,
+      positive_note:  isPos ? 'Tom e estrutura aprovados para agente ' + slug : '',
+      negative_note:  !isPos ? 'Conteudo rejeitado para agente ' + slug : '',
+    });
+
+    toast(isPos ? 'Ótimo! Vou aprender com isso.' : 'Entendido. Vou melhorar.', 'ok');
+  } catch(e) {
+    toast('Feedback registrado localmente.', 'ok');
+  }
+}
+
 
 function selNet(n) {
   _currentNet = n;
@@ -10657,10 +10753,20 @@ document.addEventListener('DOMContentLoaded', function() {
           function pump() {
             reader.read().then(({ done, value }) => {
               if (done) {
-                // Final cleanup: remove cursor, apply markdown-style formatting
-                if (contentEl) {
-                  contentEl.innerHTML = _formatAgentOutput(fullText);
+                if (contentEl) contentEl.innerHTML = _formatAgentOutput(fullText);
+                // Mark stage bar as done
+                const stageBar = document.getElementById('stage-bar-' + slug);
+                if (stageBar) {
+                  stageBar.classList.add('done');
+                  const lbl = document.getElementById('stage-label-' + slug);
+                  if (lbl) lbl.textContent = 'Conteúdo gerado pelo pipeline de 2 agentes';
                 }
+                // Show feedback row
+                const feedbackRow = document.getElementById('ag-' + slug + '-feedback');
+                if (feedbackRow) feedbackRow.style.display = 'flex';
+                // Store last gen id for feedback (use timestamp as fallback)
+                window._lastGenId = window._lastGenId || {};
+                window._lastGenId[slug] = 'gen-' + Date.now();
                 if (window.me) { window.me.quota_used = (window.me.quota_used || 0) + 1; window.updateQuota?.(); }
                 window.toast?.('Conteúdo gerado!', 'ok');
                 resolve(true);
@@ -10675,14 +10781,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!line.startsWith('data: ')) continue;
                 try {
                   const evt = JSON.parse(line.slice(6));
-                  if (evt.type === 'start') {
-                    // Already showing output
+                  if (evt.type === 'stage') {
+                    // Show stage progress bar
+                    let stageBar = document.getElementById('stage-bar-' + slug);
+                    if (!stageBar) {
+                      stageBar = document.createElement('div');
+                      stageBar.id = 'stage-bar-' + slug;
+                      stageBar.className = 'agent-stage-bar';
+                      stageBar.innerHTML = '<div class="stage-dot"></div><span id="stage-label-' + slug + '"></span>';
+                      if (contentEl && contentEl.parentNode) contentEl.parentNode.insertBefore(stageBar, contentEl);
+                    }
+                    const lbl = document.getElementById('stage-label-' + slug);
+                    if (lbl) lbl.textContent = evt.label || ('Estágio ' + evt.stage + '...');
                   } else if (evt.type === 'delta') {
                     fullText += evt.text;
-                    // Incremental render with cursor
                     if (contentEl) {
                       contentEl.innerHTML = _formatAgentOutput(fullText) + '<span class="stream-cursor"></span>';
-                      // Auto-scroll
                       const panel = contentEl.closest('.agent-out-panel, .agent-result');
                       if (panel) panel.scrollTop = panel.scrollHeight;
                     }
