@@ -8181,14 +8181,15 @@ function startGenPipeline() {
     emptyEl.innerHTML = `<svg style="width:28px;height:28px;fill:none;stroke:var(--t3);stroke-width:1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Escolha um modelo abaixo e clique em "Gerar imagem"`;
   }
 
-  _ensureModelGrid();
-
-  // Show new step-based UI
+  // Show new step-based UI first so modelo-grid exists in DOM
   var stepModels = document.getElementById('gen-step-models');
   var stepResult = document.getElementById('gen-step-result');
-  if (stepModels) stepModels.style.display = 'block';
   if (stepResult) stepResult.style.display = 'none';
+  if (stepModels) stepModels.style.display = 'block';
   _setGenStep(1);
+
+  // Now populate the grid (DOM element is now visible)
+  renderModelGrid();
 
   // Legacy compat
   switchOutTab('conceitos');
@@ -8268,9 +8269,18 @@ async function gerarImagem() {
     modelN: model.n, modelName: model.name, modelSvg: model.svg
   });
 
+  // Switch to result panel first so loading div is in DOM and visible
+  var _stepR = document.getElementById('gen-step-result');
+  var _stepM = document.getElementById('gen-step-models');
+  if (_stepR) _stepR.style.display = 'block';
+  if (_stepM) _stepM.style.display = 'none';
+  _setGenStep(2);
+
   switchOutTab('imagem');
-  document.getElementById('img-preview-empty').style.display = 'none';
-  document.getElementById('img-preview-wrap')?.classList.remove('vis');
+  var _emptyEl = document.getElementById('img-preview-empty');
+  if (_emptyEl) _emptyEl.style.display = 'none';
+  var _wrapEl = document.getElementById('img-preview-wrap');
+  if (_wrapEl) { _wrapEl.style.display = 'none'; _wrapEl.classList.remove('vis'); }
   document.getElementById('img-gen-loading').style.display = 'flex';
 
   const stageEl = document.getElementById('img-gen-stage');
@@ -10706,45 +10716,32 @@ function renderModelGrid() {
 }
 
 function _updateFormatBadge() {
-  // Show/update a small badge above the grid indicating active format
-  var section = document.getElementById('modelo-picker-section');
-  if (!section) return;
   var badge = document.getElementById('fmt-active-badge');
-  if (!badge) {
-    badge = document.createElement('div');
-    badge.id = 'fmt-active-badge';
-    badge.style.cssText = 'font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;'
-      + 'letter-spacing:.1em;margin-bottom:8px;display:flex;align-items:center;gap:6px;';
-    var lbl = section.querySelector('div[style*="Escolha um modelo"]');
-    if (lbl) lbl.after(badge);
-    else section.insertBefore(badge, section.firstChild);
-  }
+  if (!badge) return;
   var fmtLabels = {
-    post_instagram:      'Post Instagram \xb7 1:1',
-    carrossel_instagram: 'Carrossel Instagram \xb7 1:1',
-    anuncio_instagram:   'An\xfancio Instagram \xb7 1:1',
-    story_instagram:     'Story Instagram \xb7 9:16',
-    post_linkedin:       'Post LinkedIn \xb7 1.91:1',
-    carrossel_linkedin:  'Carrossel LinkedIn \xb7 1:1',
-    anuncio_linkedin:    'An\xfancio LinkedIn \xb7 1.91:1',
-    banner_linkedin:     'Banner LinkedIn \xb7 4:1',
-    thumbnail_youtube:   'YouTube Thumbnail \xb7 16:9',
-    thumbnail_tiktok:    'TikTok Thumbnail \xb7 9:16',
+    post_instagram:      'Post Instagram · 1:1',
+    carrossel_instagram: 'Carrossel Instagram · 1:1',
+    anuncio_instagram:   'Anúncio Instagram · 1:1',
+    story_instagram:     'Story Instagram · 9:16',
+    post_linkedin:       'Post LinkedIn · 1.91:1',
+    carrossel_linkedin:  'Carrossel LinkedIn · 1:1',
+    anuncio_linkedin:    'Anúncio LinkedIn · 1.91:1',
+    banner_linkedin:     'Banner LinkedIn · 4:1',
+    thumbnail_youtube:   'YouTube Thumbnail · 16:9',
+    thumbnail_tiktok:    'TikTok Thumbnail · 9:16',
   };
-  var label = fmtLabels[_modelFmt] || _modelFmt;
-  badge.innerHTML = '<svg style="width:10px;height:10px;fill:none;stroke:var(--amber);stroke-width:2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> '
-    + label + ' <span style="font-weight:400;color:var(--t2)">\xe2\x80\x94 20 estilos</span>';
+  badge.textContent = fmtLabels[_modelFmt] || _modelFmt;
 }
-
-function _getModelDesc(n) { return _MODEL_DESCS[n] || ''; }
 
 function selectModel(idx) {
   var list = MODELS[_modelFmt] || [];
   _selectedModel        = list[idx];
   window._selectedModel = _selectedModel;
-  // Advance to step 2
+
+  // Step indicator
   _setGenStep(2);
 
+  // Highlight selected card
   var cards = document.querySelectorAll('#modelo-grid > div');
   for (var i = 0; i < cards.length; i++) {
     var on = (i === idx);
@@ -10762,8 +10759,8 @@ function _updateModelInfo() {
   var name = document.getElementById('modelo-selected-name');
   if (info) info.style.display = _selectedModel ? 'block' : 'none';
   if (name && _selectedModel)
-    name.textContent = _selectedModel.n + ' \u2014 ' + _selectedModel.name
-      + (_selectedModel.label ? ' \xb7 ' + _selectedModel.label : '');
+    name.textContent = _selectedModel.n + ' — ' + _selectedModel.name
+      + (_selectedModel.label ? ' · ' + _selectedModel.label : '');
 }
 
 function _ensureModelGrid() {
