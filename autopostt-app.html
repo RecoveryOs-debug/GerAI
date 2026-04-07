@@ -8254,120 +8254,35 @@ function startGenPipeline() {
   const input = (document.getElementById('gen-in').value || '').trim();
   if (!input) { toast('Descreva sua ideia antes de gerar'); return; }
 
-  // Guarda o input bruto; limpa refinamento anterior (modelo novo = refinamento novo)
   window._rawInput = input;
   window._refinedPrompt = '';
-
-  // Limpa o bloco de prompt refinado
-  const wrap = document.getElementById('refined-prompt-wrap');
-  const box  = document.getElementById('refined-prompt-box');
-  if (wrap) wrap.style.display = 'none';
-  if (box)  box.textContent = '';
-
-  // Reset cmd-out
-  const cmdEl  = document.getElementById('cmd-out');
-  const cmdTxt = document.getElementById('cmd-out-txt');
-  if (cmdEl)  cmdEl.dataset.prompt = '';
-  if (cmdTxt) cmdTxt.textContent = 'Selecione um modelo para refinar o prompt';
-
-  // Limpa seleção de modelo anterior
   window._selectedModel = null;
   _selectedModel = null;
-  document.querySelectorAll('.model-card').forEach(c => c.classList.remove('on'));
+
+  // Reset refined prompt box
+  const box = document.getElementById('refined-prompt-box');
+  if (box) box.textContent = '';
+  const wrap = document.getElementById('refined-prompt-wrap');
+  if (wrap) wrap.style.display = 'none';
+
+  // Reset model selection info
   const info = document.getElementById('modelo-selected-info');
   if (info) info.style.display = 'none';
 
-  // Mostra a aba de modelos
-  const tabModelos = document.getElementById('tab-conceitos');
-  const tabContent = document.getElementById('out-tab-conceitos');
-  if (tabModelos) tabModelos.style.display = '';
-  if (tabContent) tabContent.style.display = 'block';
+  // Hide initial state
+  const ini = document.getElementById('gen-initial-state');
+  if (ini) ini.style.display = 'none';
 
-  document.getElementById('out-e').style.display = 'none';
-  document.getElementById('sk-w').classList.remove('vis');
-  document.getElementById('out-r').classList.add('vis');
-
-  // Reset aba imagem
-  document.getElementById('img-preview-wrap')?.classList.remove('vis');
-  const emptyEl = document.getElementById('img-preview-empty');
-  if (emptyEl) {
-    emptyEl.style.display = 'flex';
-    emptyEl.innerHTML = `<svg style="width:28px;height:28px;fill:none;stroke:var(--t3);stroke-width:1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Escolha um modelo abaixo e clique em "Gerar imagem"`;
-  }
-
-  // Show new step-based UI first so modelo-grid exists in DOM
-  var stepModels = document.getElementById('gen-step-models');
-  var stepResult = document.getElementById('gen-step-result');
+  // Show model picker, hide result
+  const stepModels = document.getElementById('gen-step-models');
+  const stepResult = document.getElementById('gen-step-result');
   if (stepResult) stepResult.style.display = 'none';
   if (stepModels) stepModels.style.display = 'block';
   _setGenStep(1);
 
-  // Now populate the grid (DOM element is now visible)
   renderModelGrid();
-
-  // Legacy compat
-  switchOutTab('conceitos');
 }
 
-function regenWithCredit() {
-  const box = document.getElementById('refined-prompt-box');
-  const raw = document.getElementById('gen-in').value || '';
-  const input = (box?.textContent || raw).trim();
-  if (!input) { toast('Nenhum input para regerar'); return; }
-  toast('Refinando novamente... −1 crédito', 'ok');
-  startGenPipeline();
-}
-
-function editRefined() {
-  const box = document.getElementById('refined-prompt-box');
-  if (!box) return;
-  const inp = document.createElement('textarea');
-  inp.value = box.textContent; inp.rows = 4;
-  inp.style.cssText = 'width:100%;background:var(--bg);border:1px solid var(--a);color:var(--t0);border-radius:var(--r2);padding:10px;font-size:12px;font-family:monospace;resize:none;outline:none';
-  box.replaceWith(inp); inp.focus();
-  inp.addEventListener('blur', () => {
-    const nb = document.createElement('div');
-    nb.id = 'refined-prompt-box';
-    nb.style.cssText = 'background:var(--bg3);border:1px solid rgba(243,107,42,.2);border-radius:var(--r2);padding:11px 13px;font-size:12px;color:var(--t1);line-height:1.7;font-family:monospace;word-break:break-word';
-    nb.textContent = inp.value; inp.replaceWith(nb);
-  });
-}
-
-function clearGenForm() {
-  document.getElementById('gen-in').value = ''; ucc();
-  const w = document.getElementById('refined-prompt-wrap');
-  if (w) w.style.display = 'none';
-  document.getElementById('out-e').style.display = 'flex';
-  document.getElementById('out-r').classList.remove('vis');
-  // Esconder aba Modelos novamente
-  const tabModelos = document.getElementById('tab-conceitos');
-  const tabContent = document.getElementById('out-tab-conceitos');
-  const outHd = document.getElementById('out-hd-conceitos');
-  if (tabModelos) tabModelos.style.display = 'none';
-  if (tabContent) tabContent.style.display = 'none';
-  if (outHd) outHd.style.display = 'none';
-  window._refinedPrompt = '';
-  // Resetar cmd-out
-  const cmdEl = document.getElementById('cmd-out');
-  if (cmdEl) { cmdEl.dataset.prompt = ''; const sp = document.getElementById('cmd-out-txt'); if (sp) sp.textContent = 'Selecione um modelo acima'; }
-}
-
-// ─────────────────────────────────────────────────
-// GERAR IMAGEM SVG — chama backend + Claude gera SVG
-// ─────────────────────────────────────────────────
-let _currentSVG = null, _currentImgName = 'autopostt-imagem';
-
-const IMG_SKILL_SYSTEM = `Você é diretor de arte especialista em criação de imagens SVG para redes sociais.
-REGRAS ABSOLUTAS:
-1. Responda APENAS com código SVG puro. Zero texto antes ou depois.
-2. Sem markdown, sem blocos de código, sem explicações.
-3. Comece com <svg e termine com </svg>
-4. viewBox="0 0 1080 1080" | xmlns="http://www.w3.org/2000/svg" obrigatório
-5. font-family explícito em todo elemento text
-6. Fundo dark. Hierarquia 3 pesos: dominante 60%, suporte 25%, accent 5-10%
-7. Use as CORES DO PERFIL fornecidas. Não substitua por paletas genéricas.`;
-
-const IMG_STAGES = ['Lendo perfil da marca...','Definindo composição...','Aplicando cores...','Construindo SVG...','Refinando...','Finalizando...'];
 
 async function gerarImagem() {
   const rawInput = (window._rawInput || document.getElementById('gen-in')?.value || '').trim();
