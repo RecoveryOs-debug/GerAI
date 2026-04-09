@@ -1230,6 +1230,100 @@ function sanitizeSvg(svg) {
 }
 
 // ─────────────────────────────────────────────
+// FONT MANAGER
+// Carrega as Google Fonts no startup, caches como base64 e injeta nos SVGs
+// antes da rasterização, garantindo renderização correta sem dependência externa.
+// ─────────────────────────────────────────────
+
+const _fontCache = new Map(); // `${family}:${weight}` → { b64, fmt }
+
+// Todas as fontes usadas nos templates
+const DESIGN_FONTS = [
+  { family: 'Bebas Neue',          weight: '400' },
+  { family: 'Syne',                weight: '700' },
+  { family: 'DM Sans',             weight: '400' },
+  { family: 'DM Sans',             weight: '700' },
+  { family: 'Playfair Display',    weight: '400' },
+  { family: 'Playfair Display',    weight: '700' },
+  { family: 'Cormorant Garamond',  weight: '400' },
+  { family: 'Cormorant Garamond',  weight: '600' },
+  { family: 'IBM Plex Mono',       weight: '400' },
+];
+
+// Utilitário HTTPS genérico (retorna Buffer ou string)
+function _httpsGet(url, asBuffer = false) {
+  return new Promise((resolve, reject) => {
+    const u = new URL(url);
+    const req = https.request({
+      hostname: u.hostname,
+      path:     u.pathname + u.search,
+      method:   'GET',
+      headers:  { 'User-Agent': 'AutoPostt/1.0 FontManager' },
+    }, res => {
+      // Segue redirect 301/302 uma vez
+      if ((res.statusCode === 301 || res.statusCode === 302) && res.headers.location) {
+        return _httpsGet(res.headers.location, asBuffer).then(resolve).catch(reject);
+      }
+      const chunks = [];
+      res.on('data', c => chunks.push(Buffer.isBuffer(c) ? c : Buffer.from(c)));
+      res.on('end', () => {
+        const buf = Buffer.concat(chunks);
+        resolve(asBuffer ? buf : buf.toString('utf8'));
+      });
+    });
+    req.on('error', reject);
+    req.setTimeout(10000, () => { req.destroy(); reject(new Error('timeout')); });
+    req.end();
+  });
+}
+
+// Carrega 1 fonte: CSS API → extrai URL do arquivo → download → base64
+async function _loadOneFont(family, weight) {
+  const key = `${family}:${weight}`;
+  if (_fontCache.has(key)) return;
+  try {
+    // Google Fonts CSS v2
+    const cssUrl = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@${weight}&display=swap`;
+    const css = await _httpsGet(cssUrl);
+    // Pega a primeira URL de fonte do CSS (preferência: woff2 > woff > ttf)
+    const urlMatch = css.match(/url\((https:\/\/fonts\.gstatic\.com\/[^)]+)\)/);
+    if (!urlMatch) throw new Error('URL de fonte não encontrada no CSS');
+    const fontUrl = urlMatch[1];
+    const fmt = fontUrl.includes('.woff2') ? 'woff2'
+              : fontUrl.includes('.woff')  ? 'woff'
+              : 'truetype';
+    const fontData = await _httpsGet(fontUrl, true);
+    _fontCache.set(key, { b64: fontData.toString('base64'), fmt });
+  } catch(e) {
+    log.warn(`[FONTS] Falha ao carregar ${family} ${weight}: ${e.message}`);
+  }
+}
+
+// Inicializa o cache em background (não bloqueia o startup)
+function initFontCache() {
+  Promise.allSettled(DESIGN_FONTS.map(f => _loadOneFont(f.family, f.weight)))
+    .then(() => log.info(`[FONTS] Cache: ${_fontCache.size}/${DESIGN_FONTS.length} fontes prontas`));
+}
+
+// Gera o bloco @font-face CSS com as fontes em base64
+function _buildFontFaceCSS() {
+  return [..._fontCache.entries()].map(([key, { b64, fmt }]) => {
+    const [family, weight] = key.split(':');
+    return `@font-face{font-family:'${family}';font-weight:${weight};font-style:normal;` +
+           `src:url('data:font/${fmt};base64,${b64}') format('${fmt}');}`;
+  }).join('');
+}
+
+// Injeta @font-face no SVG para que a rasterização use as fontes corretas
+function injectFontsIntoSvg(svg) {
+  const css = _buildFontFaceCSS();
+  if (!css) return svg; // sem cache ainda — rasteriza com fontes do sistema
+  const defs = `<defs><style>${css}</style></defs>`;
+  // Insere logo após a tag de abertura <svg ...>
+  return svg.replace(/(<svg[^>]*>)/, `$1${defs}`);
+}
+
+// ─────────────────────────────────────────────
 // HTTP UTILS
 // ─────────────────────────────────────────────
 
@@ -2498,6 +2592,58 @@ route('POST', '/api/user/design-agent', async (req, res) => {
   res.end();
 });
 
+// ── Rota: Export SVG → PNG/JPG ────────────────────────────────────────────────
+// Recebe o SVG, injeta as fontes em base64 e rasteriza via sharp.
+// fmt: 'png' (padrão) | 'jpg'   quality: 60–100 (padrão 90, só JPG)
+route('POST', '/api/user/design-agent/export', async (req, res) => {
+  const payload = requireAuth(req, res); if (!payload) return;
+  const { svg, fmt = 'jpg', quality = 90 } = await parseBody(req);
+  if (!svg || typeof svg !== 'string' || svg.trim().length < 100)
+    return err(res, 'svg inválido ou ausente');
+
+  let sharp;
+  try { sharp = require('sharp'); }
+  catch { return err(res, 'Módulo sharp não disponível — execute npm install', 503); }
+
+  try {
+    const clean      = sanitizeSvg(svg);
+    const withFonts  = injectFontsIntoSvg(clean);
+    const svgBuf     = Buffer.from(withFonts, 'utf8');
+    const q          = Math.max(60, Math.min(100, parseInt(quality) || 90));
+    const isJpg      = fmt === 'jpg' || fmt === 'jpeg';
+
+    // density 96 = 1 SVG px → 1 raster px (SVG usa 96dpi por definição)
+    let pipeline = sharp(svgBuf, { density: 96 });
+    if (isJpg) {
+      pipeline = pipeline
+        .flatten({ background: { r: 255, g: 255, b: 255 } }) // fundo branco (JPG não tem alpha)
+        .jpeg({ quality: q, mozjpeg: true, chromaSubsampling: '4:4:4' });
+    } else {
+      pipeline = pipeline.png({ compressionLevel: 6, adaptiveFiltering: true });
+    }
+
+    const output = await pipeline.toBuffer({ resolveWithObject: true });
+    const mime   = isJpg ? 'image/jpeg' : 'image/png';
+    const ext    = isJpg ? 'jpg' : 'png';
+    const fname  = `autopostt-${Date.now()}.${ext}`;
+
+    res.writeHead(200, {
+      'Content-Type':        mime,
+      'Content-Length':      output.data.length,
+      'Content-Disposition': `attachment; filename="${fname}"`,
+      'Cache-Control':       'no-store',
+      'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
+    });
+    res.end(output.data);
+
+    log.info(`[EXPORT] user=${payload.id} fmt=${ext} size=${Math.round(output.data.length / 1024)}KB`
+      + ` dim=${output.info.width}x${output.info.height}`);
+  } catch(e) {
+    log.error('[EXPORT] Falha:', e.message);
+    err(res, 'Erro ao exportar imagem: ' + e.message);
+  }
+});
+
 // ─────────────────────────────────────────────
 // STATIC FILES
 // ─────────────────────────────────────────────
@@ -2560,6 +2706,7 @@ function scheduleMonthlyQuotaReset() {
 }
 
 scheduleMonthlyQuotaReset();
+initFontCache(); // carrega Google Fonts em background para o export funcionar
 
 const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') {

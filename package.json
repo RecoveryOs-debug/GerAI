@@ -10,7 +10,16 @@
   "engines": {
     "node": ">=22.0.0"
   },
-  "keywords": ["autopostt", "ia", "conteudo", "redes-sociais", "automacao"],
+  "dependencies": {
+    "sharp": "^0.33.5"
+  },
+  "keywords": [
+    "autopostt",
+    "ia",
+    "conteudo",
+    "redes-sociais",
+    "automacao"
+  ],
   "author": "AutoPostt",
   "license": "UNLICENSED"
 }
