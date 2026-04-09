@@ -1182,6 +1182,32 @@ REGRAS ABSOLUTAS:
 6. O resultado deve ser rico o suficiente para a IA replicar o modelo escolhido com o conteúdo e cores corretos.`;
 }
 // ─────────────────────────────────────────────
+// STYLE DNA — referência de identidade visual dos 20 templates
+// ─────────────────────────────────────────────
+const STYLE_DNA = {
+  '01': 'fundo ultra-escuro #0A0A0A, acento dourado, linha vertical esquerda, DM Sans bold',
+  '02': 'fundo branco editorial #FAFAF8, barra preta topo/rodape, Playfair serifada grande',
+  '03': 'split color: metade superior cor primaria, metade inferior escura, Syne ultra-bold',
+  '04': 'fundo escuro com grid de linhas, barra vertical acento esquerda, DM Sans bold',
+  '05': 'fundo preto, IBM Plex Mono tamanho extremo, pseudo-codigo como elemento visual',
+  '06': 'fundo creme #FAF6EE, bordas douradas finas, Playfair centrado, paleta warm',
+  '07': 'fundo escuro, barras de grafico como elemento visual, Syne bold para metricas',
+  '08': 'fundo preto, Bebas Neue com glow neon na cor primaria, cantos decorativos',
+  '09': 'fundo branco puro, barra lateral na cor primaria, DM Sans clean e arejado',
+  '10': 'fundo escuro, Cormorant Garamond italico, aspas decorativas gigantes',
+  '11': 'fundo solido na cor primaria, Syne 800 em cor escura, maxima presenca',
+  '12': 'fundo claro com grid de linhas como textura, barra lateral vertical',
+  '13': 'fundo preto absoluto, Bebas Neue gigante, linha horizontal branca, brutalismo',
+  '14': 'fundo creme #FDF8F2, circulos decorativos em acento, Cormorant italico',
+  '15': 'fundo verde terminal #050F05, IBM Plex Mono com glow verde #00FF41',
+  '16': 'fundo branco, barra magazine colorida topo/rodape, Syne 800 editorial',
+  '17': 'fundo azul-escuro #0C0C14, circulo e triangulo geometrico, Syne com acento roxo',
+  '18': 'fundo dourado solido, Bebas Neue em marrom escuro, linhas horizontais espessas',
+  '19': 'fundo azul-noite #06080F, caixa glass borda translucida, acento azul eletrico',
+  '20': 'fundo off-white #F8F7F4, DM Serif Display italico, linha horizontal dourada minima',
+};
+
+// ─────────────────────────────────────────────
 // SVG SANITIZER — remove elementos/atributos perigosos
 // ─────────────────────────────────────────────
 function sanitizeSvg(svg) {
@@ -1670,28 +1696,6 @@ route('POST', '/api/user/generate-image', async (req, res) => {
     : format === 'banner' ? { w: 1584, h: 396  }
     : { w: 1080, h: 1080 };
 
-  const STYLE_DNA = {
-    '01': 'fundo ultra-escuro #0A0A0A, acento dourado, linha vertical esquerda, DM Sans bold',
-    '02': 'fundo branco editorial #FAFAF8, barra preta topo/rodape, Playfair serifada grande',
-    '03': 'split color: metade superior cor primaria, metade inferior escura, Syne ultra-bold',
-    '04': 'fundo escuro com grid de linhas, barra vertical acento esquerda, DM Sans bold',
-    '05': 'fundo preto, IBM Plex Mono tamanho extremo, pseudo-codigo como elemento visual',
-    '06': 'fundo creme #FAF6EE, bordas douradas finas, Playfair centrado, paleta warm',
-    '07': 'fundo escuro, barras de grafico como elemento visual, Syne bold para metricas',
-    '08': 'fundo preto, Bebas Neue com glow neon na cor primaria, cantos decorativos',
-    '09': 'fundo branco puro, barra lateral na cor primaria, DM Sans clean e arejado',
-    '10': 'fundo escuro, Cormorant Garamond italico, aspas decorativas gigantes',
-    '11': 'fundo solido na cor primaria, Syne 800 em cor escura, maxima presenca',
-    '12': 'fundo claro com grid de linhas como textura, barra lateral vertical',
-    '13': 'fundo preto absoluto, Bebas Neue gigante, linha horizontal branca, brutalismo',
-    '14': 'fundo creme #FDF8F2, circulos decorativos em acento, Cormorant italico',
-    '15': 'fundo verde terminal #050F05, IBM Plex Mono com glow verde #00FF41',
-    '16': 'fundo branco, barra magazine colorida topo/rodape, Syne 800 editorial',
-    '17': 'fundo azul-escuro #0C0C14, circulo e triangulo geometrico, Syne com acento roxo',
-    '18': 'fundo dourado solido, Bebas Neue em marrom escuro, linhas horizontais espessas',
-    '19': 'fundo azul-noite #06080F, caixa glass borda translucida, acento azul eletrico',
-    '20': 'fundo off-white #F8F7F4, DM Serif Display italico, linha horizontal dourada minima',
-  };
   const styleDNA = modelN ? (STYLE_DNA[modelN] || '') : '';
   const fmtLabel = ({ post:'Post', carrossel:'Carrossel', anuncio:'Anuncio', story:'Story', reels:'Reels', thumb:'Thumbnail', banner:'Banner' })[format] || 'Post';
   const netLabel = ({ instagram:'Instagram', linkedin:'LinkedIn', youtube:'YouTube', tiktok:'TikTok', facebook:'Facebook' })[network] || 'Instagram';
@@ -1999,6 +2003,499 @@ route('GET', '/api/admin/user-stats/:id', async (req, res, params) => {
 
 route('GET', '/api/plans', async (req, res) => {
   ok(res, { plans: db.getPlans(), packages: db.getPackages().filter(p => p.active) });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// DESIGN AGENT — Coração da plataforma de criação visual
+//
+// Pipeline 3 estágios (cada um alimenta o próximo com dados estruturados):
+//   Estágio 1 · Brief Analyst   → extrai hierarquia de conteúdo (JSON)
+//   Estágio 2 · Art Director    → define blueprint de design com coords precisas (JSON)
+//   Estágio 3 · SVG Executor    → gera SVG profissional seguindo o blueprint
+//
+// Rotas:
+//   POST /api/user/design-agent               → SSE, gera 1 imagem/slide
+//   POST /api/user/design-agent/plan-carousel → JSON, planeja narrativa completa
+// ═════════════════════════════════════════════════════════════════════════════
+
+const DA_DIMS = {
+  post:      { w: 1080, h: 1080 },
+  carrossel: { w: 1080, h: 1080 },
+  story:     { w: 1080, h: 1920 },
+  reels:     { w: 1080, h: 1920 },
+  thumb:     { w: 1280, h: 720  },
+  banner:    { w: 1584, h: 396  },
+  anuncio:   { w: 1080, h: 1080 },
+};
+
+const DA_NET_LABELS = {
+  instagram: 'Instagram', linkedin: 'LinkedIn',
+  youtube: 'YouTube', tiktok: 'TikTok', facebook: 'Facebook',
+};
+
+// Normaliza dados da marca em um objeto único
+function daBrand(user, bp) {
+  const bpal = bp?.brandPalette;
+  const raw  = ((bp?.cores) || user?.cores || '#F5C518,#0D0D0F,#F5F4F0,#888888')
+    .split(',').map(s => s.trim()).filter(Boolean);
+  const profissao = bp?.profissao || user?.profissao || 'criador de conteúdo';
+  return {
+    p1: bpal?.primaria    || raw[0] || '#F5C518',   // accent / destaque
+    p2: bpal?.secundaria  || raw[1] || '#0D0D0F',   // fundo base
+    p3: bpal?.terciaria   || raw[2] || '#F5F4F0',   // texto principal
+    p4: bpal?.quaternaria || raw[3] || '#888888',   // texto muted
+    nicho:     bp?.nicho     || user?.nicho     || 'negócios',
+    profissao,
+    estilo:    bp?.estilo    || user?.estilo    || 'dark luxury',
+    tom:       bp?.tom       || user?.tom       || 'autoridade',
+    publico:   bp?.publico   || user?.publico   || 'profissionais',
+    handle:    bp?.handle    || ('@' + profissao.toLowerCase().replace(/\s+/g, '').slice(0, 15)),
+    modelN:    bp?.modelN    || '',
+    modelName: bp?.modelName || '',
+  };
+}
+
+// ── Estágio 1: Brief Analyst ──────────────────────────────────────────────────
+// Recebe o input bruto e extrai a hierarquia de conteúdo em JSON estruturado.
+// Garante que o texto seja real, específico, no tom da marca.
+async function daStage1Brief({ prompt, format, network, brand, slideRole }) {
+  const fmtLabel = { post:'Post', carrossel:'Carrossel', story:'Story', reels:'Reels',
+                     thumb:'Thumbnail', banner:'Banner', anuncio:'Anúncio' }[format] || format;
+  const system =
+`Você é o BRIEF ANALYST — Estágio 1 do Design Agent.
+MISSÃO: Transformar o input em hierarquia de conteúdo precisa e impactante para design visual.
+
+MARCA: profissão=${brand.profissao} | nicho=${brand.nicho} | tom=${brand.tom} | público=${brand.publico}
+FORMATO: ${fmtLabel} → ${DA_NET_LABELS[network] || network}${slideRole ? `\nFUNÇÃO DO SLIDE: ${slideRole}` : ''}
+
+REGRAS DE COPYWRITING PARA DESIGN:
+• Headline: máx 7 palavras — PARA O SCROLL — usa tom ${brand.tom}
+• Subheadline: máx 12 palavras — complementa, não repete
+• Body points: máx 3 itens, máx 6 palavras cada
+• CTA: máx 4 palavras, ação específica e direta
+• data_highlight: extraia o NÚMERO/DADO mais impactante (ex: "3x mais", "R$10k", "87%") — ou null
+• TODO texto REAL, específico, derivado do input — ZERO genérico
+
+RETORNE SOMENTE JSON VÁLIDO:
+{
+  "headline": "texto do gancho principal",
+  "subheadline": "subtítulo de apoio ou null",
+  "body_points": ["ponto 1", "ponto 2"],
+  "cta": "chamada para ação",
+  "data_highlight": "dado numérico impactante ou null",
+  "visual_mood": "dark-power | clean-premium | bold-energy | soft-trust | tech-sharp",
+  "content_type": "educational | motivational | promotional | storytelling | data-driven",
+  "emphasis": "number | quote | list | statement | question"
+}`;
+
+  const r = await callClaude({
+    system,
+    userMsg: `INPUT: "${prompt}"\n\nAnalise e extraia a hierarquia de conteúdo:`,
+    maxTokens: 600,
+  });
+  try {
+    const m = r.text.match(/\{[\s\S]*?\}/);
+    return { data: JSON.parse(m[0]), tok: { in: r.inputTokens, out: r.outputTokens } };
+  } catch {
+    return {
+      data: {
+        headline: prompt.slice(0, 50), subheadline: null, body_points: [],
+        cta: 'Saiba mais', data_highlight: null,
+        visual_mood: 'dark-power', content_type: 'educational', emphasis: 'statement',
+      },
+      tok: { in: r.inputTokens || 0, out: r.outputTokens || 0 },
+    };
+  }
+}
+
+// ── Estágio 2: Art Director ───────────────────────────────────────────────────
+// Recebe o brief estruturado e define um blueprint de design com coordenadas,
+// tipografia, cores e layout exatos — eliminando ambiguidade para o SVG Executor.
+async function daStage2ArtDir({ brief, brand, dim, format, slideIndex, totalSlides }) {
+  const dna    = STYLE_DNA[brand.modelN] || '';
+  const margin = dim.w > 1200 ? 60 : 80;
+  const isVertical  = dim.h > dim.w;
+  const isWide      = dim.w > dim.h;
+  const orientation = isVertical ? 'vertical (story/reels)' : isWide ? 'horizontal (thumb/banner)' : 'quadrado (post)';
+
+  const system =
+`Você é o ART DIRECTOR — Estágio 2 do Design Agent.
+MISSÃO: Definir o blueprint de design PRECISO que o SVG Executor irá implementar à risca.
+Pense como designer sênior. Cada número, cor e posição importa.
+
+CANVAS: ${dim.w}×${dim.h}px — ${orientation}
+MARGEM BASE: ${margin}px
+PALETA:
+  P1 primária/accent:    ${brand.p1}
+  P2 secundária/fundo:   ${brand.p2}
+  P3 terciária/texto:    ${brand.p3}
+  P4 quaternária/muted:  ${brand.p4}
+ESTILO: ${brand.estilo}${dna ? `\nTEMPLATE DNA (modelo ${brand.modelN}): ${dna}` : ''}
+${format === 'carrossel' && slideIndex ? `SLIDE ${slideIndex}/${totalSlides}` : ''}
+
+BRIEF DO CONTENT ANALYST:
+${JSON.stringify(brief, null, 2)}
+
+PRINCÍPIOS INVIOLÁVEIS:
+• Rule of thirds: posicione headline em y≈${Math.round(dim.h * 0.38)} ou y≈${Math.round(dim.h * 0.62)}
+• Headline DOMINA: tamanho mínimo 72px, máximo 180px
+• Contraste AAA: texto sempre legível — se fundo escuro, texto claro e vice-versa
+• Respiração: espaço negativo é design — margem mínima ${margin}px em todas as bordas
+• Hierarquia: headline > subheadline > body (escala e peso decrescentes)
+• Accent element sempre na cor P1 (primária)
+
+RETORNE SOMENTE JSON VÁLIDO com valores REAIS (números inteiros):
+{
+  "bg": {
+    "type": "solid | linear-gradient | dual-tone",
+    "color": "#hex",
+    "grad_from": "#hex ou null",
+    "grad_to": "#hex ou null",
+    "grad_angle": 135
+  },
+  "accent": {
+    "type": "rule-left | rule-right | rule-top | rule-bottom | corner-tl | corner-br | circle-bg | none",
+    "color": "#hex",
+    "x": 0, "y": 0, "w": 0, "h": 0,
+    "rx": 0,
+    "opacity": 1.0
+  },
+  "headline": {
+    "text": "${brief.headline}",
+    "font": "Bebas Neue | Syne | DM Sans | Playfair Display | Cormorant Garamond | IBM Plex Mono",
+    "size": 100,
+    "weight": "400 | 700 | 800",
+    "color": "#hex",
+    "x": 0, "y": 0,
+    "max_w": 0,
+    "line_h": 0,
+    "anchor": "start | middle | end",
+    "letter_spacing": 0,
+    "transform": "none | uppercase"
+  },
+  "subheadline": {
+    "text": "${brief.subheadline || ''}",
+    "font": "DM Sans | Playfair Display | IBM Plex Mono",
+    "size": 26,
+    "color": "#hex",
+    "x": 0, "y": 0,
+    "max_w": 0
+  },
+  "data_block": {
+    "number": "${brief.data_highlight || ''}",
+    "number_font": "Bebas Neue | Syne",
+    "number_size": 140,
+    "number_color": "#hex",
+    "label": "descrição curta do dado",
+    "label_font": "DM Sans",
+    "label_size": 22,
+    "label_color": "#hex",
+    "x": 0, "y": 0,
+    "bg_rect": { "x": 0, "y": 0, "w": 0, "h": 0, "rx": 8, "color": "#hex" }
+  },
+  "body": {
+    "font": "DM Sans | IBM Plex Mono",
+    "size": 24,
+    "color": "#hex",
+    "line_h": 40,
+    "x": 0, "y_start": 0,
+    "max_w": 0,
+    "prefix": "• | → | ✓ | none"
+  },
+  "separator": { "x1": 0, "y1": 0, "x2": 0, "y2": 0, "color": "#hex", "w": 2 },
+  "footer": {
+    "handle": "${brand.handle}",
+    "font": "DM Sans",
+    "size": 20,
+    "color": "#hex",
+    "x": 0, "y": 0
+  },
+  "slide_indicator": { "text": "${slideIndex || ''}/${totalSlides || ''}", "x": 0, "y": 0, "color": "#hex", "size": 18 },
+  "cta_block": {
+    "text": "${brief.cta}",
+    "font": "DM Sans",
+    "size": 22,
+    "color": "#hex",
+    "bg_color": "#hex",
+    "x": 0, "y": 0,
+    "pad_x": 28,
+    "pad_y": 14,
+    "rx": 4
+  }
+}
+
+NOTA: inclua apenas os campos relevantes para o layout. Campos desnecessários podem ser null.`;
+
+  const r = await callClaude({
+    system,
+    userMsg: `Defina o blueprint de design preciso para este brief:`,
+    maxTokens: 1500,
+  });
+  try {
+    const m = r.text.match(/\{[\s\S]*\}/);
+    return { data: JSON.parse(m[0]), tok: { in: r.inputTokens, out: r.outputTokens } };
+  } catch {
+    // Blueprint de fallback robusto
+    const mg = margin + 30;
+    return {
+      data: {
+        bg: { type: 'solid', color: brand.p2, grad_from: null, grad_to: null, grad_angle: 135 },
+        accent: { type: 'rule-left', color: brand.p1, x: margin, y: margin, w: 5, h: dim.h - margin * 2, rx: 0, opacity: 1 },
+        headline: {
+          text: brief.headline, font: 'Bebas Neue', size: 96, weight: '400',
+          color: brand.p3, x: mg, y: Math.round(dim.h * 0.4),
+          max_w: dim.w - mg - margin, line_h: 108,
+          anchor: 'start', letter_spacing: 1, transform: 'uppercase',
+        },
+        subheadline: brief.subheadline ? {
+          text: brief.subheadline, font: 'DM Sans', size: 26, color: brand.p4,
+          x: mg, y: Math.round(dim.h * 0.4) + 118, max_w: dim.w - mg - margin,
+        } : null,
+        data_block: null,
+        body: brief.body_points?.length ? {
+          font: 'DM Sans', size: 24, color: brand.p4, line_h: 40,
+          x: mg, y_start: Math.round(dim.h * 0.56), max_w: dim.w - mg - margin, prefix: '→',
+        } : null,
+        separator: { x1: mg, y1: Math.round(dim.h * 0.51), x2: dim.w - margin, y2: Math.round(dim.h * 0.51), color: brand.p1, w: 1 },
+        footer: { handle: brand.handle, font: 'DM Sans', size: 20, color: brand.p4, x: mg, y: dim.h - margin + 10 },
+        slide_indicator: null,
+        cta_block: null,
+      },
+      tok: { in: r.inputTokens || 0, out: r.outputTokens || 0 },
+    };
+  }
+}
+
+// ── Estágio 3: SVG Executor ───────────────────────────────────────────────────
+// Recebe brief + blueprint e gera o SVG final com alta fidelidade.
+// Não precisa "adivinhar" o design — o blueprint já define tudo.
+async function daStage3Svg({ brief, blueprint, brand, dim, format, network }) {
+  const system =
+`Você é o SVG EXECUTOR — Estágio 3 (final) do Design Agent.
+MISSÃO: Gerar um SVG PROFISSIONAL e IMPACTANTE seguindo o blueprint com precisão cirúrgica.
+
+LEIS ABSOLUTAS — NUNCA VIOLE:
+1. Retorne SOMENTE o SVG. Comece com <svg — termine com </svg>. ZERO texto antes ou depois.
+2. xmlns="http://www.w3.org/2000/svg" OBRIGATÓRIO na tag <svg>
+3. viewBox="0 0 ${dim.w} ${dim.h}" OBRIGATÓRIO na tag <svg>
+4. NUNCA use <image href="http..."> — sem recursos externos
+5. NUNCA use @import CSS
+6. ZERO placeholders: "TÍTULO AQUI", "SEU TEXTO", etc — use o conteúdo REAL do blueprint
+7. Nenhum elemento ultrapassa o viewBox — use clipPath se necessário
+8. Todo <text> com font-family, fill, font-size explícitos no elemento
+
+FONTES DISPONÍVEIS (use EXATAMENTE estes nomes no font-family):
+"Bebas Neue" | "Syne" | "DM Sans" | "Playfair Display" | "Cormorant Garamond" | "IBM Plex Mono"
+
+TÉCNICAS DE QUALIDADE (aplique sempre):
+• Textos longos: <text> com <tspan x="X" dy="Npx"> para cada linha
+• text-rendering="optimizeLegibility" nos headlines
+• Gradientes: defina em <defs> com <linearGradient> e referencie com url(#id)
+• Profundidade: elementos decorativos com opacity="0.08" criam camadas sem poluir
+• Sombra em texto sobre fundo complexo: <filter> com feDropShadow
+• Elementos geométricos de suporte (retângulos, linhas, círculos) elevam a composição
+
+CONTEÚDO REAL A USAR:
+• Headline:     "${brief.headline}"${brief.subheadline ? `\n• Subheadline:  "${brief.subheadline}"` : ''}${(brief.body_points || []).length ? `\n• Body points:  ${JSON.stringify(brief.body_points)}` : ''}${brief.data_highlight ? `\n• Data:         "${brief.data_highlight}"` : ''}
+• CTA:          "${brief.cta}"
+• Handle:       "${brand.handle}"
+
+BLUEPRINT DO ART DIRECTOR — EXECUTE COM PRECISÃO:
+${JSON.stringify(blueprint, null, 2)}`;
+
+  const r = await callClaude({
+    system,
+    userMsg: `Plataforma: ${DA_NET_LABELS[network] || network}. Execute o blueprint e gere o SVG completo:`,
+    maxTokens: 10000,
+  });
+
+  let svg = '';
+  const m = r.text.match(/<svg[\s\S]*?<\/svg>/i);
+  if (m) svg = m[0];
+  else if (r.text.trim().startsWith('<svg')) svg = r.text.trim();
+  if (svg && !svg.includes('xmlns='))
+    svg = svg.replace('<svg', `<svg xmlns="http://www.w3.org/2000/svg"`);
+  if (svg && !svg.includes('viewBox'))
+    svg = svg.replace('<svg', `<svg viewBox="0 0 ${dim.w} ${dim.h}"`);
+  return { svg: sanitizeSvg(svg), tok: { in: r.inputTokens, out: r.outputTokens } };
+}
+
+// ── Rota: Planejador de Carrossel ─────────────────────────────────────────────
+// Gera o plano narrativo completo antes de gerar os slides individualmente.
+// O cliente usa o plano para passar slideRole em cada chamada do design-agent.
+route('POST', '/api/user/design-agent/plan-carousel', async (req, res) => {
+  const payload = requireAuth(req, res); if (!payload) return;
+  const { prompt, totalSlides = 5, network = 'instagram', brandProfile } = await parseBody(req);
+  if (!prompt) return err(res, 'prompt obrigatório');
+
+  const user  = db.getUserById(payload.id);
+  const brand = daBrand(user, brandProfile);
+  const n     = Math.max(3, Math.min(10, parseInt(totalSlides) || 5));
+  const netLabel = DA_NET_LABELS[network] || network;
+
+  const system =
+`Você é o CAROUSEL PLANNER — especialista em narrativa visual para carrosseis que convertem.
+MISSÃO: Criar o plano narrativo completo de ${n} slides. Cada slide cria desejo pelo próximo.
+
+MARCA: profissão=${brand.profissao} | nicho=${brand.nicho} | tom=${brand.tom} | público=${brand.publico}
+PLATAFORMA: ${netLabel}
+
+ESTRUTURA OBRIGATÓRIA:
+• SLIDE 1 (CAPA): Para o scroll. Promessa irresistível. Máximo impacto visual.
+• SLIDES 2–${n - 1} (DESENVOLVIMENTO): Uma ideia poderosa por slide. Progressão lógica.
+• SLIDE ${n} (CTA): Fechamento com transformação + ação clara.
+
+REGRAS:
+• Headline máx 7 palavras — específico e real
+• Subheadline máx 12 palavras
+• Body points: máx 3 itens de máx 6 palavras
+• data_highlight: número/dado impactante ou null
+• CTA máx 4 palavras
+• visual_note: instrução para o designer (mood, elemento de destaque)
+• Cada slide deve ter CONTEÚDO DIFERENTE — não repita ideias
+
+RETORNE SOMENTE JSON VÁLIDO:
+{
+  "theme": "tema central do carrossel",
+  "narrative_arc": "descrição do arco em 1 frase",
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "capa | desenvolvimento | revelação | virada | cta",
+      "headline": "string",
+      "subheadline": "string ou null",
+      "body_points": [],
+      "data_highlight": "string ou null",
+      "cta": "string",
+      "visual_note": "string"
+    }
+  ]
+}`;
+
+  try {
+    const r = await callClaude({
+      system,
+      userMsg: `TEMA: "${prompt}"\nSLIDES: ${n}\nPlataforma: ${netLabel}\n\nCrie o plano narrativo completo:`,
+      maxTokens: 2500,
+    });
+    const m = r.text.match(/\{[\s\S]*\}/);
+    const plan = JSON.parse(m[0]);
+    ok(res, { plan, totalSlides: n });
+  } catch(e) { err(res, 'Falha ao gerar plano: ' + e.message); }
+});
+
+// ── Rota: Design Agent SSE ────────────────────────────────────────────────────
+// Pipeline completo: Brief → Art Direction → SVG
+// Eventos SSE: stage | brief | blueprint | done | error
+route('POST', '/api/user/design-agent', async (req, res) => {
+  const payload = requireAuth(req, res); if (!payload) return;
+  const {
+    prompt, format = 'post', network = 'instagram', brandProfile,
+    slideIndex, totalSlides, slideRole,
+  } = await parseBody(req);
+
+  if (!prompt) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({ ok: false, error: 'prompt obrigatório' }));
+  }
+
+  const user      = db.getUserById(payload.id);
+  const brand     = daBrand(user, brandProfile);
+  const dim       = DA_DIMS[format] || DA_DIMS.post;
+  const isCarrossel = format === 'carrossel';
+  const slideIdx  = Math.max(1, parseInt(slideIndex) || 1);
+  const totalSl   = Math.max(1, parseInt(totalSlides) || 1);
+
+  // Quota: consome 1 crédito por post; em carrosseis, consome apenas no 1º slide
+  if (!isCarrossel || slideIdx === 1) {
+    try { db.consumeQuota(payload.id); }
+    catch(e) {
+      res.writeHead(402, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ ok: false, error: e.message }));
+    }
+  }
+
+  // SSE headers
+  res.writeHead(200, {
+    'Content-Type':  'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection':    'keep-alive',
+    'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
+  });
+
+  const send = (type, data) => {
+    try { res.write(`data: ${JSON.stringify({ type, ...data })}\n\n`); } catch {}
+  };
+
+  let totalIn = 0, totalOut = 0;
+
+  try {
+    // ── Estágio 1: Brief Analysis ──────────────────────────────────────────
+    send('stage', { stage: 1, total: 3, label: 'Analisando conteúdo...', pct: 8 });
+
+    const s1 = await daStage1Brief({ prompt, format, network, brand, slideRole });
+    totalIn  += s1.tok.in;
+    totalOut += s1.tok.out;
+
+    send('brief',  { brief: s1.data });
+    send('stage',  { stage: 1, total: 3, label: 'Conteúdo estruturado ✓', pct: 28 });
+
+    // ── Estágio 2: Art Direction ───────────────────────────────────────────
+    send('stage', { stage: 2, total: 3, label: 'Definindo direção de arte...', pct: 32 });
+
+    const s2 = await daStage2ArtDir({
+      brief: s1.data, brand, dim, format, slideIndex: slideIdx, totalSlides: totalSl,
+    });
+    totalIn  += s2.tok.in;
+    totalOut += s2.tok.out;
+
+    send('blueprint', { blueprint: s2.data });
+    send('stage',     { stage: 2, total: 3, label: 'Blueprint definido ✓', pct: 55 });
+
+    // ── Estágio 3: SVG Execution ───────────────────────────────────────────
+    send('stage', { stage: 3, total: 3, label: 'Executando design...', pct: 60 });
+
+    const s3 = await daStage3Svg({
+      brief: s1.data, blueprint: s2.data, brand, dim, format, network,
+    });
+    totalIn  += s3.tok.in;
+    totalOut += s3.tok.out;
+
+    if (!s3.svg || s3.svg.length < 300) throw new Error('SVG inválido gerado. Tente novamente.');
+
+    // ── Persiste geração ───────────────────────────────────────────────────
+    const costUsd = parseFloat(((totalIn / 1_000_000 * 3) + (totalOut / 1_000_000 * 15)).toFixed(6));
+    const gen = db.addGeneration({
+      user_id:      payload.id,
+      feature:     'design-agent',
+      format,
+      network,
+      concept_name: (s1.data.headline || prompt).slice(0, 60),
+      prompt:       prompt.slice(0, 200),
+      svg_data:     s3.svg,
+      credits_used: 1,
+      input_tokens:  totalIn,
+      output_tokens: totalOut,
+    });
+
+    send('done', {
+      svg:          s3.svg,
+      brief:        s1.data,
+      blueprint:    s2.data,
+      generation_id: gen.id,
+      tokens:       { input: totalIn, output: totalOut },
+      cost_usd:     costUsd,
+      pct:          100,
+    });
+
+    log.info(`[DESIGN-AGENT] user=${payload.id} format=${format} tokens=${totalIn + totalOut} cost=$${costUsd}`);
+
+  } catch(e) {
+    log.error('[DESIGN-AGENT] Error:', e.message);
+    send('error', { message: e.message });
+  }
+
+  res.end();
 });
 
 // ─────────────────────────────────────────────
