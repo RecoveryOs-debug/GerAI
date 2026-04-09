@@ -26,12 +26,34 @@ const { DatabaseSync } = require('node:sqlite');
 
 const PORT           = process.env.PORT || 3001;
 const HOST           = '0.0.0.0';
-const JWT_SECRET     = process.env.JWT_SECRET || 'autopostt-dev-' + crypto.randomBytes(8).toString('hex');
 const ANTHROPIC_KEY  = process.env.ANTHROPIC_API_KEY || '';
 const DB_PATH        = process.env.DB_PATH || path.join(__dirname, 'autopostt.db');
 const LEGACY_JSON    = process.env.LEGACY_JSON || path.join(__dirname, 'gerai.db.json');
 // Em produção, defina ALLOWED_ORIGIN=https://seudominio.com no Railway
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';
+const ADMIN_EMAIL    = process.env.ADMIN_EMAIL || 'pedro@ainoz.com.br';
+
+// ── JWT_SECRET: persiste entre restarts para não invalidar sessões ──
+const JWT_SECRET_FILE = path.join(__dirname, '.jwt_secret');
+let JWT_SECRET;
+if (process.env.JWT_SECRET) {
+  JWT_SECRET = process.env.JWT_SECRET;
+} else {
+  try {
+    JWT_SECRET = fs.readFileSync(JWT_SECRET_FILE, 'utf8').trim();
+  } catch {
+    JWT_SECRET = 'autopostt-' + crypto.randomBytes(24).toString('hex');
+    try { fs.writeFileSync(JWT_SECRET_FILE, JWT_SECRET, { mode: 0o600 }); }
+    catch (e) { console.warn('[WARN] Não foi possível persistir JWT_SECRET:', e.message); }
+  }
+}
+
+// ── Logger com timestamp ──
+const log = {
+  info:  (...a) => console.log(`[${new Date().toISOString()}] [INFO]`, ...a),
+  warn:  (...a) => console.warn(`[${new Date().toISOString()}] [WARN]`, ...a),
+  error: (...a) => console.error(`[${new Date().toISOString()}] [ERROR]`, ...a),
+};
 
 // ─────────────────────────────────────────────
 // SQLITE DATABASE LAYER
@@ -174,6 +196,13 @@ class Database {
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )`);
 
+    // LOGIN RATE LIMITING (persistido — sobrevive a restarts)
+    this.db.exec(`CREATE TABLE IF NOT EXISTS login_attempts (
+      identifier TEXT PRIMARY KEY,
+      count      INTEGER NOT NULL DEFAULT 0,
+      first_at   INTEGER NOT NULL
+    )`);
+
     // Seed default plans if empty
     const planCount = this.db.prepare('SELECT COUNT(*) as c FROM plans').get();
     if (planCount.c === 0) {
@@ -247,9 +276,9 @@ class Database {
         }
       }
 
-      console.log(`[MIGRATE] Legacy JSON → SQLite: ${migratedUsers} users, ${migratedGens} generations`);
+      log.info(`[MIGRATE] Legacy JSON → SQLite: ${migratedUsers} users, ${migratedGens} generations`);
     } catch (e) {
-      console.error('[MIGRATE] Failed:', e.message);
+      log.error('[MIGRATE] Failed:', e.message);
     }
   }
 
@@ -276,7 +305,7 @@ class Database {
   _seedAdmin() {
     const adminPw = process.env.ADMIN_PASSWORD;
     if (!adminPw) {
-      console.error('[SEED] ADMIN_PASSWORD não definida. Admin não criado. Defina a variável de ambiente.');
+      log.error('[SEED] ADMIN_PASSWORD não definida. Admin não criado. Defina a variável de ambiente.');
       return;
     }
     const id = this._id();
@@ -284,7 +313,7 @@ class Database {
     this.db.prepare(`
       INSERT OR IGNORE INTO users (id,name,email,password,role,plan,quota_limit,quota_used)
       VALUES (?,?,?,?,?,?,?,?)
-    `).run(id, 'Pedro Admin', process.env.ADMIN_EMAIL || 'pedro@ainoz.com.br', pw, 'admin', 'elite', 99999, 0);
+    `).run(id, 'Admin', ADMIN_EMAIL, pw, 'admin', 'elite', 99999, 0);
   }
 
   // ── USERS ──
@@ -338,7 +367,7 @@ class Database {
   deleteUser(id) {
     const u = this.db.prepare('SELECT email FROM users WHERE id=?').get(id);
     if (!u) throw new Error('Usuário não encontrado');
-    if (u.email === 'pedro@ainoz.com.br') throw new Error('Admin master não pode ser excluído');
+    if (u.email === ADMIN_EMAIL) throw new Error('Admin master não pode ser excluído');
     this.db.prepare('DELETE FROM users WHERE id=?').run(id);
     return true;
   }
@@ -390,6 +419,19 @@ class Database {
       ).all(user_id, limit);
     }
     return this.db.prepare('SELECT * FROM generations ORDER BY created_at DESC LIMIT ?').all(limit);
+  }
+
+  // Retorna gerações com dados do usuário em uma única query (evita N+1)
+  getGenerationsWithUsers({ limit = 1000 } = {}) {
+    return this.db.prepare(`
+      SELECT g.id, g.user_id, g.feature, g.format, g.network, g.concept_name,
+             g.input_tokens, g.output_tokens, g.total_tokens, g.cost_usd,
+             g.credits_used, g.created_at,
+             u.name AS user_name, u.email AS user_email
+      FROM generations g
+      LEFT JOIN users u ON g.user_id = u.id
+      ORDER BY g.created_at DESC LIMIT ?
+    `).all(limit);
   }
 
   // ── PLANS ──
@@ -487,6 +529,7 @@ class Database {
   }
 
   createCalendarPost({ user_id, title, content, format, network, status, scheduled_at, color, agent_slug, generation_id }) {
+    this._validateCalendarFields({ title, format, network, status, color, scheduled_at });
     const id = this._id();
     this.db.prepare(`
       INSERT INTO calendar_posts (id,user_id,title,content,format,network,status,scheduled_at,color,agent_slug,generation_id)
@@ -496,9 +539,30 @@ class Database {
     return this.getCalendarPost(id, user_id);
   }
 
+  _validateCalendarFields(fields) {
+    const VALID_STATUS  = ['idea', 'draft', 'ready', 'published'];
+    const VALID_FORMAT  = ['post', 'carrossel', 'story', 'reels', 'anuncio', 'thumb', 'banner'];
+    const VALID_NETWORK = ['instagram', 'linkedin', 'youtube', 'tiktok', 'facebook'];
+    const HEX_RE        = /^#[0-9A-Fa-f]{6}$/;
+    const ISO_DATE_RE   = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2})?)?$/;
+    if (fields.status !== undefined && !VALID_STATUS.includes(fields.status))
+      throw new Error(`status inválido. Aceitos: ${VALID_STATUS.join(', ')}`);
+    if (fields.format !== undefined && !VALID_FORMAT.includes(fields.format))
+      throw new Error(`format inválido. Aceitos: ${VALID_FORMAT.join(', ')}`);
+    if (fields.network !== undefined && !VALID_NETWORK.includes(fields.network))
+      throw new Error(`network inválido. Aceitos: ${VALID_NETWORK.join(', ')}`);
+    if (fields.color !== undefined && !HEX_RE.test(fields.color))
+      throw new Error('color inválido. Use formato #RRGGBB');
+    if (fields.scheduled_at !== undefined && fields.scheduled_at !== null && !ISO_DATE_RE.test(fields.scheduled_at))
+      throw new Error('scheduled_at inválido. Use formato ISO (YYYY-MM-DD ou YYYY-MM-DDTHH:MM)');
+    if (fields.title !== undefined && (typeof fields.title !== 'string' || fields.title.trim().length === 0))
+      throw new Error('title não pode ser vazio');
+  }
+
   updateCalendarPost(id, user_id, fields) {
     const post = this.getCalendarPost(id, user_id);
     if (!post) throw new Error('Post não encontrado');
+    this._validateCalendarFields(fields);
     const allowed = ['title','content','format','network','status','scheduled_at','color','agent_slug'];
     const sets = [];
     const vals = [];
@@ -579,6 +643,29 @@ class Database {
   resetMonthlyQuotas() {
     this.db.prepare(`UPDATE users SET quota_used = 0, updated_at = datetime('now')`).run();
   }
+
+  // ── LOGIN RATE LIMITING (SQLite) ──
+  loginRateCheck(identifier, maxAttempts = 10, windowMs = 15 * 60 * 1000) {
+    const now = Date.now();
+    // Remove entradas expiradas
+    this.db.prepare('DELETE FROM login_attempts WHERE first_at < ?').run(now - windowMs);
+    const entry = this.db.prepare('SELECT count, first_at FROM login_attempts WHERE identifier=?').get(identifier);
+    if (!entry) {
+      this.db.prepare('INSERT INTO login_attempts (identifier, count, first_at) VALUES (?, 1, ?)').run(identifier, now);
+      return { blocked: false };
+    }
+    const newCount = entry.count + 1;
+    this.db.prepare('UPDATE login_attempts SET count=? WHERE identifier=?').run(newCount, identifier);
+    if (newCount > maxAttempts) {
+      const retryAfter = Math.ceil((windowMs - (now - entry.first_at)) / 1000);
+      return { blocked: true, retryAfter: Math.max(retryAfter, 0) };
+    }
+    return { blocked: false };
+  }
+
+  loginRateClear(identifier) {
+    this.db.prepare('DELETE FROM login_attempts WHERE identifier=?').run(identifier);
+  }
   // ── STATS ──
   getStats() {
     const users  = this.db.prepare(`SELECT * FROM users WHERE role != 'admin'`).all();
@@ -614,14 +701,21 @@ class Database {
       userCosts[g.user_id].cost_usd += (g.cost_usd || 0);
       userCosts[g.user_id].count++;
     });
-    const topUsers = Object.entries(userCosts)
+    const topEntries = Object.entries(userCosts)
       .sort((a, b) => b[1].cost_usd - a[1].cost_usd)
-      .slice(0, 5)
-      .map(([uid, d]) => {
-        const u = this.db.prepare('SELECT name,email FROM users WHERE id=?').get(uid);
-        return { user_id:uid, name:u?.name||'Desconhecido', email:u?.email||'',
-                 cost_usd: parseFloat(d.cost_usd.toFixed(6)), count: d.count };
-      });
+      .slice(0, 5);
+    const topIds = topEntries.map(([uid]) => uid);
+    const usersMap = {};
+    if (topIds.length > 0) {
+      const ph = topIds.map(() => '?').join(',');
+      this.db.prepare(`SELECT id, name, email FROM users WHERE id IN (${ph})`).all(...topIds)
+        .forEach(u => { usersMap[u.id] = u; });
+    }
+    const topUsers = topEntries.map(([uid, d]) => {
+      const u = usersMap[uid];
+      return { user_id:uid, name:u?.name||'Desconhecido', email:u?.email||'',
+               cost_usd: parseFloat(d.cost_usd.toFixed(6)), count: d.count };
+    });
     return {
       total_users: users.length,
       active_users: users.filter(u => u.status === 'active').length,
@@ -799,8 +893,8 @@ async function maybeSummarizeMemory(userId, genCount, recentGens) {
     });
     var currentMemory = db.getMemory(userId);
     db.upsertMemory(userId, { summary: summary.trim(), preferences: currentMemory.preferences || {}, positive: currentMemory.positive || [], negative: currentMemory.negative || [], incrementGen: false });
-    console.log('[MEMORY] Summarized for user ' + userId);
-  } catch(e) { console.error('[MEMORY] Summary failed:', e.message); }
+    log.info('[MEMORY] Summarized for user ' + userId);
+  } catch(e) { log.error('[MEMORY] Summary failed:', e.message); }
 }
 
 function getAgentStructure(slug) {
@@ -1088,6 +1182,28 @@ REGRAS ABSOLUTAS:
 6. O resultado deve ser rico o suficiente para a IA replicar o modelo escolhido com o conteúdo e cores corretos.`;
 }
 // ─────────────────────────────────────────────
+// SVG SANITIZER — remove elementos/atributos perigosos
+// ─────────────────────────────────────────────
+function sanitizeSvg(svg) {
+  // Remove blocos <script> completos
+  svg = svg.replace(/<script[\s\S]*?<\/script>/gi, '');
+  // Remove elementos que podem carregar conteúdo externo ou executar código
+  const dangerousTags = ['object', 'embed', 'iframe', 'foreignObject', 'animate', 'set'];
+  for (const tag of dangerousTags) {
+    svg = svg.replace(new RegExp(`<${tag}[^>]*>[\\s\\S]*?<\\/${tag}>`, 'gi'), '');
+    svg = svg.replace(new RegExp(`<${tag}[^>]*/?>`, 'gi'), '');
+  }
+  // Remove event handlers inline (onclick, onload, onerror, etc.)
+  svg = svg.replace(/\s+on\w+\s*=\s*"[^"]*"/gi, '');
+  svg = svg.replace(/\s+on\w+\s*=\s*'[^']*'/gi, '');
+  // Remove href/xlink:href com javascript:
+  svg = svg.replace(/\s+(href|xlink:href)\s*=\s*["']javascript:[^"']*["']/gi, '');
+  // Remove uso de <use> com href externo (pode carregar SVG externo)
+  svg = svg.replace(/<use[^>]*href\s*=\s*["']https?:\/\/[^"']*["'][^>]*\/?>/gi, '');
+  return svg;
+}
+
+// ─────────────────────────────────────────────
 // HTTP UTILS
 // ─────────────────────────────────────────────
 
@@ -1177,40 +1293,9 @@ function requireAdmin(req, res) {
 }
 
 // ─────────────────────────────────────────────
-// RATE LIMITER — proteção contra força bruta
+// RATE LIMITER — proteção contra força bruta (SQLite)
 // ─────────────────────────────────────────────
-const _loginAttempts = new Map(); // key: email|ip → { count, firstAt }
-const LOGIN_MAX      = 10;        // tentativas máximas
-const LOGIN_WINDOW   = 15 * 60 * 1000; // janela de 15 minutos
-
-function loginRateLimit(identifier) {
-  const now  = Date.now();
-  const entry = _loginAttempts.get(identifier) || { count: 0, firstAt: now };
-  if (now - entry.firstAt > LOGIN_WINDOW) {
-    // Janela expirou — resetar
-    _loginAttempts.set(identifier, { count: 1, firstAt: now });
-    return { blocked: false };
-  }
-  entry.count++;
-  _loginAttempts.set(identifier, entry);
-  if (entry.count > LOGIN_MAX) {
-    const retryAfter = Math.ceil((LOGIN_WINDOW - (now - entry.firstAt)) / 1000);
-    return { blocked: true, retryAfter };
-  }
-  return { blocked: false };
-}
-
-function loginRateLimitReset(identifier) {
-  _loginAttempts.delete(identifier);
-}
-
-// Limpa entradas expiradas a cada 30 minutos (evita memory leak)
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, entry] of _loginAttempts.entries()) {
-    if (now - entry.firstAt > LOGIN_WINDOW) _loginAttempts.delete(key);
-  }
-}, 30 * 60 * 1000);
+// Delegado ao Database.loginRateCheck / loginRateClear para sobreviver a restarts.
 
 // ─────────────────────────────────────────────
 // ROUTES — AUTH (preservados do v12)
@@ -1231,9 +1316,9 @@ route('POST', '/api/auth/login', async (req, res) => {
   const { email, password } = await parseBody(req);
   if (!email || !password) return err(res, 'E-mail e senha obrigatórios');
 
-  // Rate limiting por e-mail
+  // Rate limiting por e-mail (persistido em SQLite)
   const rlKey = 'login:' + (email || '').toLowerCase().trim();
-  const rl = loginRateLimit(rlKey);
+  const rl = db.loginRateCheck(rlKey);
   if (rl.blocked) {
     res.setHeader('Retry-After', String(rl.retryAfter));
     return err(res, `Muitas tentativas. Tente novamente em ${Math.ceil(rl.retryAfter / 60)} minutos.`, 429);
@@ -1249,7 +1334,7 @@ route('POST', '/api/auth/login', async (req, res) => {
   if (!user) return err(res, 'E-mail ou senha incorretos', 401);
 
   // Login OK — resetar contador
-  loginRateLimitReset(rlKey);
+  db.loginRateClear(rlKey);
   const token = JWT.sign({ id: user.id, email: user.email, role: user.role });
   ok(res, { user, token });
 });
@@ -1455,7 +1540,7 @@ route('POST', '/api/user/generate-content-stream', async (req, res) => {
   }
   const user   = db.getUserById(payload.id);
   const memory = db.getMemory(payload.id);
-  res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive', 'Access-Control-Allow-Origin': '*' });
+  res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive', 'Access-Control-Allow-Origin': ALLOWED_ORIGIN });
   const send = function(type, data) {
     const obj = Object.assign({ type: type }, data);
     res.write('data: ' + JSON.stringify(obj) + '\n\n');
@@ -1654,6 +1739,7 @@ route('POST', '/api/user/generate-image', async (req, res) => {
     if (!finalSvg.includes('xmlns=')) finalSvg = finalSvg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
     if (!finalSvg.includes('viewBox')) finalSvg = finalSvg.replace('<svg', '<svg viewBox="0 0 ' + dim.w + ' ' + dim.h + '"');
     if (!finalSvg || finalSvg.length < 200) throw new Error('SVG invalido. Tente novamente.');
+    finalSvg = sanitizeSvg(finalSvg);
 
     db.addGeneration({ user_id: payload.id, feature: isCarrossel ? 'carrossel-slide' : 'gerar-imagem', format: format || 'post', network: network || 'instagram', concept_name: (modelName || prompt).slice(0, 60), prompt: prompt.slice(0, 200), svg_data: finalSvg, credits_used: 1, input_tokens: result.inputTokens, output_tokens: result.outputTokens });
 
@@ -1890,13 +1976,14 @@ route('PATCH', '/api/admin/settings', async (req, res) => {
 
 route('GET', '/api/admin/cost-report', async (req, res) => {
   const payload = requireAdmin(req, res); if (!payload) return;
-  const gens = db.getGenerations({ limit: 1000 });
-  const report = gens.map(g => {
-    const u = db.getUserById(g.user_id);
-    return { id:g.id, feature:g.feature||g.format||'unknown', user_name:u?.name||'?', user_email:u?.email||'',
-      input_tokens:g.input_tokens||0, output_tokens:g.output_tokens||0, total_tokens:g.total_tokens||0,
-      cost_usd: parseFloat((g.cost_usd||0).toFixed(6)), credits_used:g.credits_used||1, created_at:g.created_at };
-  });
+  const gens = db.getGenerationsWithUsers({ limit: 1000 });
+  const report = gens.map(g => ({
+    id: g.id, feature: g.feature || g.format || 'unknown',
+    user_name: g.user_name || '?', user_email: g.user_email || '',
+    input_tokens: g.input_tokens || 0, output_tokens: g.output_tokens || 0,
+    total_tokens: g.total_tokens || 0, cost_usd: parseFloat((g.cost_usd || 0).toFixed(6)),
+    credits_used: g.credits_used || 1, created_at: g.created_at
+  }));
   ok(res, { report, total: report.length });
 });
 
@@ -1962,16 +2049,16 @@ function scheduleMonthlyQuotaReset() {
   function doReset() {
     try {
       db.resetMonthlyQuotas();
-      console.log(`[QUOTA] Reset mensal executado em ${new Date().toISOString()}`);
+      log.info('[QUOTA] Reset mensal executado');
     } catch (e) {
-      console.error('[QUOTA] Falha no reset mensal:', e.message);
+      log.error('[QUOTA] Falha no reset mensal:', e.message);
     }
     // Agenda próximo reset daqui a ~1 mês
     setTimeout(doReset, msUntilFirstOfNextMonth());
   }
 
   const ms = msUntilFirstOfNextMonth();
-  console.log(`[QUOTA] Próximo reset mensal em ${new Date(Date.now() + ms).toISOString()}`);
+  log.info(`[QUOTA] Próximo reset mensal em ${new Date(Date.now() + ms).toISOString()}`);
   setTimeout(doReset, ms);
 }
 
@@ -1991,10 +2078,10 @@ const server = http.createServer(async (req, res) => {
   const match = matchRoute(req.method, req.url);
   if (match) {
     try { await match.handler(req, res, match.params); }
-    catch (e) { console.error('[Route Error]', req.method, req.url, e.message); err(res, 'Erro interno', 500); }
+    catch (e) { log.error('[Route Error]', req.method, req.url, e.message); err(res, 'Erro interno', 500); }
   } else {
     const body = JSON.stringify({ ok:false, error:`Rota não encontrada: ${req.method} ${req.url}` });
-    res.writeHead(404, { 'Content-Type':'application/json', 'Content-Length':Buffer.byteLength(body), 'Access-Control-Allow-Origin':'*' });
+    res.writeHead(404, { 'Content-Type':'application/json', 'Content-Length':Buffer.byteLength(body), 'Access-Control-Allow-Origin': ALLOWED_ORIGIN });
     res.end(body);
   }
 });
@@ -2014,7 +2101,7 @@ server.listen(PORT, HOST, () => {
 ║  GET|POST|PATCH|DELETE /api/user/calendar     ║
 ║  POST /api/user/onboard-step                  ║
 ╠═══════════════════════════════════════════════╣
-║  Admin: pedro@ainoz.com.br                    ║
+║  Admin: ${ADMIN_EMAIL.padEnd(34)}║
 ╚═══════════════════════════════════════════════╝
 ${!hasKey ? '\n⚠️  Defina ANTHROPIC_API_KEY no Railway para ativar a IA.\n' : ''}`);
 });
