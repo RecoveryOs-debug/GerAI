@@ -1195,26 +1195,187 @@ REGRAS ABSOLUTAS:
 // STYLE DNA — referência de identidade visual dos 20 templates
 // ─────────────────────────────────────────────
 const STYLE_DNA = {
-  '01': 'fundo ultra-escuro #0A0A0A, acento dourado, linha vertical esquerda, DM Sans bold',
-  '02': 'fundo branco editorial #FAFAF8, barra preta topo/rodape, Playfair serifada grande',
-  '03': 'split color: metade superior cor primaria, metade inferior escura, Syne ultra-bold',
-  '04': 'fundo escuro com grid de linhas, barra vertical acento esquerda, DM Sans bold',
-  '05': 'fundo preto, IBM Plex Mono tamanho extremo, pseudo-codigo como elemento visual',
-  '06': 'fundo creme #FAF6EE, bordas douradas finas, Playfair centrado, paleta warm',
-  '07': 'fundo escuro, barras de grafico como elemento visual, Syne bold para metricas',
-  '08': 'fundo preto, Bebas Neue com glow neon na cor primaria, cantos decorativos',
-  '09': 'fundo branco puro, barra lateral na cor primaria, DM Sans clean e arejado',
-  '10': 'fundo escuro, Cormorant Garamond italico, aspas decorativas gigantes',
-  '11': 'fundo solido na cor primaria, Syne 800 em cor escura, maxima presenca',
-  '12': 'fundo claro com grid de linhas como textura, barra lateral vertical',
-  '13': 'fundo preto absoluto, Bebas Neue gigante, linha horizontal branca, brutalismo',
-  '14': 'fundo creme #FDF8F2, circulos decorativos em acento, Cormorant italico',
-  '15': 'fundo verde terminal #050F05, IBM Plex Mono com glow verde #00FF41',
-  '16': 'fundo branco, barra magazine colorida topo/rodape, Syne 800 editorial',
-  '17': 'fundo azul-escuro #0C0C14, circulo e triangulo geometrico, Syne com acento roxo',
-  '18': 'fundo dourado solido, Bebas Neue em marrom escuro, linhas horizontais espessas',
-  '19': 'fundo azul-noite #06080F, caixa glass borda translucida, acento azul eletrico',
-  '20': 'fundo off-white #F8F7F4, DM Serif Display italico, linha horizontal dourada minima',
+  '01': `DARK LUXURY — Poder e luxo silencioso
+BG: #0A0A0A | micro-grid linhas #FFFFFF opacity:0.025 step:60px
+ACCENT: #C9A84C ouro | linha-vertical-esq x=56 w=3px h=75% da altura
+HEADLINE: Bebas Neue 900 | #FFFFFF | 110-140px | UPPERCASE | letter-spacing:2px
+CORPO: DM Sans 300 | #9E9E9E | 22-26px | line-height:38px
+DECO: círculo outline #C9A84C r=140px opacity:0.08 atrás headline | retangulo accent 5x40px
+EFEITO: radial-gradient #C9A84C→transparent opacity:0.12 center | feDropShadow headline
+REGRA: 70% espaço negativo — cada elemento intencional, luxo pelo vazio`,
+
+  '02': `EDITORIAL CLEAN — Autoridade jornalística
+BG: #FAFAF8 | barra preta #0D0D0F topo h=10px + rodapé h=8px
+ACCENT: #0D0D0F | separador horizontal 1px + container rect opcional atrás headline
+HEADLINE: Playfair Display 700 | #0D0D0F | 80-110px | mixed case
+CORPO: DM Sans 400 | #3D3D3D | 20-22px | line-height:36px
+DECO: aspas decorativas 120px #0D0D0F opacity:0.08 | linha vertical dir 1px #CCCCCC
+EFEITO: zero efeitos — tipografia É o design
+REGRA: barras horizontais ancoram o espaço | composição esparsa e intencional`,
+
+  '03': `SPLIT BOLD — Dualidade e tensão visual
+BG: split — top-50% cor-primária | bottom-50% #0D0D0F | linha divisória 3px #FFFFFF glow
+ACCENT: #FFFFFF | linha-horizontal 100% em y=50% com glow sutil
+HEADLINE: Syne 900 | #FFFFFF | 100-130px | UPPERCASE | DEVE CRUZAR a linha divisória
+CORPO: DM Sans 600 | 22px | acima-linha: #0D0D0F | abaixo-linha: #FFFFFF opacity:0.85
+DECO: texto ghost opacity:0.06 repetido como textura de fundo
+EFEITO: feGaussianBlur na linha divisória stdDev=1 | glow sutil na transição
+REGRA: headline DEVE cruzar a linha de corte — tensão entre os dois planos é obrigatória`,
+
+  '04': `TECH GRID — Precisão sistemática
+BG: #0C1017 | grid #3A4A5A opacity:0.35 step:40px linhas horiz+vert
+ACCENT: cor-primária | linha vertical esq w=4px + círculo sólido 8px no topo da linha
+HEADLINE: DM Sans 800 | #E8F0FE | 90-120px | alinhado na grid
+CORPO: IBM Plex Mono 400 | cor-primária | 16-18px
+DECO: hexágono outline canto inf-dir opacity:0.2 | coordenadas tipográficas pequenas
+EFEITO: zero blur — tudo sharp | grid visível como decoração
+REGRA: alinhamento rigoroso ao step de 40px | monospace body reforça tema tech`,
+
+  '05': `CODE AESTHETIC — Terminal e autoridade técnica
+BG: #0D0D0D | pseudo-código comentado opacity:0.07 preenchendo fundo
+ACCENT: #00D4AA verde ou cor-primária | glow em tudo
+HEADLINE: IBM Plex Mono 700 | #FFFFFF | 72-96px | prefix "$ " em cor-primária
+CORPO: IBM Plex Mono 400 | #7ADFBB | 16-18px | prefix "// " cada ponto
+DECO: retangulo terminal borda 1px cor-primária padding:12px | cursor "_" | linha de status
+EFEITO: feGaussianBlur halo verde stdDeviation=8 | scanlines 1px opacity:0.06
+REGRA: tudo flush-left, espaçamento 8px, paleta monocromática fora do accent`,
+
+  '06': `LUXURY WARM — Elegância atemporal centrada
+BG: #FAF6EE creme | noise-texture feTurbulence opacity:0.03
+ACCENT: #C9A84C ouro | frame interno 1px 24px da borda | ornamento central linha+losango
+HEADLINE: Playfair Display 700 | #1A1A1A | 72-96px | centrado | mixed case
+CORPO: Cormorant Garamond 400 italic | #5A4A3A | 22-26px | centrado
+DECO: ornamento linha+losango+linha #C9A84C centralizado | frame interno dourado
+EFEITO: noise texture sutil | sombra retangular #C9A84C opacity:0.05
+REGRA: simetria absoluta — eixo central sagrado, 60px margens generosas`,
+
+  '07': `DATA VISUAL — O número como herói absoluto
+BG: #0E1621 | gradiente linear #0E1621→#162030 diagonal
+ACCENT: cor-primária | barras mini-gráfico lado direito como decoração
+HEADLINE: Syne 800 | #FFFFFF | 80-100px | enquadra e amplifica o dado
+DADO: Bebas Neue 900 | cor-primária | 160-200px | 40% do canvas | HERÓI
+CORPO: DM Sans 400 | #8AAABE | 20px | label/descrição contextual do dado
+DECO: 4-5 barras gráfico canto dir gradiente | linhas grid horiz opacity:0.15
+EFEITO: glow no número feGaussianBlur stdDev=12 opacity:0.5 | escala dramática
+REGRA: número é o herói — tudo enquadra e amplifica o dado`,
+
+  '08': `NEON IMPACT — Energia e urgência neon
+BG: #050505 | radial-gradient cor-primária center opacity:0.15
+ACCENT: cor-primária | 4 corner-brackets L-shape 2px nos cantos + linha horizontal center
+HEADLINE: Bebas Neue 900 | cor-primária | 120-160px | UPPERCASE | feDropShadow glow
+CORPO: DM Sans 600 | #CCCCCC | 24px | uppercase
+DECO: scanlines 1px opacity:0.05 | linhas diagonais decorativas opacity:0.08
+EFEITO: feDropShadow flood-color=cor-primária stdDeviation=8 | radial glow fundo
+REGRA: contraste extremo preto×neon | corner brackets OBRIGATÓRIOS nos 4 cantos`,
+
+  '09': `CLEAN MINIMAL — Confiança pela simplicidade extrema
+BG: #FFFFFF puro | zero texturas — espaço negativo É o design
+ACCENT: cor-primária | barra vertical esq w=4px h=60% centralizada + bullet círculo 12px
+HEADLINE: DM Sans 800 | #0D0D0F | 80-100px | flush-left
+CORPO: DM Sans 400 | #555555 | 22-24px | line-height:40px
+DECO: CTA retangular sólido cor-primária | separador linha 1px | bullet círculo
+EFEITO: zero efeitos — a pureza é o efeito
+REGRA: 80px margens, espaçamento 1.5× normal | cada elemento respira`,
+
+  '10': `QUOTE POWER — Impacto emocional pela citação
+BG: #0A0A0F escuro ou #FAF8F5 claro baseado no tom da marca
+ACCENT: cor-primária | aspas decorativas 80-120px opacity:0.12 atrás do quote
+HEADLINE: Cormorant Garamond 700 italic | 60-80px | centrado | quote entre aspas
+ATRIB: DM Sans 300 uppercase letter-spacing:4px | #888888 | 14px | "— Fonte/Autor"
+DECO: linha horizontal 40px cor-primária centralizada acima+abaixo do quote
+EFEITO: feGaussianBlur nas aspas decorativas | linha cor-primária brilhante
+REGRA: quote ocupa 60% vertical centrado — silêncio ao redor é obrigatório`,
+
+  '11': `BRAND SOLID — Identidade em tela cheia
+BG: cor-primária preenchendo 100% | círculo 600px #FFFFFF opacity:0.06 canto
+ACCENT: #FFFFFF | CTA retangulo com texto na cor-primária
+HEADLINE: Syne 900 | #FFFFFF ou #0D0D0F AAA contrast | 100-140px
+CORPO: Syne 400 | #FFFFFF opacity:0.65 | 22px
+DECO: linhas diagonais #FFFFFF opacity:0.03 | padrão geométrico opacity:0.04
+EFEITO: noise texture opacity:0.02 | círculo gigante como âncora visual
+REGRA: a COR é o design — tipografia confirma, ornamentos decoram discretamente`,
+
+  '12': `STRUCTURED GRID — Organização visual como arte
+BG: #F5F5F2 | grid #DEDEDE 1px step:30px visível como textura
+ACCENT: cor-primária | barra vertical dir w=6px + highlight rect opacity:0.08 atrás headline
+HEADLINE: DM Sans 900 | #0D0D0F | 80-100px | alinhado na grid
+CORPO: DM Sans 400 | #444444 | 20-22px | bullet quadrado 8px cor-primária
+DECO: número do slide grande opacity:0.07 | marcador de coluna decorativo
+EFEITO: sombra sutil no rect do headline | separador 2px
+REGRA: cada elemento em coluna do grid — alinhamento perfeccionista ao step`,
+
+  '13': `BRUTALIST — Impacto cru e inquestionável
+BG: #000000 absoluto — zero texturas zero gradientes zero ornamentos
+ACCENT: #FFFFFF | linha horizontal 4px cortando o canvas em y≈45%
+HEADLINE: Bebas Neue 900 | #FFFFFF | 130-180px | UPPERCASE | letter-spacing:0
+CORPO: DM Sans 700 | #FFFFFF | 20px | UPPERCASE acima | #888888 abaixo
+DECO: ZERO ornamentos — o tipo É o design
+EFEITO: ZERO blur ZERO sombras ZERO gradientes — brutalismo puro
+REGRA: remove tudo que pode ser removido — o que sobra é o design`,
+
+  '14': `ORGANIC WARM — Humanidade e conexão emocional
+BG: #FDF8F2 creme orgânico | círculos sobrepostos como textura sutil
+ACCENT: cor-primária | 3 círculos 80px+160px+300px sobrepostos canto inf-dir
+HEADLINE: Cormorant Garamond 700 | #1A1A1A | 72-90px
+CORPO: Cormorant Garamond 400 italic | #5A4535 | 22-26px
+DECO: círculo outline 300px opacity:0.08 + 160px opacity:0.15 + 80px opacity:0.25
+EFEITO: preenchimento gradiente radial nos círculos | sobreposição orgânica
+REGRA: assimetria intencional — 3 círculos DEVEM aparecer sempre no canto`,
+
+  '15': `TERMINAL GREEN — Estética hacker e dev
+BG: #050F05 | scanlines 1px #00FF41 opacity:0.06
+ACCENT: #00FF41 phosphor | glow em todo elemento primário
+HEADLINE: IBM Plex Mono 700 | #00FF41 | 72-100px | prefix "> " ou "$ " em verde
+CORPO: IBM Plex Mono 400 | #00AA2B | 16-18px | prefix "> " em cada ponto
+DECO: retangulo terminal borda 1px #00FF41 | linha de status | cursor "_"
+EFEITO: feGaussianBlur halo verde stdDeviation=6 em headline | CRT glow
+REGRA: monocromático verde — zero outras cores | paleta terminal histórica`,
+
+  '16': `MAGAZINE EDITORIAL — Publicação premium
+BG: #FFFFFF | barra cor-primária 12px topo + 8px rodapé | label categoria obrigatório
+ACCENT: cor-primária | barra 2px separando label do headline
+HEADLINE: Syne 900 | #0D0D0F | 80-110px | pode tocar a barra superior
+LABEL: rect cor-primária | DM Sans 700 12px #FFFFFF | CATEGORIA EM MAIÚSCULA
+CORPO: DM Sans 400 | #3D3D3D | 20-22px
+DECO: drop capital | forma geométrica 40% canvas dir se landscape
+EFEITO: gradiente sutil no label | borda angular da barra
+REGRA: label de CATEGORIA é OBRIGATÓRIO — linguagem de revista premium de luxo`,
+
+  '17': `COSMIC GEOMETRIC — Profundidade e dimensão espacial
+BG: #0C0C14 | radial-gradient cor-primária opacity:0.2 center
+ACCENT: cor-primária | círculo 400px + triângulo/polígono sobrepostos opacity:0.3-0.6
+HEADLINE: Syne 800 | #FFFFFF | 80-110px | sobre as formas geométricas
+CORPO: DM Sans 300 | cor-primária-clara | 20-22px
+DECO: 15-20 pontos brancos 2-4px opacity:0.4 espalhados | nebulosa radial difusa
+EFEITO: feGaussianBlur formas stdDeviation=30 | glow difuso no fundo
+REGRA: formas geométricas grandes criam profundidade — ousado e dramático`,
+
+  '18': `GOLDEN IMPACT — Riqueza e autoridade dourada
+BG: cor-primária dourado ou #B8860B | cor sólida — sem gradiente
+ACCENT: #0D0D0F escuro | linhas horizontais 3px múltiplas abaixo e acima do headline
+HEADLINE: Bebas Neue 900 | #0D0D0F | 110-140px | UPPERCASE
+CORPO: DM Sans 700 | #0D0D0F | 20px | UPPERCASE
+DECO: 5-7 linhas horizontais paralelas laterais 40px | sombra sutil no headline
+EFEITO: text-shadow leve #0D0D0F opacity:0.2 | fundo sólido vibrante
+REGRA: inversão total — fundo claro/dourado com tudo escuro`,
+
+  '19': `GLASS MORPHISM — Modernidade translúcida
+BG: #06080F | radial-gradient cor-primária center opacity:0.25
+GLASS: rect fill rgba(255,255,255,0.07) stroke rgba(255,255,255,0.18) + blur
+HEADLINE: Syne 700 | #FFFFFF | 72-96px | dentro do glass card centralizado
+CORPO: DM Sans 300 | rgba(255,255,255,0.7) | 20px
+DECO: 2-3 blobs cor-primária opacity:0.3 atrás do glass com blur stdDeviation:40
+EFEITO: feGaussianBlur nos blobs | borda glass rgba(255,255,255,0.25)
+REGRA: glass card centralizado — blobs DEVEM ter blur real via filter SVG`,
+
+  '20': `REFINED MINIMAL — Sofisticação pela ausência absoluta
+BG: #F8F7F4 off-white | zero texturas
+ACCENT: #C9A84C ouro | linha horizontal 40px w=1px centralizada abaixo do headline
+HEADLINE: DM Serif Display 400 italic | #0D0D0F | 64-88px | mixed case
+CORPO: DM Sans 300 | #5A5A5A | 18-20px | letter-spacing:0.5px
+DECO: círculo outline 1px #0D0D0F opacity:0.1 200px canto sup-dir
+EFEITO: zero efeitos — o silêncio é a sofisticação
+REGRA: 100px margens — remova tudo que puder sendo ainda funcional`,
 };
 
 // ─────────────────────────────────────────────
@@ -2174,36 +2335,63 @@ async function daStage1Brief({ prompt, format, network, brand, slideRole }) {
   const fmtLabel = { post:'Post', carrossel:'Carrossel', story:'Story', reels:'Reels',
                      thumb:'Thumbnail', banner:'Banner', anuncio:'Anúncio' }[format] || format;
   const system =
-`Você é o BRIEF ANALYST — Estágio 1 do Design Agent.
-MISSÃO: Transformar o input em hierarquia de conteúdo precisa e impactante para design visual.
+`Você é o CREATIVE BRIEF MASTER — Estágio 1 do Design Agent de nível mundial.
+MISSÃO: Transformar qualquer input em hierarquia de conteúdo IRRESISTÍVEL que para o scroll.
 
-MARCA: profissão=${brand.profissao} | nicho=${brand.nicho} | tom=${brand.tom} | público=${brand.publico}
-FORMATO: ${fmtLabel} → ${DA_NET_LABELS[network] || network}${slideRole ? `\nFUNÇÃO DO SLIDE: ${slideRole}` : ''}
+CONTEXTO DA MARCA:
+Profissão: ${brand.profissao} | Nicho: ${brand.nicho} | Tom: ${brand.tom} | Público: ${brand.publico}
+Formato: ${fmtLabel} → ${DA_NET_LABELS[network] || network}${slideRole ? `\nFunção do slide: ${slideRole}` : ''}
 
-REGRAS DE COPYWRITING PARA DESIGN:
-• Headline: máx 7 palavras — PARA O SCROLL — usa tom ${brand.tom}
-• Subheadline: máx 12 palavras — complementa, não repete
-• Body points: máx 3 itens, máx 6 palavras cada
-• CTA: máx 4 palavras, ação específica e direta
-• data_highlight: extraia o NÚMERO/DADO mais impactante (ex: "3x mais", "R$10k", "87%") — ou null
-• TODO texto REAL, específico, derivado do input — ZERO genérico
+━━━ FRAMEWORK DE COPYWRITING PARA DESIGN VIRAL ━━━
 
-RETORNE SOMENTE JSON VÁLIDO:
+HEADLINE (o gancho que para o scroll):
+• Máx 7 palavras — cada palavra deve justificar sua presença
+• Use um destes padrões comprovados:
+  NÚMERO: "5 estratégias que triplicaram minha receita"
+  CONTRASTE: "Por que esforçados ficam para trás"
+  URGÊNCIA: "O erro que 90% dos iniciantes cometem"
+  SEGREDO: "O método silencioso dos top performers"
+  TRANSFORMAÇÃO: "De [problema] para [resultado] em [tempo]"
+  PERGUNTA: "Por que seu negócio não está crescendo?"
+• Deve gerar: curiosidade + relevância + urgência
+• Tom obrigatório: ${brand.tom}
+
+SUBHEADLINE (resolve a tensão do headline):
+• Máx 14 palavras — especifica o QUÊ, PARA QUEM, ou QUANDO
+• Complementa sem repetir — expande a promessa
+
+BODY POINTS (prova social e credibilidade):
+• Máx 3 itens, máx 8 palavras cada
+• Benefício concreto OU dado numérico real
+• Verbo de ação: "Elimina / Dobra / Garante / Protege"
+
+CTA (chamada irresistível):
+• Máx 4 palavras — verbo + benefício implícito
+• Use: Descubra / Acesse / Garanta / Transforme / Comece
+
+DATA HIGHLIGHT:
+• Extraia/crie o NÚMERO mais impactante (ex: "3x", "R$47k", "87%", "30 dias")
+• Se não explícito no input, crie um contextual crível para o nicho
+• null APENAS se absolutamente incompatível
+
+━━━ RETORNE SOMENTE JSON VÁLIDO ━━━
 {
-  "headline": "texto do gancho principal",
-  "subheadline": "subtítulo de apoio ou null",
-  "body_points": ["ponto 1", "ponto 2"],
-  "cta": "chamada para ação",
-  "data_highlight": "dado numérico impactante ou null",
+  "headline": "gancho irresistível máx 7 palavras",
+  "subheadline": "complemento específico ou null",
+  "body_points": ["benefício concreto 1", "benefício concreto 2", "benefício concreto 3"],
+  "cta": "ação direta máx 4 palavras",
+  "data_highlight": "dado impactante ou null",
   "visual_mood": "dark-power | clean-premium | bold-energy | soft-trust | tech-sharp",
   "content_type": "educational | motivational | promotional | storytelling | data-driven",
-  "emphasis": "number | quote | list | statement | question"
+  "emphasis": "number | quote | list | statement | question",
+  "font_mood": "display-bold | editorial | monospace | serif-elegant | sans-clean",
+  "composition_hint": "text-dominant | data-hero | split-layout | quote-focus | list-view"
 }`;
 
   const r = await callClaude({
     system,
-    userMsg: `INPUT: "${prompt}"\n\nAnalise e extraia a hierarquia de conteúdo:`,
-    maxTokens: 600,
+    userMsg: `INPUT: "${prompt}"\n\nAnalise e extraia a hierarquia de conteúdo com copywriting de nível mundial:`,
+    maxTokens: 900,
   });
   try {
     const m = r.text.match(/\{[\s\S]*?\}/);
@@ -2231,40 +2419,64 @@ async function daStage2ArtDir({ brief, brand, dim, format, slideIndex, totalSlid
   const orientation = isVertical ? 'vertical (story/reels)' : isWide ? 'horizontal (thumb/banner)' : 'quadrado (post)';
 
   const system =
-`Você é o ART DIRECTOR — Estágio 2 do Design Agent.
-MISSÃO: Definir o blueprint de design PRECISO que o SVG Executor irá implementar à risca.
-Pense como designer sênior. Cada número, cor e posição importa.
+`Você é o ART DIRECTOR SÊNIOR — Estágio 2 do Design Agent de nível Pentagram/R/GA.
+MISSÃO: Definir blueprint de design PRECISO com coordenadas exatas, tipografia calibrada e camadas visuais ricas que criam designs de parar o scroll.
 
 CANVAS: ${dim.w}×${dim.h}px — ${orientation}
 MARGEM BASE: ${margin}px
-PALETA:
-  P1 primária/accent:    ${brand.p1}
-  P2 secundária/fundo:   ${brand.p2}
-  P3 terciária/texto:    ${brand.p3}
-  P4 quaternária/muted:  ${brand.p4}
-ESTILO: ${brand.estilo}${dna ? `\nTEMPLATE DNA (modelo ${brand.modelN}): ${dna}` : ''}
-${format === 'carrossel' && slideIndex ? `SLIDE ${slideIndex}/${totalSlides}` : ''}
+SAFE ZONE X: ${margin} a ${dim.w - margin}px | SAFE ZONE Y: ${margin} a ${dim.h - margin}px
 
-BRIEF DO CONTENT ANALYST:
+PALETA DA MARCA:
+  P1 primary/accent:   ${brand.p1}
+  P2 background:       ${brand.p2}
+  P3 text-primary:     ${brand.p3}
+  P4 text-secondary:   ${brand.p4}
+ESTILO: ${brand.estilo}${dna ? `\n\nTEMPLATE DNA (modelo ${brand.modelN}):\n${dna}` : ''}
+${format === 'carrossel' && slideIndex ? `\nSLIDE ${slideIndex} DE ${totalSlides}` : ''}
+
+BRIEF DO CREATIVE ANALYST:
 ${JSON.stringify(brief, null, 2)}
 
-PRINCÍPIOS INVIOLÁVEIS:
-• Rule of thirds: posicione headline em y≈${Math.round(dim.h * 0.38)} ou y≈${Math.round(dim.h * 0.62)}
-• Headline DOMINA: tamanho mínimo 72px, máximo 180px
-• Contraste AAA: texto sempre legível — se fundo escuro, texto claro e vice-versa
-• Respiração: espaço negativo é design — margem mínima ${margin}px em todas as bordas
-• Hierarquia: headline > subheadline > body (escala e peso decrescentes)
-• Accent element sempre na cor P1 (primária)
+━━━ PRINCÍPIOS INVIOLÁVEIS ━━━
+• HIERARQUIA: headline (maior/mais pesado) > subheadline > body > footer
+• REGRA DOS TERÇOS: headline em y≈${Math.round(dim.h * 0.35)} ou y≈${Math.round(dim.h * 0.6)}
+• CONTRASTE AAA: fundo escuro→texto claro | fundo claro→texto escuro
+• MARGEM SAGRADA: nunca viole ${margin}px das bordas
+• HEADLINE DOMINA: mín 72px, máx 180px | é o herói visual
+• PROFUNDIDADE: mínimo 4 camadas visuais (bg + texture + decorative + content)
+• ACCENT: sempre na cor P1
 
-RETORNE SOMENTE JSON VÁLIDO com valores REAIS (números inteiros):
+━━━ ESCALA TIPOGRÁFICA ━━━
+Hero: 140-180px | XL: 100-130px | L: 72-96px | M: 28-36px | S: 20-24px | XS: 14-18px
+WRAPPING: headline > 18 chars → quebre em 2 linhas, line_h = size × 1.12
+
+━━━ RETORNE SOMENTE JSON VÁLIDO (números inteiros reais) ━━━
 {
   "bg": {
-    "type": "solid | linear-gradient | dual-tone",
+    "type": "solid | linear-gradient | radial-gradient | dual-tone",
     "color": "#hex",
-    "grad_from": "#hex ou null",
-    "grad_to": "#hex ou null",
-    "grad_angle": 135
+    "grad_from": "#hex or null",
+    "grad_to": "#hex or null",
+    "grad_angle": 135,
+    "overlay_type": "grid-pattern | noise | scanlines | none",
+    "overlay_color": "#hex",
+    "overlay_opacity": 0.03
   },
+  "layers": [
+    {
+      "type": "circle | rect | line | polygon | ellipse",
+      "role": "glow-bg | texture | frame | ornament | divider | badge | corner-bracket",
+      "fill": "#hex or rgba(r,g,b,a) or none",
+      "stroke": "#hex or none",
+      "stroke_w": 0,
+      "x": 0, "y": 0, "r": 0,
+      "width": 0, "height": 0, "rx": 0,
+      "x1": 0, "y1": 0, "x2": 0, "y2": 0,
+      "points": "x1,y1 x2,y2 x3,y3",
+      "opacity": 0.15,
+      "filter": "blur-30 | glow-20 | none"
+    }
+  ],
   "accent": {
     "type": "rule-left | rule-right | rule-top | rule-bottom | corner-tl | corner-br | circle-bg | none",
     "color": "#hex",
@@ -2276,72 +2488,87 @@ RETORNE SOMENTE JSON VÁLIDO com valores REAIS (números inteiros):
     "text": "${brief.headline}",
     "font": "Bebas Neue | Syne | DM Sans | Playfair Display | Cormorant Garamond | IBM Plex Mono",
     "size": 100,
-    "weight": "400 | 700 | 800",
+    "weight": "400 | 700 | 800 | 900",
     "color": "#hex",
     "x": 0, "y": 0,
-    "max_w": 0,
-    "line_h": 0,
+    "max_w": ${dim.w - margin * 2},
+    "line_h": 115,
     "anchor": "start | middle | end",
     "letter_spacing": 0,
-    "transform": "none | uppercase"
+    "transform": "none | uppercase",
+    "filter": "glow-8 | shadow | none"
   },
   "subheadline": {
     "text": "${brief.subheadline || ''}",
-    "font": "DM Sans | Playfair Display | IBM Plex Mono",
+    "font": "DM Sans | Playfair Display | IBM Plex Mono | Cormorant Garamond",
     "size": 26,
+    "weight": "300 | 400 | 600",
     "color": "#hex",
     "x": 0, "y": 0,
-    "max_w": 0
+    "max_w": ${dim.w - margin * 2}
   },
   "data_block": {
     "number": "${brief.data_highlight || ''}",
     "number_font": "Bebas Neue | Syne",
-    "number_size": 140,
+    "number_size": 160,
     "number_color": "#hex",
-    "label": "descrição curta do dado",
+    "label": "descrição contextual do dado",
     "label_font": "DM Sans",
-    "label_size": 22,
+    "label_size": 20,
     "label_color": "#hex",
     "x": 0, "y": 0,
-    "bg_rect": { "x": 0, "y": 0, "w": 0, "h": 0, "rx": 8, "color": "#hex" }
+    "bg_rect": { "x": 0, "y": 0, "w": 0, "h": 0, "rx": 8, "color": "#hex", "opacity": 0.15 }
   },
   "body": {
     "font": "DM Sans | IBM Plex Mono",
-    "size": 24,
+    "size": 22,
+    "weight": "400",
     "color": "#hex",
-    "line_h": 40,
+    "line_h": 38,
     "x": 0, "y_start": 0,
-    "max_w": 0,
-    "prefix": "• | → | ✓ | none"
+    "max_w": ${dim.w - margin * 2},
+    "prefix": "• | → | ✓ | ▸ | none"
   },
   "separator": { "x1": 0, "y1": 0, "x2": 0, "y2": 0, "color": "#hex", "w": 2 },
-  "footer": {
-    "handle": "${brand.handle}",
-    "font": "DM Sans",
-    "size": 20,
-    "color": "#hex",
-    "x": 0, "y": 0
-  },
-  "slide_indicator": { "text": "${slideIndex || ''}/${totalSlides || ''}", "x": 0, "y": 0, "color": "#hex", "size": 18 },
   "cta_block": {
     "text": "${brief.cta}",
     "font": "DM Sans",
-    "size": 22,
+    "size": 20,
+    "weight": "700",
     "color": "#hex",
     "bg_color": "#hex",
     "x": 0, "y": 0,
-    "pad_x": 28,
+    "pad_x": 32,
     "pad_y": 14,
-    "rx": 4
+    "rx": 6,
+    "border_color": "#hex or none"
+  },
+  "footer": {
+    "handle": "${brand.handle}",
+    "font": "DM Sans",
+    "size": 16,
+    "color": "#hex",
+    "x": ${margin},
+    "y": ${dim.h - margin + 16}
+  },
+  "slide_indicator": { "text": "${slideIndex || ''}${totalSlides ? '/' + totalSlides : ''}", "x": ${dim.w - margin}, "y": ${margin}, "color": "#hex", "size": 16, "anchor": "end" },
+  "effects": {
+    "headline_glow": { "active": false, "color": "#hex", "std_dev": 8 },
+    "vignette": { "active": false, "opacity": 0.25 }
   }
 }
 
-NOTA: inclua apenas os campos relevantes para o layout. Campos desnecessários podem ser null.`;
+ORIENTAÇÕES CRÍTICAS:
+1. layers[] DEVE ter mínimo 3 elementos que criam riqueza visual (glow-bg + ornament + frame/texture)
+2. Aplique o TEMPLATE DNA fielmente — é a identidade visual do template
+3. Campos null = não renderizar | todos os números são INTEIROS reais no canvas
+4. Se composition_hint = "data-hero": data_block com number_size 160-200px é OBRIGATÓRIO
+5. Escolha cores com contraste real — fundo escuro → texto claro, e vice-versa`;
 
   const r = await callClaude({
     system,
-    userMsg: `Defina o blueprint de design preciso para este brief:`,
-    maxTokens: 1500,
+    userMsg: `Defina o blueprint de design completo e rico para este brief. Inclua mínimo 3 layers decorativos:`,
+    maxTokens: 2500,
   });
   try {
     const m = r.text.match(/\{[\s\S]*\}/);
@@ -2383,42 +2610,133 @@ NOTA: inclua apenas os campos relevantes para o layout. Campos desnecessários p
 // Não precisa "adivinhar" o design — o blueprint já define tudo.
 async function daStage3Svg({ brief, blueprint, brand, dim, format, network }) {
   const system =
-`Você é o SVG EXECUTOR — Estágio 3 (final) do Design Agent.
-MISSÃO: Gerar um SVG PROFISSIONAL e IMPACTANTE seguindo o blueprint com precisão cirúrgica.
+`Você é o SVG EXECUTOR MASTER — o melhor gerador de SVG de design do mundo.
+MISSÃO: Criar SVGs de nível AGÊNCIA INTERNACIONAL (Pentagram, IDEO, R/GA) — designs que param o scroll, impressionam e convertem. Cada pixel é uma decisão de design.
 
-LEIS ABSOLUTAS — NUNCA VIOLE:
-1. Retorne SOMENTE o SVG. Comece com <svg — termine com </svg>. ZERO texto antes ou depois.
+═══════════════ LEIS ABSOLUTAS (nunca viole) ═══════════════
+1. Retorne APENAS o SVG. Começa com <svg — termina com </svg>. Zero texto antes/depois.
 2. xmlns="http://www.w3.org/2000/svg" OBRIGATÓRIO na tag <svg>
 3. viewBox="0 0 ${dim.w} ${dim.h}" OBRIGATÓRIO na tag <svg>
-4. NUNCA use <image href="http..."> — sem recursos externos
-5. NUNCA use @import CSS
-6. ZERO placeholders: "TÍTULO AQUI", "SEU TEXTO", etc — use o conteúdo REAL do blueprint
-7. Nenhum elemento ultrapassa o viewBox — use clipPath se necessário
-8. Todo <text> com font-family, fill, font-size explícitos no elemento
+4. NUNCA use <image href="http..."> ou @import — zero recursos externos
+5. ZERO placeholders — use o texto REAL do blueprint
+6. Nenhum elemento ultrapassa o viewBox — use clipPath quando necessário
+7. Todo <text> com font-family, fill, font-size EXPLÍCITOS no elemento
+8. width="${dim.w}" height="${dim.h}" na tag <svg>
 
-FONTES DISPONÍVEIS (use EXATAMENTE estes nomes no font-family):
+═══════════════ FONTES DISPONÍVEIS ═══════════════
 "Bebas Neue" | "Syne" | "DM Sans" | "Playfair Display" | "Cormorant Garamond" | "IBM Plex Mono"
 
-TÉCNICAS DE QUALIDADE (aplique sempre):
-• Textos longos: <text> com <tspan x="X" dy="Npx"> para cada linha
-• text-rendering="optimizeLegibility" nos headlines
-• Gradientes: defina em <defs> com <linearGradient> e referencie com url(#id)
-• Profundidade: elementos decorativos com opacity="0.08" criam camadas sem poluir
-• Sombra em texto sobre fundo complexo: <filter> com feDropShadow
-• Elementos geométricos de suporte (retângulos, linhas, círculos) elevam a composição
+═══════════════ BIBLIOTECA DE TÉCNICAS SVG AVANÇADAS ═══════════════
 
-CONTEÚDO REAL A USAR:
-• Headline:     "${brief.headline}"${brief.subheadline ? `\n• Subheadline:  "${brief.subheadline}"` : ''}${(brief.body_points || []).length ? `\n• Body points:  ${JSON.stringify(brief.body_points)}` : ''}${brief.data_highlight ? `\n• Data:         "${brief.data_highlight}"` : ''}
-• CTA:          "${brief.cta}"
-• Handle:       "${brand.handle}"
+TÉCNICA 1 — GRADIENTE LINEAR (define em defs, aplica com url(#id)):
+<defs><linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+  <stop offset="0%" stop-color="#1A1A2E"/><stop offset="100%" stop-color="#0F0F1A"/>
+</linearGradient></defs>
+<rect width="${dim.w}" height="${dim.h}" fill="url(#bgGrad)"/>
 
-BLUEPRINT DO ART DIRECTOR — EXECUTE COM PRECISÃO:
+TÉCNICA 2 — RADIAL GLOW (halo luminoso de fundo):
+<defs><radialGradient id="glow1" cx="50%" cy="40%" r="55%">
+  <stop offset="0%" stop-color="#7C3AED" stop-opacity="0.35"/>
+  <stop offset="100%" stop-color="#7C3AED" stop-opacity="0"/>
+</radialGradient></defs>
+<rect width="${dim.w}" height="${dim.h}" fill="url(#glow1)"/>
+
+TÉCNICA 3 — FILTRO GLOW/BLUR em shapes:
+<defs><filter id="glowFx" x="-40%" y="-40%" width="180%" height="180%">
+  <feGaussianBlur stdDeviation="20" result="blur"/>
+  <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+</filter></defs>
+<circle cx="540" cy="300" r="200" fill="#7C3AED" opacity="0.4" filter="url(#glowFx)"/>
+
+TÉCNICA 4 — DROP SHADOW em texto/shapes:
+<defs><filter id="textShadow"><feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#000" flood-opacity="0.5"/></filter></defs>
+<text filter="url(#textShadow)" ...>HEADLINE</text>
+
+TÉCNICA 5 — TEXTO MULTI-LINHA (obrigatório para headlines longos):
+<!-- Regra de quebra: font 120px→~10 chars/linha | 100px→~12 | 80px→~15 | 60px→~20 -->
+<text x="80" y="380" font-family="Bebas Neue" font-size="110" fill="#FFF" text-rendering="optimizeLegibility">
+  <tspan x="80" dy="0">PRIMEIRA LINHA</tspan>
+  <tspan x="80" dy="126">SEGUNDA LINHA</tspan>
+</text>
+
+TÉCNICA 6 — PADRÃO GRID (textura de fundo):
+<defs><pattern id="gridPat" width="40" height="40" patternUnits="userSpaceOnUse">
+  <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#fff" stroke-width="0.5" opacity="0.2"/>
+</pattern></defs>
+<rect width="${dim.w}" height="${dim.h}" fill="url(#gridPat)"/>
+
+TÉCNICA 7 — CLIP PATH (manter elementos no canvas):
+<defs><clipPath id="bounds"><rect width="${dim.w}" height="${dim.h}"/></clipPath></defs>
+<g clip-path="url(#bounds)"><!-- elementos que extrapolam --></g>
+
+TÉCNICA 8 — NOISE/GRAIN (textura orgânica):
+<defs><filter id="grainFx"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
+<feColorMatrix type="saturate" values="0"/><feBlend in="SourceGraphic" mode="overlay"/></filter></defs>
+<rect width="${dim.w}" height="${dim.h}" filter="url(#grainFx)" opacity="0.04"/>
+
+TÉCNICA 9 — GLASS MORPHISM:
+<defs><filter id="glassFx"><feGaussianBlur stdDeviation="12"/></filter></defs>
+<!-- blob atrás do glass com blur -->
+<circle cx="540" cy="400" r="250" fill="#7C3AED" opacity="0.3" filter="url(#glassFx)"/>
+<!-- glass card -->
+<rect x="80" y="250" width="920" height="380" rx="16" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+
+TÉCNICA 10 — SHAPES DECORATIVOS (corners, diagonais, polígonos):
+<!-- L-bracket corner (4 cantos) -->
+<path d="M 60 60 L 60 100 M 60 60 L 100 60" fill="none" stroke="#C9A84C" stroke-width="2"/>
+<!-- Triângulo decorativo canto -->
+<polygon points="${dim.w - 200},0 ${dim.w},0 ${dim.w},200" fill="#7C3AED" opacity="0.25"/>
+<!-- Linha diagonal decorativa -->
+<line x1="${dim.w - 80}" y1="0" x2="${dim.w}" y2="80" stroke="#FFFFFF" stroke-width="1" opacity="0.3"/>
+
+═══════════════ CAMADAS VISUAIS OBRIGATÓRIAS (mín. 6) ═══════════════
+CAMADA 1: Fundo base (rect sólido ou gradiente linear)
+CAMADA 2: Atmosfera (radial glow, scanlines, grid, noise)
+CAMADA 3: Shapes decorativos grandes (circles/blobs com blur, polígonos)
+CAMADA 4: Elementos estruturais (linhas, frames, barras, separadores)
+CAMADA 5: Conteúdo principal (headline hero, dado numérico)
+CAMADA 6: Conteúdo secundário (subheadline, body points, data blocks)
+CAMADA 7: Footer/CTA (handle, botão CTA, slide indicator)
+REGRA: design sem profundidade = design fraco. Crie tensão visual entre os planos.
+
+═══════════════ RECEITAS POR VISUAL MOOD ═══════════════
+dark-power:    radial-glow P1 center + blur-blobs 2x + feDropShadow headline + micro-grid opacity:0.025
+clean-premium: zero noise + sharp edges + circle-bullet P1 + subtle separator + CTA button sólido
+bold-energy:   diagonal polygon corners + neon glow + scanlines opacity:0.05 + L-brackets 4 cantos
+soft-trust:    warm grain texture + organic circles 3x + box shadows suaves + warmth nos tons
+tech-sharp:    grid-pattern visible + monospace + L-brackets + coordinate marks + color accent sharp
+
+═══════════════ REGRAS ANTI-FALHA ═══════════════
+✦ text-rendering="optimizeLegibility" em TODOS os headlines
+✦ Headline > 2 palavras longas: SEMPRE 2 tspans (nunca deixe transbordar)
+✦ Body points: CADA item = 1 tspan com dy=line_height (não empilhe sem dy)
+✦ CTA button: SEMPRE rect + text centrado (cx da rect + padding, cy da rect + padding/2 + font-size/3)
+✦ Footer handle: y = ${dim.h - 30}px mínimo, nunca dentro do conteúdo
+✦ Pelo menos 1 shape com filter blur/glow (cria profundidade premium)
+✦ Pelo menos 1 gradiente (linear ou radial) — designs planos parecem amadores
+✦ Elementos decorativos opacity 0.04-0.25 — visíveis mas não competem com conteúdo
+
+═══════════════ IMPLEMENTAÇÃO DOS LAYERS ═══════════════
+Para cada item em blueprint.layers[]:
+- type "circle": <circle cx=x+r cy=y+r r=r fill=fill opacity=opacity [filter se filter≠none]/>
+- type "rect": <rect x=x y=y width=width height=height rx=rx fill=fill stroke=stroke stroke-width=stroke_w opacity=opacity [filter]/>
+- type "line": <line x1=x1 y1=y1 x2=x2 y2=y2 stroke=stroke stroke-width=stroke_w opacity=opacity/>
+- type "polygon": <polygon points=points fill=fill stroke=stroke opacity=opacity/>
+Para filter "blur-N": adicione filter="url(#blur{N})" e defina <filter id="blur{N}"><feGaussianBlur stdDeviation="N"/></filter> em defs
+Para filter "glow-N": defina filtro de merge (blur + original) com stdDeviation=N
+
+═══════════════ CONTEÚDO REAL A IMPLEMENTAR ═══════════════
+• Headline:    "${brief.headline}"${brief.subheadline ? `\n• Subheadline: "${brief.subheadline}"` : ''}${(brief.body_points || []).length ? `\n• Body:        ${JSON.stringify(brief.body_points)}` : ''}${brief.data_highlight ? `\n• Dado:        "${brief.data_highlight}"` : ''}
+• CTA:         "${brief.cta}"
+• Handle:      "${brand.handle}"
+
+═══════════════ BLUEPRINT COMPLETO DO ART DIRECTOR ═══════════════
 ${JSON.stringify(blueprint, null, 2)}`;
 
   const r = await callClaude({
     system,
-    userMsg: `Plataforma: ${DA_NET_LABELS[network] || network}. Execute o blueprint e gere o SVG completo:`,
-    maxTokens: 10000,
+    userMsg: `Plataforma: ${DA_NET_LABELS[network] || network}. Execute o blueprint com todas as camadas visuais. Crie um design de agência premium — rico, profundo, impactante. SVG completo agora:`,
+    maxTokens: 12000,
   });
 
   let svg = '';
