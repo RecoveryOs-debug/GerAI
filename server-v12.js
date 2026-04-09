@@ -763,6 +763,7 @@ function callClaude({ system, userMsg, maxTokens = 2000 }) {
         } catch { reject(new Error('Resposta inválida da API')); }
       });
     });
+    req.setTimeout(90000, () => { req.destroy(); reject(new Error('Anthropic API timeout (90s)')); });
     req.on('error', reject);
     req.write(body); req.end();
   });
@@ -784,7 +785,11 @@ function callClaudeMessages({ system, messages, maxTokens = 2500 }) {
         try {
           const p = JSON.parse(data);
           if (p.error) return reject(new Error(p.error.message || 'Erro Anthropic'));
-          resolve(p.content?.[0]?.text || '');
+          resolve({
+            text: p.content?.[0]?.text || '',
+            inputTokens: p.usage?.input_tokens || 0,
+            outputTokens: p.usage?.output_tokens || 0,
+          });
         } catch { reject(new Error('Resposta inválida da API')); }
       });
     });
@@ -886,7 +891,7 @@ async function maybeSummarizeMemory(userId, genCount, recentGens) {
     var lines = recentGens.slice(0, 15).map(function(g) {
       return '- ' + (g.feature || 'conteudo') + ' | ' + (g.format || '') + ' | ' + (g.network || '') + ' | tema: "' + ((g.prompt || '').slice(0, 80)) + '"';
     }).join('\n');
-    var summary = await callClaudeMessages({
+    var { text: summary } = await callClaudeMessages({
       system: 'Voce e um analista de padroes de conteudo. Analise o historico e extraia insights sobre padroes, preferencias e estilo do usuario. Maximo 200 palavras. Responda em portugues.',
       messages: [{ role: 'user', content: 'Historico:\n' + lines + '\n\nExtraia: formatos preferidos, temas recorrentes, redes usadas, padroes de conteudo.' }],
       maxTokens: 300,
@@ -949,7 +954,12 @@ async function runAgentPipeline(opts) {
   }
 
   var resultCopy = await callClaudeMessages({ system: sysCopywriter, messages: messages, maxTokens: 2500 });
-  return { content: resultCopy, brief: brief };
+  return {
+    content: resultCopy.text,
+    brief,
+    inputTokens:  (resultStrategist.inputTokens  || 0) + (resultCopy.inputTokens  || 0),
+    outputTokens: (resultStrategist.outputTokens || 0) + (resultCopy.outputTokens || 0),
+  };
 }
 
 function getAgentSkill(slug, user, tomOverride) {
@@ -1615,7 +1625,7 @@ route('POST', '/api/user/refine-prompt', async (req, res) => {
     } else {
       messages = [{ role: 'user', content: userMsg }];
     }
-    const refined = await callClaudeMessages({ system: getRefineSkill(user, refineOpts) + memCtx, messages, maxTokens: 600 });
+    const { text: refined } = await callClaudeMessages({ system: getRefineSkill(user, refineOpts) + memCtx, messages, maxTokens: 600 });
     ok(res, { refined_prompt: refined.trim(), original: input });
   } catch(e) {
     const p = user || {};
@@ -1680,6 +1690,8 @@ route('POST', '/api/user/generate-content-stream', async (req, res) => {
 
     const stratResult = await callClaude({ system: sysStrategist, userMsg: 'INPUT: "' + input + '"\nAGENTE: ' + agent + '\n\nDefina a estrategia:', maxTokens: 400 });
     const brief = stratResult.text;
+    let streamInputTokens = stratResult.inputTokens || 0;
+    let streamOutputTokens = stratResult.outputTokens || 0;
 
     send('stage', { stage: 2, label: 'Copywriter escrevendo...' });
 
@@ -1720,6 +1732,12 @@ route('POST', '/api/user/generate-content-stream', async (req, res) => {
               if (evt.type === 'content_block_delta' && evt.delta && evt.delta.text) {
                 send('delta', { text: evt.delta.text });
               }
+              if (evt.type === 'message_start' && evt.message?.usage) {
+                streamInputTokens += evt.message.usage.input_tokens || 0;
+              }
+              if (evt.type === 'message_delta' && evt.usage) {
+                streamOutputTokens += evt.usage.output_tokens || 0;
+              }
             } catch(e) {}
           });
         });
@@ -1734,7 +1752,7 @@ route('POST', '/api/user/generate-content-stream', async (req, res) => {
     send('done', { agent: agent, rede: rede, tipo: tipo });
     res.end();
 
-    db.addGeneration({ user_id: payload.id, feature: agent, format: tipo || agent, network: rede || 'instagram', concept_name: agent, prompt: input.slice(0, 200), credits_used: 1 });
+    db.addGeneration({ user_id: payload.id, feature: agent, format: tipo || agent, network: rede || 'instagram', concept_name: agent, prompt: input.slice(0, 200), credits_used: 1, input_tokens: streamInputTokens, output_tokens: streamOutputTokens });
     const newCount = db.upsertMemory(payload.id, { summary: memory.summary, preferences: memory.preferences, positive: memory.positive, negative: memory.negative, incrementGen: true });
     if (newCount % 5 === 0) {
       const recentGens = db.getRecentGenerations(payload.id, 15);
@@ -1752,8 +1770,8 @@ route('POST', '/api/user/generate-content', async (req, res) => {
   try { db.consumeQuota(payload.id); } catch(e) { return err(res, e.message); }
   const memory = db.getMemory(payload.id);
   try {
-    const { content: responseText } = await runAgentPipeline({ agent, input, user, memory, tomOverride: tom, mediaFiles });
-    db.addGeneration({ user_id: payload.id, feature: agent, format: tipo || agent, network: rede || 'instagram', concept_name: agent, prompt: input.slice(0, 200), credits_used: 1 });
+    const { content: responseText, inputTokens: agentIn, outputTokens: agentOut } = await runAgentPipeline({ agent, input, user, memory, tomOverride: tom, mediaFiles });
+    db.addGeneration({ user_id: payload.id, feature: agent, format: tipo || agent, network: rede || 'instagram', concept_name: agent, prompt: input.slice(0, 200), credits_used: 1, input_tokens: agentIn || 0, output_tokens: agentOut || 0 });
     const newCount = db.upsertMemory(payload.id, { summary: memory.summary, preferences: memory.preferences, positive: memory.positive, negative: memory.negative, incrementGen: true });
     if (newCount % 5 === 0) {
       const recentGens = db.getRecentGenerations(payload.id, 15);
@@ -2404,7 +2422,7 @@ ${JSON.stringify(blueprint, null, 2)}`;
   });
 
   let svg = '';
-  const m = r.text.match(/<svg[\s\S]*?<\/svg>/i);
+  const m = r.text.match(/<svg[\s\S]*<\/svg>/i);  // greedy: from first <svg to last </svg>
   if (m) svg = m[0];
   else if (r.text.trim().startsWith('<svg')) svg = r.text.trim();
   if (svg && !svg.includes('xmlns='))
@@ -2433,10 +2451,11 @@ route('POST', '/api/user/design-agent/variations', async (req, res) => {
   catch(e) { return err(res, e.message, 402); }
 
   // Estágio 1 compartilhado — brief único para todas as variações
-  let brief;
+  let brief, s1Tok = { in: 0, out: 0 };
   try {
     const s1 = await daStage1Brief({ prompt, format, network, brand });
-    brief = s1.data;
+    brief  = s1.data;
+    s1Tok  = s1.tok;
   } catch(e) { return err(res, 'Falha na análise: ' + e.message); }
 
   // Visual moods distintos para garantir diversidade visual entre variações
@@ -2446,26 +2465,29 @@ route('POST', '/api/user/design-agent/variations', async (req, res) => {
   const tasks = Array.from({ length: n }, (_, i) => {
     const moodBrief = { ...brief, visual_mood: VARIATION_MOODS[i % VARIATION_MOODS.length] };
     return daStage2ArtDir({ brief: moodBrief, brand, dim, format, slideIndex: null, totalSlides: null })
-      .then(s2 => daStage3Svg({ brief: moodBrief, blueprint: s2.data, brand, dim, format, network }))
-      .then(s3 => ({
-        index: i + 1,
-        mood:  VARIATION_MOODS[i % VARIATION_MOODS.length],
-        svg:   s3.svg,
-        ok:    !!(s3.svg && s3.svg.length > 300),
-      }))
-      .catch(e => ({ index: i + 1, mood: VARIATION_MOODS[i % VARIATION_MOODS.length], svg: null, ok: false, error: e.message }));
+      .then(s2 => daStage3Svg({ brief: moodBrief, blueprint: s2.data, brand, dim, format, network })
+        .then(s3 => ({
+          index: i + 1,
+          mood:  VARIATION_MOODS[i % VARIATION_MOODS.length],
+          svg:   s3.svg,
+          ok:    !!(s3.svg && s3.svg.length > 300),
+          tok:   { in: (s2.tok.in||0) + (s3.tok.in||0), out: (s2.tok.out||0) + (s3.tok.out||0) },
+        })))
+      .catch(e => ({ index: i + 1, mood: VARIATION_MOODS[i % VARIATION_MOODS.length], svg: null, ok: false, error: e.message, tok: { in: 0, out: 0 } }));
   });
 
   const results = await Promise.all(tasks);
 
-  // Persiste apenas as variações bem-sucedidas
-  const totalIn = 0, totalOut = 0;
+  // Persiste apenas as variações bem-sucedidas (Stage 1 tokens divididos igualmente)
+  const s1PerVar = { in: Math.round((s1Tok.in||0) / n), out: Math.round((s1Tok.out||0) / n) };
   for (const r of results) {
     if (r.ok && r.svg) {
       db.addGeneration({
         user_id: payload.id, feature: 'design-agent-variation',
         format, network, concept_name: (brief.headline || prompt).slice(0, 60),
         prompt: prompt.slice(0, 200), svg_data: r.svg, credits_used: 1,
+        input_tokens:  (r.tok?.in  || 0) + s1PerVar.in,
+        output_tokens: (r.tok?.out || 0) + s1PerVar.out,
       });
     }
   }
@@ -2581,6 +2603,9 @@ route('POST', '/api/user/design-agent', async (req, res) => {
     try { res.write(`data: ${JSON.stringify({ type, ...data })}\n\n`); } catch {}
   };
 
+  // Keepalive: send SSE comment every 8s to prevent proxy timeouts (design agent can take 60-90s)
+  const keepalive = setInterval(() => { try { res.write(': ping\n\n'); } catch {} }, 8000);
+
   let totalIn = 0, totalOut = 0;
 
   try {
@@ -2647,6 +2672,8 @@ route('POST', '/api/user/design-agent', async (req, res) => {
   } catch(e) {
     log.error('[DESIGN-AGENT] Error:', e.message);
     send('error', { message: e.message });
+  } finally {
+    clearInterval(keepalive);
   }
 
   res.end();
