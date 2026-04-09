@@ -6176,6 +6176,10 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                   <svg style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                   Gerar imagem com IA
                 </button>
+                <button id="btn-variacoes-img" onclick="gerarVariacoes()" style="width:100%;margin-top:7px;background:transparent;border:1.5px solid var(--amber-30,rgba(245,197,24,.3));border-radius:var(--r2);padding:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--f);font-size:12px;font-weight:600;color:var(--amber);letter-spacing:-.01em;transition:all .15s">
+                  <svg style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                  Gerar 3 variações
+                </button>
               </div>
             </div>
 
@@ -6207,11 +6211,21 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                   </button>
                 </div>
               </div>
-              <!-- loading state -->
+              <!-- loading state — Design Agent -->
               <div class="img-gen-loading" id="img-gen-loading" style="display:none">
+                <!-- barra de progresso -->
+                <div style="width:100%;background:var(--ink-3,#1a1a1a);border-radius:4px;height:3px;margin-bottom:14px;overflow:hidden">
+                  <div id="img-gen-bar" style="height:100%;background:var(--a,#F5C518);width:0%;transition:width .6s ease;border-radius:4px"></div>
+                </div>
                 <div class="img-gen-spin"></div>
-                <div class="img-gen-txt">Gerando imagem com IA...</div>
-                <div class="img-gen-stage" id="img-gen-stage">Aplicando identidade da marca...</div>
+                <div class="img-gen-txt">Design Agent trabalhando...</div>
+                <div class="img-gen-stage" id="img-gen-stage">Inicializando...</div>
+                <!-- brief preview — aparece após estágio 1 -->
+                <div id="img-gen-brief" style="display:none;margin-top:12px;padding:10px 12px;background:var(--ink-3,#111);border-radius:8px;border-left:3px solid var(--a,#F5C518);width:100%;box-sizing:border-box;text-align:left">
+                  <div style="font-size:10px;color:var(--a,#F5C518);font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px">Brief extraído</div>
+                  <div id="img-gen-headline" style="font-size:13px;font-weight:700;color:var(--t0,#fff);margin-bottom:3px;line-height:1.3"></div>
+                  <div id="img-gen-mood" style="font-size:11px;color:var(--t2,#888)"></div>
+                </div>
               </div>
             </div>
 
@@ -8007,8 +8021,8 @@ async function gerarImagem() {
   if (!rawInput) { toast('Descreva sua ideia antes de gerar','err'); return; }
   if (!window._selectedModel) { toast('Escolha um modelo antes de gerar a imagem','err'); return; }
 
-  const model   = window._selectedModel;
-  const refined = (window._refinedPrompt || '').trim() || rawInput;
+  const model       = window._selectedModel;
+  const refined     = (window._refinedPrompt || '').trim() || rawInput;
   const isCarrossel = (_currentFmt === 'carrossel');
   const slideCount  = isCarrossel ? ((typeof _slideCount !== 'undefined') ? _slideCount : 0) : 1;
 
@@ -8021,104 +8035,132 @@ async function gerarImagem() {
   document.getElementById('img-preview-wrap')?.classList.remove('vis');
   document.getElementById('img-gen-loading').style.display = 'flex';
 
-  const stageEl = document.getElementById('img-gen-stage');
+  const stageEl    = document.getElementById('img-gen-stage');
+  const barEl      = document.getElementById('img-gen-bar');
+  const briefEl    = document.getElementById('img-gen-brief');
+  const headlineEl = document.getElementById('img-gen-headline');
+  const moodEl     = document.getElementById('img-gen-mood');
 
-  // ── Carousel mode ────────────────────────────────────────────────────────
+  function setBar(pct) { if (barEl) barEl.style.width = pct + '%'; }
+  function setStage(txt) { if (stageEl) stageEl.textContent = txt; }
+
+  // ── SSE streamer: calls /api/user/design-agent and returns SVG ───────────
+  async function streamDesignAgent(payload) {
+    const resp = await fetch(API + '/api/user/design-agent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify(payload)
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error || 'Erro ' + resp.status);
+    }
+    const reader  = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '', svgResult = null;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop(); // keep incomplete last line
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        let evt;
+        try { evt = JSON.parse(line.slice(6)); } catch { continue; }
+        if (evt.type === 'stage') {
+          const stageMap = { 1: [10, 'Analisando brief...'], 2: [42, 'Direcionamento de arte...'], 3: [72, 'Executando SVG...'] };
+          const [pct, label] = stageMap[evt.stage] || [5, 'Processando...'];
+          setBar(pct); setStage(label);
+        } else if (evt.type === 'brief') {
+          setBar(35); setStage('Brief extraído. Criando arte...');
+          if (briefEl) briefEl.style.display = 'block';
+          if (headlineEl) headlineEl.textContent = evt.brief?.headline || '';
+          if (moodEl) moodEl.textContent = evt.brief?.visual_mood || '';
+        } else if (evt.type === 'blueprint') {
+          setBar(70); setStage('Blueprint pronto. Gerando SVG...');
+        } else if (evt.type === 'done') {
+          setBar(100); svgResult = evt.svg;
+        } else if (evt.type === 'error') {
+          throw new Error(evt.message || 'Erro no agente');
+        }
+      }
+    }
+    if (!svgResult) throw new Error('SVG não retornado pelo agente');
+    return svgResult;
+  }
+
+  // ── Carousel mode ─────────────────────────────────────────────────────────
   if (isCarrossel) {
-    // Determine how many slides to generate
-    var totalSlides = slideCount > 0 ? slideCount : null; // null = IA decide (will come from backend)
-
-    const bodyFirst = {
-      prompt:   refined,
-      format:   _currentFmt,
-      network:  _netMap[_currentNet] || 'instagram',
-      imgMode:  'model',
-      brandProfile,
-      slideIndex:  1,
-      totalSlides: totalSlides,
-      isCarrossel: true,
-    };
-
-    if (stageEl) stageEl.textContent = 'Gerando slide 1...';
-
-    let firstSvg = null;
-    let resolvedTotal = totalSlides || 4; // fallback while waiting
-
+    setStage('Planejando narrativa do carrossel...'); setBar(5);
+    let plan;
     try {
-      const data = await api('POST', '/api/user/generate-image', bodyFirst);
-      if (!data.svg) throw new Error('SVG não retornado');
-      firstSvg = data.svg;
-      if (data.totalSlides) resolvedTotal = data.totalSlides;
-    } catch(e) {
-      clearGenLoading();
-      showGenError(e.message);
-      return;
-    }
+      plan = await api('POST', '/api/user/design-agent/plan-carousel', {
+        prompt: refined,
+        network: _netMap[_currentNet] || 'instagram',
+        brandProfile,
+        totalSlides: slideCount > 0 ? slideCount : null
+      });
+    } catch(e) { clearGenLoading(); showGenError(e.message); return; }
 
-    // Show carousel grid
+    const slides = plan.plan?.slides || [];
+    const total  = slides.length || plan.totalSlides || (slideCount > 0 ? slideCount : 4);
+
     document.getElementById('img-gen-loading').style.display = 'none';
-    _showCarouselOutput(resolvedTotal);
-    _renderCarouselSlide(1, firstSvg, resolvedTotal);
+    _showCarouselOutput(total);
 
-    // Generate remaining slides sequentially
-    for (var s = 2; s <= resolvedTotal; s++) {
-      var sIdx = s; // capture
-      var slideWrap = document.getElementById('cs-wrap-' + sIdx);
-      if (slideWrap) {
-        var ldr = slideWrap.querySelector('.cs-loading');
-        if (ldr) ldr.style.display = 'flex';
-      }
-      if (stageEl) stageEl.textContent = 'Gerando slide ' + sIdx + ' de ' + resolvedTotal + '...';
+    for (let s = 0; s < total; s++) {
+      const sIdx     = s + 1;
+      const slideWrap = document.getElementById('cs-wrap-' + sIdx);
+      document.getElementById('img-gen-loading').style.display = 'flex';
+      setStage('Gerando slide ' + sIdx + ' de ' + total + '...');
+      setBar(Math.round((s / total) * 90));
+      if (briefEl) briefEl.style.display = 'none';
+
+      const slide     = slides[s] || {};
+      const slideRole = slide.role || (sIdx === 1 ? 'capa' : sIdx === total ? 'cta' : 'conteudo');
+      const slideDesc = [slide.headline, slide.subheadline, (slide.body_points||[]).join('. '), slide.cta]
+        .filter(Boolean).join(' — ') || refined;
       try {
-        const bodyN = {
-          prompt:   refined,
-          format:   _currentFmt,
-          network:  _netMap[_currentNet] || 'instagram',
-          imgMode:  'model',
-          brandProfile,
-          slideIndex:  sIdx,
-          totalSlides: resolvedTotal,
-          isCarrossel: true,
-        };
-        const dataN = await api('POST', '/api/user/generate-image', bodyN);
-        if (dataN.svg) _renderCarouselSlide(sIdx, dataN.svg, resolvedTotal);
+        const svg = await streamDesignAgent({
+          prompt: slideDesc, format: _currentFmt,
+          network: _netMap[_currentNet] || 'instagram',
+          brandProfile, slideIndex: sIdx, totalSlides: total, slideRole,
+        });
+        _renderCarouselSlide(sIdx, svg, total);
       } catch(e) {
-        if (slideWrap) slideWrap.querySelector('.cs-loading').innerHTML =
-          '<span style="color:var(--red);font-size:11px">Erro no slide ' + sIdx + '</span>';
+        const ldr = slideWrap?.querySelector('.cs-loading');
+        if (ldr) ldr.innerHTML = '<span style="color:var(--red);font-size:11px">Erro no slide ' + sIdx + '</span>';
       }
     }
-    if (stageEl) stageEl.textContent = 'Carrossel completo!';
-    toast('Carrossel gerado! ' + resolvedTotal + ' slides prontos.', 'ok');
-    if (me) { me.quota_used = (me.quota_used || 0) + resolvedTotal; updateQuota(); }
+
+    document.getElementById('img-gen-loading').style.display = 'none';
+    setStage('Carrossel completo!');
+    toast('Carrossel gerado! ' + total + ' slides prontos.', 'ok');
+    if (me) { me.quota_used = (me.quota_used || 0) + total; updateQuota(); }
     return;
   }
 
   // ── Single image mode ─────────────────────────────────────────────────────
-  let si = 0;
-  const IV_STAGES = ['Criando composição...','Aplicando paleta de marca...','Tipografia e hierarquia...','Elementos visuais...','Finalizando...'];
-  const iv = setInterval(function() { if (si < IV_STAGES.length && stageEl) stageEl.textContent = IV_STAGES[si++]; }, 900);
+  setStage('Inicializando Design Agent...'); setBar(0);
+  if (briefEl) briefEl.style.display = 'none';
 
   try {
-    const body = {
-      prompt:  refined, format: _currentFmt,
+    const svg = await streamDesignAgent({
+      prompt: refined, format: _currentFmt,
       network: _netMap[_currentNet] || 'instagram',
-      imgMode: 'model', brandProfile,
-    };
-    const data = await api('POST', '/api/user/generate-image', body);
-    clearInterval(iv);
-    const svgCode = data.svg;
-    if (!svgCode) throw new Error('Sem SVG na resposta');
-    window._currentSVG = svgCode;
-    _currentSVG = svgCode;
+      brandProfile,
+    });
+    window._currentSVG = svg;
+    _currentSVG = svg;
     _currentImgName = 'autopostt-' + model.n + '-' + Date.now();
     const thumb = document.getElementById('img-preview-thumb');
-    if (thumb) thumb.innerHTML = svgCode;
+    if (thumb) thumb.innerHTML = svg;
     document.getElementById('img-gen-loading').style.display = 'none';
     document.getElementById('img-preview-wrap')?.classList.add('vis');
     toast('Imagem gerada!', 'ok');
     if (me) { me.quota_used = (me.quota_used||0)+1; updateQuota(); }
   } catch(e) {
-    clearInterval(iv);
     clearGenLoading();
     showGenError(e.message);
   }
@@ -8137,6 +8179,75 @@ function showGenError(msg) {
       + '<button class="btn btn-g btn-sm" onclick="gerarImagem()">Tentar novamente</button>';
   }
   toast(msg, 'err');
+}
+
+async function gerarVariacoes() {
+  const rawInput = (window._rawInput || document.getElementById('gen-in')?.value || '').trim();
+  if (!rawInput) { toast('Descreva sua ideia antes de gerar variações','err'); return; }
+  if (!window._selectedModel) { toast('Escolha um modelo antes de gerar variações','err'); return; }
+
+  const model    = window._selectedModel;
+  const refined  = (window._refinedPrompt || '').trim() || rawInput;
+  const brandProfile = BrandProfileModule.toGenerationPayload({
+    modelN: model.n, modelName: model.name, modelSvg: model.svg
+  });
+
+  switchOutTab('imagem');
+  document.getElementById('img-preview-empty').style.display = 'none';
+  document.getElementById('img-preview-wrap')?.classList.remove('vis');
+  document.getElementById('img-gen-loading').style.display = 'flex';
+  const stageEl = document.getElementById('img-gen-stage');
+  const barEl   = document.getElementById('img-gen-bar');
+  const briefEl = document.getElementById('img-gen-brief');
+  if (stageEl) stageEl.textContent = 'Gerando 3 variações em paralelo...';
+  if (barEl) barEl.style.width = '30%';
+  if (briefEl) briefEl.style.display = 'none';
+
+  try {
+    const data = await api('POST', '/api/user/design-agent/variations', {
+      prompt:  refined,
+      format:  _currentFmt,
+      network: _netMap[_currentNet] || 'instagram',
+      brandProfile,
+    });
+    if (barEl) barEl.style.width = '100%';
+    document.getElementById('img-gen-loading').style.display = 'none';
+
+    // Remove old grid if present
+    let grid = document.getElementById('variations-grid');
+    if (grid) grid.remove();
+    grid = document.createElement('div');
+    grid.id = 'variations-grid';
+    grid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px';
+
+    (data.variations || []).forEach(function(v, i) {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--ink-2);border-radius:8px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:border-color .15s';
+      card.innerHTML =
+        '<div style="aspect-ratio:1/1;overflow:hidden">' + v.svg + '</div>'
+        + '<div style="padding:5px 8px;font-size:10px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.5px">' + esc(v.mood || ('Variação ' + (i+1))) + '</div>';
+      card.onclick = function() {
+        document.querySelectorAll('#variations-grid > div').forEach(d => d.style.borderColor = 'transparent');
+        card.style.borderColor = 'var(--a)';
+        window._currentSVG = v.svg;
+        _currentSVG = v.svg;
+        _currentImgName = 'autopostt-' + model.n + '-var' + (i+1) + '-' + Date.now();
+        const thumb = document.getElementById('img-preview-thumb');
+        if (thumb) thumb.innerHTML = v.svg;
+        document.getElementById('img-preview-wrap')?.classList.add('vis');
+      };
+      grid.appendChild(card);
+    });
+
+    document.getElementById('img-preview-empty').style.display = 'none';
+    const tab = document.getElementById('out-tab-imagem');
+    if (tab) tab.insertBefore(grid, tab.firstChild);
+    toast((data.variations?.length || 3) + ' variações prontas! Clique para selecionar.', 'ok');
+    if (me) { me.quota_used = (me.quota_used||0) + (data.variations?.length||3); updateQuota(); }
+  } catch(e) {
+    clearGenLoading();
+    showGenError(e.message);
+  }
 }
 
 function _showCarouselOutput(total) {
@@ -8276,53 +8387,62 @@ function closeImgModal() {
   const body = document.getElementById('img-modal-body');
   if (body) body.innerHTML = '';
 }
-function downloadImg() {
+async function downloadImg() {
   const svg = window._currentSVG || _currentSVG;
   if (!svg) { toast('Nenhuma imagem para baixar','err'); return; }
-  toast('Gerando JPG...','ok');
+  const fname = _currentImgName || 'autopostt-imagem';
+  toast('Exportando...', '');
 
-  // Extrai viewBox para dimensões corretas
+  // ── Server-side export (preserves fonts for Instagram) ───────────────────
+  try {
+    const resp = await fetch(API + '/api/user/design-agent/export', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ svg, fmt: 'jpg', quality: 92 })
+    });
+    if (!resp.ok) throw new Error('server-export-failed');
+    const blob = await resp.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = fname + '.jpg';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+    toast('JPG exportado!', 'ok');
+    return;
+  } catch {}
+
+  // ── Canvas fallback ───────────────────────────────────────────────────────
   const vbMatch = svg.match(/viewBox=["']([^"']+)["']/);
   let W = 1080, H = 1350;
-  if (vbMatch) {
-    const parts = vbMatch[1].trim().split(/[\s,]+/);
-    if (parts.length === 4) { W = parseFloat(parts[2])||1080; H = parseFloat(parts[3])||1350; }
-  }
-
-  // Usa a cor secundária da marca como fundo do canvas (garante que fundo SVG transparente fique certo)
+  if (vbMatch) { const p = vbMatch[1].trim().split(/[\s,]+/); if (p.length===4){W=parseFloat(p[2])||1080;H=parseFloat(p[3])||1350;} }
   const brandParts = (me?.cores || '#F5C518,#0D0D0F,#F5F4F0').split(',').map(s=>s.trim());
   const bgColor = brandParts[1] || '#0D0D0F';
-
-  const blob = new Blob([svg], {type:'image/svg+xml;charset=utf-8'});
-  const url  = URL.createObjectURL(blob);
-  const img  = new Image();
+  const blob0 = new Blob([svg], {type:'image/svg+xml;charset=utf-8'});
+  const url   = URL.createObjectURL(blob0);
+  const img   = new Image();
   img.onload = function() {
     const canvas = document.createElement('canvas');
-    canvas.width  = W * 2; // 2x para alta qualidade
-    canvas.height = H * 2;
+    canvas.width = W*2; canvas.height = H*2;
     const ctx = canvas.getContext('2d');
-    ctx.scale(2, 2);
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, W, H);
-    ctx.drawImage(img, 0, 0, W, H);
+    ctx.scale(2,2); ctx.fillStyle = bgColor; ctx.fillRect(0,0,W,H);
+    ctx.drawImage(img,0,0,W,H);
     URL.revokeObjectURL(url);
     canvas.toBlob(function(b){
-      if (!b) { toast('Erro na conversão. Tente novamente.','err'); return; }
+      if (!b) { toast('Erro na conversão.','err'); return; }
       const a = document.createElement('a');
       a.href = URL.createObjectURL(b);
-      a.download = (_currentImgName || 'autopostt-imagem') + '.jpg';
+      a.download = fname + '.jpg';
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       URL.revokeObjectURL(a.href);
       toast('JPG baixado! (' + W + 'x' + H + ')','ok');
     }, 'image/jpeg', 0.96);
   };
-  img.onerror = function(){
+  img.onerror = function() {
     URL.revokeObjectURL(url);
-    // Fallback: tenta via canvas com Blob URL diferente
-    toast('Erro ao renderizar. Baixando SVG como fallback.','');
+    toast('Baixando SVG como fallback.','');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));
-    a.download = (_currentImgName||'autopostt') + '.svg';
+    a.download = fname + '.svg';
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
   };
   img.src = url;

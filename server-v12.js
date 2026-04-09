@@ -2414,6 +2414,66 @@ ${JSON.stringify(blueprint, null, 2)}`;
   return { svg: sanitizeSvg(svg), tok: { in: r.inputTokens, out: r.outputTokens } };
 }
 
+// ── Rota: Variações — gera N alternativas visuais em paralelo ────────────────
+// Roda 1 Brief Analyst compartilhado + N Art Director/SVG Executor em paralelo.
+// Cada variação recebe um visual_mood diferente para máxima diversidade.
+// Quota: 1 crédito por variação gerada com sucesso.
+route('POST', '/api/user/design-agent/variations', async (req, res) => {
+  const payload = requireAuth(req, res); if (!payload) return;
+  const { prompt, format = 'post', network = 'instagram', brandProfile, count = 2 } = await parseBody(req);
+  if (!prompt) return err(res, 'prompt obrigatório');
+
+  const user  = db.getUserById(payload.id);
+  const brand = daBrand(user, brandProfile);
+  const dim   = DA_DIMS[format] || DA_DIMS.post;
+  const n     = Math.max(2, Math.min(3, parseInt(count) || 2));
+
+  // Consome n créditos antecipadamente
+  try { for (let i = 0; i < n; i++) db.consumeQuota(payload.id); }
+  catch(e) { return err(res, e.message, 402); }
+
+  // Estágio 1 compartilhado — brief único para todas as variações
+  let brief;
+  try {
+    const s1 = await daStage1Brief({ prompt, format, network, brand });
+    brief = s1.data;
+  } catch(e) { return err(res, 'Falha na análise: ' + e.message); }
+
+  // Visual moods distintos para garantir diversidade visual entre variações
+  const VARIATION_MOODS = ['dark-power', 'clean-premium', 'bold-energy'];
+
+  // Estágios 2+3 em paralelo — cada variação com mood diferente
+  const tasks = Array.from({ length: n }, (_, i) => {
+    const moodBrief = { ...brief, visual_mood: VARIATION_MOODS[i % VARIATION_MOODS.length] };
+    return daStage2ArtDir({ brief: moodBrief, brand, dim, format, slideIndex: null, totalSlides: null })
+      .then(s2 => daStage3Svg({ brief: moodBrief, blueprint: s2.data, brand, dim, format, network }))
+      .then(s3 => ({
+        index: i + 1,
+        mood:  VARIATION_MOODS[i % VARIATION_MOODS.length],
+        svg:   s3.svg,
+        ok:    !!(s3.svg && s3.svg.length > 300),
+      }))
+      .catch(e => ({ index: i + 1, mood: VARIATION_MOODS[i % VARIATION_MOODS.length], svg: null, ok: false, error: e.message }));
+  });
+
+  const results = await Promise.all(tasks);
+
+  // Persiste apenas as variações bem-sucedidas
+  const totalIn = 0, totalOut = 0;
+  for (const r of results) {
+    if (r.ok && r.svg) {
+      db.addGeneration({
+        user_id: payload.id, feature: 'design-agent-variation',
+        format, network, concept_name: (brief.headline || prompt).slice(0, 60),
+        prompt: prompt.slice(0, 200), svg_data: r.svg, credits_used: 1,
+      });
+    }
+  }
+
+  log.info(`[VARIATIONS] user=${payload.id} n=${n} ok=${results.filter(r=>r.ok).length}/${n}`);
+  ok(res, { variations: results, brief, total: n });
+});
+
 // ── Rota: Planejador de Carrossel ─────────────────────────────────────────────
 // Gera o plano narrativo completo antes de gerar os slides individualmente.
 // O cliente usa o plano para passar slideRole em cada chamada do design-agent.
