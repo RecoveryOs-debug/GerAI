@@ -1,11 +1,23 @@
 /**
  * AutoPostt Backend — server-v13.js
- * 
+ *
  * Melhorias sobre v12:
  * 1. SQLite via node:sqlite (built-in Node 22) — zero deps, escala para 10k+ users
  * 2. SSE Streaming nos agentes de conteúdo — UX de digitação em tempo real
  * 3. API de Calendário Editorial — CRUD completo de posts agendados
  * 4. Onboarding otimizado — salva step-by-step, progresso não se perde
+ *
+ * Design Agent v2 (overhaul de qualidade — nível agência):
+ * 5. STYLE_DNA rico — 20 templates com DNA completo (cores, fontes, efeitos, regras)
+ * 6. Stage 1 (Brief Analyst) — framework de copywriting viral com 6 padrões de gancho
+ * 7. Stage 2 (Art Director) — blueprint com layers[], effects, tipografia scale
+ * 8. Stage 3 (SVG Executor) — biblioteca de 10 técnicas SVG avançadas, 7 camadas
+ *    obrigatórias, receitas por mood, regras anti-falha, maxTokens 10k→12k
+ *
+ * Fixes:
+ * 9. Rastreamento de custo por geração (callClaudeMessages retorna tokens)
+ * 10. SVG regex greedy (evita truncamento em SVGs com nested elements)
+ * 11. Keepalive SSE a cada 8s (evita timeout de proxies em gerações longas)
  *
  * Compatibilidade total com v12: todos os endpoints existentes preservados.
  * Novos endpoints prefixados claramente abaixo.
