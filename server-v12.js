@@ -2458,9 +2458,31 @@ ${JSON.stringify(brief, null, 2)}
 • PROFUNDIDADE: mínimo 4 camadas visuais (bg + texture + decorative + content)
 • ACCENT: sempre na cor P1
 
-━━━ ESCALA TIPOGRÁFICA ━━━
+━━━ ESCALA TIPOGRÁFICA + FÓRMULA ANTI-OVERFLOW (CRÍTICO) ━━━
 Hero: 140-180px | XL: 100-130px | L: 72-96px | M: 28-36px | S: 20-24px | XS: 14-18px
-WRAPPING: headline > 18 chars → quebre em 2 linhas, line_h = size × 1.12
+
+⚠️  CÁLCULO OBRIGATÓRIO — use ANTES de definir qualquer font-size de headline:
+Safe width canvas: ${dim.w - margin * 2}px | Char width média Bebas Neue: 0.60 × fontSize
+
+headline: "${brief.headline}" → ${brief.headline.length} chars
+  → 1 linha max: floor(${dim.w - margin * 2} ÷ (${brief.headline.length} × 0.60)) = ${Math.floor((dim.w - margin * 2) / (brief.headline.length * 0.60))}px
+  → 2 linhas max (${Math.ceil(brief.headline.length / 2)} chars/linha): ${Math.floor((dim.w - margin * 2) / (Math.ceil(brief.headline.length / 2) * 0.60))}px
+
+REGRA DURA: NUNCA defina headline.size acima do valor calculado para 1 linha.
+Se quiser fonte maior → quebre em 2 linhas com line_h e o SVG Executor usará tspans.
+Se headline > 12 chars → PREFIRA 2 linhas a fonte gigante que transborda.
+
+━━━ ZONAS ESPACIAIS (anti-colisão obrigatório) ━━━
+  HEADER ZONE:  y = 0       → ${Math.round(dim.h * 0.15)}  — slide_indicator, badge, label, data_block se for badge
+  HERO ZONE:    y = ${Math.round(dim.h * 0.14)} → ${Math.round(dim.h * 0.65)} — headline + subheadline (zona exclusiva)
+  BODY ZONE:    y = ${Math.round(dim.h * 0.57)} → ${Math.round(dim.h * 0.82)} — separator + body_points
+  CTA ZONE:     y = ${Math.round(dim.h * 0.78)} → ${Math.round(dim.h * 0.91)} — cta_block
+  FOOTER ZONE:  y = ${Math.round(dim.h * 0.91)} → ${dim.h}  — handle (@), foot text
+
+⛔ data_block E headline NÃO podem coexistir na mesma zona:
+  - Se emphasis="number" E data_highlight existe: data_block é HERÓI → ocupa HERO ZONE e headline migra para topo (y≈${Math.round(dim.h * 0.2)}) em tamanho menor
+  - Se headline é o foco principal: data_block vai como badge no HEADER (número pequeno, x=${dim.w - margin - 80}, y=${Math.round(dim.h * 0.12)}) ou na BODY ZONE
+  - NUNCA um número grande sobre um headline grande — escolha quem é o herói
 
 ━━━ RETORNE SOMENTE JSON VÁLIDO (números inteiros reais) ━━━
 {
@@ -2572,10 +2594,11 @@ WRAPPING: headline > 18 chars → quebre em 2 linhas, line_h = size × 1.12
 
 ORIENTAÇÕES CRÍTICAS:
 1. layers[] DEVE ter mínimo 3 elementos que criam riqueza visual (glow-bg + ornament + frame/texture)
-2. Aplique o TEMPLATE DNA fielmente — é a identidade visual do template
+2. TEMPLATE DNA É LEI: se DNA especifica cor de fundo explícita (ex: BG: #050505), use ESSA cor no bg.color — NÃO use brand.p2. O template tem identidade própria. Use brand.p1 para accent SEMPRE.
 3. Campos null = não renderizar | todos os números são INTEIROS reais no canvas
-4. Se composition_hint = "data-hero": data_block com number_size 160-200px é OBRIGATÓRIO
-5. Escolha cores com contraste real — fundo escuro → texto claro, e vice-versa`;
+4. Se emphasis="number" E data_highlight existe: decida UMA hierarquia — ou o número é HERÓI (data_hero layout) ou é badge secundário — NUNCA número grande + headline grande no mesmo espaço
+5. Contraste AAA: fundo escuro (#0A0A0A, #050505) → texto branco + accent em P1 | fundo claro → texto escuro
+6. headline.size NUNCA pode exceder o valor calculado na fórmula acima — verifique antes de definir`;
 
   const r = await callClaude({
     system,
@@ -2621,6 +2644,7 @@ ORIENTAÇÕES CRÍTICAS:
 // Recebe brief + blueprint e gera o SVG final com alta fidelidade.
 // Não precisa "adivinhar" o design — o blueprint já define tudo.
 async function daStage3Svg({ brief, blueprint, brand, dim, format, network }) {
+  const margin = dim.w > 1200 ? 60 : 80;
   const system =
 `Você é o SVG EXECUTOR MASTER — o melhor gerador de SVG de design do mundo.
 MISSÃO: Criar SVGs de nível AGÊNCIA INTERNACIONAL (Pentagram, IDEO, R/GA) — designs que param o scroll, impressionam e convertem. Cada pixel é uma decisão de design.
@@ -2631,7 +2655,10 @@ MISSÃO: Criar SVGs de nível AGÊNCIA INTERNACIONAL (Pentagram, IDEO, R/GA) —
 3. viewBox="0 0 ${dim.w} ${dim.h}" OBRIGATÓRIO na tag <svg>
 4. NUNCA use <image href="http..."> ou @import — zero recursos externos
 5. ZERO placeholders — use o texto REAL do blueprint
-6. Nenhum elemento ultrapassa o viewBox — use clipPath quando necessário
+6. ClipPath OBRIGATÓRIO — SEMPRE declare no defs:
+   <clipPath id="canvas"><rect width="${dim.w}" height="${dim.h}"/></clipPath>
+   E envolva TODO conteúdo (exceto o rect de fundo) em: <g clip-path="url(#canvas)">...</g>
+   Isso previne QUALQUER overflow de texto ou shape para fora do canvas.
 7. Todo <text> com font-family, fill, font-size EXPLÍCITOS no elemento
 8. width="${dim.w}" height="${dim.h}" na tag <svg>
 
@@ -2664,8 +2691,8 @@ TÉCNICA 4 — DROP SHADOW em texto/shapes:
 <defs><filter id="textShadow"><feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#000" flood-opacity="0.5"/></filter></defs>
 <text filter="url(#textShadow)" ...>HEADLINE</text>
 
-TÉCNICA 5 — TEXTO MULTI-LINHA (obrigatório para headlines longos):
-<!-- Regra de quebra: font 120px→~10 chars/linha | 100px→~12 | 80px→~15 | 60px→~20 -->
+TÉCNICA 5 — TEXTO MULTI-LINHA (USE SEMPRE para headline com > 1 palavra longa):
+<!-- Safe width ${dim.w - margin * 2}px | Bebas Neue: 120px→${Math.floor((dim.w-margin*2)/(120*0.60))}chars | 100px→${Math.floor((dim.w-margin*2)/(100*0.60))}chars | 80px→${Math.floor((dim.w-margin*2)/(80*0.60))}chars -->
 <text x="80" y="380" font-family="Bebas Neue" font-size="110" fill="#FFF" text-rendering="optimizeLegibility">
   <tspan x="80" dy="0">PRIMEIRA LINHA</tspan>
   <tspan x="80" dy="126">SEGUNDA LINHA</tspan>
@@ -2719,11 +2746,21 @@ soft-trust:    warm grain texture + organic circles 3x + box shadows suaves + wa
 tech-sharp:    grid-pattern visible + monospace + L-brackets + coordinate marks + color accent sharp
 
 ═══════════════ REGRAS ANTI-FALHA ═══════════════
+✦ ClipPath PRIMEIRO: antes de qualquer elemento, declare o clipPath id="canvas" e use em <g>
 ✦ text-rendering="optimizeLegibility" em TODOS os headlines
-✦ Headline > 2 palavras longas: SEMPRE 2 tspans (nunca deixe transbordar)
+✦ QUEBRA DE LINHA OBRIGATÓRIA — pixel math para este canvas (safe width: ${dim.w - margin * 2}px):
+    Bebas Neue 120px → max ${Math.floor((dim.w - margin * 2) / (120 * 0.60))} chars/linha
+    Bebas Neue 100px → max ${Math.floor((dim.w - margin * 2) / (100 * 0.60))} chars/linha
+    Bebas Neue  80px → max ${Math.floor((dim.w - margin * 2) / (80 * 0.60))} chars/linha
+    DM Sans    100px → max ${Math.floor((dim.w - margin * 2) / (100 * 0.55))} chars/linha
+    DM Sans     80px → max ${Math.floor((dim.w - margin * 2) / (80 * 0.55))} chars/linha
+  Headline atual: "${brief.headline}" (${brief.headline.length} chars)
+  → Cabe em 1 linha até: ~${Math.floor((dim.w - margin * 2) / (brief.headline.length * 0.60))}px Bebas Neue
+  → SEMPRE use tspans se headline > 1 linha. dy deve ser = fontSize × 1.15
 ✦ Body points: CADA item = 1 tspan com dy=line_height (não empilhe sem dy)
-✦ CTA button: SEMPRE rect + text centrado (cx da rect + padding, cy da rect + padding/2 + font-size/3)
-✦ Footer handle: y = ${dim.h - 30}px mínimo, nunca dentro do conteúdo
+✦ CTA button: SEMPRE rect + text centrado — text.y = rect.y + pad_y + font_size × 0.75
+✦ Handle footer: FIXO em y=${dim.h - 28}px | font-size 15-17px | não mude essa posição
+✦ Handle comprido (>${Math.floor((dim.w - margin * 2) / 9)} chars): font-size 14px
 ✦ Pelo menos 1 shape com filter blur/glow (cria profundidade premium)
 ✦ Pelo menos 1 gradiente (linear ou radial) — designs planos parecem amadores
 ✦ Elementos decorativos opacity 0.04-0.25 — visíveis mas não competem com conteúdo
