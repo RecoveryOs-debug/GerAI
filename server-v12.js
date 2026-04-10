@@ -208,6 +208,23 @@ class Database {
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )`);
 
+    // SAVED DESIGNS — designs favoritos salvos pelo usuário
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS saved_designs (
+        id         TEXT PRIMARY KEY,
+        user_id    TEXT NOT NULL,
+        svg        TEXT NOT NULL,
+        prompt     TEXT DEFAULT '',
+        format     TEXT DEFAULT 'post',
+        network    TEXT DEFAULT 'instagram',
+        voice_id   TEXT DEFAULT '',
+        voice_name TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+    this.db.exec(`CREATE INDEX IF NOT EXISTS idx_saved_user ON saved_designs(user_id)`);
+
     // LOGIN RATE LIMITING (persistido — sobrevive a restarts)
     this.db.exec(`CREATE TABLE IF NOT EXISTS login_attempts (
       identifier TEXT PRIMARY KEY,
@@ -520,6 +537,33 @@ class Database {
     const insert = this.db.prepare('INSERT OR REPLACE INTO settings (key,value) VALUES (?,?)');
     for (const [k, v] of Object.entries(fields)) insert.run(k, String(v));
     return this.getSettings();
+  }
+
+  // ── SAVED DESIGNS ──
+  saveDesign({ user_id, svg, prompt, format, network, voice_id, voice_name }) {
+    const id = crypto.randomUUID();
+    this.db.prepare(
+      `INSERT INTO saved_designs (id, user_id, svg, prompt, format, network, voice_id, voice_name)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+    ).run(id, user_id, svg, prompt || '', format || 'post', network || 'instagram', voice_id || '', voice_name || '');
+    return id;
+  }
+
+  getSavedDesigns({ user_id, limit = 50 } = {}) {
+    return this.db.prepare(
+      'SELECT id, user_id, prompt, format, network, voice_id, voice_name, created_at FROM saved_designs WHERE user_id=? ORDER BY created_at DESC LIMIT ?'
+    ).all(user_id, limit);
+  }
+
+  getSavedDesignSvg(id, user_id) {
+    return this.db.prepare(
+      'SELECT id, svg, prompt, format, network FROM saved_designs WHERE id=? AND user_id=?'
+    ).get(id, user_id);
+  }
+
+  deleteSavedDesign(id, user_id) {
+    const r = this.db.prepare('DELETE FROM saved_designs WHERE id=? AND user_id=?').run(id, user_id);
+    return r.changes > 0;
   }
 
   // ── CALENDAR ── (BLOCO 3 — novo)
@@ -1182,9 +1226,11 @@ function getRefineSkill(user, opts) {
     ? `\nPALETA DA MARCA:\n- Primária (destaque/accent): ${bp.primaria || '#F5C518'}\n- Secundária (fundo principal): ${bp.secundaria || '#0D0D0F'}\n- Terciária (texto/contraste): ${bp.terciaria || '#F5F4F0'}\n- Quaternária (suporte): ${bp.quaternaria || '#888888'}`
     : '';
 
-  const modelCtx = modelN
-    ? `\nMODELO SELECIONADO: ${modelN} — ${modelName}${modelTextSlots}`
-    : '';
+  const voiceId   = opts?.voiceId   || '';
+  const voiceName = opts?.voiceName || '';
+  const voiceCtx  = voiceId
+    ? `\nVOZ DA MARCA: ${voiceName || voiceId} — ${BRAND_VOICES[voiceId] ? BRAND_VOICES[voiceId].split('\n')[0] : voiceName}`
+    : (modelN ? `\nMODELO DE REFERÊNCIA: ${modelN} — ${modelName}${modelTextSlots}` : '');
 
   return `Você é um especialista em marketing, copy e direção de arte para redes sociais.
 Sua função é refinar o input em um prompt rico que a IA usará para gerar a imagem final.
@@ -1193,7 +1239,7 @@ PERFIL DO USUÁRIO:
 - Profissão: ${p.profissao || 'criador de conteúdo'}
 - Nicho: ${p.nicho || 'negócios'}
 - Tom de voz: ${p.tom || 'autoridade'}
-- Público-alvo: ${p.publico || 'profissionais'}${paletteCtx}${modelCtx}
+- Público-alvo: ${p.publico || 'profissionais'}${paletteCtx}${voiceCtx}
 
 REGRAS ABSOLUTAS:
 1. O prompt refinado DEVE mencionar as cores da paleta nos contextos corretos (destaque, fundo, texto).
@@ -1388,6 +1434,93 @@ CORPO: DM Sans 300 | #5A5A5A | 18-20px | letter-spacing:0.5px
 DECO: círculo outline 1px #0D0D0F opacity:0.1 200px canto sup-dir
 EFEITO: zero efeitos — o silêncio é a sofisticação
 REGRA: 100px margens — remova tudo que puder sendo ainda funcional`,
+};
+
+// ─────────────────────────────────────────────
+// BRAND VOICES — 8 personalidades de marca (substituem os 20 modelos visuais)
+// Definem DIREÇÃO CRIATIVA (energia, tipografia, layout, efeitos) sem prescrever
+// coordenadas exatas — a IA tem liberdade criativa dentro da personalidade.
+// ─────────────────────────────────────────────
+const BRAND_VOICES = {
+  'luxury': `LUXURY PREMIUM — Silêncio como poder
+ENERGIA: mínima — cada elemento justifica sua existência
+TIPOGRAFIA: serifada display (Playfair Display, Cormorant Garamond) OU condensada ultra-bold (Bebas Neue) para contraste
+LAYOUT: generoso espaço negativo (60-80px+ margens), composição assimétrica intencional, hierarquia rigorosa
+FUNDO: escuro preferencial (#0A0A0A, #0D0D0F, charcoal profundo) OU creme quente (#FAF6EE) para variante clara
+ACCENT: dourado (#C9A84C), platina (#B8B8B8), ou cor da marca em tom premium e dessaturado
+DECORAÇÃO: geométrica sutil (linhas finas, frames internos, ornamentos discretos), blur em backgrounds
+EFEITOS: radial gradient sutil, drop shadow leve, grain mínimo, profundidade por camadas
+REGRA: se em dúvida, remova. Luxo é ausência de esforço visível.`,
+
+  'bold': `BOLD IMPACT — Energia máxima, stop-the-scroll imediato
+ENERGIA: máxima — impacto na primeira milissegunda
+TIPOGRAFIA: condensada ultra-bold (Bebas Neue 900, Syne 900), UPPERCASE obrigatório, letter-spacing apertado
+LAYOUT: denso e urgente, corner brackets nos 4 cantos, linha horizontal central, diagonal elements
+FUNDO: preto absoluto #050505 OU cor da marca como background sólido vibrante
+ACCENT: neon (cor da marca máxima saturação), branco puro, contraste extremo preto×neon
+DECORAÇÃO: L-brackets, linhas diagonais, glow neon, scanlines, formas angulares que sangram
+EFEITOS: feDropShadow neon, radial glow, blur halo, contraste brutal sem compromisso
+REGRA: se não para o scroll, faça maior, mais contrastante, mais ousado.`,
+
+  'clean': `CLEAN PROFESSIONAL — Confiança pela simplicidade extrema
+ENERGIA: média-baixa — cada elemento preciso, respiração ampla
+TIPOGRAFIA: geométrica sans-serif (DM Sans 700-800, Syne 700), pesos variados para hierarquia clara
+LAYOUT: abundante espaço negativo (80px+ margens), composição arejada, barra vertical accent
+FUNDO: branco puro (#FFFFFF, #FAFAF8) OU light gray (#F5F5F2)
+ACCENT: cor da marca pontual (barra, bullet, CTA), usado com moderação
+DECORAÇÃO: círculo sólido como bullet, linha separadora fina, CTA button com cor da marca
+EFEITOS: zero noise, zero glow — a pureza é o efeito
+REGRA: 80% do canvas pode ser vazio. O vazio é design premium.`,
+
+  'editorial': `EDITORIAL MAGAZINE — Autoridade pela tipografia como design
+ENERGIA: média — refinamento editorial, autoridade estruturada
+TIPOGRAFIA: mix serif (Playfair Display 700 italic) + sans (DM Sans 600) — tipografia É o elemento visual
+LAYOUT: magazine-style (barras horizontais, separadores, label de categoria obrigatório)
+FUNDO: branco editorial (#FAFAF8) OU preto editorial (#0D0D0F) dependendo do tom
+ACCENT: cor da marca para barras e labels, preto/branco para tipografia principal
+DECORAÇÃO: barras horizontais topo+rodapé, aspas decorativas gigantes opacity:0.1, label de categoria rect
+EFEITOS: zero filtros — a tipografia É a decoração
+REGRA: headline pode ser ousado, layout deve ser estruturado como uma revista premium.`,
+
+  'tech': `TECH & DIGITAL — Precisão, profundidade e inovação sistemática
+ENERGIA: média-alta — sistemático, preciso, profundo, inovador
+TIPOGRAFIA: geométrica (DM Sans 800) para headlines + monospace (IBM Plex Mono) para detalhes técnicos
+LAYOUT: grid visible como textura, alinhamento rigoroso, coordenadas explícitas no design
+FUNDO: escuro azulado (#0C1017, #06080F) OU preto técnico (#0D0D0D)
+ACCENT: cor da marca em neon/elétrico, azul elétrico, verde terminal — saturação máxima
+DECORAÇÃO: grid pattern, L-brackets, hexágonos, coordenadas, scanlines, polígonos geométricos
+EFEITOS: glow técnico feGaussianBlur, filtros nítidos, blur cirúrgico em elementos de bg
+REGRA: cada elemento no grid — a precisão sistemática é a estética.`,
+
+  'warm': `WARM & HUMAN — Conexão emocional e acolhimento genuíno
+ENERGIA: baixa-média — orgânico, humano, convidativo, próximo
+TIPOGRAFIA: serifada humanista (Cormorant Garamond italic, Playfair Display) OU sans amigável (DM Sans 300-400)
+LAYOUT: orgânico e assimétrico suave, formas arredondadas, composição natural não-geométrica
+FUNDO: tons quentes (#FDF8F2, #FAF6EE, #F5EFE6) OU escuro acolhedor (#1A1410)
+ACCENT: terroso, dourado morno, verde sálvia, marsala, terracota — tons orgânicos da natureza
+DECORAÇÃO: 3 círculos sobrepostos (organic overlap), grain texture, formas fluidas e orgânicas
+EFEITOS: sombras suaves, gradientes quentes, noise grain orgânica feTurbulence
+REGRA: se parecer frio ou corporativo, adicione calor. Humanidade e conexão primeiro.`,
+
+  'creative': `CREATIVE & EXPRESSIVE — Surpresa visual que não esquece
+ENERGIA: alta — visual inesperado, quebra regras conscientemente
+TIPOGRAFIA: mista expressiva — misture pesos, tamanhos variados, posicionamentos inusitados
+LAYOUT: assimétrico deliberado, overlaps intencionais, elementos que sangram, composição dinâmica
+FUNDO: cor vibrante da marca OU combinação bicolor inesperada (split, diagonal, radial)
+ACCENT: combinação cromática ousada, alto contraste, cor como protagonista não como acento
+DECORAÇÃO: formas irregulares, polígonos, texto como textura, elementos fora do grid propositalmente
+EFEITOS: gradientes vibrantes, mistura de opacidades, composição em muitas camadas
+REGRA: o objetivo é ser inesquecível. Se todos fazem X, faça o oposto de X.`,
+
+  'data': `DATA & AUTHORITY — O número como herói absoluto
+ENERGIA: média-alta — assertivo, convincente, baseado em evidências concretas
+TIPOGRAFIA: display bold (Bebas Neue 900, Syne 900) para números GIGANTES | clean sans para labels
+LAYOUT: number-centric — o dado ocupa 35-50% do canvas; tudo ao redor amplifica o número
+FUNDO: escuro estruturado (#0E1621, #0C1017) com gradiente diagonal sutil
+ACCENT: cor da marca para o número-herói, branco para texto de apoio
+DECORAÇÃO: mini gráficos de barras, linhas de grid horizontais, badges de métrica, sparklines
+EFEITOS: glow neon no número (feGaussianBlur + feMerge), contexto visual de dados, depth
+REGRA: o número É o headline — tudo serve para enquadrar, contextualizar e amplificar o dado.`,
 };
 
 // ─────────────────────────────────────────────
@@ -2335,7 +2468,9 @@ function daBrand(user, bp) {
     tom:       bp?.tom       || user?.tom       || 'autoridade',
     publico:   bp?.publico   || user?.publico   || 'profissionais',
     handle:    bp?.handle    || ('@' + profissao.toLowerCase().replace(/\s+/g, '').slice(0, 15)),
-    modelN:    bp?.modelN    || '',
+    voiceId:   bp?.voiceId   || '',          // nova arquitetura: brand voice
+    voiceName: bp?.voiceName || '',
+    modelN:    bp?.modelN    || '',          // legacy: mantido para compat
     modelName: bp?.modelName || '',
   };
 }
@@ -2424,7 +2559,9 @@ DATA HIGHLIGHT:
 // Recebe o brief estruturado e define um blueprint de design com coordenadas,
 // tipografia, cores e layout exatos — eliminando ambiguidade para o SVG Executor.
 async function daStage2ArtDir({ brief, brand, dim, format, slideIndex, totalSlides }) {
-  const dna    = STYLE_DNA[brand.modelN] || '';
+  // Nova arquitetura: voice tem prioridade; fallback para STYLE_DNA legacy; fallback para livre
+  const voice  = brand.voiceId ? (BRAND_VOICES[brand.voiceId] || '') : '';
+  const dna    = voice || (brand.modelN ? (STYLE_DNA[brand.modelN] || '') : '');
   const margin = dim.w > 1200 ? 60 : 80;
   const isVertical  = dim.h > dim.w;
   const isWide      = dim.w > dim.h;
@@ -2443,7 +2580,7 @@ PALETA DA MARCA:
   P2 background:       ${brand.p2}
   P3 text-primary:     ${brand.p3}
   P4 text-secondary:   ${brand.p4}
-ESTILO: ${brand.estilo}${dna ? `\n\nTEMPLATE DNA (modelo ${brand.modelN}):\n${dna}` : ''}
+ESTILO: ${brand.estilo}${dna ? `\n\n${brand.voiceId ? `VOZ DA MARCA (${brand.voiceName || brand.voiceId})` : `REFERÊNCIA VISUAL (modelo ${brand.modelN})`}:\n${dna}` : '\n\n[LIBERDADE CRIATIVA TOTAL — escolha o melhor estilo visual para este conteúdo, brand colors e mood]'}
 ${format === 'carrossel' && slideIndex ? `\nSLIDE ${slideIndex} DE ${totalSlides}` : ''}
 
 BRIEF DO CREATIVE ANALYST:
@@ -2798,6 +2935,36 @@ ${JSON.stringify(blueprint, null, 2)}`;
     svg = svg.replace('<svg', `<svg viewBox="0 0 ${dim.w} ${dim.h}"`);
   return { svg: sanitizeSvg(svg), tok: { in: r.inputTokens, out: r.outputTokens } };
 }
+
+// ── Rotas: Designs Salvos ─────────────────────────────────────────────────────
+
+route('POST', '/api/user/designs/save', async (req, res) => {
+  const payload = requireAuth(req, res); if (!payload) return;
+  const { svg, prompt, format, network, voice_id, voice_name } = await parseBody(req);
+  if (!svg || svg.length < 100) return err(res, 'SVG inválido ou ausente');
+  const id = db.saveDesign({ user_id: payload.id, svg, prompt, format, network, voice_id, voice_name });
+  ok(res, { id, message: 'Design salvo com sucesso!' });
+});
+
+route('GET', '/api/user/designs/saved', async (req, res) => {
+  const payload = requireAuth(req, res); if (!payload) return;
+  const designs = db.getSavedDesigns({ user_id: payload.id, limit: 100 });
+  ok(res, { designs });
+});
+
+route('GET', '/api/user/designs/:id', async (req, res, params) => {
+  const payload = requireAuth(req, res); if (!payload) return;
+  const design = db.getSavedDesignSvg(params.id, payload.id);
+  if (!design) return err(res, 'Design não encontrado', 404);
+  ok(res, { design });
+});
+
+route('DELETE', '/api/user/designs/:id', async (req, res, params) => {
+  const payload = requireAuth(req, res); if (!payload) return;
+  const deleted = db.deleteSavedDesign(params.id, payload.id);
+  if (!deleted) return err(res, 'Design não encontrado ou sem permissão', 404);
+  ok(res, { message: 'Design removido dos favoritos.' });
+});
 
 // ── Rota: Variações — gera N alternativas visuais em paralelo ────────────────
 // Roda 1 Brief Analyst compartilhado + N Art Director/SVG Executor em paralelo.

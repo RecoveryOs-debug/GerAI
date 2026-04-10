@@ -5904,6 +5904,10 @@ body.image-agent-refining #image-agent-refine-overlay{
         <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
         Histórico
       </div>
+      <div class="ni" onclick="nav('saved-designs',this)" id="ni-saved-designs">
+        <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>
+        Designs Salvos
+      </div>
     </div>
     <div class="sb-sect" style="margin-top:4px">
       <div class="sb-lbl">Agentes de Conteúdo</div>
@@ -6124,14 +6128,14 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
             <!-- tab: modelos + conceitos -->
             <div id="out-tab-conceitos" style="display:none">
 
-              <!-- ── MODELO PICKER ── -->
-              <div id="modelo-picker-section" style="margin-bottom:14px">
-                <div style="font-size:10px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">Escolha um modelo</div>
-                <div id="modelo-grid" style="display:flex;flex-direction:column;gap:10px;max-height:520px;overflow-y:auto;padding-right:4px;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent"></div>
-                <div id="modelo-selected-info" style="display:none;margin-top:8px;padding:7px 10px;background:var(--ink-3);border:1px solid var(--amber-18);border-radius:6px">
-                  <div style="font-size:10px;color:var(--t2)">Modelo selecionado</div>
-                  <div style="font-size:12px;font-weight:700;color:var(--a)" id="modelo-selected-name">—</div>
-                </div>
+              <!-- ── BRAND VOICE PICKER ── -->
+              <div id="voice-picker-section" style="margin-bottom:14px">
+                <div style="font-size:10px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">Tom visual da marca</div>
+                <div style="font-size:11px;color:var(--t3);margin-bottom:10px;line-height:1.4">A IA cria livremente dentro da personalidade escolhida. Salve os que gostar.</div>
+                <div id="voice-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:7px"></div>
+                <button id="voice-none-btn" onclick="selectVoice(null)" style="width:100%;margin-top:7px;padding:7px;background:transparent;border:1px dashed var(--line-2);border-radius:6px;cursor:pointer;font-family:var(--f);font-size:11px;color:var(--t3);transition:.15s">
+                  ✦ Liberdade total (sem estilo fixo)
+                </button>
               </div>
               <div class="divider" style="margin:0 0 12px"></div>
 
@@ -6171,7 +6175,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                     </div>
                   </label>
                 </div>
-<div class="cmd-box" id="cmd-out" data-prompt="" style="word-break:break-word;font-size:11px"><span id="cmd-out-txt" style="color:var(--t3);font-style:italic">Selecione um modelo acima para refinar o prompt automaticamente</span><button class="cp-btn" onclick="cpElById('cmd-out')">Copiar</button></div>
+<div class="cmd-box" id="cmd-out" data-prompt="" style="word-break:break-word;font-size:11px"><span id="cmd-out-txt" style="color:var(--t3);font-style:italic">Descreva sua ideia — a IA gera livremente com a personalidade visual escolhida</span><button class="cp-btn" onclick="cpElById('cmd-out')">Copiar</button></div>
                 <button id="btn-gerar-img" onclick="gerarImagem()" style="width:100%;margin-top:12px;background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:var(--f);font-size:14px;font-weight:700;color:#fff;letter-spacing:-.02em;box-shadow:0 4px 20px rgba(243,107,42,.3);transition:all .15s">
                   <svg style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                   Gerar imagem com IA
@@ -6205,9 +6209,13 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                   <button class="btn btn-s btn-sm btn-icon" onclick="gerarImagem()" title="Regerar imagem">
                     <svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
                   </button>
+                  <button id="btn-save-design" class="btn btn-s btn-sm" onclick="saveCurrentDesign()" title="Salvar nos favoritos" style="background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.3);color:#ef4444">
+                    <svg class="ico ico-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    Salvar
+                  </button>
                   <button class="btn btn-s btn-sm" onclick="saveImageToMemoryBank()" title="Salvar no banco de memória visual" style="background:var(--amber-10);border-color:var(--amber-18);color:var(--amber)">
                     <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-                    Salvar no banco
+                    Banco
                   </button>
                 </div>
               </div>
@@ -6267,6 +6275,27 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
         </div>
       </div>
  Carregando histórico...</div>
+      </div>
+    </div>
+
+    <!-- saved designs -->
+    <div class="pg" id="pg-saved-designs">
+      <div class="pg-hd">
+        <div>
+          <div class="pg-title">Designs Salvos</div>
+          <div class="pg-sub">Seus favoritos gerados pelo Design Agent</div>
+        </div>
+        <button class="btn btn-g btn-sm" onclick="loadSavedDesigns()">
+          <svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
+          Atualizar
+        </button>
+      </div>
+      <div id="saved-designs-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:4px">
+        <div id="saved-designs-empty" style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--t3)">
+          <svg style="width:40px;height:40px;stroke:var(--t3);fill:none;margin-bottom:12px" viewBox="0 0 24 24" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <div style="font-size:14px;font-weight:600;color:var(--t2);margin-bottom:6px">Nenhum design salvo ainda</div>
+          <div style="font-size:12px">Gere uma imagem e clique em ❤ Salvar para guardar seus favoritos aqui</div>
+        </div>
       </div>
     </div>
 
@@ -7358,6 +7387,7 @@ function ap(c1, c2) { sc1(1,c1); document.querySelector('#sw1 input').value=c1; 
 // ─────────────────────────────────────────────────
 const crumbs = {
   dashboard:'Dashboard', generate:'Gerar', history:'Histórico',
+  'saved-designs':'Designs Salvos',
   profile:'Perfil de Marca', settings:'Configurações',
   'agent-legenda':'Legenda', 'agent-roteiro-yt':'Roteiro YouTube',
   'agent-roteiro-reels':'Roteiro Reels', 'agent-story':'Ideias Story',
@@ -7383,10 +7413,11 @@ function nav(p, el) {
 
   if (el && el.classList) el.classList.add('on');
   document.getElementById('tb-cur').textContent = crumbs[p] || p;
-  if (p === 'dashboard') loadDashboard();
-  if (p === 'history')   loadHistory();
-  if (p === 'profile')   loadProfile();
-  if (p === 'settings')  loadSettings();
+  if (p === 'dashboard')      loadDashboard();
+  if (p === 'history')        loadHistory();
+  if (p === 'saved-designs')  loadSavedDesigns();
+  if (p === 'profile')        loadProfile();
+  if (p === 'settings')       loadSettings();
 }
 
 function navP(p) {
@@ -7951,6 +7982,7 @@ function startGenPipeline() {
     emptyEl.innerHTML = `<svg style="width:28px;height:28px;fill:none;stroke:var(--t3);stroke-width:1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Escolha um modelo abaixo e clique em "Gerar imagem"`;
   }
 
+  renderVoiceGrid();
   _ensureModelGrid();
   switchOutTab('conceitos');
   toast('Escolha o modelo e clique em "Gerar imagem".', 'ok');
@@ -8019,15 +8051,16 @@ const IMG_STAGES = ['Lendo perfil da marca...','Definindo composição...','Apli
 async function gerarImagem() {
   const rawInput = (window._rawInput || document.getElementById('gen-in')?.value || '').trim();
   if (!rawInput) { toast('Descreva sua ideia antes de gerar','err'); return; }
-  if (!window._selectedModel) { toast('Escolha um modelo antes de gerar a imagem','err'); return; }
 
-  const model       = window._selectedModel;
+  const voice       = window._selectedVoice || null;  // null = liberdade total
+  const model       = window._selectedModel || { n:'', name:'', svg:'' }; // legacy compat
   const refined     = (window._refinedPrompt || '').trim() || rawInput;
   const isCarrossel = (_currentFmt === 'carrossel');
   const slideCount  = isCarrossel ? ((typeof _slideCount !== 'undefined') ? _slideCount : 0) : 1;
 
   const brandProfile = BrandProfileModule.toGenerationPayload({
-    modelN: model.n, modelName: model.name, modelSvg: model.svg
+    voiceId: voice?.id || '', voiceName: voice?.name || '',
+    modelN: model.n || '', modelName: model.name || '', modelSvg: model.svg || '',
   });
 
   switchOutTab('imagem');
@@ -8153,7 +8186,7 @@ async function gerarImagem() {
     });
     window._currentSVG = svg;
     _currentSVG = svg;
-    _currentImgName = 'autopostt-' + model.n + '-' + Date.now();
+    _currentImgName = 'autopostt-' + (voice?.id || 'livre') + '-' + Date.now();
     const thumb = document.getElementById('img-preview-thumb');
     if (thumb) thumb.innerHTML = svg;
     document.getElementById('img-gen-loading').style.display = 'none';
@@ -8184,12 +8217,13 @@ function showGenError(msg) {
 async function gerarVariacoes() {
   const rawInput = (window._rawInput || document.getElementById('gen-in')?.value || '').trim();
   if (!rawInput) { toast('Descreva sua ideia antes de gerar variações','err'); return; }
-  if (!window._selectedModel) { toast('Escolha um modelo antes de gerar variações','err'); return; }
 
-  const model    = window._selectedModel;
-  const refined  = (window._refinedPrompt || '').trim() || rawInput;
+  const voice  = window._selectedVoice || null;
+  const model  = window._selectedModel || { n:'', name:'', svg:'' };
+  const refined = (window._refinedPrompt || '').trim() || rawInput;
   const brandProfile = BrandProfileModule.toGenerationPayload({
-    modelN: model.n, modelName: model.name, modelSvg: model.svg
+    voiceId: voice?.id || '', voiceName: voice?.name || '',
+    modelN: model.n || '', modelName: model.name || '', modelSvg: model.svg || '',
   });
 
   switchOutTab('imagem');
@@ -8232,7 +8266,7 @@ async function gerarVariacoes() {
         card.style.borderColor = 'var(--a)';
         window._currentSVG = v.svg;
         _currentSVG = v.svg;
-        _currentImgName = 'autopostt-' + model.n + '-var' + (i+1) + '-' + Date.now();
+        _currentImgName = 'autopostt-' + (voice?.id || model.n || 'livre') + '-var' + (i+1) + '-' + Date.now();
         const thumb = document.getElementById('img-preview-thumb');
         if (thumb) thumb.innerHTML = v.svg;
         document.getElementById('img-preview-wrap')?.classList.add('vis');
@@ -9419,6 +9453,120 @@ function saveImageToMemoryBank() {
   img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
 }
 
+// ─────────────────────────────────────────────────
+// SAVED DESIGNS
+// ─────────────────────────────────────────────────
+async function saveCurrentDesign() {
+  const svg = window._currentSVG || _currentSVG;
+  if (!svg) { toast('Gere uma imagem antes de salvar', 'err'); return; }
+  const btn = document.getElementById('btn-save-design');
+  if (btn) { btn.disabled = true; btn.style.opacity = '.5'; }
+  try {
+    const voice = window._selectedVoice || null;
+    await api('POST', '/api/user/designs/save', {
+      svg,
+      prompt:   (window._rawInput || '').trim(),
+      format:   _currentFmt  || 'post',
+      network:  _netMap?.[_currentNet] || 'instagram',
+      voiceId:   voice?.id   || '',
+      voiceName: voice?.name || '',
+    });
+    toast('Design salvo nos favoritos!', 'ok');
+    if (btn) {
+      btn.disabled          = false;
+      btn.style.background  = 'rgba(239,68,68,.3)';
+      btn.style.borderColor = '#ef4444';
+      btn.style.opacity     = '1';
+    }
+  } catch(e) {
+    toast('Erro ao salvar: ' + e.message, 'err');
+    if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+  }
+}
+
+async function loadSavedDesigns() {
+  const grid  = document.getElementById('saved-designs-grid');
+  const empty = document.getElementById('saved-designs-empty');
+  if (!grid) return;
+  // Show loading
+  if (empty) empty.style.display = 'none';
+  // Remove old cards but keep the empty placeholder
+  grid.querySelectorAll('.saved-design-card').forEach(c => c.remove());
+  grid.insertAdjacentHTML('beforeend',
+    '<div id="saved-designs-loading" style="grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:20px 0;color:var(--t3)">'
+    + '<div style="width:14px;height:14px;border:2px solid var(--b2);border-top-color:#ef4444;border-radius:50%;animation:spin .7s linear infinite"></div> Carregando designs salvos...</div>');
+  try {
+    const data = await api('GET', '/api/user/designs/saved');
+    document.getElementById('saved-designs-loading')?.remove();
+    const designs = data.designs || [];
+    if (designs.length === 0) {
+      if (empty) empty.style.display = 'block';
+      return;
+    }
+    designs.forEach(function(d) {
+      const card = document.createElement('div');
+      card.className = 'saved-design-card';
+      card.style.cssText = 'background:var(--ink-2,#111);border:1px solid var(--line-1,rgba(255,255,255,.08));border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color .15s,transform .15s';
+      card.onmouseover  = function() { card.style.borderColor = '#ef4444'; card.style.transform = 'translateY(-2px)'; };
+      card.onmouseout   = function() { card.style.borderColor = ''; card.style.transform = ''; };
+      // Placeholder thumbnail (SVG loaded on click to avoid loading all at once)
+      const svgWrap = document.createElement('div');
+      svgWrap.style.cssText = 'aspect-ratio:1/1;overflow:hidden;background:#0a0a0a;display:flex;align-items:center;justify-content:center;position:relative';
+      const promptPreview = (d.prompt || '').slice(0, 60) || 'Design salvo';
+      svgWrap.innerHTML = '<div style="padding:12px;text-align:center">'
+        + '<svg style="width:28px;height:28px;stroke:#ef4444;fill:none;margin-bottom:8px" viewBox="0 0 24 24" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'
+        + '<div style="font-size:10px;color:var(--t2);line-height:1.4">' + esc(promptPreview) + '</div>'
+        + '</div>';
+      card.appendChild(svgWrap);
+      // Meta row
+      const meta = document.createElement('div');
+      meta.style.cssText = 'padding:8px 10px;display:flex;align-items:center;justify-content:space-between';
+      const info = document.createElement('div');
+      info.style.cssText = 'font-size:10px;color:var(--t3);line-height:1.4';
+      const voiceTxt = d.voice_name ? `<span style="color:#ef4444;font-weight:700">${esc(d.voice_name)}</span> · ` : '';
+      const dateTxt  = d.created_at ? new Date(d.created_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}) : '';
+      info.innerHTML = voiceTxt + dateTxt;
+      const del = document.createElement('button');
+      del.style.cssText = 'background:none;border:none;cursor:pointer;padding:2px 4px;color:var(--t3);font-size:14px;line-height:1';
+      del.title = 'Remover dos favoritos';
+      del.textContent = '×';
+      del.onclick = async function(e) {
+        e.stopPropagation();
+        del.disabled = true;
+        try {
+          await api('DELETE', '/api/user/designs/' + d.id);
+          card.remove();
+          // Check if grid empty
+          if (!grid.querySelector('.saved-design-card')) { if (empty) empty.style.display = 'block'; }
+        } catch(err) { toast('Erro ao remover', 'err'); del.disabled = false; }
+      };
+      meta.appendChild(info);
+      meta.appendChild(del);
+      card.appendChild(meta);
+      // Click → load into preview
+      svgWrap.onclick = function() {
+        // fetch full SVG then display
+        api('GET', '/api/user/designs/' + d.id).then(function(r) {
+          const fullSvg = (r.design || {}).svg || '';
+          window._currentSVG = fullSvg;
+          _currentSVG = fullSvg;
+          const thumb = document.getElementById('img-preview-thumb');
+          if (thumb) thumb.innerHTML = fullSvg;
+          document.getElementById('img-preview-wrap')?.classList.add('vis');
+          document.getElementById('img-preview-empty').style.display = 'none';
+          nav('generate', document.querySelector('.ni[onclick*="generate"]'));
+          toast('Design carregado no editor', 'ok');
+        }).catch(function() { toast('Erro ao carregar design', 'err'); });
+      };
+      grid.appendChild(card);
+    });
+  } catch(e) {
+    document.getElementById('saved-designs-loading')?.remove();
+    grid.insertAdjacentHTML('beforeend',
+      '<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--t3)">Erro ao carregar designs: ' + esc(e.message) + '</div>');
+  }
+}
+
 function clearVisualMemory() {
   window._memoryRefs = [];
   window._visualMemory = null;
@@ -10495,12 +10643,60 @@ function _computeModelFmt() {
   return fmtKey + '_' + network;
 }
 
+// ─── BRAND VOICE SYSTEM ─────────────────────────────────────────────────────
+var _selectedVoice = null;
+
+const BRAND_VOICES_UI = [
+  { id: 'luxury',   name: 'Luxury Premium',      desc: 'Luxo silencioso, elegância atemporal',    icon: '💎' },
+  { id: 'bold',     name: 'Bold Impact',          desc: 'Energia máxima, para o scroll',           icon: '⚡' },
+  { id: 'clean',    name: 'Clean Pro',            desc: 'Confiança pela simplicidade',             icon: '✦' },
+  { id: 'editorial',name: 'Editorial',            desc: 'Tipografia como design, autoridade',      icon: '📰' },
+  { id: 'tech',     name: 'Tech & Digital',       desc: 'Grid, precisão, inovação sistemática',    icon: '⬡' },
+  { id: 'warm',     name: 'Warm & Human',         desc: 'Conexão emocional, acolhimento',          icon: '🌿' },
+  { id: 'creative', name: 'Creative',             desc: 'Surpresa visual, quebra as regras',       icon: '✦' },
+  { id: 'data',     name: 'Data & Authority',     desc: 'O número como herói do design',           icon: '◈' },
+];
+
+function renderVoiceGrid() {
+  var grid = document.getElementById('voice-grid');
+  if (!grid) return;
+  var html = '';
+  BRAND_VOICES_UI.forEach(function(v, i) {
+    var sel = _selectedVoice && _selectedVoice.id === v.id;
+    html += '<div onclick="selectVoice(' + i + ')" data-vid="' + v.id + '" style="'
+      + 'cursor:pointer;border-radius:8px;padding:9px 10px;background:var(--ink-3);'
+      + 'border:2px solid ' + (sel ? 'var(--amber)' : 'var(--line-1)') + ';'
+      + (sel ? 'box-shadow:0 0 0 1px var(--amber),0 2px 12px rgba(245,197,24,.1);' : '')
+      + 'transition:all .15s;display:flex;flex-direction:column;gap:4px;position:relative">'
+      + '<div style="font-size:16px;line-height:1">' + v.icon + '</div>'
+      + '<div style="font-size:12px;font-weight:700;color:var(--t0);letter-spacing:-.01em">' + v.name + '</div>'
+      + '<div style="font-size:10px;color:var(--t3);line-height:1.3">' + v.desc + '</div>'
+      + (sel ? '<div style="position:absolute;top:5px;right:5px;background:var(--amber);border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700;color:#000">✓</div>' : '')
+      + '</div>';
+  });
+  grid.innerHTML = html;
+  // Update "none" button state
+  var noneBtn = document.getElementById('voice-none-btn');
+  if (noneBtn) {
+    noneBtn.style.borderColor = !_selectedVoice ? 'var(--amber)' : 'var(--line-2)';
+    noneBtn.style.color       = !_selectedVoice ? 'var(--amber)' : 'var(--t3)';
+  }
+}
+
+function selectVoice(idx) {
+  _selectedVoice = (idx !== null && idx >= 0) ? BRAND_VOICES_UI[idx] : null;
+  window._selectedVoice = _selectedVoice;
+  renderVoiceGrid();
+}
+
+// Legacy stubs — mantidos para não quebrar chamadas existentes
 function renderModelGrid() {
+  renderVoiceGrid();
   var grid = document.getElementById('modelo-grid');
   if (!grid) return;
 
   if (typeof MODELS === 'undefined') {
-    grid.innerHTML = '<div style="padding:20px;color:var(--t3);font-size:12px;text-align:center">Carregando modelos...</div>';
+    grid.innerHTML = '';
     return;
   }
 
