@@ -1547,38 +1547,41 @@ function sanitizeSvg(svg) {
 
 // ─────────────────────────────────────────────
 // FONT MANAGER
-// Carrega as Google Fonts no startup, caches como base64 e injeta nos SVGs
-// antes da rasterização, garantindo renderização correta sem dependência externa.
+// Baixa Google Fonts como TTF, injeta no SVG como base64 E salva no disco
+// para que librsvg/fontconfig encontre as fontes pelo nome.
 // ─────────────────────────────────────────────
 
 const _fontCache = new Map(); // `${family}:${weight}` → { b64, fmt }
+const _fontsDir  = path.join(process.env.HOME || '/root', '.local', 'share', 'fonts', 'autopostt');
 
-// Todas as fontes usadas nos templates
+// Todas as fontes usadas nos templates + brand voices
 const DESIGN_FONTS = [
   { family: 'Bebas Neue',          weight: '400' },
   { family: 'Syne',                weight: '700' },
+  { family: 'Syne',                weight: '800' },
   { family: 'DM Sans',             weight: '400' },
   { family: 'DM Sans',             weight: '700' },
+  { family: 'DM Sans',             weight: '800' },
   { family: 'Playfair Display',    weight: '400' },
   { family: 'Playfair Display',    weight: '700' },
   { family: 'Cormorant Garamond',  weight: '400' },
   { family: 'Cormorant Garamond',  weight: '600' },
   { family: 'IBM Plex Mono',       weight: '400' },
+  { family: 'IBM Plex Mono',       weight: '700' },
 ];
 
-// Utilitário HTTPS genérico (retorna Buffer ou string)
-function _httpsGet(url, asBuffer = false) {
+// _httpsGet com User-Agent configurável
+function _httpsGetOpts(url, { asBuffer = false, ua = 'AutoPostt/1.0' } = {}) {
   return new Promise((resolve, reject) => {
     const u = new URL(url);
     const req = https.request({
       hostname: u.hostname,
       path:     u.pathname + u.search,
       method:   'GET',
-      headers:  { 'User-Agent': 'AutoPostt/1.0 FontManager' },
+      headers:  { 'User-Agent': ua },
     }, res => {
-      // Segue redirect 301/302 uma vez
       if ((res.statusCode === 301 || res.statusCode === 302) && res.headers.location) {
-        return _httpsGet(res.headers.location, asBuffer).then(resolve).catch(reject);
+        return _httpsGetOpts(res.headers.location, { asBuffer, ua }).then(resolve).catch(reject);
       }
       const chunks = [];
       res.on('data', c => chunks.push(Buffer.isBuffer(c) ? c : Buffer.from(c)));
@@ -1588,28 +1591,46 @@ function _httpsGet(url, asBuffer = false) {
       });
     });
     req.on('error', reject);
-    req.setTimeout(10000, () => { req.destroy(); reject(new Error('timeout')); });
+    req.setTimeout(12000, () => { req.destroy(); reject(new Error('timeout')); });
     req.end();
   });
 }
 
-// Carrega 1 fonte: CSS API → extrai URL do arquivo → download → base64
+// Utilitário HTTPS genérico (retorna Buffer ou string)
+function _httpsGet(url, asBuffer = false) {
+  return _httpsGetOpts(url, { asBuffer });
+}
+
+// Carrega 1 fonte como TTF (UA antigo força Google Fonts a retornar TTF, que librsvg suporta)
 async function _loadOneFont(family, weight) {
   const key = `${family}:${weight}`;
   if (_fontCache.has(key)) return;
   try {
-    // Google Fonts CSS v2
-    const cssUrl = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@${weight}&display=swap`;
-    const css = await _httpsGet(cssUrl);
-    // Pega a primeira URL de fonte do CSS (preferência: woff2 > woff > ttf)
-    const urlMatch = css.match(/url\((https:\/\/fonts\.gstatic\.com\/[^)]+)\)/);
-    if (!urlMatch) throw new Error('URL de fonte não encontrada no CSS');
-    const fontUrl = urlMatch[1];
-    const fmt = fontUrl.includes('.woff2') ? 'woff2'
-              : fontUrl.includes('.woff')  ? 'woff'
+    const familyQ = encodeURIComponent(family) + ':wght@' + weight;
+    // UA de Android antigo → Google Fonts retorna TTF (não woff2); librsvg suporta TTF em data URI
+    const css = await _httpsGetOpts(
+      `https://fonts.googleapis.com/css2?family=${familyQ}&display=swap`,
+      { ua: 'Mozilla/5.0 (Linux; Android 2.3.4; GT-I9100 Build/GINGERBREAD)' }
+    );
+    // Captura todos os URLs de fonte no CSS e prefere TTF
+    const allUrls = [...css.matchAll(/url\((https:\/\/fonts\.gstatic\.com\/[^)]+)\)/g)].map(m => m[1]);
+    if (!allUrls.length) throw new Error('Nenhuma URL de fonte encontrada no CSS');
+    const fontUrl = allUrls.find(u => u.endsWith('.ttf')) || allUrls[0];
+    const fmt = fontUrl.endsWith('.woff2') ? 'woff2'
+              : fontUrl.endsWith('.woff')  ? 'woff'
               : 'truetype';
     const fontData = await _httpsGet(fontUrl, true);
     _fontCache.set(key, { b64: fontData.toString('base64'), fmt });
+
+    // Salva TTF no disco para fontconfig — librsvg encontra pelo nome da família
+    try {
+      fs.mkdirSync(_fontsDir, { recursive: true });
+      const ext  = fmt === 'truetype' ? '.ttf' : fmt === 'woff2' ? '.woff2' : '.woff';
+      const file = path.join(_fontsDir, `${family.replace(/\s+/g, '')}-${weight}${ext}`);
+      if (!fs.existsSync(file)) fs.writeFileSync(file, fontData);
+    } catch(saveErr) {
+      log.warn(`[FONTS] Não foi possível salvar ${family}: ${saveErr.message}`);
+    }
   } catch(e) {
     log.warn(`[FONTS] Falha ao carregar ${family} ${weight}: ${e.message}`);
   }
@@ -1618,7 +1639,17 @@ async function _loadOneFont(family, weight) {
 // Inicializa o cache em background (não bloqueia o startup)
 function initFontCache() {
   Promise.allSettled(DESIGN_FONTS.map(f => _loadOneFont(f.family, f.weight)))
-    .then(() => log.info(`[FONTS] Cache: ${_fontCache.size}/${DESIGN_FONTS.length} fontes prontas`));
+    .then(() => {
+      log.info(`[FONTS] Cache: ${_fontCache.size}/${DESIGN_FONTS.length} fontes prontas`);
+      // Atualiza fontconfig para que librsvg encontre as fontes pelo nome da família
+      try {
+        const { execSync } = require('child_process');
+        execSync(`fc-cache -f "${_fontsDir}"`, { timeout: 15000, stdio: 'ignore' });
+        log.info('[FONTS] fontconfig atualizado — fontes disponíveis para rasterização');
+      } catch(fcErr) {
+        log.warn('[FONTS] fc-cache falhou:', fcErr.message);
+      }
+    });
 }
 
 // Gera o bloco @font-face CSS com as fontes em base64
@@ -3233,11 +3264,12 @@ route('POST', '/api/user/design-agent/export', async (req, res) => {
     const q          = Math.max(60, Math.min(100, parseInt(quality) || 90));
     const isJpg      = fmt === 'jpg' || fmt === 'jpeg';
 
-    // density 96 = 1 SVG px → 1 raster px (SVG usa 96dpi por definição)
-    let pipeline = sharp(svgBuf, { density: 96 });
+    // density 150 = ~1.5x resolution para qualidade extra sem overhead excessivo
+    let pipeline = sharp(svgBuf, { density: 150 });
     if (isJpg) {
+      // Fundo preto (designs têm fundo escuro; branco causaria "flash" em áreas transparentes)
       pipeline = pipeline
-        .flatten({ background: { r: 255, g: 255, b: 255 } }) // fundo branco (JPG não tem alpha)
+        .flatten({ background: { r: 5, g: 5, b: 5 } })
         .jpeg({ quality: q, mozjpeg: true, chromaSubsampling: '4:4:4' });
     } else {
       pipeline = pipeline.png({ compressionLevel: 6, adaptiveFiltering: true });
