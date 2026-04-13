@@ -2997,19 +2997,147 @@ route('DELETE', '/api/user/designs/:id', async (req, res, params) => {
   ok(res, { message: 'Design removido dos favoritos.' });
 });
 
+// ── Tweet Card: Stage 3 especializado ────────────────────────────────────────
+// Bypassa Stage 2 e gera direto o SVG de tweet card com layout fixo.
+// O tweet card é determinístico: posições hardcoded, IA só adapta o texto/cores.
+async function daStage3Tweet({ brief, brand, dim }) {
+  const W = dim.w, H = dim.h;
+  // Card geometry — centralizado com margens generosas
+  const cX = Math.round(W * 0.056);              // card x = 60px em 1080
+  const cY = Math.round(H * 0.093);              // card y = 100px em 1080
+  const cW = W - cX * 2;                         // card width = 960px em 1080
+  const cH = Math.round(H * 0.815);              // card height = 880px em 1080
+  const cRx = 20;
+  const pad = 48;                                 // padding interno do card
+  const textX = cX + pad;
+  const textMaxW = cW - pad * 2;
+
+  const authorName  = (brand.nome  || 'Marca').slice(0, 28);
+  const handle      = (brand.handle || '@marca').replace(/^@?/, '@').slice(0, 20);
+  const accent      = brand.p1 || '#1DA1F2';
+
+  // Engagement numbers — escala viral
+  const likes    = brief.data_highlight || '14.2k';
+  const retweets = String(Math.round(parseInt(String(likes).replace(/[^0-9]/g,'')) * 0.27 || 3800)).slice(0, 4) + (String(likes).includes('k') ? 'k' : '');
+  const replies  = String(Math.round(parseInt(String(likes).replace(/[^0-9]/g,'')) * 0.06 || 850));
+  const views    = String(parseInt(String(likes).replace(/[^0-9]/g,'')) * (String(likes).includes('k') ? 20 : 1) || 284) + 'k';
+
+  const system =
+`Você é um SVG EXECUTOR especializado em TWEET CARDS virais para Instagram.
+MISSÃO: Gerar um SVG perfeito que imita um tweet do X/Twitter — o formato mais compartilhado de 2024/25.
+
+CANVAS: ${W}×${H}px
+CARD: x=${cX}, y=${cY}, width=${cW}, height=${cH}, rx=${cRx}
+PADDING INTERNO: ${pad}px | TEXT_X=${textX} | TEXT_MAX_W=${textMaxW}px
+
+PALETA:
+  Accent da marca: ${accent}
+  Background externo: gradiente escuro (use tom da marca ou #0A0A0A)
+  Card background: #FFFFFF (modo claro) — texto escuro, autêntico
+  Texto principal: #0F1419
+  Texto secundário / handles: #536471
+  Linha divisória: #EFF3F4
+  Like color: #F91880
+
+CONTEÚDO:
+  Autor: "${authorName}"
+  Handle: "${handle}"
+  Tweet text: "${brief.headline}${brief.subheadline ? '\n\n' + brief.subheadline : ''}"
+  Body points: ${JSON.stringify(brief.body_points || [])}
+  Likes: "${likes}" | Retweets: "${retweets}" | Replies: "${replies}" | Views: "${views}"
+
+ESTRUTURA OBRIGATÓRIA DO SVG (siga pixel a pixel):
+
+1. FUNDO EXTERNO: rect ${W}×${H} — gradiente escuro com toque da cor accent (sutil, elegante)
+
+2. SOMBRA DO CARD: rect x=${cX+4} y=${cY+8} w=${cW} h=${cH} rx=${cRx} fill="rgba(0,0,0,0.25)"
+
+3. CARD BRANCO: rect x=${cX} y=${cY} w=${cW} h=${cH} rx=${cRx} fill="#FFFFFF"
+
+4. X LOGO (topo direito do card): path do logo X em fill="#0F1419" — posição x=${cX+cW-${pad}} y=${cY+${pad}}
+   Use este path SVG: M 18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z
+   Scale para ~28px, posicione em: x≈${cX + cW - pad - 28} y≈${cY + pad}
+
+5. AVATAR CIRCULAR: cx=${cX+pad+32} cy=${cY+pad+32+16} r=32 fill="${accent}"
+   Iniciais dentro: "${authorName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}" — fill="#FFFFFF" font-size=18 font-weight=700
+
+6. NOME + VERIFICADO (ao lado do avatar):
+   Nome: x=${textX+70} y=${cY+pad+30+16} font="DM Sans" size=20 weight=700 fill="#0F1419"
+   Ícone verificado ✓: círculo preenchido accent r=9 ao lado do nome
+   Handle: x=${textX+70} y=${cY+pad+54+16} font="DM Sans" size=16 fill="#536471"
+
+7. TWEET TEXT (bloco principal — herói do card):
+   y_start ≈ ${cY + pad + 110}
+   font="DM Sans" size=28 weight=400 fill="#0F1419" line-height=42
+   Use <tspan> para quebrar linhas. max ${Math.floor(textMaxW / (28 * 0.52))} chars/linha.
+   Se tiver body_points: liste-os com espaço antes, tamanho 24px, fill="#0F1419"
+
+8. DATA + FONTE (abaixo do tweet text, espaço calculado):
+   y ≈ calcule após o texto terminar + 32px
+   "${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})} · X Web App"
+   font="DM Sans" size=16 fill="#536471"
+
+9. LINHA DIVISÓRIA 1: x1=${cX+pad} x2=${cX+cW-pad} stroke="#EFF3F4" stroke-width=1
+   y = data_y + 28
+
+10. LIKES EM DESTAQUE: y = div1_y + 28
+    "<strong>${likes}</strong> Likes  <span>${retweets}</span> Retweets"
+    Likes em font-weight=700 fill="#0F1419" size=17 | resto fill="#536471"
+    Use dois <text> separados para bold vs normal
+
+11. LINHA DIVISÓRIA 2: y = likes_y + 28  stroke="#EFF3F4"
+
+12. ÍCONES DE ENGAJAMENTO (linha final — y = div2_y + 32):
+    Espaçados uniformemente no card. Cor base: fill="#536471"
+    a) Reply icon (balão de chat) + "${replies}"
+    b) Retweet icon (setas circulares) + "${retweets}"
+    c) Like/Heart icon + "${likes}" em fill="#F91880"
+    d) Views/Analytics icon + "${views}"
+    e) Share/Bookmark icon (sem número)
+    Use paths SVG simples — NÃO use emojis
+
+    Reply path:    M1.751 10c0-3.836 3.153-7 7.044-7 1.923 0 3.675.792 4.965 2.07a6.98 6.98 0 0 1 2.04 4.93v.602h-2.008V10c0-2.76-2.236-5-4.997-5s-5 2.24-5 5 2.239 5 5 5h.625v2h-.625C4.904 17 1.751 13.836 1.751 10Z
+    Retweet path:  M4.5 3.88l-1.87 1.85.99 1 1.85-1.83V12h1.4V4.9l1.85 1.83.99-1L7.85 3.88a.95.95 0 0 0-1.35 0ZM19.5 12.12l1.87-1.85-.99-1-1.85 1.83V5h-1.4v7.1l-1.85-1.83-.99 1 1.87 1.85c.37.37.98.37 1.34 0Z (adaptado para 20x20)
+    Heart path:    M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.561-1.13-1.666-1.84-2.908-1.91Z
+    Analytics path: M12 1.996c-2.808 0-5 2.472-5 5.504 0 2.01.945 3.792 2.025 5.31 1.058 1.49 2.312 2.795 3.17 3.65.406.403 1.034.403 1.44 0 .857-.855 2.112-2.16 3.17-3.65C17.985 11.292 19 9.51 19 7.5c0-3.032-2.192-5.504-5-5.504Zm0 7.5c-1.105 0-2-.895-2-2s.895-2 2-2 2 .895 2 2-.895 2-2 2Z
+
+13. MARCA D'ÁGUA (fora do card, fundo escuro):
+    Handle da marca em fill="rgba(255,255,255,0.4)" size=16 centralizado y=${H-32}
+
+REGRAS ABSOLUTAS:
+- Responda APENAS com SVG puro — comece com <svg e termine com </svg>
+- xmlns="http://www.w3.org/2000/svg" obrigatório
+- viewBox="0 0 ${W} ${H}" obrigatório
+- ClipPath OBRIGATÓRIO: <clipPath id="canvas"><rect width="${W}" height="${H}"/></clipPath> no <defs>
+- Todo conteúdo dentro de <g clip-path="url(#canvas)">
+- Font-family="DM Sans, Arial, sans-serif" em TODOS os elementos text
+- NUNCA deixe texto ultrapassar o card (use tspan com quebras)`;
+
+  const r = await callClaude({
+    system,
+    userMsg: `Gere o SVG do tweet card com o conteúdo acima. Siga a estrutura pixel a pixel:`,
+    maxTokens: 6000,
+  });
+
+  let svg = r.text.match(/<svg[\s\S]*<\/svg>/i)?.[0] || '';
+  if (!svg) throw new Error('SVG não gerado no tweet card');
+  return { svg, tok: { in: r.inputTokens, out: r.outputTokens } };
+}
+
 // ── Rota: Variações — gera N alternativas visuais em paralelo ────────────────
 // Roda 1 Brief Analyst compartilhado + N Art Director/SVG Executor em paralelo.
 // Cada variação recebe um visual_mood diferente para máxima diversidade.
 // Quota: 1 crédito por variação gerada com sucesso.
 route('POST', '/api/user/design-agent/variations', async (req, res) => {
   const payload = requireAuth(req, res); if (!payload) return;
-  const { prompt, format = 'post', network = 'instagram', brandProfile, count = 2 } = await parseBody(req);
+  const { prompt, format = 'post', network = 'instagram', brandProfile, count = 2, postFormat } = await parseBody(req);
   if (!prompt) return err(res, 'prompt obrigatório');
 
-  const user  = db.getUserById(payload.id);
-  const brand = daBrand(user, brandProfile);
-  const dim   = DA_DIMS[format] || DA_DIMS.post;
-  const n     = Math.max(2, Math.min(3, parseInt(count) || 2));
+  const user    = db.getUserById(payload.id);
+  const brand   = daBrand(user, brandProfile);
+  const dim     = DA_DIMS[format] || DA_DIMS.post;
+  const n       = Math.max(2, Math.min(3, parseInt(count) || 2));
+  const isTweet = postFormat === 'tweet';
 
   // Consome n créditos antecipadamente
   try { for (let i = 0; i < n; i++) db.consumeQuota(payload.id); }
@@ -3029,15 +3157,17 @@ route('POST', '/api/user/design-agent/variations', async (req, res) => {
   // Estágios 2+3 em paralelo — cada variação com mood diferente
   const tasks = Array.from({ length: n }, (_, i) => {
     const moodBrief = { ...brief, visual_mood: VARIATION_MOODS[i % VARIATION_MOODS.length] };
-    return daStage2ArtDir({ brief: moodBrief, brand, dim, format, slideIndex: null, totalSlides: null })
-      .then(s2 => daStage3Svg({ brief: moodBrief, blueprint: s2.data, brand, dim, format, network })
-        .then(s3 => ({
+    const taskPromise = isTweet
+      ? daStage3Tweet({ brief: moodBrief, brand, dim })
+          .then(s3 => ({ s2: { tok: { in: 0, out: 0 } }, s3 }))
+      : daStage2ArtDir({ brief: moodBrief, brand, dim, format, slideIndex: null, totalSlides: null })
+          .then(s2 => daStage3Svg({ brief: moodBrief, blueprint: s2.data, brand, dim, format, network })
+            .then(s3 => ({ s2, s3 })));
+    return taskPromise
+      .then(({ s2, s3 }) => ({
           index: i + 1,
-          mood:  VARIATION_MOODS[i % VARIATION_MOODS.length],
-          svg:   s3.svg,
-          ok:    !!(s3.svg && s3.svg.length > 300),
-          tok:   { in: (s2.tok.in||0) + (s3.tok.in||0), out: (s2.tok.out||0) + (s3.tok.out||0) },
-        })))
+          tok: { in: (s2.tok.in||0) + (s3.tok.in||0), out: (s2.tok.out||0) + (s3.tok.out||0) },
+        }))
       .catch(e => ({ index: i + 1, mood: VARIATION_MOODS[i % VARIATION_MOODS.length], svg: null, ok: false, error: e.message, tok: { in: 0, out: 0 } }));
   });
 
@@ -3132,7 +3262,7 @@ route('POST', '/api/user/design-agent', async (req, res) => {
   const payload = requireAuth(req, res); if (!payload) return;
   const {
     prompt, format = 'post', network = 'instagram', brandProfile,
-    slideIndex, totalSlides, slideRole,
+    slideIndex, totalSlides, slideRole, postFormat,
   } = await parseBody(req);
 
   if (!prompt) {
@@ -3172,38 +3302,46 @@ route('POST', '/api/user/design-agent', async (req, res) => {
   const keepalive = setInterval(() => { try { res.write(': ping\n\n'); } catch {} }, 8000);
 
   let totalIn = 0, totalOut = 0;
+  const isTweet = postFormat === 'tweet';
 
   try {
     // ── Estágio 1: Brief Analysis ──────────────────────────────────────────
-    send('stage', { stage: 1, total: 3, label: 'Analisando conteúdo...', pct: 8 });
+    send('stage', { stage: 1, total: isTweet ? 2 : 3, label: 'Analisando conteúdo...', pct: 8 });
 
     const s1 = await daStage1Brief({ prompt, format, network, brand, slideRole });
     totalIn  += s1.tok.in;
     totalOut += s1.tok.out;
 
-    send('brief',  { brief: s1.data });
-    send('stage',  { stage: 1, total: 3, label: 'Conteúdo estruturado ✓', pct: 28 });
+    send('brief', { brief: s1.data });
+    send('stage', { stage: 1, total: isTweet ? 2 : 3, label: 'Conteúdo estruturado ✓', pct: 30 });
 
-    // ── Estágio 2: Art Direction ───────────────────────────────────────────
-    send('stage', { stage: 2, total: 3, label: 'Definindo direção de arte...', pct: 32 });
+    let svgResult;
 
-    const s2 = await daStage2ArtDir({
-      brief: s1.data, brand, dim, format, slideIndex: slideIdx, totalSlides: totalSl,
-    });
-    totalIn  += s2.tok.in;
-    totalOut += s2.tok.out;
+    if (isTweet) {
+      // ── Tweet Format: Stage 2 bypassed — SVG determinístico ───────────────
+      send('stage', { stage: 2, total: 2, label: 'Gerando tweet card...', pct: 55 });
+      svgResult = await daStage3Tweet({ brief: s1.data, brand, dim });
+    } else {
+      // ── Estágio 2: Art Direction ─────────────────────────────────────────
+      send('stage', { stage: 2, total: 3, label: 'Definindo direção de arte...', pct: 32 });
+      const s2 = await daStage2ArtDir({
+        brief: s1.data, brand, dim, format, slideIndex: slideIdx, totalSlides: totalSl,
+      });
+      totalIn  += s2.tok.in;
+      totalOut += s2.tok.out;
+      send('blueprint', { blueprint: s2.data });
+      send('stage',     { stage: 2, total: 3, label: 'Blueprint definido ✓', pct: 55 });
 
-    send('blueprint', { blueprint: s2.data });
-    send('stage',     { stage: 2, total: 3, label: 'Blueprint definido ✓', pct: 55 });
+      // ── Estágio 3: SVG Execution ───────────────────────────────────────────
+      send('stage', { stage: 3, total: 3, label: 'Executando design...', pct: 60 });
+      svgResult = await daStage3Svg({
+        brief: s1.data, blueprint: s2.data, brand, dim, format, network,
+      });
+    }
 
-    // ── Estágio 3: SVG Execution ───────────────────────────────────────────
-    send('stage', { stage: 3, total: 3, label: 'Executando design...', pct: 60 });
-
-    const s3 = await daStage3Svg({
-      brief: s1.data, blueprint: s2.data, brand, dim, format, network,
-    });
-    totalIn  += s3.tok.in;
-    totalOut += s3.tok.out;
+    totalIn  += svgResult.tok.in;
+    totalOut += svgResult.tok.out;
+    const s3 = svgResult;
 
     if (!s3.svg || s3.svg.length < 300) throw new Error('SVG inválido gerado. Tente novamente.');
 
@@ -3225,7 +3363,7 @@ route('POST', '/api/user/design-agent', async (req, res) => {
     send('done', {
       svg:          s3.svg,
       brief:        s1.data,
-      blueprint:    s2.data,
+      blueprint:    isTweet ? null : undefined,
       generation_id: gen.id,
       tokens:       { input: totalIn, output: totalOut },
       cost_usd:     costUsd,

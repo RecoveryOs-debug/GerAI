@@ -6128,6 +6128,20 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
             <!-- tab: modelos + conceitos -->
             <div id="out-tab-conceitos" style="display:none">
 
+              <!-- ── POST FORMAT PICKER ── -->
+              <div id="post-format-section" style="margin-bottom:14px">
+                <div style="font-size:10px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Formato do post</div>
+                <div style="display:flex;gap:7px;flex-wrap:wrap">
+                  <button id="pfmt-none" onclick="selectPostFormat(null)" style="flex:1;padding:8px 10px;background:transparent;border:1.5px solid var(--amber);border-radius:8px;cursor:pointer;font-family:var(--f);font-size:11px;font-weight:600;color:var(--amber);transition:.15s">
+                    ✦ Post padrão
+                  </button>
+                  <button id="pfmt-tweet" onclick="selectPostFormat('tweet')" style="flex:1;padding:8px 10px;background:transparent;border:1.5px solid var(--line-2);border-radius:8px;cursor:pointer;font-family:var(--f);font-size:11px;font-weight:600;color:var(--t2);transition:.15s;display:flex;align-items:center;justify-content:center;gap:5px">
+                    <svg style="width:12px;height:12px;fill:currentColor;flex-shrink:0" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    Tweet Card
+                  </button>
+                </div>
+              </div>
+
               <!-- ── BRAND VOICE PICKER ── -->
               <div id="voice-picker-section" style="margin-bottom:14px">
                 <div style="font-size:10px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">Tom visual da marca</div>
@@ -8161,6 +8175,7 @@ async function gerarImagem() {
           prompt: slideDesc, format: _currentFmt,
           network: _netMap[_currentNet] || 'instagram',
           brandProfile, slideIndex: sIdx, totalSlides: total, slideRole,
+          postFormat: _selectedPostFormat || undefined,
         });
         _renderCarouselSlide(sIdx, svg, total);
       } catch(e) {
@@ -8185,6 +8200,7 @@ async function gerarImagem() {
       prompt: refined, format: _currentFmt,
       network: _netMap[_currentNet] || 'instagram',
       brandProfile,
+      postFormat: _selectedPostFormat || undefined,
     });
     window._currentSVG = svg;
     _currentSVG = svg;
@@ -8246,6 +8262,7 @@ async function gerarVariacoes() {
       network: _netMap[_currentNet] || 'instagram',
       brandProfile,
       count: 3,
+      postFormat: _selectedPostFormat || undefined,
     });
     if (barEl) barEl.style.width = '100%';
     document.getElementById('img-gen-loading').style.display = 'none';
@@ -10673,7 +10690,26 @@ function _computeModelFmt() {
   return fmtKey + '_' + network;
 }
 
-// ─── BRAND VOICE SYSTEM ─────────────────────────────────────────────────────
+// ─── POST FORMAT SYSTEM ──────────────────────────────────────────────────────
+var _selectedPostFormat = null; // null = padrão | 'tweet' = tweet card
+
+function selectPostFormat(fmt) {
+  _selectedPostFormat = fmt;
+  const btnNone  = document.getElementById('pfmt-none');
+  const btnTweet = document.getElementById('pfmt-tweet');
+  if (btnNone) {
+    btnNone.style.borderColor = !fmt ? 'var(--amber)' : 'var(--line-2)';
+    btnNone.style.color       = !fmt ? 'var(--amber)' : 'var(--t2)';
+    btnNone.style.background  = !fmt ? 'rgba(245,197,24,.07)' : 'transparent';
+  }
+  if (btnTweet) {
+    btnTweet.style.borderColor = fmt === 'tweet' ? 'var(--amber)' : 'var(--line-2)';
+    btnTweet.style.color       = fmt === 'tweet' ? 'var(--amber)' : 'var(--t2)';
+    btnTweet.style.background  = fmt === 'tweet' ? 'rgba(245,197,24,.07)' : 'transparent';
+  }
+}
+
+// ─── BRAND VOICE SYSTEM ──────────────────────────────────────────────────────
 var _selectedVoice = null;
 
 const BRAND_VOICES_UI = [
