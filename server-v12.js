@@ -3054,7 +3054,7 @@ ESTRUTURA OBRIGATÓRIA DO SVG (siga pixel a pixel):
 
 3. CARD BRANCO: rect x=${cX} y=${cY} w=${cW} h=${cH} rx=${cRx} fill="#FFFFFF"
 
-4. X LOGO (topo direito do card): path do logo X em fill="#0F1419" — posição x=${cX+cW-${pad}} y=${cY+${pad}}
+4. X LOGO (topo direito do card): path do logo X em fill="#0F1419" — posição x=${cX+cW-pad} y=${cY+pad}
    Use este path SVG: M 18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z
    Scale para ~28px, posicione em: x≈${cX + cW - pad - 28} y≈${cY + pad}
 
