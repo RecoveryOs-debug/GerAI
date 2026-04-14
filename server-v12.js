@@ -2522,52 +2522,59 @@ async function daStage1Brief({ prompt, format, network, brand, slideRole }) {
   const fmtLabel = { post:'Post', carrossel:'Carrossel', story:'Story', reels:'Reels',
                      thumb:'Thumbnail', banner:'Banner', anuncio:'Anúncio' }[format] || format;
   const system =
-`Você é o CREATIVE BRIEF MASTER — Estágio 1 do Design Agent de nível mundial.
-MISSÃO: Transformar qualquer input em hierarquia de conteúdo IRRESISTÍVEL que para o scroll.
+`Você é o CREATIVE BRIEF MASTER — Estágio 1 do Design Agent de elite mundial.
+MISSÃO: Transformar qualquer input em hierarquia de conteúdo IRRESISTÍVEL que para o scroll e converte.
 
 CONTEXTO DA MARCA:
 Profissão: ${brand.profissao} | Nicho: ${brand.nicho} | Tom: ${brand.tom} | Público: ${brand.publico}
 Formato: ${fmtLabel} → ${DA_NET_LABELS[network] || network}${slideRole ? `\nFunção do slide: ${slideRole}` : ''}
 
-━━━ FRAMEWORK DE COPYWRITING PARA DESIGN VIRAL ━━━
+━━━ PSICOLOGIA DO SCROLL-STOP + COPYWRITING DE CONVERSÃO ━━━
 
-HEADLINE (o gancho que para o scroll):
-• Máx 7 palavras — cada palavra deve justificar sua presença
-• Use um destes padrões comprovados:
-  NÚMERO: "5 estratégias que triplicaram minha receita"
-  CONTRASTE: "Por que esforçados ficam para trás"
-  URGÊNCIA: "O erro que 90% dos iniciantes cometem"
-  SEGREDO: "O método silencioso dos top performers"
-  TRANSFORMAÇÃO: "De [problema] para [resultado] em [tempo]"
-  PERGUNTA: "Por que seu negócio não está crescendo?"
-• Deve gerar: curiosidade + relevância + urgência
+HEADLINE — O GANCHO QUE PRENDE EM 0,3 SEGUNDOS:
+• Máx 7 palavras — cada palavra carrega peso; elimine adjetivos fracos e genéricos
+• Padrões comprovados por neurociência de conversão:
+  NÚMERO ESPECÍFICO: "7 gatilhos que triplicam fechamentos"
+  CONTRASTE BRUTAL: "Trabalhadores duram. Estrategistas prosperam."
+  LACUNA DE CURIOSIDADE: "O gap que separa top 1% do resto"
+  PARADOXO: "Por que mais esforço reduz resultado"
+  TRANSFORMAÇÃO CONCRETA: "De R$10k para R$100k: o que mudou"
+  PERGUNTA INCÔMODA: "Por que você ainda cobra por hora?"
+  AFIRMAÇÃO POLÊMICA: "Networking é perda de tempo disfarçada"
+• Gatilhos psicológicos obrigatórios: FOMO / Identidade / Curiosidade lacunar / Urgência
 • Tom obrigatório: ${brand.tom}
+• NUNCA use: importante, essencial, incrível, perfeito, ótimo, excelente
 
-SUBHEADLINE (resolve a tensão do headline):
-• Máx 14 palavras — especifica o QUÊ, PARA QUEM, ou QUANDO
-• Complementa sem repetir — expande a promessa
+SUBHEADLINE — RESOLVE A TENSÃO E ESPECIFICA:
+• Máx 14 palavras — QUÊ exatamente + PARA QUEM + RESULTADO mensurável
+• Fórmula: [Ação específica] + [Condição ou contexto] + [Resultado tangível]
+• Exemplos fortes: "Para donos de negócio que já tentaram e sentiram que algo estava faltando"
+• Complementa sem repetir — adiciona especificidade e credibilidade
 
-BODY POINTS (prova social e credibilidade):
+BODY POINTS — PROVA, PROFUNDIDADE, CREDIBILIDADE:
 • Máx 3 itens, máx 8 palavras cada
-• Benefício concreto OU dado numérico real
-• Verbo de ação: "Elimina / Dobra / Garante / Protege"
+• Estrutura: verbo de impacto + benefício concreto + qualificador/dado
+• Verbos poderosos: Elimina / Dobra / Garante / Acelera / Reverte / Desbloqueia / Converte
+• Pelo menos 1 item com dado numérico específico quando possível
+• Cada ponto deve ser autônomo e convincente por si só
 
-CTA (chamada irresistível):
-• Máx 4 palavras — verbo + benefício implícito
-• Use: Descubra / Acesse / Garanta / Transforme / Comece
+CTA — A ORDEM IRRECUSÁVEL:
+• Máx 4 palavras — verbo imperativo + benefício implícito
+• Alta conversão: "Descubra o método" / "Acesse agora" / "Garanta sua vaga" / "Ative hoje"
 
-DATA HIGHLIGHT:
-• Extraia/crie o NÚMERO mais impactante (ex: "3x", "R$47k", "87%", "30 dias")
-• Se não explícito no input, crie um contextual crível para o nicho
-• null APENAS se absolutamente incompatível
+DATA HIGHLIGHT — O NÚMERO QUE CONVENCE:
+• O dado mais específico e impactante possível (ex: "3,4x", "R$127k", "93%", "19 dias")
+• Números quebrados convencem mais: 87% > 90%, R$4.700 > R$5.000
+• Se não fornecido: crie dado contextualmente crível e específico para o nicho
+• null APENAS se completamente incompatível com o conteúdo
 
 ━━━ RETORNE SOMENTE JSON VÁLIDO ━━━
 {
   "headline": "gancho irresistível máx 7 palavras",
-  "subheadline": "complemento específico ou null",
-  "body_points": ["benefício concreto 1", "benefício concreto 2", "benefício concreto 3"],
+  "subheadline": "complemento específico e quantificado ou null",
+  "body_points": ["verbo+benefício+dado 1", "verbo+benefício+dado 2", "verbo+benefício+dado 3"],
   "cta": "ação direta máx 4 palavras",
-  "data_highlight": "dado impactante ou null",
+  "data_highlight": "dado impactante e específico ou null",
   "visual_mood": "dark-power | clean-premium | bold-energy | soft-trust | tech-sharp",
   "content_type": "educational | motivational | promotional | storytelling | data-driven",
   "emphasis": "number | quote | list | statement | question",
@@ -2608,8 +2615,10 @@ async function daStage2ArtDir({ brief, brand, dim, format, slideIndex, totalSlid
   const orientation = isVertical ? 'vertical (story/reels)' : isWide ? 'horizontal (thumb/banner)' : 'quadrado (post)';
 
   const system =
-`Você é o ART DIRECTOR SÊNIOR — Estágio 2 do Design Agent de nível Pentagram/R/GA.
-MISSÃO: Definir blueprint de design PRECISO com coordenadas exatas, tipografia calibrada e camadas visuais ricas que criam designs de parar o scroll.
+`Você é o ART DIRECTOR CHEFE — Estágio 2 do Design Agent. Nível: Pentagram + R/GA + Sagmeister & Walsh combinados.
+MISSÃO: Definir blueprint de design MAGISTRAL — coordenadas precisas, tipografia calibrada, camadas visuais com profundidade e tensão visual que param o scroll e geram desejo instantâneo.
+
+FILOSOFIA DE DESIGN: O melhor post não é o mais bonito — é o mais IRRESISTÍVEL. Cada elemento deve ter função estratégica. Hierarquia visual clara. Tensão criativa controlada. Identidade que marca memória.
 
 CANVAS: ${dim.w}×${dim.h}px — ${orientation}
 MARGEM BASE: ${margin}px
@@ -2971,7 +2980,18 @@ ${JSON.stringify(blueprint, null, 2)}`;
 
   const r = await callClaude({
     system,
-    userMsg: `Plataforma: ${DA_NET_LABELS[network] || network}. Execute o blueprint com todas as camadas visuais. Crie um design de agência premium — rico, profundo, impactante. SVG completo agora:`,
+    userMsg: `Plataforma: ${DA_NET_LABELS[network] || network}.
+
+Execute o blueprint SEM OMITIR NENHUMA CAMADA. Exigências mínimas:
+✦ Mínimo 6 camadas visuais distintas (bg + atmosfera + shapes + estrutura + conteúdo + footer)
+✦ Pelo menos 1 gradiente (bg ou elemento) — zero fundos 100% planos
+✦ Pelo menos 1 filtro (blur/glow/sombra) — profundidade é obrigatória
+✦ Texto headline em TSPANS se necessário — NUNCA transbordando o canvas
+✦ Todo texto com font-family, fill, font-size explícitos
+✦ ClipPath ativo envolvendo todo conteúdo
+
+Este design vai para o feed de clientes pagantes. Ele deve ser o post mais impactante que eles já viram.
+Nível: top 0.1% dos designs de marketing digital do Brasil. SVG completo agora:`,
     maxTokens: 12000,
   });
 
@@ -3357,12 +3377,14 @@ route('POST', '/api/user/design-agent', async (req, res) => {
   const brand     = daBrand(user, brandProfile);
   const dim       = DA_DIMS[format] || DA_DIMS.post;
   const isCarrossel = format === 'carrossel';
+  const isTweetFmt  = postFormat === 'tweet';
   const slideIdx  = Math.max(1, parseInt(slideIndex) || 1);
   const totalSl   = Math.max(1, parseInt(totalSlides) || 1);
 
-  // Quota: consome 1 crédito por post; em carrosseis, consome apenas no 1º slide
+  // Quota: tweet=4 créditos, padrão=2 créditos; carrossel só consome no 1º slide
   if (!isCarrossel || slideIdx === 1) {
-    try { db.consumeQuota(payload.id); }
+    const credits = isTweetFmt ? 4 : 2;
+    try { for (let i = 0; i < credits; i++) db.consumeQuota(payload.id); }
     catch(e) {
       res.writeHead(402, { 'Content-Type': 'application/json' });
       return res.end(JSON.stringify({ ok: false, error: e.message }));
@@ -3385,7 +3407,7 @@ route('POST', '/api/user/design-agent', async (req, res) => {
   const keepalive = setInterval(() => { try { res.write(': ping\n\n'); } catch {} }, 8000);
 
   let totalIn = 0, totalOut = 0;
-  const isTweet = postFormat === 'tweet';
+  const isTweet = isTweetFmt;
 
   try {
     // ── Estágio 1: Brief Analysis ──────────────────────────────────────────
@@ -3463,6 +3485,114 @@ route('POST', '/api/user/design-agent', async (req, res) => {
   }
 
   res.end();
+});
+
+// ── Rota: Brainstorm conversacional ──────────────────────────────────────────
+// Permite o usuário desenvolver a ideia em conversa com a IA antes de gerar.
+// Cada mensagem consome 1 crédito. Suporta até 14 mensagens de histórico.
+route('POST', '/api/user/brainstorm', async (req, res) => {
+  const payload = requireAuth(req, res); if (!payload) return;
+  const { messages, context, brandProfile } = await parseBody(req);
+  if (!messages || !Array.isArray(messages) || messages.length === 0)
+    return err(res, 'messages obrigatório');
+
+  const user = db.getUserById(payload.id);
+  try { db.consumeQuota(payload.id); } catch(e) { return err(res, e.message, 402); }
+
+  const brand = daBrand(user, brandProfile);
+
+  const ctxLabel = {
+    image: 'post visual / imagem de marketing',
+    legenda: 'legenda para redes sociais',
+    'roteiro-yt': 'roteiro para YouTube',
+    'roteiro-reels': 'roteiro para Reels/TikTok',
+    story: 'ideias para Stories',
+    linkedin: 'post profissional para LinkedIn',
+    tiktok: 'roteiro e hook para TikTok',
+  }[context] || context || 'conteúdo de marketing';
+
+  const system =
+`Você é o CREATIVE STRATEGIST — consultor criativo de elite especializado em conteúdo digital viral.
+Missão: ajudar o usuário a desenvolver a ideia mais afiada e específica possível para criar ${ctxLabel}.
+
+MARCA: ${brand.profissao} | Nicho: ${brand.nicho} | Tom: ${brand.tom} | Público: ${brand.publico}
+
+COMO AGIR:
+— Se a ideia estiver vaga: faça 1-2 perguntas estratégicas (ângulo, dado específico, transformação)
+— Se a ideia estiver clara: confirme, sugira um twist criativo ou um dado que deixe mais impactante
+— Proponha ângulos alternativos quando pertinente (contraste, curiosidade, prova social, urgência)
+— Seja conciso: máx 3 parágrafos. Linguagem direta, em português.
+— Ao final, sempre indique se a ideia está pronta para refinar (✅) ou precisa de mais desenvolvimento (🔄)`;
+
+  try {
+    const r = await callClaudeMessages({
+      system,
+      messages: messages.slice(-14).map(m => ({ role: m.role, content: String(m.content) })),
+      maxTokens: 600,
+    });
+    const tok = { in: r.inputTokens || 0, out: r.outputTokens || 0 };
+    const cost_usd = parseFloat(((tok.in / 1_000_000 * 3) + (tok.out / 1_000_000 * 15)).toFixed(6));
+    res.end(JSON.stringify({ ok: true, reply: r.text, tok, cost_usd }));
+  } catch(e) {
+    return err(res, 'Erro na conversa: ' + e.message);
+  }
+});
+
+// ── Rota: Refinar prompt a partir de uma conversa ─────────────────────────────
+// Consolida o histórico de brainstorm em um prompt rico e específico. +1 crédito.
+route('POST', '/api/user/brainstorm/refine', async (req, res) => {
+  const payload = requireAuth(req, res); if (!payload) return;
+  const { messages, context, brandProfile } = await parseBody(req);
+  if (!messages || !Array.isArray(messages) || messages.length === 0)
+    return err(res, 'messages obrigatório');
+
+  const user = db.getUserById(payload.id);
+  try { db.consumeQuota(payload.id); } catch(e) { return err(res, e.message, 402); }
+
+  const brand = daBrand(user, brandProfile);
+
+  const ctxType = {
+    image: 'post visual de marketing digital',
+    legenda: 'legenda para redes sociais',
+    'roteiro-yt': 'roteiro completo para YouTube',
+    'roteiro-reels': 'roteiro de Reels/TikTok',
+    story: 'sequência de Stories',
+    linkedin: 'post profissional para LinkedIn',
+    tiktok: 'roteiro e hook para TikTok',
+  }[context] || context || 'conteúdo digital';
+
+  const conversationStr = messages
+    .slice(-16)
+    .map(m => `${m.role === 'user' ? 'Usuário' : 'Consultor'}: ${m.content}`)
+    .join('\n\n');
+
+  const system =
+`Você é um especialista em copywriting e direção criativa de nível mundial.
+Com base na conversa de brainstorm abaixo, crie um prompt DETALHADO e ESPECÍFICO para geração de ${ctxType}.
+
+O prompt deve conter de forma clara:
+• Tema central e ângulo criativo específico
+• Tom, estilo e intensidade desejados
+• Dados, números ou elementos concretos mencionados
+• Objetivo (educar, vender, engajar, inspirar)
+• Público-alvo e transformação que o conteúdo deve provocar
+
+Marca: ${brand.profissao} | Nicho: ${brand.nicho} | Tom: ${brand.tom} | Público: ${brand.publico}
+
+RETORNE APENAS O PROMPT REFINADO — sem introdução, sem explicação, direto ao ponto.
+Tamanho: 80-200 palavras. Seja específico, rico e direto.`;
+
+  try {
+    const r = await callClaudeMessages({
+      system,
+      messages: [{ role: 'user', content: `Conversa de brainstorm:\n\n${conversationStr}\n\nGere o prompt refinado:` }],
+      maxTokens: 450,
+    });
+    const tok = { in: r.inputTokens || 0, out: r.outputTokens || 0 };
+    res.end(JSON.stringify({ ok: true, refinedPrompt: r.text.trim(), tok }));
+  } catch(e) {
+    return err(res, 'Erro ao refinar: ' + e.message);
+  }
 });
 
 // ── Rota: Export SVG → PNG/JPG ────────────────────────────────────────────────

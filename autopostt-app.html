@@ -2247,6 +2247,47 @@ tr:hover .td-actions { opacity: 1; }
 .refine-step{background:var(--bg3);border:1px solid rgba(243,107,42,.15);border-radius:var(--r2);padding:10px 13px;margin-bottom:12px;font-size:11px;color:var(--t2);display:flex;align-items:center;gap:8px}
 .refine-step-dot{width:6px;height:6px;border-radius:50%;background:var(--a);flex-shrink:0}
 
+/* ── Brainstorm Chat UI ─────────────────────────────────────── */
+.bs-wrap{border:1.5px solid var(--line-2);border-radius:var(--r2);background:var(--bg2);overflow:hidden;margin-bottom:16px}
+.bs-header{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:1px solid var(--line-2);background:var(--bg3)}
+.bs-header-label{font-size:10px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;gap:6px}
+.bs-header-cost{font-size:10px;color:var(--t3)}
+.bs-msgs{min-height:130px;max-height:280px;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.bs-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:110px;gap:8px;color:var(--t3);text-align:center}
+.bs-placeholder-icon{font-size:22px;opacity:.6}
+.bs-placeholder-text{font-size:12px;line-height:1.5;max-width:220px}
+.bs-bubble{max-width:87%;padding:9px 13px;border-radius:12px;font-size:12.5px;line-height:1.55;word-break:break-word}
+.bs-bubble-user{align-self:flex-end;background:var(--a);color:#fff;border-bottom-right-radius:4px}
+.bs-bubble-assistant{align-self:flex-start;background:var(--bg4,var(--bg3));color:var(--t1);border-bottom-left-radius:4px;border:1px solid var(--line-2)}
+.bs-typing{align-self:flex-start}
+.bs-typing-dots{display:flex;gap:4px;padding:3px 2px}
+.bs-typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--t3);animation:bsDot 1.2s ease-in-out infinite}
+.bs-typing-dots span:nth-child(2){animation-delay:.2s}
+.bs-typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes bsDot{0%,80%,100%{transform:scale(.75);opacity:.35}40%{transform:scale(1);opacity:1}}
+.bs-input-row{display:flex;gap:8px;padding:9px 12px;border-top:1px solid var(--line-2);align-items:flex-end}
+.bs-input-row textarea{flex:1;background:transparent;border:none;outline:none;font-family:var(--f);font-size:13px;color:var(--t1);resize:none;line-height:1.5;max-height:90px;overflow-y:auto;padding:2px 0}
+.bs-input-row textarea::placeholder{color:var(--t3)}
+.bs-send-btn{background:var(--a);border:none;border-radius:8px;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s;opacity:1}
+.bs-send-btn:disabled{opacity:.35;cursor:not-allowed}
+.bs-send-btn svg{width:14px;height:14px;fill:none;stroke:#fff;stroke-width:2.5}
+.bs-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 14px 12px;gap:8px}
+.bs-cost-hint{font-size:10px;color:var(--t3)}
+.bs-refine-btn{background:transparent;border:1.5px solid var(--a);border-radius:8px;padding:7px 14px;cursor:pointer;font-family:var(--f);font-size:11px;font-weight:700;color:var(--a);transition:.15s;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.bs-refine-btn:disabled{border-color:var(--line-2);color:var(--t3);cursor:not-allowed;opacity:.6}
+.bs-refine-btn:not(:disabled):hover{background:var(--a);color:#fff}
+.bs-credit-badge{background:rgba(243,107,42,.14);color:var(--a);border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;transition:.15s}
+.bs-refine-btn:not(:disabled):hover .bs-credit-badge{background:rgba(255,255,255,.2);color:#fff}
+/* refined prompt box */
+.bs-refined-wrap{margin-bottom:16px;border:1.5px solid rgba(243,107,42,.3);border-radius:var(--r2);overflow:hidden}
+.bs-refined-header{display:flex;align-items:center;justify-content:space-between;padding:8px 13px;background:rgba(243,107,42,.06);border-bottom:1px solid rgba(243,107,42,.15)}
+.bs-refined-label{font-size:10px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.08em}
+.bs-refined-actions{display:flex;gap:6px}
+.bs-refined-text{padding:12px 14px;font-size:12px;color:var(--t1);line-height:1.75;font-family:monospace;white-space:pre-wrap;background:var(--bg3);min-height:60px}
+.bs-refined-text[contenteditable="true"]{outline:none;background:var(--bg2)}
+.bs-gen-btn{width:100%;background:var(--a);border:none;border-radius:var(--r2);padding:13px 20px;cursor:pointer;font-family:var(--f);font-size:13px;font-weight:700;color:#fff;transition:.15s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;box-shadow:0 4px 18px rgba(243,107,42,.22)}
+.bs-gen-btn:disabled{opacity:.45;cursor:not-allowed}
+
 .img-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);z-index:600;display:none;align-items:center;justify-content:center;padding:20px}
 .img-modal-bg.open{display:flex}
 .img-modal{background:var(--bg2);border:1px solid var(--b2);border-radius:var(--r3);padding:0;max-width:680px;width:100%;animation:fin .18s var(--ease);overflow:hidden}
@@ -6064,30 +6105,51 @@ body.image-agent-refining #image-agent-refine-overlay{
             </div>
           </div>
           <!-- textarea + refinador -->
-          <div style="margin-bottom:18px">
-            <div class="sec-lbl">Sua ideia</div>
-            <div class="ta-wrap">
-              <textarea id="gen-in" rows="5" placeholder="Descreva o conteúdo que quer criar. Pode ser uma ideia solta, um tema, uma mensagem ou uma transcrição de voz.
-
-Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="ucc()"></textarea>
-              <div class="ta-foot">
-                <span class="ta-count" id="cc">0 / 500</span>
-                <button class="mic-btn" id="mic-b" onclick="toggleMic()">
-                  <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>
-                  Gravar
-                </button>
+          <!-- Brainstorm chat UI -->
+          <div class="sec-lbl" style="margin-bottom:8px">Sua ideia <span style="font-size:10px;color:var(--t3);font-weight:400;text-transform:none;letter-spacing:0">— converse com a IA para refinar</span></div>
+          <div class="bs-wrap" id="bs-image-wrap">
+            <div class="bs-header">
+              <span class="bs-header-label">
+                <svg style="width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                Creative Strategist
+              </span>
+              <span class="bs-header-cost">1 crédito por mensagem</span>
+            </div>
+            <div class="bs-msgs" id="bs-image-msgs">
+              <div class="bs-placeholder">
+                <div class="bs-placeholder-icon">✦</div>
+                <div class="bs-placeholder-text">Descreva sua ideia. A IA vai te ajudar a desenvolvê-la até ficar irresistível.</div>
               </div>
             </div>
+            <div class="bs-input-row">
+              <textarea id="bs-image-input" rows="2" placeholder="O que você quer criar?" onkeydown="bsKeydown(event,'image')"></textarea>
+              <button class="bs-send-btn" id="bs-image-send" onclick="sendBrainstorm('image')" title="Enviar">
+                <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+            </div>
+            <div class="bs-footer">
+              <span class="bs-cost-hint">Enter para enviar · Shift+Enter nova linha</span>
+              <button class="bs-refine-btn" id="bs-image-refine" onclick="bsRefine('image')" disabled>
+                ✦ Refinar Prompt <span class="bs-credit-badge">+1</span>
+              </button>
+            </div>
           </div>
 
-          <!-- prompt refinado (aparece após refinamento) -->
-          <div id="refined-prompt-wrap" style="display:none;margin-bottom:18px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-              <div class="sec-lbl" style="margin-bottom:0">Prompt refinado pelo agente</div>
-              <button class="btn btn-g btn-sm" onclick="editRefined()" style="font-size:10px">Editar</button>
+          <!-- prompt refinado -->
+          <div class="bs-refined-wrap" id="bs-image-refined-wrap" style="display:none;margin-bottom:16px">
+            <div class="bs-refined-header">
+              <span class="bs-refined-label">✦ Prompt refinado pela IA</span>
+              <div class="bs-refined-actions">
+                <button class="btn btn-g btn-sm" onclick="bsEditRefined('image')" style="font-size:10px">Editar</button>
+                <button class="btn btn-g btn-sm" onclick="bsReset('image')" style="font-size:10px">Nova conversa</button>
+              </div>
             </div>
-            <div id="refined-prompt-box" style="background:var(--bg3);border:1px solid rgba(243,107,42,.2);border-radius:var(--r2);padding:11px 13px;font-size:12px;color:var(--t1);line-height:1.7;font-family:monospace;position:relative"></div>
+            <div class="bs-refined-text" id="bs-image-refined-text"></div>
           </div>
+          <!-- hidden textarea mantido para compatibilidade com gerarImagem() -->
+          <textarea id="gen-in" style="display:none"></textarea>
+          <!-- hidden refined-prompt-wrap mantido para compatibilidade -->
+          <div id="refined-prompt-wrap" style="display:none"><div id="refined-prompt-box"></div></div>
           <!-- upload -->
           <div style="margin-bottom:20px">
             <div class="sec-lbl">Referência visual <span style="font-size:10px;color:var(--t3);font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></div>
@@ -6193,7 +6255,7 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
                 <button id="btn-gerar-img" onclick="gerarImagem()" style="width:100%;margin-top:12px;background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:var(--f);font-size:14px;font-weight:700;color:#fff;letter-spacing:-.02em;box-shadow:0 4px 20px rgba(243,107,42,.3);transition:all .15s">
                   <svg style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                   Gerar imagem com IA
-                  <span style="margin-left:auto;font-size:10px;font-weight:500;opacity:.75;background:rgba(0,0,0,.2);border-radius:10px;padding:2px 7px">1 crédito</span>
+                  <span style="margin-left:auto;font-size:10px;font-weight:500;opacity:.75;background:rgba(0,0,0,.2);border-radius:10px;padding:2px 7px" id="btn-gerar-img-cost">2 créditos</span>
                 </button>
                 <button id="btn-variacoes-img" onclick="gerarVariacoes()" style="width:100%;margin-top:7px;background:transparent;border:1.5px solid var(--amber-30,rgba(245,197,24,.3));border-radius:var(--r2);padding:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--f);font-size:12px;font-weight:600;color:var(--amber);letter-spacing:-.01em;transition:all .15s">
                   <svg style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
@@ -6782,14 +6844,14 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
       </div>
       <div class="agent-cols">
         <div class="agent-left">
-          <div class="refine-step"><span class="refine-step-dot"></span>Seu input passa pelo agente refinador antes de ser processado</div>
-          <div class="form-row" style="margin-top:14px"><label>Sua ideia ou contexto</label>
-            <div class="ta-wrap"><textarea id="ag-legenda-in" rows="5" placeholder="Ex: Post sobre os 3 maiores erros de gestão comercial que custam vendas..." oninput="this.nextElementSibling.querySelector('.ta-count').textContent=this.value.length+' / 500'"></textarea>
-              <div class="ta-foot"><span class="ta-count">0 / 500</span>
-                <button class="mic-btn" onclick="toggleMicAgent(this,'ag-legenda-in')"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>Gravar</button>
-              </div>
-            </div>
+          <div class="bs-wrap">
+            <div class="bs-header"><span class="bs-header-label">✦ Creative Strategist</span><span class="bs-header-cost">1 crédito/mensagem</span></div>
+            <div class="bs-msgs" id="bs-legenda-msgs"><div class="bs-placeholder"><div class="bs-placeholder-icon">✦</div><div class="bs-placeholder-text">Descreva sua ideia. A IA vai refinar até ficar perfeita.</div></div></div>
+            <div class="bs-input-row"><textarea id="bs-legenda-input" rows="2" placeholder="Qual a ideia da legenda?" onkeydown="bsKeydown(event,'legenda')"></textarea><button class="bs-send-btn" id="bs-legenda-send" onclick="sendBrainstorm('legenda')" title="Enviar"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div>
+            <div class="bs-footer"><span class="bs-cost-hint">Enter para enviar</span><button class="bs-refine-btn" id="bs-legenda-refine" onclick="bsRefine('legenda')" disabled>✦ Refinar Prompt <span class="bs-credit-badge">+1</span></button></div>
           </div>
+          <div class="bs-refined-wrap" id="bs-legenda-refined-wrap" style="display:none;margin-bottom:12px"><div class="bs-refined-header"><span class="bs-refined-label">✦ Prompt refinado</span><div class="bs-refined-actions"><button class="btn btn-g btn-sm" onclick="bsEditRefined('legenda')" style="font-size:10px">Editar</button><button class="btn btn-g btn-sm" onclick="bsReset('legenda')" style="font-size:10px">Resetar</button></div></div><div class="bs-refined-text" id="bs-legenda-refined-text"></div></div>
+          <textarea id="ag-legenda-in" style="display:none"></textarea>
           <div class="form-row" style="margin-top:12px"><label>Tom de voz <span style="color:var(--t3);font-weight:400;text-transform:none">(opcional)</span></label>
             <select id="ag-legenda-tom"><option value="">Usar perfil de marca</option>              <option>Autoridade</option>
               <option>Provocativo</option>
@@ -6848,14 +6910,14 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
       </div>
       <div class="agent-cols">
         <div class="agent-left">
-          <div class="refine-step"><span class="refine-step-dot"></span>Seu input passa pelo agente refinador antes de ser processado</div>
-          <div class="form-row" style="margin-top:14px"><label>Sua ideia ou contexto</label>
-            <div class="ta-wrap"><textarea id="ag-roteiro-yt-in" rows="5" placeholder="Ex: Vídeo sobre como estruturar uma equipe comercial de alta performance em 90 dias..." oninput="this.nextElementSibling.querySelector('.ta-count').textContent=this.value.length+' / 500'"></textarea>
-              <div class="ta-foot"><span class="ta-count">0 / 500</span>
-                <button class="mic-btn" onclick="toggleMicAgent(this,'ag-roteiro-yt-in')"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>Gravar</button>
-              </div>
-            </div>
+          <div class="bs-wrap">
+            <div class="bs-header"><span class="bs-header-label">✦ Creative Strategist</span><span class="bs-header-cost">1 crédito/mensagem</span></div>
+            <div class="bs-msgs" id="bs-roteiro-yt-msgs"><div class="bs-placeholder"><div class="bs-placeholder-icon">✦</div><div class="bs-placeholder-text">Sobre o que é o vídeo? A IA vai ajudar a estruturar o roteiro.</div></div></div>
+            <div class="bs-input-row"><textarea id="bs-roteiro-yt-input" rows="2" placeholder="Tema do vídeo..." onkeydown="bsKeydown(event,'roteiro-yt')"></textarea><button class="bs-send-btn" id="bs-roteiro-yt-send" onclick="sendBrainstorm('roteiro-yt')" title="Enviar"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div>
+            <div class="bs-footer"><span class="bs-cost-hint">Enter para enviar</span><button class="bs-refine-btn" id="bs-roteiro-yt-refine" onclick="bsRefine('roteiro-yt')" disabled>✦ Refinar Prompt <span class="bs-credit-badge">+1</span></button></div>
           </div>
+          <div class="bs-refined-wrap" id="bs-roteiro-yt-refined-wrap" style="display:none;margin-bottom:12px"><div class="bs-refined-header"><span class="bs-refined-label">✦ Prompt refinado</span><div class="bs-refined-actions"><button class="btn btn-g btn-sm" onclick="bsEditRefined('roteiro-yt')" style="font-size:10px">Editar</button><button class="btn btn-g btn-sm" onclick="bsReset('roteiro-yt')" style="font-size:10px">Resetar</button></div></div><div class="bs-refined-text" id="bs-roteiro-yt-refined-text"></div></div>
+          <textarea id="ag-roteiro-yt-in" style="display:none"></textarea>
           <div class="form-row" style="margin-top:12px"><label>Tom de voz <span style="color:var(--t3);font-weight:400;text-transform:none">(opcional)</span></label>
             <select id="ag-roteiro-yt-tom"><option value="">Usar perfil de marca</option>              <option>Autoridade</option>
               <option>Provocativo</option>
@@ -6914,14 +6976,14 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
       </div>
       <div class="agent-cols">
         <div class="agent-left">
-          <div class="refine-step"><span class="refine-step-dot"></span>Seu input passa pelo agente refinador antes de ser processado</div>
-          <div class="form-row" style="margin-top:14px"><label>Sua ideia ou contexto</label>
-            <div class="ta-wrap"><textarea id="ag-roteiro-reels-in" rows="5" placeholder="Ex: Reels mostrando os 3 erros que impedem vendedores de bater meta..." oninput="this.nextElementSibling.querySelector('.ta-count').textContent=this.value.length+' / 500'"></textarea>
-              <div class="ta-foot"><span class="ta-count">0 / 500</span>
-                <button class="mic-btn" onclick="toggleMicAgent(this,'ag-roteiro-reels-in')"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>Gravar</button>
-              </div>
-            </div>
+          <div class="bs-wrap">
+            <div class="bs-header"><span class="bs-header-label">✦ Creative Strategist</span><span class="bs-header-cost">1 crédito/mensagem</span></div>
+            <div class="bs-msgs" id="bs-roteiro-reels-msgs"><div class="bs-placeholder"><div class="bs-placeholder-icon">✦</div><div class="bs-placeholder-text">Qual é a ideia do Reels? A IA vai criar um hook inesquecível.</div></div></div>
+            <div class="bs-input-row"><textarea id="bs-roteiro-reels-input" rows="2" placeholder="Ideia do Reels..." onkeydown="bsKeydown(event,'roteiro-reels')"></textarea><button class="bs-send-btn" id="bs-roteiro-reels-send" onclick="sendBrainstorm('roteiro-reels')" title="Enviar"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div>
+            <div class="bs-footer"><span class="bs-cost-hint">Enter para enviar</span><button class="bs-refine-btn" id="bs-roteiro-reels-refine" onclick="bsRefine('roteiro-reels')" disabled>✦ Refinar Prompt <span class="bs-credit-badge">+1</span></button></div>
           </div>
+          <div class="bs-refined-wrap" id="bs-roteiro-reels-refined-wrap" style="display:none;margin-bottom:12px"><div class="bs-refined-header"><span class="bs-refined-label">✦ Prompt refinado</span><div class="bs-refined-actions"><button class="btn btn-g btn-sm" onclick="bsEditRefined('roteiro-reels')" style="font-size:10px">Editar</button><button class="btn btn-g btn-sm" onclick="bsReset('roteiro-reels')" style="font-size:10px">Resetar</button></div></div><div class="bs-refined-text" id="bs-roteiro-reels-refined-text"></div></div>
+          <textarea id="ag-roteiro-reels-in" style="display:none"></textarea>
           <div class="form-row" style="margin-top:12px"><label>Tom de voz <span style="color:var(--t3);font-weight:400;text-transform:none">(opcional)</span></label>
             <select id="ag-roteiro-reels-tom"><option value="">Usar perfil de marca</option>              <option>Autoridade</option>
               <option>Provocativo</option>
@@ -6980,14 +7042,14 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
       </div>
       <div class="agent-cols">
         <div class="agent-left">
-          <div class="refine-step"><span class="refine-step-dot"></span>Seu input passa pelo agente refinador antes de ser processado</div>
-          <div class="form-row" style="margin-top:14px"><label>Sua ideia ou contexto</label>
-            <div class="ta-wrap"><textarea id="ag-story-in" rows="5" placeholder="Ex: Stories para lançamento de mentoria de gestão comercial..." oninput="this.nextElementSibling.querySelector('.ta-count').textContent=this.value.length+' / 500'"></textarea>
-              <div class="ta-foot"><span class="ta-count">0 / 500</span>
-                <button class="mic-btn" onclick="toggleMicAgent(this,'ag-story-in')"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>Gravar</button>
-              </div>
-            </div>
+          <div class="bs-wrap">
+            <div class="bs-header"><span class="bs-header-label">✦ Creative Strategist</span><span class="bs-header-cost">1 crédito/mensagem</span></div>
+            <div class="bs-msgs" id="bs-story-msgs"><div class="bs-placeholder"><div class="bs-placeholder-icon">✦</div><div class="bs-placeholder-text">Qual o objetivo dos Stories? A IA vai criar uma sequência irresistível.</div></div></div>
+            <div class="bs-input-row"><textarea id="bs-story-input" rows="2" placeholder="Ideia para Stories..." onkeydown="bsKeydown(event,'story')"></textarea><button class="bs-send-btn" id="bs-story-send" onclick="sendBrainstorm('story')" title="Enviar"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div>
+            <div class="bs-footer"><span class="bs-cost-hint">Enter para enviar</span><button class="bs-refine-btn" id="bs-story-refine" onclick="bsRefine('story')" disabled>✦ Refinar Prompt <span class="bs-credit-badge">+1</span></button></div>
           </div>
+          <div class="bs-refined-wrap" id="bs-story-refined-wrap" style="display:none;margin-bottom:12px"><div class="bs-refined-header"><span class="bs-refined-label">✦ Prompt refinado</span><div class="bs-refined-actions"><button class="btn btn-g btn-sm" onclick="bsEditRefined('story')" style="font-size:10px">Editar</button><button class="btn btn-g btn-sm" onclick="bsReset('story')" style="font-size:10px">Resetar</button></div></div><div class="bs-refined-text" id="bs-story-refined-text"></div></div>
+          <textarea id="ag-story-in" style="display:none"></textarea>
           <div class="form-row" style="margin-top:12px"><label>Tom de voz <span style="color:var(--t3);font-weight:400;text-transform:none">(opcional)</span></label>
             <select id="ag-story-tom"><option value="">Usar perfil de marca</option>              <option>Autoridade</option>
               <option>Provocativo</option>
@@ -7046,14 +7108,14 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
       </div>
       <div class="agent-cols">
         <div class="agent-left">
-          <div class="refine-step"><span class="refine-step-dot"></span>Seu input passa pelo agente refinador antes de ser processado</div>
-          <div class="form-row" style="margin-top:14px"><label>Sua ideia ou contexto</label>
-            <div class="ta-wrap"><textarea id="ag-linkedin-in" rows="5" placeholder="Ex: Post sobre os 5 indicadores que todo gestor comercial precisa acompanhar..." oninput="this.nextElementSibling.querySelector('.ta-count').textContent=this.value.length+' / 500'"></textarea>
-              <div class="ta-foot"><span class="ta-count">0 / 500</span>
-                <button class="mic-btn" onclick="toggleMicAgent(this,'ag-linkedin-in')"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>Gravar</button>
-              </div>
-            </div>
+          <div class="bs-wrap">
+            <div class="bs-header"><span class="bs-header-label">✦ Creative Strategist</span><span class="bs-header-cost">1 crédito/mensagem</span></div>
+            <div class="bs-msgs" id="bs-linkedin-msgs"><div class="bs-placeholder"><div class="bs-placeholder-icon">✦</div><div class="bs-placeholder-text">Qual o ângulo do post LinkedIn? A IA vai torná-lo viral na plataforma.</div></div></div>
+            <div class="bs-input-row"><textarea id="bs-linkedin-input" rows="2" placeholder="Ideia para LinkedIn..." onkeydown="bsKeydown(event,'linkedin')"></textarea><button class="bs-send-btn" id="bs-linkedin-send" onclick="sendBrainstorm('linkedin')" title="Enviar"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div>
+            <div class="bs-footer"><span class="bs-cost-hint">Enter para enviar</span><button class="bs-refine-btn" id="bs-linkedin-refine" onclick="bsRefine('linkedin')" disabled>✦ Refinar Prompt <span class="bs-credit-badge">+1</span></button></div>
           </div>
+          <div class="bs-refined-wrap" id="bs-linkedin-refined-wrap" style="display:none;margin-bottom:12px"><div class="bs-refined-header"><span class="bs-refined-label">✦ Prompt refinado</span><div class="bs-refined-actions"><button class="btn btn-g btn-sm" onclick="bsEditRefined('linkedin')" style="font-size:10px">Editar</button><button class="btn btn-g btn-sm" onclick="bsReset('linkedin')" style="font-size:10px">Resetar</button></div></div><div class="bs-refined-text" id="bs-linkedin-refined-text"></div></div>
+          <textarea id="ag-linkedin-in" style="display:none"></textarea>
           <div class="form-row" style="margin-top:12px"><label>Tom de voz <span style="color:var(--t3);font-weight:400;text-transform:none">(opcional)</span></label>
             <select id="ag-linkedin-tom"><option value="">Usar perfil de marca</option>              <option>Autoridade</option>
               <option>Técnico</option>
@@ -7112,14 +7174,14 @@ Nosso agente refinador vai estruturar automaticamente antes de gerar." oninput="
       </div>
       <div class="agent-cols">
         <div class="agent-left">
-          <div class="refine-step"><span class="refine-step-dot"></span>Seu input passa pelo agente refinador antes de ser processado</div>
-          <div class="form-row" style="margin-top:14px"><label>Sua ideia ou contexto</label>
-            <div class="ta-wrap"><textarea id="ag-tiktok-in" rows="5" placeholder="Ex: Vídeo sobre como fechei R$50k em vendas usando apenas o WhatsApp..." oninput="this.nextElementSibling.querySelector('.ta-count').textContent=this.value.length+' / 500'"></textarea>
-              <div class="ta-foot"><span class="ta-count">0 / 500</span>
-                <button class="mic-btn" onclick="toggleMicAgent(this,'ag-tiktok-in')"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>Gravar</button>
-              </div>
-            </div>
+          <div class="bs-wrap">
+            <div class="bs-header"><span class="bs-header-label">✦ Creative Strategist</span><span class="bs-header-cost">1 crédito/mensagem</span></div>
+            <div class="bs-msgs" id="bs-tiktok-msgs"><div class="bs-placeholder"><div class="bs-placeholder-icon">✦</div><div class="bs-placeholder-text">O que vai ser o vídeo? A IA vai criar o hook perfeito para o TikTok.</div></div></div>
+            <div class="bs-input-row"><textarea id="bs-tiktok-input" rows="2" placeholder="Ideia para TikTok..." onkeydown="bsKeydown(event,'tiktok')"></textarea><button class="bs-send-btn" id="bs-tiktok-send" onclick="sendBrainstorm('tiktok')" title="Enviar"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div>
+            <div class="bs-footer"><span class="bs-cost-hint">Enter para enviar</span><button class="bs-refine-btn" id="bs-tiktok-refine" onclick="bsRefine('tiktok')" disabled>✦ Refinar Prompt <span class="bs-credit-badge">+1</span></button></div>
           </div>
+          <div class="bs-refined-wrap" id="bs-tiktok-refined-wrap" style="display:none;margin-bottom:12px"><div class="bs-refined-header"><span class="bs-refined-label">✦ Prompt refinado</span><div class="bs-refined-actions"><button class="btn btn-g btn-sm" onclick="bsEditRefined('tiktok')" style="font-size:10px">Editar</button><button class="btn btn-g btn-sm" onclick="bsReset('tiktok')" style="font-size:10px">Resetar</button></div></div><div class="bs-refined-text" id="bs-tiktok-refined-text"></div></div>
+          <textarea id="ag-tiktok-in" style="display:none"></textarea>
           <div class="form-row" style="margin-top:12px"><label>Tom de voz <span style="color:var(--t3);font-weight:400;text-transform:none">(opcional)</span></label>
             <select id="ag-tiktok-tom"><option value="">Usar perfil de marca</option>              <option>Autoridade</option>
               <option>Provocativo</option>
@@ -7953,9 +8015,9 @@ function fmtIcon(format) {
 // ─────────────────────────────────────────────────
 // NOVO FLUXO: Botão principal apenas mostra a grade de modelos.
 // O refinamento acontece dentro de gerarImagem(), após o modelo ser escolhido.
-function startGenPipeline() {
-  const input = (document.getElementById('gen-in').value || '').trim();
-  if (!input) { toast('Descreva sua ideia antes de gerar'); return; }
+function startGenPipelineOriginal() {
+  const input = (window._refinedPrompt || document.getElementById('gen-in').value || '').trim();
+  if (!input) { toast('Refine sua ideia antes de gerar'); return; }
 
   // Guarda o input bruto; limpa refinamento anterior (modelo novo = refinamento novo)
   window._rawInput = input;
@@ -8064,9 +8126,168 @@ REGRAS ABSOLUTAS:
 
 const IMG_STAGES = ['Lendo perfil da marca...','Definindo composição...','Aplicando cores...','Construindo SVG...','Refinando...','Finalizando...'];
 
+// ── Brainstorm / Creative Strategist ────────────────────────────────────────────
+const _bsState = {};
+function _bsGet(ctx) { if (!_bsState[ctx]) _bsState[ctx] = { messages: [], refined: '' }; return _bsState[ctx]; }
+
+function bsKeydown(e, ctx) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendBrainstorm(ctx); }
+}
+
+function _bsRender(ctx) {
+  const state = _bsGet(ctx);
+  const msgsEl = document.getElementById(`bs-${ctx}-msgs`);
+  if (!msgsEl) return;
+  if (state.messages.length === 0) {
+    const hints = {
+      image: 'Descreva sua ideia. A IA vai te ajudar a desenvolvê-la até ficar irresistível.',
+      legenda: 'Descreva sua ideia. A IA vai refinar até ficar perfeita.',
+      'roteiro-yt': 'Sobre o que é o vídeo? A IA vai ajudar a estruturar o roteiro.',
+      'roteiro-reels': 'Qual é a ideia do Reels? A IA vai criar um hook inesquecível.',
+      story: 'Qual o objetivo dos Stories? A IA vai criar uma sequência irresistível.',
+      linkedin: 'Qual o ângulo do post LinkedIn? A IA vai torná-lo viral na plataforma.',
+      tiktok: 'O que vai ser o vídeo? A IA vai criar o hook perfeito para o TikTok.',
+    };
+    msgsEl.innerHTML = `<div class="bs-placeholder"><div class="bs-placeholder-icon">✦</div><div class="bs-placeholder-text">${hints[ctx]||'Descreva sua ideia.'}</div></div>`;
+    return;
+  }
+  msgsEl.innerHTML = state.messages.map(m =>
+    `<div class="bs-bubble bs-bubble-${m.role}">${String(m.content).replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>`
+  ).join('');
+  msgsEl.scrollTop = msgsEl.scrollHeight;
+  const refEl = document.getElementById(`bs-${ctx}-refine`);
+  if (refEl) refEl.disabled = false;
+}
+
+async function sendBrainstorm(ctx) {
+  const inputEl = document.getElementById(`bs-${ctx}-input`);
+  const sendEl  = document.getElementById(`bs-${ctx}-send`);
+  if (!inputEl) return;
+  const msg = inputEl.value.trim();
+  if (!msg) return;
+  const state = _bsGet(ctx);
+  state.messages.push({ role: 'user', content: msg });
+  inputEl.value = '';
+  _bsRender(ctx);
+  if (sendEl) sendEl.disabled = true;
+
+  // typing indicator
+  const msgsEl = document.getElementById(`bs-${ctx}-msgs`);
+  const dot = document.createElement('div');
+  dot.className = 'bs-bubble bs-bubble-assistant bs-typing';
+  dot.innerHTML = '<div class="bs-typing-dots"><span></span><span></span><span></span></div>';
+  if (msgsEl) { msgsEl.appendChild(dot); msgsEl.scrollTop = msgsEl.scrollHeight; }
+
+  try {
+    const brandProfile = BrandProfileModule ? BrandProfileModule.toGenerationPayload({
+      voiceId:'', voiceName:'', modelN:'', modelName:'', modelSvg:'',
+      userName: me?.name||'', logoData: window._logoData||null,
+    }) : {};
+    const r = await fetch(API+'/api/user/brainstorm', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({ messages: state.messages, context: ctx, brandProfile }),
+    });
+    dot.remove();
+    if (!r.ok) { const d=await r.json().catch(()=>({})); toast(d.error||'Erro na conversa','err'); state.messages.pop(); _bsRender(ctx); return; }
+    const d = await r.json();
+    state.messages.push({ role: 'assistant', content: d.reply });
+    _bsRender(ctx);
+    if (me) { me.quota_used=(me.quota_used||0)+1; updateQuota(); }
+  } catch(e) {
+    dot.remove(); toast('Erro de conexão','err'); state.messages.pop(); _bsRender(ctx);
+  } finally {
+    if (sendEl) sendEl.disabled = false;
+    if (inputEl) inputEl.focus();
+  }
+}
+
+async function bsRefine(ctx) {
+  const state = _bsGet(ctx);
+  if (!state.messages.length) { toast('Converse primeiro para refinar o prompt','err'); return; }
+  const refEl = document.getElementById(`bs-${ctx}-refine`);
+  const prevHtml = refEl ? refEl.innerHTML : '';
+  if (refEl) { refEl.disabled = true; refEl.textContent = 'Refinando...'; }
+  try {
+    const brandProfile = BrandProfileModule ? BrandProfileModule.toGenerationPayload({
+      voiceId:'', voiceName:'', modelN:'', modelName:'', modelSvg:'',
+      userName: me?.name||'', logoData: window._logoData||null,
+    }) : {};
+    const r = await fetch(API+'/api/user/brainstorm/refine', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({ messages: state.messages, context: ctx, brandProfile }),
+    });
+    if (!r.ok) { const d=await r.json().catch(()=>({})); toast(d.error||'Erro ao refinar','err'); return; }
+    const d = await r.json();
+    state.refined = d.refinedPrompt;
+    if (me) { me.quota_used=(me.quota_used||0)+1; updateQuota(); }
+    _bsShowRefined(ctx, d.refinedPrompt);
+    toast('Prompt refinado!','ok');
+  } catch(e) { toast('Erro de conexão','err'); }
+  finally { if (refEl) { refEl.disabled=false; refEl.innerHTML=prevHtml; } }
+}
+
+function _bsShowRefined(ctx, text) {
+  const wrapEl = document.getElementById(`bs-${ctx}-refined-wrap`);
+  const textEl = document.getElementById(`bs-${ctx}-refined-text`);
+  if (!wrapEl||!textEl) return;
+  textEl.textContent = text;
+  wrapEl.style.display = 'block';
+  wrapEl.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  // sync to compatible inputs
+  if (ctx === 'image') {
+    window._refinedPrompt = text;
+    const h = document.getElementById('gen-in'); if (h) h.value = text;
+  } else {
+    const h = document.getElementById(`ag-${ctx}-in`); if (h) h.value = text;
+  }
+}
+
+function bsEditRefined(ctx) {
+  const textEl = document.getElementById(`bs-${ctx}-refined-text`);
+  if (!textEl) return;
+  textEl.contentEditable = 'true';
+  textEl.focus();
+  const sel = window.getSelection(); const range = document.createRange();
+  range.selectNodeContents(textEl); sel.removeAllRanges(); sel.addRange(range);
+  textEl.addEventListener('input', () => {
+    const t = textEl.innerText.trim();
+    _bsGet(ctx).refined = t;
+    if (ctx==='image') { window._refinedPrompt=t; const h=document.getElementById('gen-in');if(h)h.value=t; }
+    else { const h=document.getElementById(`ag-${ctx}-in`);if(h)h.value=t; }
+  });
+}
+
+function bsReset(ctx) {
+  _bsState[ctx] = { messages:[], refined:'' };
+  _bsRender(ctx);
+  const w=document.getElementById(`bs-${ctx}-refined-wrap`); if(w) w.style.display='none';
+  const r=document.getElementById(`bs-${ctx}-refine`); if(r) r.disabled=true;
+  if (ctx==='image') { window._refinedPrompt=''; const h=document.getElementById('gen-in');if(h)h.value=''; }
+  else { const h=document.getElementById(`ag-${ctx}-in`);if(h)h.value=''; }
+}
+
+// Legacy: startGenPipeline calls gerarImagem only if refined or brainstorm has content
+function startGenPipeline() {
+  const state = _bsGet('image');
+  const hasPrompt = (window._refinedPrompt||'').trim() || state.messages.length > 0;
+  if (!hasPrompt) { toast('Converse com a IA primeiro para refinar sua ideia','err'); return; }
+  if (!window._refinedPrompt && state.refined) window._refinedPrompt = state.refined;
+  // If no refined yet but has messages, use last user message as fallback
+  if (!window._refinedPrompt && state.messages.length) {
+    const lastUser = [...state.messages].reverse().find(m=>m.role==='user');
+    if (lastUser) { window._refinedPrompt = lastUser.content; const h=document.getElementById('gen-in');if(h)h.value=lastUser.content; }
+  }
+  startGenPipelineOriginal();
+}
+
 async function gerarImagem() {
-  const rawInput = (window._rawInput || document.getElementById('gen-in')?.value || '').trim();
-  if (!rawInput) { toast('Descreva sua ideia antes de gerar','err'); return; }
+  // Priority: refined prompt from brainstorm > hidden textarea > raw input
+  const bsRefined = _bsGet('image').refined;
+  const rawInput  = (bsRefined || window._refinedPrompt || window._rawInput || document.getElementById('gen-in')?.value || '').trim();
+  if (!rawInput) { toast('Refine sua ideia com a IA antes de gerar','err'); return; }
+  window._refinedPrompt = rawInput;
 
   const voice       = window._selectedVoice || null;  // null = liberdade total
   const model       = window._selectedModel || { n:'', name:'', svg:'' }; // legacy compat
@@ -8212,7 +8433,8 @@ async function gerarImagem() {
     document.getElementById('img-gen-loading').style.display = 'none';
     document.getElementById('img-preview-wrap')?.classList.add('vis');
     toast('Imagem gerada!', 'ok');
-    if (me) { me.quota_used = (me.quota_used||0)+1; updateQuota(); }
+    const _imgCost = (_selectedPostFormat === 'tweet') ? 4 : 2;
+    if (me) { me.quota_used = (me.quota_used||0)+_imgCost; updateQuota(); }
   } catch(e) {
     clearGenLoading();
     showGenError(e.message);
@@ -8572,8 +8794,10 @@ async function runAgent(slug, tipo, rede) {
   const inputEl = document.getElementById('ag-' + slug + '-in');
   const tomEl   = document.getElementById('ag-' + slug + '-tom');
   if (!inputEl) return;
+  const bsRef = (typeof _bsGet === 'function') ? _bsGet(slug).refined : '';
+  if (bsRef && !inputEl.value.trim()) inputEl.value = bsRef;
   const input = inputEl.value.trim();
-  if (!input) { toast('Descreva sua ideia antes de gerar'); return; }
+  if (!input) { toast('Refine sua ideia com a IA antes de gerar'); return; }
   const tom = tomEl?.value || '';
   document.getElementById('ag-' + slug + '-empty').style.display = 'none';
   document.getElementById('ag-' + slug + '-out').classList.remove('vis');
@@ -10711,6 +10935,9 @@ function selectPostFormat(fmt) {
     btnTweet.style.color       = fmt === 'tweet' ? 'var(--amber)' : 'var(--t2)';
     btnTweet.style.background  = fmt === 'tweet' ? 'rgba(245,197,24,.07)' : 'transparent';
   }
+  // Update credit cost badge
+  const costEl = document.getElementById('btn-gerar-img-cost');
+  if (costEl) costEl.textContent = fmt === 'tweet' ? '4 créditos' : '2 créditos';
 }
 
 // ─── BRAND VOICE SYSTEM ──────────────────────────────────────────────────────
@@ -11054,8 +11281,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const tomEl   = document.getElementById('ag-' + slug + '-tom');
     if (!inputEl) return;
 
+    // Use refined brainstorm prompt if available, otherwise fall back to textarea
+    const bsRef = _bsGet ? _bsGet(slug).refined : '';
+    if (bsRef && !inputEl.value.trim()) inputEl.value = bsRef;
     const input = inputEl.value.trim();
-    if (!input) { window.toast?.('Descreva sua ideia antes de gerar'); return; }
+    if (!input) { window.toast?.('Refine sua ideia com a IA antes de gerar'); return; }
 
     const tom = tomEl?.value || '';
     const emptyEl   = document.getElementById('ag-' + slug + '-empty');
