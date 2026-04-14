@@ -3021,35 +3021,8 @@ route('DELETE', '/api/user/designs/:id', async (req, res, params) => {
 // Vantagens: logo real, nome/handle corretos, layout consistente, zero tokens de layout.
 function _buildTweetCardSvg({ brief, brand, dim }) {
   const W = dim.w, H = dim.h;
-  const accent  = brand.p1 || '#F5C518';
-  const bgColor = brand.p2 || '#0A0A0A';
-
-  // Card geometry
-  const cX  = Math.round(W * 0.056);
-  const cY  = Math.round(H * 0.093);
-  const cW  = W - cX * 2;
-  const cH  = Math.round(H * 0.815);
-  const cRx = 20;
-  const pad = 52;
-  const ix  = cX + pad;      // inner left X
-  const iw  = cW - pad * 2;  // inner width
-
-  // Avatar
-  const aR  = 36;
-  const aCx = ix + aR;
-  const aCy = cY + pad + aR;
-
-  // Name / handle positions (vertically centred on avatar)
-  const nX  = aCx + aR + 16;
-  const nY  = aCy - 6;       // name baseline
-  const hY  = aCy + 22;      // handle baseline
-
-  // Content start — below header section
-  const contY = Math.max(aCy + aR, hY + 8) + 32;
-
-  // Typography constants
-  const FS_HEAD = 30, FS_SUB = 22, FS_BODY = 22, FS_DATE = 16, FS_STAT = 17, FS_ICON = 16;
-  const LH_HEAD = 40, LH_SUB = 32, LH_BODY = 36;
+  const FONT = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+  const pad  = Math.round(W * 0.056);   // ~60px at 1080
 
   // ── helpers ─────────────────────────────────────────────────────────────────
   function esc(s) {
@@ -3058,7 +3031,6 @@ function _buildTweetCardSvg({ brief, brand, dim }) {
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  // Word-wrap text to fit maxPx at given font size
   function wrap(text, maxPx, fs, ratio) {
     ratio = ratio || 0.52;
     const maxC = Math.max(1, Math.floor(maxPx / (fs * ratio)));
@@ -3073,154 +3045,159 @@ function _buildTweetCardSvg({ brief, brand, dim }) {
     return lines.length ? lines : [''];
   }
 
-  // Build <text> element with tspan lines
   function mtext(lines, x, baseY, fs, lh, extraAttrs) {
     if (!lines || !lines.length) return '';
     const a = extraAttrs || '';
-    return `<text x="${x}" y="${baseY}" font-family="DM Sans,Arial,sans-serif" font-size="${fs}" ${a}>`
+    return `<text x="${x}" y="${baseY}" font-family="${FONT}" font-size="${fs}" ${a}>`
       + lines.map((l, i) => `<tspan x="${x}" dy="${i ? lh : 0}">${esc(l)}</tspan>`).join('')
       + '</text>';
   }
 
   // ── content ──────────────────────────────────────────────────────────────────
-  const authorName = (brand.nome || brand.profissao || 'Marca').slice(0, 30);
+  const authorName = (brand.nome || brand.profissao || 'Marca').slice(0, 32);
   const initials   = authorName.split(' ').map(w => w[0] || '').join('').slice(0, 2).toUpperCase();
-  const handleStr  = brand.tweetHandle || brand.handle || ('@' + authorName.split(' ')[0].toLowerCase());
+  const rawHandle  = brand.tweetHandle || brand.handle || authorName.split(' ')[0].toLowerCase();
+  const handleStr  = '@' + rawHandle.replace(/^@/, '');
+  const dateStr    = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const viewsStr   = String(brief.data_highlight || '12.4k');
 
-  const rawLikes = String(brief.data_highlight || '14.2k');
-  const likesN   = parseFloat(rawLikes.replace(/[^0-9.]/g, '')) || 14.2;
-  const isK      = /[kK]/.test(rawLikes);
-  const likes    = rawLikes;
-  const rts      = String(Math.round(likesN * 0.27)) + (isK ? 'k' : '');
-  const repls    = String(Math.round(likesN * 0.06 * (isK ? 1 : 0.01)));
-  const views    = String(Math.round(likesN * (isK ? 20 : 0.02))) + 'k';
-  const dateStr  = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  // ── geometry ──────────────────────────────────────────────────────────────────
+  const contentW = W - pad * 2;
 
-  const hdLines  = wrap(brief.headline || '', iw, FS_HEAD, 0.55);
-  const subLines = brief.subheadline ? wrap(brief.subheadline, iw, FS_SUB, 0.50) : [];
-  const bPts     = (brief.body_points || []).slice(0, 4);
+  // Header
+  const aR  = Math.round(W * 0.033);    // ~36px at 1080 — avatar radius
+  const aTopPad = Math.round(H * 0.056);
+  const aCx = pad + aR;
+  const aCy = aTopPad + aR;
 
-  // ── layout Y-coordinate plan ──────────────────────────────────────────────────
-  let y = contY;
+  const nameX  = aCx + aR + 16;
+  const nameY  = aCy - 9;
+  const hdleY  = aCy + 18;
 
-  const hdBase = y + FS_HEAD;
-  y += hdLines.length * LH_HEAD + 10;
+  // X.com label — far right, vertically centred on avatar
+  const xcX = W - pad;
+  const xcY = aCy + 10;
 
-  const subBase = subLines.length ? y + FS_SUB + 6 : 0;
-  if (subLines.length) y += subLines.length * LH_SUB + 20;
+  // Tweet text (large)
+  const FS_TWEET = Math.round(W * 0.033);  // ~36px at 1080
+  const LH_TWEET = Math.round(FS_TWEET * 1.42);
+  const tweetTextX = pad;
+  const tweetTextY = aCy + aR + Math.round(H * 0.046);
 
-  if (bPts.length) y += 16;
-  const bptItems = [];
-  for (const pt of bPts) {
-    const lines = wrap(pt, iw - 20, FS_BODY, 0.50);
-    bptItems.push({ lines, y: y + FS_BODY });
-    y += lines.length * LH_BODY + 12;
+  const tweetLines = wrap(brief.headline || '', contentW, FS_TWEET, 0.50);
+  let curY = tweetTextY + tweetLines.length * LH_TWEET;
+
+  // Subheadline (optional, slightly smaller, gray)
+  const FS_SUB = Math.round(FS_TWEET * 0.70);
+  const LH_SUB = Math.round(FS_SUB * 1.4);
+  const subLines = brief.subheadline ? wrap(brief.subheadline, contentW, FS_SUB, 0.50) : [];
+  let subBase = 0;
+  if (subLines.length) {
+    curY += Math.round(H * 0.018);
+    subBase = curY + FS_SUB;
+    curY = subBase + (subLines.length - 1) * LH_SUB + Math.round(H * 0.022);
   }
-  if (bPts.length) y += 8;
 
-  const dateBase = y + FS_DATE + 8; y = dateBase + 26;
-  const d1Y = y;  y += 24;
-  const statsBase = y + FS_STAT; y = statsBase + 26;
-  const d2Y = y;  y += 24;
-  const iconsBase = y + FS_ICON + 8;
+  // Date + views
+  const FS_DATE = Math.round(W * 0.017);  // ~18px at 1080
+  curY += Math.round(H * 0.018);
+  const dateY = curY + FS_DATE;
+  curY = dateY + Math.round(H * 0.032);
+
+  // Divider
+  const divY = curY;
+  curY += Math.round(H * 0.028);
+
+  // Icons row
+  const FS_ICON = Math.round(W * 0.016);
+  const iconsY  = curY + Math.round(H * 0.028);
 
   // ── SVG assembly ──────────────────────────────────────────────────────────────
   let defs = '';
   let body = '';
 
-  // Gradients & filters
-  defs += `<linearGradient id="tcBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${bgColor}"/><stop offset="100%" stop-color="#101010"/></linearGradient>`;
-  defs += `<radialGradient id="tcAcc" cx="50%" cy="100%" r="65%"><stop offset="0%" stop-color="${accent}" stop-opacity="0.14"/><stop offset="100%" stop-color="${accent}" stop-opacity="0"/></radialGradient>`;
-  defs += `<filter id="tcSh" x="-5%" y="-5%" width="115%" height="115%"><feDropShadow dx="0" dy="6" stdDeviation="14" flood-color="#000" flood-opacity="0.28"/></filter>`;
-  if (brand.logo) defs += `<clipPath id="tcAvClip"><circle cx="${aCx}" cy="${aCy}" r="${aR}"/></clipPath>`;
   defs += `<clipPath id="tcCv"><rect width="${W}" height="${H}"/></clipPath>`;
+  if (brand.logo) defs += `<clipPath id="tcAvClip"><circle cx="${aCx}" cy="${aCy}" r="${aR}"/></clipPath>`;
 
-  // Background
-  body += `<rect width="${W}" height="${H}" fill="url(#tcBg)"/>`;
-  body += `<rect width="${W}" height="${H}" fill="url(#tcAcc)"/>`;
+  // White background — full bleed
+  body += `<rect width="${W}" height="${H}" fill="#FFFFFF"/>`;
 
-  // Accent bar bottom
-  body += `<rect x="${cX}" y="${H - 7}" width="${cW}" height="4" rx="2" fill="${accent}" opacity="0.85"/>`;
-
-  // Card
-  body += `<rect x="${cX}" y="${cY}" width="${cW}" height="${cH}" rx="${cRx}" fill="#FFFFFF" filter="url(#tcSh)"/>`;
-
-  // X logo — top-right of card
-  const xLX = cX + cW - pad - 20;
-  const xLY = cY + pad;
-  const xS  = (20 / 24).toFixed(4);
-  body += `<g transform="translate(${xLX},${xLY}) scale(${xS})">`;
-  body += `<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="#0F1419"/>`;
-  body += `</g>`;
-
-  // Avatar — logo or initials
+  // ── Header ────────────────────────────────────────────────────────────────────
+  // Avatar
   if (brand.logo) {
-    body += `<circle cx="${aCx}" cy="${aCy}" r="${aR + 2}" fill="${accent}" opacity="0.18"/>`;
     body += `<image href="${brand.logo}" x="${aCx - aR}" y="${aCy - aR}" width="${aR * 2}" height="${aR * 2}" clip-path="url(#tcAvClip)" preserveAspectRatio="xMidYMid slice"/>`;
-    body += `<circle cx="${aCx}" cy="${aCy}" r="${aR}" fill="none" stroke="${accent}" stroke-width="2.5"/>`;
+    body += `<circle cx="${aCx}" cy="${aCy}" r="${aR}" fill="none" stroke="#CFD9DE" stroke-width="1.5"/>`;
   } else {
-    body += `<circle cx="${aCx}" cy="${aCy}" r="${aR}" fill="${accent}"/>`;
-    body += `<text x="${aCx}" y="${aCy + 9}" text-anchor="middle" font-family="DM Sans,Arial,sans-serif" font-size="22" font-weight="700" fill="#FFFFFF">${esc(initials)}</text>`;
+    body += `<circle cx="${aCx}" cy="${aCy}" r="${aR}" fill="#1D9BF0"/>`;
+    body += `<text x="${aCx}" y="${aCy + Math.round(aR * 0.33)}" text-anchor="middle" font-family="${FONT}" font-size="${Math.round(aR * 0.72)}" font-weight="700" fill="#FFFFFF">${esc(initials)}</text>`;
   }
 
   // Name
-  body += `<text x="${nX}" y="${nY}" font-family="DM Sans,Arial,sans-serif" font-size="20" font-weight="700" fill="#0F1419" text-rendering="optimizeLegibility">${esc(authorName)}</text>`;
-  // Verified badge (circle + checkmark path)
-  const vbX = nX + Math.min(authorName.length, 24) * 11 + 8;
-  body += `<circle cx="${vbX + 9}" cy="${nY - 8}" r="9" fill="${accent}"/>`;
-  body += `<path d="M${vbX + 4} ${nY - 8} l4 4 l6 -6" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const nameFS = Math.round(W * 0.018);
+  body += `<text x="${nameX}" y="${nameY}" font-family="${FONT}" font-size="${nameFS}" font-weight="700" fill="#0F1419">${esc(authorName)}</text>`;
+
+  // Verified badge — Twitter blue circle with white checkmark
+  const vbOff  = Math.min(authorName.length * nameFS * 0.55, contentW * 0.55);
+  const vbCx   = nameX + vbOff + nameFS * 0.9;
+  const vbCy   = nameY - nameFS * 0.44;
+  const vbR    = Math.round(nameFS * 0.52);
+  body += `<circle cx="${vbCx}" cy="${vbCy}" r="${vbR}" fill="#1D9BF0"/>`;
+  body += `<path d="M${vbCx - vbR * 0.48} ${vbCy} l${vbR * 0.44} ${vbR * 0.44} l${vbR * 0.7} ${-vbR * 0.66}" fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>`;
 
   // Handle
-  body += `<text x="${nX}" y="${hY}" font-family="DM Sans,Arial,sans-serif" font-size="16" fill="#536471">${esc(handleStr)}</text>`;
+  const hdleFS = Math.round(W * 0.015);
+  body += `<text x="${nameX}" y="${hdleY}" font-family="${FONT}" font-size="${hdleFS}" fill="#536471">${esc(handleStr)}</text>`;
 
-  // Headline
-  body += mtext(hdLines, ix, hdBase, FS_HEAD, LH_HEAD, 'font-weight="700" fill="#0F1419" text-rendering="optimizeLegibility"');
+  // "X.com" — bold, top-right
+  const xcFS = Math.round(W * 0.022);
+  body += `<text x="${xcX}" y="${xcY}" text-anchor="end" font-family="${FONT}" font-size="${xcFS}" font-weight="800" fill="#0F1419">X.com</text>`;
 
-  // Subheadline
-  if (subLines.length) body += mtext(subLines, ix, subBase, FS_SUB, LH_SUB, 'fill="#536471"');
+  // ── Tweet text ────────────────────────────────────────────────────────────────
+  body += mtext(tweetLines, tweetTextX, tweetTextY, FS_TWEET, LH_TWEET, 'font-weight="400" fill="#0F1419"');
 
-  // Body points with accent bar
-  for (const { lines, y: bY } of bptItems) {
-    const barH = (lines.length - 1) * LH_BODY + FS_BODY + 4;
-    body += `<rect x="${ix}" y="${bY - FS_BODY + 2}" width="3" height="${barH}" rx="1.5" fill="${accent}"/>`;
-    body += mtext(lines, ix + 16, bY, FS_BODY, LH_BODY, 'fill="#0F1419"');
+  // Subheadline (optional)
+  if (subLines.length) {
+    body += mtext(subLines, tweetTextX, subBase, FS_SUB, LH_SUB, 'fill="#536471"');
   }
 
-  // Date
-  body += `<text x="${ix}" y="${dateBase}" font-family="DM Sans,Arial,sans-serif" font-size="${FS_DATE}" fill="#536471">${esc(dateStr)} · X Web App</text>`;
+  // Date + views — plain gray
+  body += `<text x="${pad}" y="${dateY}" font-family="${FONT}" font-size="${FS_DATE}" fill="#536471">${esc(dateStr)} · ${esc(viewsStr)} Views</text>`;
 
-  // Dividers
-  const dx2 = cX + cW - pad;
-  body += `<line x1="${ix}" y1="${d1Y}" x2="${dx2}" y2="${d1Y}" stroke="#EFF3F4" stroke-width="1"/>`;
-  body += `<line x1="${ix}" y1="${d2Y}" x2="${dx2}" y2="${d2Y}" stroke="#EFF3F4" stroke-width="1"/>`;
+  // Single thin divider
+  body += `<line x1="${pad}" y1="${divY}" x2="${W - pad}" y2="${divY}" stroke="#EFF3F4" stroke-width="1.5"/>`;
 
-  // Stats row
-  body += `<text x="${ix}" y="${statsBase}" font-family="DM Sans,Arial,sans-serif" font-size="${FS_STAT}" fill="#536471">`;
-  body += `<tspan font-weight="700" fill="#0F1419">${esc(likes)}</tspan><tspan> Likes&#160;&#160;&#160;</tspan>`;
-  body += `<tspan font-weight="700" fill="#0F1419">${esc(rts)}</tspan><tspan> Retweets&#160;&#160;&#160;</tspan>`;
-  body += `<tspan font-weight="700" fill="#0F1419">${esc(repls)}</tspan><tspan> Replies</tspan>`;
-  body += `</text>`;
-
-  // Engagement icons row
-  const iS     = (20 / 24).toFixed(4);
-  const iSpan  = Math.floor(iw / 5);
+  // ── Icons row (Reply · Retweet · Heart · Bookmark · Share) ───────────────────
+  const iSpan = Math.floor(contentW / 5);
+  const iS    = ((aR * 0.56) / 12).toFixed(4);   // scale 24px paths to ~aR*0.56
   const iItems = [
-    { d: 0,         path: 'M1.751 10c0-3.836 3.153-7 7.044-7 1.923 0 3.675.792 4.965 2.07a6.98 6.98 0 0 1 2.04 4.93v.602h-2.008V10c0-2.76-2.236-5-4.997-5s-5 2.24-5 5 2.239 5 5 5h.625v2h-.625C4.904 17 1.751 13.836 1.751 10Z', c: '#536471', lbl: repls },
-    { d: iSpan,     path: 'M4.5 3.88l-1.87 1.85.99 1 1.85-1.83V12h1.4V4.9l1.85 1.83.99-1L7.85 3.88a.95.95 0 0 0-1.35 0ZM19.5 12.12l1.87-1.85-.99-1-1.85 1.83V5h-1.4v7.1l-1.85-1.83-.99 1 1.87 1.85c.37.37.98.37 1.34 0Z', c: '#536471', lbl: rts },
-    { d: iSpan * 2, path: 'M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.561-1.13-1.666-1.84-2.908-1.91Z', c: '#F91880', lbl: likes },
-    { d: iSpan * 3, path: 'M12 1.996c-2.808 0-5 2.472-5 5.504 0 2.01.945 3.792 2.025 5.31 1.058 1.49 2.312 2.795 3.17 3.65.406.403 1.034.403 1.44 0 .857-.855 2.112-2.16 3.17-3.65C17.985 11.292 19 9.51 19 7.5c0-3.032-2.192-5.504-5-5.504Zm0 7.5c-1.105 0-2-.895-2-2s.895-2 2-2 2 .895 2 2-.895 2-2 2Z', c: '#536471', lbl: views },
-    { d: iSpan * 4, path: 'M4 4.5C4 3.12 5.119 2 6.5 2h11C18.881 2 20 3.12 20 4.5v18.044l-8-5.787-8 5.787V4.5Z', c: '#536471', lbl: '' },
+    // Reply
+    { d: 0,
+      path: 'M1.751 10c0-3.836 3.153-7 7.044-7 1.923 0 3.675.792 4.965 2.07a6.98 6.98 0 0 1 2.04 4.93v.602h-2.008V10c0-2.76-2.236-5-4.997-5s-5 2.24-5 5 2.239 5 5 5h.625v2h-.625C4.904 17 1.751 13.836 1.751 10Z',
+      c: '#536471' },
+    // Retweet
+    { d: iSpan,
+      path: 'M4.5 3.88l-1.87 1.85.99 1 1.85-1.83V12h1.4V4.9l1.85 1.83.99-1L7.85 3.88a.95.95 0 0 0-1.35 0ZM19.5 12.12l1.87-1.85-.99-1-1.85 1.83V5h-1.4v7.1l-1.85-1.83-.99 1 1.87 1.85c.37.37.98.37 1.34 0Z',
+      c: '#536471' },
+    // Heart
+    { d: iSpan * 2,
+      path: 'M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.561-1.13-1.666-1.84-2.908-1.91Z',
+      c: '#F91880' },
+    // Bookmark
+    { d: iSpan * 3,
+      path: 'M4 4.5C4 3.12 5.119 2 6.5 2h11C18.881 2 20 3.12 20 4.5v18.044l-8-5.787-8 5.787V4.5Z',
+      c: '#536471' },
+    // Share
+    { d: iSpan * 4,
+      path: 'M12 2.59l5.7 5.7-1.41 1.42L13 6.41V16h-2V6.41l-3.3 3.3-1.41-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h13c.28 0 .5-.22.5-.5V15h2z',
+      c: '#536471' },
   ];
 
+  const iconSize = aR * 0.56 * 2;  // rendered icon size in px
   for (const ic of iItems) {
-    const ix2 = ix + ic.d;
-    const iy2 = iconsBase - 16;
+    const ix2 = pad + ic.d + Math.floor((iSpan - iconSize) / 2);
+    const iy2 = iconsY - iconSize;
     body += `<g transform="translate(${ix2},${iy2}) scale(${iS})"><path d="${ic.path}" fill="${ic.c}"/></g>`;
-    if (ic.lbl) body += `<text x="${ix2 + 26}" y="${iconsBase}" font-family="DM Sans,Arial,sans-serif" font-size="${FS_ICON}" fill="${ic.c}">${esc(ic.lbl)}</text>`;
   }
-
-  // Watermark
-  body += `<text x="${W / 2}" y="${H - 28}" text-anchor="middle" font-family="DM Sans,Arial,sans-serif" font-size="14" fill="rgba(255,255,255,0.35)">${esc(handleStr)}</text>`;
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><defs>${defs}</defs><g clip-path="url(#tcCv)">${body}</g></svg>`;
 }
