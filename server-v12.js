@@ -2488,20 +2488,29 @@ function daBrand(user, bp) {
   const raw  = ((bp?.cores) || user?.cores || '#F5C518,#0D0D0F,#F5F4F0,#888888')
     .split(',').map(s => s.trim()).filter(Boolean);
   const profissao = bp?.profissao || user?.profissao || 'criador de conteúdo';
+  // Nome real do usuário (conta) tem prioridade sobre profissao
+  const nome = (bp?.userName || user?.name || profissao).slice(0, 40);
+  // Handle para tweet card: "PrimeiroNome | Profissao/Empresa"
+  const firstName = nome.split(' ')[0];
+  const empresa   = profissao.slice(0, 20);
+  const tweetHandle = firstName + ' | ' + empresa;
   return {
-    p1: bpal?.primaria    || raw[0] || '#F5C518',   // accent / destaque
-    p2: bpal?.secundaria  || raw[1] || '#0D0D0F',   // fundo base
-    p3: bpal?.terciaria   || raw[2] || '#F5F4F0',   // texto principal
-    p4: bpal?.quaternaria || raw[3] || '#888888',   // texto muted
+    p1: bpal?.primaria    || raw[0] || '#F5C518',
+    p2: bpal?.secundaria  || raw[1] || '#0D0D0F',
+    p3: bpal?.terciaria   || raw[2] || '#F5F4F0',
+    p4: bpal?.quaternaria || raw[3] || '#888888',
     nicho:     bp?.nicho     || user?.nicho     || 'negócios',
     profissao,
     estilo:    bp?.estilo    || user?.estilo    || 'dark luxury',
     tom:       bp?.tom       || user?.tom       || 'autoridade',
     publico:   bp?.publico   || user?.publico   || 'profissionais',
     handle:    bp?.handle    || ('@' + profissao.toLowerCase().replace(/\s+/g, '').slice(0, 15)),
-    voiceId:   bp?.voiceId   || '',          // nova arquitetura: brand voice
+    nome,
+    tweetHandle,
+    logo:      bp?.logoData  || null,           // base64 data URI da logo do usuário
+    voiceId:   bp?.voiceId   || '',
     voiceName: bp?.voiceName || '',
-    modelN:    bp?.modelN    || '',          // legacy: mantido para compat
+    modelN:    bp?.modelN    || '',
     modelName: bp?.modelName || '',
   };
 }
@@ -2829,6 +2838,16 @@ MISSÃO: Criar SVGs de nível AGÊNCIA INTERNACIONAL (Pentagram, IDEO, R/GA) —
    Isso previne QUALQUER overflow de texto ou shape para fora do canvas.
 7. Todo <text> com font-family, fill, font-size EXPLÍCITOS no elemento
 8. width="${dim.w}" height="${dim.h}" na tag <svg>
+9. O BLUEPRINT É LEI — use as coordenadas x/y/size EXATAS definidas pelo Art Director.
+   NÃO invente posições. NÃO mova elementos. NÃO ignore camadas.
+10. CHECKLIST DE ESTRUTURA antes de renderizar:
+    ✓ Fundo preenchendo 100% do canvas?
+    ✓ Headline na HERO ZONE (y≈${Math.round(dim.h * 0.30)}–${Math.round(dim.h * 0.60)})?
+    ✓ Subheadline abaixo do headline sem sobreposição?
+    ✓ Body points em lista vertical com espaçamento entre itens?
+    ✓ CTA na CTA ZONE (y≈${Math.round(dim.h * 0.78)}–${Math.round(dim.h * 0.91)})?
+    ✓ Handle/footer fixo em y=${dim.h - Math.round(dim.h * 0.035)}px?
+    ✓ NENHUM elemento além de y=${dim.h - margin}?
 
 ═══════════════ FONTES DISPONÍVEIS ═══════════════
 "Bebas Neue" | "Syne" | "DM Sans" | "Playfair Display" | "Cormorant Garamond" | "IBM Plex Mono"
@@ -2997,131 +3016,218 @@ route('DELETE', '/api/user/designs/:id', async (req, res, params) => {
   ok(res, { message: 'Design removido dos favoritos.' });
 });
 
-// ── Tweet Card: Stage 3 especializado ────────────────────────────────────────
-// Bypassa Stage 2 e gera direto o SVG de tweet card com layout fixo.
-// O tweet card é determinístico: posições hardcoded, IA só adapta o texto/cores.
-async function daStage3Tweet({ brief, brand, dim }) {
+// ── Tweet Card: gerador determinístico (sem IA para o layout) ────────────────
+// Stage 1 já extraiu o conteúdo. Aqui construímos o SVG pixel a pixel em JS.
+// Vantagens: logo real, nome/handle corretos, layout consistente, zero tokens de layout.
+function _buildTweetCardSvg({ brief, brand, dim }) {
   const W = dim.w, H = dim.h;
-  // Card geometry — centralizado com margens generosas
-  const cX = Math.round(W * 0.056);              // card x = 60px em 1080
-  const cY = Math.round(H * 0.093);              // card y = 100px em 1080
-  const cW = W - cX * 2;                         // card width = 960px em 1080
-  const cH = Math.round(H * 0.815);              // card height = 880px em 1080
+  const accent  = brand.p1 || '#F5C518';
+  const bgColor = brand.p2 || '#0A0A0A';
+
+  // Card geometry
+  const cX  = Math.round(W * 0.056);
+  const cY  = Math.round(H * 0.093);
+  const cW  = W - cX * 2;
+  const cH  = Math.round(H * 0.815);
   const cRx = 20;
-  const pad = 48;                                 // padding interno do card
-  const textX = cX + pad;
-  const textMaxW = cW - pad * 2;
+  const pad = 52;
+  const ix  = cX + pad;      // inner left X
+  const iw  = cW - pad * 2;  // inner width
 
-  const authorName  = (brand.nome  || 'Marca').slice(0, 28);
-  const handle      = (brand.handle || '@marca').replace(/^@?/, '@').slice(0, 20);
-  const accent      = brand.p1 || '#1DA1F2';
+  // Avatar
+  const aR  = 36;
+  const aCx = ix + aR;
+  const aCy = cY + pad + aR;
 
-  // Engagement numbers — escala viral
-  const likes    = brief.data_highlight || '14.2k';
-  const retweets = String(Math.round(parseInt(String(likes).replace(/[^0-9]/g,'')) * 0.27 || 3800)).slice(0, 4) + (String(likes).includes('k') ? 'k' : '');
-  const replies  = String(Math.round(parseInt(String(likes).replace(/[^0-9]/g,'')) * 0.06 || 850));
-  const views    = String(parseInt(String(likes).replace(/[^0-9]/g,'')) * (String(likes).includes('k') ? 20 : 1) || 284) + 'k';
+  // Name / handle positions (vertically centred on avatar)
+  const nX  = aCx + aR + 16;
+  const nY  = aCy - 6;       // name baseline
+  const hY  = aCy + 22;      // handle baseline
 
-  const system =
-`Você é um SVG EXECUTOR especializado em TWEET CARDS virais para Instagram.
-MISSÃO: Gerar um SVG perfeito que imita um tweet do X/Twitter — o formato mais compartilhado de 2024/25.
+  // Content start — below header section
+  const contY = Math.max(aCy + aR, hY + 8) + 32;
 
-CANVAS: ${W}×${H}px
-CARD: x=${cX}, y=${cY}, width=${cW}, height=${cH}, rx=${cRx}
-PADDING INTERNO: ${pad}px | TEXT_X=${textX} | TEXT_MAX_W=${textMaxW}px
+  // Typography constants
+  const FS_HEAD = 30, FS_SUB = 22, FS_BODY = 22, FS_DATE = 16, FS_STAT = 17, FS_ICON = 16;
+  const LH_HEAD = 40, LH_SUB = 32, LH_BODY = 36;
 
-PALETA:
-  Accent da marca: ${accent}
-  Background externo: gradiente escuro (use tom da marca ou #0A0A0A)
-  Card background: #FFFFFF (modo claro) — texto escuro, autêntico
-  Texto principal: #0F1419
-  Texto secundário / handles: #536471
-  Linha divisória: #EFF3F4
-  Like color: #F91880
+  // ── helpers ─────────────────────────────────────────────────────────────────
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
 
-CONTEÚDO:
-  Autor: "${authorName}"
-  Handle: "${handle}"
-  Tweet text: "${brief.headline}${brief.subheadline ? '\n\n' + brief.subheadline : ''}"
-  Body points: ${JSON.stringify(brief.body_points || [])}
-  Likes: "${likes}" | Retweets: "${retweets}" | Replies: "${replies}" | Views: "${views}"
+  // Word-wrap text to fit maxPx at given font size
+  function wrap(text, maxPx, fs, ratio) {
+    ratio = ratio || 0.52;
+    const maxC = Math.max(1, Math.floor(maxPx / (fs * ratio)));
+    const words = String(text || '').split(' ');
+    const lines = []; let cur = '';
+    for (const w of words) {
+      const t = cur ? cur + ' ' + w : w;
+      if (t.length <= maxC) { cur = t; }
+      else { if (cur) lines.push(cur); cur = w; }
+    }
+    if (cur) lines.push(cur);
+    return lines.length ? lines : [''];
+  }
 
-ESTRUTURA OBRIGATÓRIA DO SVG (siga pixel a pixel):
+  // Build <text> element with tspan lines
+  function mtext(lines, x, baseY, fs, lh, extraAttrs) {
+    if (!lines || !lines.length) return '';
+    const a = extraAttrs || '';
+    return `<text x="${x}" y="${baseY}" font-family="DM Sans,Arial,sans-serif" font-size="${fs}" ${a}>`
+      + lines.map((l, i) => `<tspan x="${x}" dy="${i ? lh : 0}">${esc(l)}</tspan>`).join('')
+      + '</text>';
+  }
 
-1. FUNDO EXTERNO: rect ${W}×${H} — gradiente escuro com toque da cor accent (sutil, elegante)
+  // ── content ──────────────────────────────────────────────────────────────────
+  const authorName = (brand.nome || brand.profissao || 'Marca').slice(0, 30);
+  const initials   = authorName.split(' ').map(w => w[0] || '').join('').slice(0, 2).toUpperCase();
+  const handleStr  = brand.tweetHandle || brand.handle || ('@' + authorName.split(' ')[0].toLowerCase());
 
-2. SOMBRA DO CARD: rect x=${cX+4} y=${cY+8} w=${cW} h=${cH} rx=${cRx} fill="rgba(0,0,0,0.25)"
+  const rawLikes = String(brief.data_highlight || '14.2k');
+  const likesN   = parseFloat(rawLikes.replace(/[^0-9.]/g, '')) || 14.2;
+  const isK      = /[kK]/.test(rawLikes);
+  const likes    = rawLikes;
+  const rts      = String(Math.round(likesN * 0.27)) + (isK ? 'k' : '');
+  const repls    = String(Math.round(likesN * 0.06 * (isK ? 1 : 0.01)));
+  const views    = String(Math.round(likesN * (isK ? 20 : 0.02))) + 'k';
+  const dateStr  = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-3. CARD BRANCO: rect x=${cX} y=${cY} w=${cW} h=${cH} rx=${cRx} fill="#FFFFFF"
+  const hdLines  = wrap(brief.headline || '', iw, FS_HEAD, 0.55);
+  const subLines = brief.subheadline ? wrap(brief.subheadline, iw, FS_SUB, 0.50) : [];
+  const bPts     = (brief.body_points || []).slice(0, 4);
 
-4. X LOGO (topo direito do card): path do logo X em fill="#0F1419" — posição x=${cX+cW-pad} y=${cY+pad}
-   Use este path SVG: M 18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z
-   Scale para ~28px, posicione em: x≈${cX + cW - pad - 28} y≈${cY + pad}
+  // ── layout Y-coordinate plan ──────────────────────────────────────────────────
+  let y = contY;
 
-5. AVATAR CIRCULAR: cx=${cX+pad+32} cy=${cY+pad+32+16} r=32 fill="${accent}"
-   Iniciais dentro: "${authorName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}" — fill="#FFFFFF" font-size=18 font-weight=700
+  const hdBase = y + FS_HEAD;
+  y += hdLines.length * LH_HEAD + 10;
 
-6. NOME + VERIFICADO (ao lado do avatar):
-   Nome: x=${textX+70} y=${cY+pad+30+16} font="DM Sans" size=20 weight=700 fill="#0F1419"
-   Ícone verificado ✓: círculo preenchido accent r=9 ao lado do nome
-   Handle: x=${textX+70} y=${cY+pad+54+16} font="DM Sans" size=16 fill="#536471"
+  const subBase = subLines.length ? y + FS_SUB + 6 : 0;
+  if (subLines.length) y += subLines.length * LH_SUB + 20;
 
-7. TWEET TEXT (bloco principal — herói do card):
-   y_start ≈ ${cY + pad + 110}
-   font="DM Sans" size=28 weight=400 fill="#0F1419" line-height=42
-   Use <tspan> para quebrar linhas. max ${Math.floor(textMaxW / (28 * 0.52))} chars/linha.
-   Se tiver body_points: liste-os com espaço antes, tamanho 24px, fill="#0F1419"
+  if (bPts.length) y += 16;
+  const bptItems = [];
+  for (const pt of bPts) {
+    const lines = wrap(pt, iw - 20, FS_BODY, 0.50);
+    bptItems.push({ lines, y: y + FS_BODY });
+    y += lines.length * LH_BODY + 12;
+  }
+  if (bPts.length) y += 8;
 
-8. DATA + FONTE (abaixo do tweet text, espaço calculado):
-   y ≈ calcule após o texto terminar + 32px
-   "${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})} · X Web App"
-   font="DM Sans" size=16 fill="#536471"
+  const dateBase = y + FS_DATE + 8; y = dateBase + 26;
+  const d1Y = y;  y += 24;
+  const statsBase = y + FS_STAT; y = statsBase + 26;
+  const d2Y = y;  y += 24;
+  const iconsBase = y + FS_ICON + 8;
 
-9. LINHA DIVISÓRIA 1: x1=${cX+pad} x2=${cX+cW-pad} stroke="#EFF3F4" stroke-width=1
-   y = data_y + 28
+  // ── SVG assembly ──────────────────────────────────────────────────────────────
+  let defs = '';
+  let body = '';
 
-10. LIKES EM DESTAQUE: y = div1_y + 28
-    "<strong>${likes}</strong> Likes  <span>${retweets}</span> Retweets"
-    Likes em font-weight=700 fill="#0F1419" size=17 | resto fill="#536471"
-    Use dois <text> separados para bold vs normal
+  // Gradients & filters
+  defs += `<linearGradient id="tcBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${bgColor}"/><stop offset="100%" stop-color="#101010"/></linearGradient>`;
+  defs += `<radialGradient id="tcAcc" cx="50%" cy="100%" r="65%"><stop offset="0%" stop-color="${accent}" stop-opacity="0.14"/><stop offset="100%" stop-color="${accent}" stop-opacity="0"/></radialGradient>`;
+  defs += `<filter id="tcSh" x="-5%" y="-5%" width="115%" height="115%"><feDropShadow dx="0" dy="6" stdDeviation="14" flood-color="#000" flood-opacity="0.28"/></filter>`;
+  if (brand.logo) defs += `<clipPath id="tcAvClip"><circle cx="${aCx}" cy="${aCy}" r="${aR}"/></clipPath>`;
+  defs += `<clipPath id="tcCv"><rect width="${W}" height="${H}"/></clipPath>`;
 
-11. LINHA DIVISÓRIA 2: y = likes_y + 28  stroke="#EFF3F4"
+  // Background
+  body += `<rect width="${W}" height="${H}" fill="url(#tcBg)"/>`;
+  body += `<rect width="${W}" height="${H}" fill="url(#tcAcc)"/>`;
 
-12. ÍCONES DE ENGAJAMENTO (linha final — y = div2_y + 32):
-    Espaçados uniformemente no card. Cor base: fill="#536471"
-    a) Reply icon (balão de chat) + "${replies}"
-    b) Retweet icon (setas circulares) + "${retweets}"
-    c) Like/Heart icon + "${likes}" em fill="#F91880"
-    d) Views/Analytics icon + "${views}"
-    e) Share/Bookmark icon (sem número)
-    Use paths SVG simples — NÃO use emojis
+  // Accent bar bottom
+  body += `<rect x="${cX}" y="${H - 7}" width="${cW}" height="4" rx="2" fill="${accent}" opacity="0.85"/>`;
 
-    Reply path:    M1.751 10c0-3.836 3.153-7 7.044-7 1.923 0 3.675.792 4.965 2.07a6.98 6.98 0 0 1 2.04 4.93v.602h-2.008V10c0-2.76-2.236-5-4.997-5s-5 2.24-5 5 2.239 5 5 5h.625v2h-.625C4.904 17 1.751 13.836 1.751 10Z
-    Retweet path:  M4.5 3.88l-1.87 1.85.99 1 1.85-1.83V12h1.4V4.9l1.85 1.83.99-1L7.85 3.88a.95.95 0 0 0-1.35 0ZM19.5 12.12l1.87-1.85-.99-1-1.85 1.83V5h-1.4v7.1l-1.85-1.83-.99 1 1.87 1.85c.37.37.98.37 1.34 0Z (adaptado para 20x20)
-    Heart path:    M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.561-1.13-1.666-1.84-2.908-1.91Z
-    Analytics path: M12 1.996c-2.808 0-5 2.472-5 5.504 0 2.01.945 3.792 2.025 5.31 1.058 1.49 2.312 2.795 3.17 3.65.406.403 1.034.403 1.44 0 .857-.855 2.112-2.16 3.17-3.65C17.985 11.292 19 9.51 19 7.5c0-3.032-2.192-5.504-5-5.504Zm0 7.5c-1.105 0-2-.895-2-2s.895-2 2-2 2 .895 2 2-.895 2-2 2Z
+  // Card
+  body += `<rect x="${cX}" y="${cY}" width="${cW}" height="${cH}" rx="${cRx}" fill="#FFFFFF" filter="url(#tcSh)"/>`;
 
-13. MARCA D'ÁGUA (fora do card, fundo escuro):
-    Handle da marca em fill="rgba(255,255,255,0.4)" size=16 centralizado y=${H-32}
+  // X logo — top-right of card
+  const xLX = cX + cW - pad - 20;
+  const xLY = cY + pad;
+  const xS  = (20 / 24).toFixed(4);
+  body += `<g transform="translate(${xLX},${xLY}) scale(${xS})">`;
+  body += `<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="#0F1419"/>`;
+  body += `</g>`;
 
-REGRAS ABSOLUTAS:
-- Responda APENAS com SVG puro — comece com <svg e termine com </svg>
-- xmlns="http://www.w3.org/2000/svg" obrigatório
-- viewBox="0 0 ${W} ${H}" obrigatório
-- ClipPath OBRIGATÓRIO: <clipPath id="canvas"><rect width="${W}" height="${H}"/></clipPath> no <defs>
-- Todo conteúdo dentro de <g clip-path="url(#canvas)">
-- Font-family="DM Sans, Arial, sans-serif" em TODOS os elementos text
-- NUNCA deixe texto ultrapassar o card (use tspan com quebras)`;
+  // Avatar — logo or initials
+  if (brand.logo) {
+    body += `<circle cx="${aCx}" cy="${aCy}" r="${aR + 2}" fill="${accent}" opacity="0.18"/>`;
+    body += `<image href="${brand.logo}" x="${aCx - aR}" y="${aCy - aR}" width="${aR * 2}" height="${aR * 2}" clip-path="url(#tcAvClip)" preserveAspectRatio="xMidYMid slice"/>`;
+    body += `<circle cx="${aCx}" cy="${aCy}" r="${aR}" fill="none" stroke="${accent}" stroke-width="2.5"/>`;
+  } else {
+    body += `<circle cx="${aCx}" cy="${aCy}" r="${aR}" fill="${accent}"/>`;
+    body += `<text x="${aCx}" y="${aCy + 9}" text-anchor="middle" font-family="DM Sans,Arial,sans-serif" font-size="22" font-weight="700" fill="#FFFFFF">${esc(initials)}</text>`;
+  }
 
-  const r = await callClaude({
-    system,
-    userMsg: `Gere o SVG do tweet card com o conteúdo acima. Siga a estrutura pixel a pixel:`,
-    maxTokens: 6000,
-  });
+  // Name
+  body += `<text x="${nX}" y="${nY}" font-family="DM Sans,Arial,sans-serif" font-size="20" font-weight="700" fill="#0F1419" text-rendering="optimizeLegibility">${esc(authorName)}</text>`;
+  // Verified badge (circle + checkmark path)
+  const vbX = nX + Math.min(authorName.length, 24) * 11 + 8;
+  body += `<circle cx="${vbX + 9}" cy="${nY - 8}" r="9" fill="${accent}"/>`;
+  body += `<path d="M${vbX + 4} ${nY - 8} l4 4 l6 -6" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`;
 
-  let svg = r.text.match(/<svg[\s\S]*<\/svg>/i)?.[0] || '';
-  if (!svg) throw new Error('SVG não gerado no tweet card');
-  return { svg, tok: { in: r.inputTokens, out: r.outputTokens } };
+  // Handle
+  body += `<text x="${nX}" y="${hY}" font-family="DM Sans,Arial,sans-serif" font-size="16" fill="#536471">${esc(handleStr)}</text>`;
+
+  // Headline
+  body += mtext(hdLines, ix, hdBase, FS_HEAD, LH_HEAD, 'font-weight="700" fill="#0F1419" text-rendering="optimizeLegibility"');
+
+  // Subheadline
+  if (subLines.length) body += mtext(subLines, ix, subBase, FS_SUB, LH_SUB, 'fill="#536471"');
+
+  // Body points with accent bar
+  for (const { lines, y: bY } of bptItems) {
+    const barH = (lines.length - 1) * LH_BODY + FS_BODY + 4;
+    body += `<rect x="${ix}" y="${bY - FS_BODY + 2}" width="3" height="${barH}" rx="1.5" fill="${accent}"/>`;
+    body += mtext(lines, ix + 16, bY, FS_BODY, LH_BODY, 'fill="#0F1419"');
+  }
+
+  // Date
+  body += `<text x="${ix}" y="${dateBase}" font-family="DM Sans,Arial,sans-serif" font-size="${FS_DATE}" fill="#536471">${esc(dateStr)} · X Web App</text>`;
+
+  // Dividers
+  const dx2 = cX + cW - pad;
+  body += `<line x1="${ix}" y1="${d1Y}" x2="${dx2}" y2="${d1Y}" stroke="#EFF3F4" stroke-width="1"/>`;
+  body += `<line x1="${ix}" y1="${d2Y}" x2="${dx2}" y2="${d2Y}" stroke="#EFF3F4" stroke-width="1"/>`;
+
+  // Stats row
+  body += `<text x="${ix}" y="${statsBase}" font-family="DM Sans,Arial,sans-serif" font-size="${FS_STAT}" fill="#536471">`;
+  body += `<tspan font-weight="700" fill="#0F1419">${esc(likes)}</tspan><tspan> Likes&#160;&#160;&#160;</tspan>`;
+  body += `<tspan font-weight="700" fill="#0F1419">${esc(rts)}</tspan><tspan> Retweets&#160;&#160;&#160;</tspan>`;
+  body += `<tspan font-weight="700" fill="#0F1419">${esc(repls)}</tspan><tspan> Replies</tspan>`;
+  body += `</text>`;
+
+  // Engagement icons row
+  const iS     = (20 / 24).toFixed(4);
+  const iSpan  = Math.floor(iw / 5);
+  const iItems = [
+    { d: 0,         path: 'M1.751 10c0-3.836 3.153-7 7.044-7 1.923 0 3.675.792 4.965 2.07a6.98 6.98 0 0 1 2.04 4.93v.602h-2.008V10c0-2.76-2.236-5-4.997-5s-5 2.24-5 5 2.239 5 5 5h.625v2h-.625C4.904 17 1.751 13.836 1.751 10Z', c: '#536471', lbl: repls },
+    { d: iSpan,     path: 'M4.5 3.88l-1.87 1.85.99 1 1.85-1.83V12h1.4V4.9l1.85 1.83.99-1L7.85 3.88a.95.95 0 0 0-1.35 0ZM19.5 12.12l1.87-1.85-.99-1-1.85 1.83V5h-1.4v7.1l-1.85-1.83-.99 1 1.87 1.85c.37.37.98.37 1.34 0Z', c: '#536471', lbl: rts },
+    { d: iSpan * 2, path: 'M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.561-1.13-1.666-1.84-2.908-1.91Z', c: '#F91880', lbl: likes },
+    { d: iSpan * 3, path: 'M12 1.996c-2.808 0-5 2.472-5 5.504 0 2.01.945 3.792 2.025 5.31 1.058 1.49 2.312 2.795 3.17 3.65.406.403 1.034.403 1.44 0 .857-.855 2.112-2.16 3.17-3.65C17.985 11.292 19 9.51 19 7.5c0-3.032-2.192-5.504-5-5.504Zm0 7.5c-1.105 0-2-.895-2-2s.895-2 2-2 2 .895 2 2-.895 2-2 2Z', c: '#536471', lbl: views },
+    { d: iSpan * 4, path: 'M4 4.5C4 3.12 5.119 2 6.5 2h11C18.881 2 20 3.12 20 4.5v18.044l-8-5.787-8 5.787V4.5Z', c: '#536471', lbl: '' },
+  ];
+
+  for (const ic of iItems) {
+    const ix2 = ix + ic.d;
+    const iy2 = iconsBase - 16;
+    body += `<g transform="translate(${ix2},${iy2}) scale(${iS})"><path d="${ic.path}" fill="${ic.c}"/></g>`;
+    if (ic.lbl) body += `<text x="${ix2 + 26}" y="${iconsBase}" font-family="DM Sans,Arial,sans-serif" font-size="${FS_ICON}" fill="${ic.c}">${esc(ic.lbl)}</text>`;
+  }
+
+  // Watermark
+  body += `<text x="${W / 2}" y="${H - 28}" text-anchor="middle" font-family="DM Sans,Arial,sans-serif" font-size="14" fill="rgba(255,255,255,0.35)">${esc(handleStr)}</text>`;
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><defs>${defs}</defs><g clip-path="url(#tcCv)">${body}</g></svg>`;
+}
+
+async function daStage3Tweet({ brief, brand, dim }) {
+  const svg = _buildTweetCardSvg({ brief, brand, dim });
+  return { svg, tok: { in: 0, out: 0 } };
 }
 
 // ── Rota: Variações — gera N alternativas visuais em paralelo ────────────────

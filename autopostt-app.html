@@ -8077,6 +8077,8 @@ async function gerarImagem() {
   const brandProfile = BrandProfileModule.toGenerationPayload({
     voiceId: voice?.id || '', voiceName: voice?.name || '',
     modelN: model.n || '', modelName: model.name || '', modelSvg: model.svg || '',
+    userName: me?.name || '',
+    logoData: window._logoData || null,
   });
 
   switchOutTab('imagem');
@@ -8242,6 +8244,8 @@ async function gerarVariacoes() {
   const brandProfile = BrandProfileModule.toGenerationPayload({
     voiceId: voice?.id || '', voiceName: voice?.name || '',
     modelN: model.n || '', modelName: model.name || '', modelSvg: model.svg || '',
+    userName: me?.name || '',
+    logoData: window._logoData || null,
   });
 
   switchOutTab('imagem');
