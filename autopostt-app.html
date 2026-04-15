@@ -865,14 +865,122 @@ tr:hover .td-actions { opacity: 1; }
 /* ══════════════════════════════════════════════
    GENERATE PAGE — 3-column layout
 ══════════════════════════════════════════════ */
-.g-gen { display: grid; grid-template-columns: 224px 1fr 352px; gap: 20px; align-items: start; }
-.gen-col-left { display: flex; flex-direction: column; gap: 0; }
-.gen-col-mid  { display: flex; flex-direction: column; gap: 0; min-width: 0; }
-.gen-col-right { position: sticky; top: 72px; }
-#gen-visual-slot { min-height: 200px; margin-bottom: 14px; }
-#ref-visual-wrap .drop-zone { min-height: 200px; }
-#ref-visual-wrap .drop-zone .drop-main { font-size: 12px; }
-#ref-visual-wrap .drop-zone .drop-sub  { font-size: 10px; }
+.g-gen {
+  display: grid;
+  grid-template-columns: 220px 1fr 340px;
+  gap: 0;
+  align-items: start;
+}
+
+/* Column base */
+.gen-col-left,
+.gen-col-mid,
+.gen-col-right {
+  padding: 28px 24px;
+  min-height: calc(100vh - 140px);
+}
+
+/* Left col — subtle right border */
+.gen-col-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-right: 1px solid var(--line-1);
+}
+
+/* Mid col — main content area */
+.gen-col-mid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+  border-right: 1px solid var(--line-1);
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+/* Right col — output panel */
+.gen-col-right {
+  position: sticky;
+  top: 60px;
+  min-height: auto;
+  padding: 24px 22px;
+  background: transparent;
+}
+
+/* Visual slot — ref upload / image output */
+#gen-visual-slot { margin-bottom: 18px; }
+#ref-visual-wrap .drop-zone {
+  min-height: 220px;
+  border-radius: 16px;
+}
+
+/* Brainstorm chat — taller in mid col */
+#pg-generate .bs-wrap {
+  min-height: 320px;
+}
+#pg-generate .bs-msgs {
+  min-height: 200px;
+}
+
+/* Section labels in generate */
+#pg-generate .gen-col-left .sec-lbl,
+#pg-generate .gen-col-mid  .sec-lbl {
+  margin-bottom: 14px;
+  font-size: 10.5px;
+  letter-spacing: .1em;
+}
+
+/* Format grid — 2 cols in left panel */
+#pg-generate .gen-col-left .fmt-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+#pg-generate .gen-col-left .fmt {
+  min-height: 72px;
+  border-radius: 14px;
+  padding: 10px 8px;
+}
+#pg-generate .gen-col-left .fmt-ico {
+  width: 32px; height: 32px;
+  margin: 0 auto 8px;
+  border-radius: 9px;
+}
+#pg-generate .gen-col-left .fmt-ico svg { width: 16px; height: 16px; }
+#pg-generate .gen-col-left .fmt-name   { font-size: 11px; }
+
+/* Network row */
+#pg-generate .gen-col-left .net-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+#pg-generate .gen-col-left .net {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 10px 6px;
+  border-radius: 14px;
+  min-height: 72px;
+}
+#pg-generate .gen-col-left .net-ico  { margin: 0 auto 8px; }
+#pg-generate .gen-col-left .net-name { font-size: 11px; }
+
+/* Gerar button in left col */
+#pg-generate #btn-gen-main {
+  margin-top: 24px;
+  border-radius: 14px;
+  padding: 13px 12px;
+  font-size: 13px;
+}
+
+/* Voice grid */
+#pg-generate #voice-grid {
+  grid-template-columns: 1fr;
+  gap: 5px;
+}
+
 
 .fmt-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }
 .fmt-btn {
@@ -3381,22 +3489,18 @@ tbody tr:hover{background:rgba(255,255,255,.025)}
 .card:hover,.kpi:hover,.hist-card:hover,.tip-card:hover,.profile-card:hover{border-color:rgba(255,255,255,.14)!important;box-shadow:0 0 0 1px rgba(245,197,24,.04) inset!important}
 .plan-box,.profile-plan-wrap .plan-box,#pg-settings .sett-plan-card.feat,#pg-settings .sett-plan-card.premium,#pg-settings .sett-plan-card.pro,#pg-settings .sett-plan-card.elite{background:radial-gradient(circle at top right, rgba(245,197,24,.12), transparent 38%),linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)),#17171D!important;border:1px solid rgba(245,197,24,.18)!important;box-shadow:0 18px 60px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.03)!important}
 /* .g-gen override neutralizado — layout 3col definido em base CSS */
-#pg-generate .card{padding:0!important;border:none!important}
+/* 3-col layout: card/panel resets */
+#pg-generate .card{padding:0!important;border:none!important;box-shadow:none!important;}
 #pg-generate .card:hover{box-shadow:none!important}
-#pg-generate .fmt-grid{gap:10px!important}
-#pg-generate .net-row{gap:10px!important}
-#pg-generate .fmt,#pg-generate .net,#pg-generate .drop-zone,#pg-generate .out-tab,#pg-generate .ta-wrap,#pg-generate #refined-prompt-box,#pg-generate #modelo-selected-info{background:transparent!important;border:1px solid rgba(255,255,255,.08)!important;box-shadow:none!important}
-#pg-generate .fmt,#pg-generate .net{min-height:92px!important;border-radius:22px!important}
-#pg-generate .fmt:hover,#pg-generate .net:hover,#pg-generate .drop-zone:hover{border-color:rgba(245,197,24,.24)!important;background:rgba(245,197,24,.035)!important}
+#pg-generate .gen-col-left .fmt-grid{gap:8px!important}
+#pg-generate .gen-col-left .net-row{gap:8px!important}
+#pg-generate .fmt,#pg-generate .net{background:transparent!important;border:1px solid rgba(255,255,255,.08)!important;box-shadow:none!important}
+#pg-generate .fmt:hover,#pg-generate .net:hover{border-color:rgba(245,197,24,.24)!important;background:rgba(245,197,24,.035)!important}
 #pg-generate .fmt.on,#pg-generate .net.on{background:linear-gradient(180deg, rgba(245,197,24,.09), rgba(245,197,24,.05))!important;border-color:rgba(245,197,24,.34)!important;box-shadow:0 0 0 1px rgba(245,197,24,.07) inset!important}
-#pg-generate textarea,.agent-pg textarea,#pg-profile textarea,#pg-settings textarea,#pg-generate input,.agent-pg input,#pg-profile input,#pg-settings input,#pg-settings select,.agent-pg select,#pg-profile select{background:rgba(255,255,255,.01)!important;border:1px solid rgba(255,255,255,.08)!important}
-#pg-generate .ta-wrap{padding:0!important;overflow:hidden!important;border-radius:24px!important}
-#pg-generate textarea{min-height:196px!important;padding:20px 22px 84px!important;border:none!important;background:transparent!important}
-#pg-generate .ta-foot{padding:14px 16px!important;border-top:1px solid rgba(255,255,255,.06)!important;background:rgba(255,255,255,.015)!important}
-#pg-generate .drop-zone{min-height:164px!important;border-radius:24px!important}
-#pg-generate .out-panel{min-height:calc(100vh - 138px)!important;top:88px!important;padding:18px!important;border-radius:28px!important}
-#pg-generate .out-tabs{background:transparent!important;border:none!important;padding:0 0 12px!important}
-#pg-generate .out-tab{border-radius:999px!important;padding:12px 16px!important}
+#pg-generate .drop-zone{background:transparent!important;border:1px solid rgba(255,255,255,.08)!important;border-radius:16px!important;min-height:200px!important;}
+#pg-generate .drop-zone:hover{border-color:rgba(245,197,24,.24)!important;background:rgba(245,197,24,.025)!important;}
+/* col-right inherits out-panel styles but no sticky constraints from old code */
+#pg-generate .gen-col-right.out-panel{min-height:auto!important;top:60px!important;padding:24px 22px!important;border-radius:0!important;border:none!important;background:transparent!important;}
 .agent-layout,.agent-cols{grid-template-columns:minmax(0,1.08fr) minmax(440px,.92fr)!important;gap:24px!important}
 .agent-pg .agent-left,.agent-pg .agent-right{background:transparent!important}
 .agent-pg .agent-input-panel,.agent-pg .agent-out-panel,.agent-pg .agent-result{padding:0!important;border:none!important;min-height:auto!important}
@@ -3739,16 +3843,14 @@ tbody tr:hover{background:rgba(255,255,255,.025)}
 .sb-top{gap:12px!important;padding:0 18px!important}
 .sb-logo-mark--brand{width:42px!important;height:42px!important;display:flex!important;align-items:center!important;justify-content:center!important;border-radius:14px!important;overflow:hidden!important;box-shadow:none!important}
 .sb-logo-img{display:block;width:34px;height:34px;object-fit:contain;filter:drop-shadow(0 6px 18px rgba(245,197,24,.12));}
-#pg-generate .fmt-grid{gap:18px!important}
-#pg-generate .net-row{gap:16px!important}
-#pg-generate .fmt,#pg-generate .net{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important;min-height:164px!important;padding:18px 14px!important}
-#pg-generate .net{min-height:148px!important}
-#pg-generate .fmt-ico,#pg-generate .net-ico{margin:0 auto 16px!important;width:44px!important;height:44px!important;border-radius:12px!important;display:flex!important;align-items:center!important;justify-content:center!important}
-#pg-generate .fmt-ico svg,#pg-generate .net-ico svg{width:20px!important;height:20px!important}
-#pg-generate .fmt-name,#pg-generate .net-name{font-size:17px!important;line-height:1.2!important;font-weight:700!important}
-#pg-generate .sec-lbl{margin-bottom:18px!important}
-#pg-generate .ta-wrap textarea{padding:28px 24px 64px!important;min-height:250px!important;font-size:18px!important;line-height:1.65!important}
-#pg-generate .drop-zone{min-height:244px!important;display:flex!important;align-items:center!important;justify-content:center!important}
+/* NEUTRALIZADO — layout 3col gerencia próprios tamanhos */
+#pg-generate .fmt-grid{gap:8px!important}
+#pg-generate .gen-col-left .net-row{gap:8px!important}
+#pg-generate .gen-col-left .fmt,#pg-generate .gen-col-left .net{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important;min-height:72px!important;padding:10px 8px!important}
+#pg-generate .gen-col-left .fmt-ico,#pg-generate .gen-col-left .net-ico{margin:0 auto 7px!important;width:32px!important;height:32px!important;border-radius:9px!important;display:flex!important;align-items:center!important;justify-content:center!important}
+#pg-generate .gen-col-left .fmt-ico svg,#pg-generate .gen-col-left .net-ico svg{width:16px!important;height:16px!important}
+#pg-generate .gen-col-left .fmt-name,#pg-generate .gen-col-left .net-name{font-size:11px!important;line-height:1.2!important;font-weight:600!important}
+#pg-generate .drop-zone{min-height:200px!important;display:flex!important;align-items:center!important;justify-content:center!important}
 #pg-dashboard .kpi-row{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:18px!important;align-items:stretch!important;justify-content:center!important}
 #pg-dashboard .kpi{min-height:196px!important;padding:28px 26px!important;border-radius:26px!important}
 #pg-dashboard .kpi-icon{width:58px!important;height:58px!important;border-radius:18px!important;margin-bottom:20px!important}
@@ -4533,21 +4635,26 @@ body.sidebar-collapsed .ni.on::after{
   box-shadow: none !important;
 }
 
-/* 2) Image generator: remove demarcation lines / boxed feel */
+/* 2) Image generator — 3-column layout polish */
 #pg-generate .sec-lbl::after,
-#pg-generate .divider,
 #pg-generate .out-panel::before,
 #pg-generate .out-panel::after{
   display:none !important;
 }
-#pg-generate > .g-gen > .card,
-#pg-generate .out-panel{
+/* The divider inside col-right is kept (visual separator between sections) */
+#pg-generate .gen-col-right .divider{ display:block !important; opacity:.5; }
+#pg-generate > .g-gen > .card{
   border: none !important;
   padding: 0 !important;
 }
-#pg-generate .out-panel{
-  min-height: calc(100vh - 124px) !important;
+/* gen-col-right takes its own padding, no extra */
+#pg-generate .gen-col-right.out-panel{
+  min-height: calc(100vh - 60px) !important;
+  border-left: 1px solid rgba(255,255,255,.06) !important;
 }
+/* 3-col page container: full bleed, no outer padding */
+#pg-generate { padding-left: 0 !important; padding-right: 0 !important; }
+#pg-generate .pg-hd { padding-left: 28px; padding-right: 28px; }
 #pg-generate .ta-wrap,
 #pg-generate .drop-zone,
 #pg-generate #refined-prompt-box,
