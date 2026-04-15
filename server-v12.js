@@ -2706,6 +2706,7 @@ Se headline > 12 chars → PREFIRA 2 linhas a fonte gigante que transborda.
   },
   "headline": {
     "text": "${brief.headline}",
+    "lines": ["OBRIGATÓRIO: quebre o texto aqui", "segunda linha se necessário"],
     "font": "Bebas Neue | Syne | DM Sans | Playfair Display | Cormorant Garamond | IBM Plex Mono",
     "size": 100,
     "weight": "400 | 700 | 800 | 900",
@@ -2720,6 +2721,7 @@ Se headline > 12 chars → PREFIRA 2 linhas a fonte gigante que transborda.
   },
   "subheadline": {
     "text": "${brief.subheadline || ''}",
+    "lines": ["linha 1 do subheadline", "linha 2 se necessário"],
     "font": "DM Sans | Playfair Display | IBM Plex Mono | Cormorant Garamond",
     "size": 26,
     "weight": "300 | 400 | 600",
@@ -2784,7 +2786,13 @@ ORIENTAÇÕES CRÍTICAS:
 3. Campos null = não renderizar | todos os números são INTEIROS reais no canvas
 4. Se emphasis="number" E data_highlight existe: decida UMA hierarquia — ou o número é HERÓI (data_hero layout) ou é badge secundário — NUNCA número grande + headline grande no mesmo espaço
 5. Contraste AAA: fundo escuro (#0A0A0A, #050505) → texto branco + accent em P1 | fundo claro → texto escuro
-6. headline.size NUNCA pode exceder o valor calculado na fórmula acima — verifique antes de definir`;
+6. headline.size NUNCA pode exceder o valor calculado na fórmula acima — verifique antes de definir
+7. ⚠️  LINES[] É OBRIGATÓRIO E INVIOLÁVEL:
+   - headline.lines[] e subheadline.lines[] DEVEM ser calculados com a fórmula de chars acima
+   - Se headline cabe em 1 linha: lines = ["texto completo"]
+   - Se headline NÃO cabe: quebre em 2-3 linhas respeitando palavras completas
+   - lines[] determina exatamente o que o SVG Executor vai renderizar em tspans
+   - NÃO repita o texto inteiro em "text" e "lines" contraditórios — lines[] é a verdade`;
 
   const r = await callClaude({
     system,
@@ -2887,11 +2895,13 @@ TÉCNICA 4 — DROP SHADOW em texto/shapes:
 <defs><filter id="textShadow"><feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#000" flood-opacity="0.5"/></filter></defs>
 <text filter="url(#textShadow)" ...>HEADLINE</text>
 
-TÉCNICA 5 — TEXTO MULTI-LINHA (USE SEMPRE para headline com > 1 palavra longa):
+TÉCNICA 5 — TEXTO MULTI-LINHA (USE SEMPRE — substitui texto simples):
 <!-- Safe width ${dim.w - margin * 2}px | Bebas Neue: 120px→${Math.floor((dim.w-margin*2)/(120*0.60))}chars | 100px→${Math.floor((dim.w-margin*2)/(100*0.60))}chars | 80px→${Math.floor((dim.w-margin*2)/(80*0.60))}chars -->
+<!-- ⚠️  REGRA ABSOLUTA: use blueprint.headline.lines[] como a quebra de linha DEFINITIVA -->
+<!-- Se lines=["UMA SÓ LINHA"], use apenas 1 tspan. Se lines=["LINHA 1","LINHA 2"], use 2 tspans -->
 <text x="80" y="380" font-family="Bebas Neue" font-size="110" fill="#FFF" text-rendering="optimizeLegibility">
-  <tspan x="80" dy="0">PRIMEIRA LINHA</tspan>
-  <tspan x="80" dy="126">SEGUNDA LINHA</tspan>
+  <tspan x="80" dy="0">PRIMEIRA LINHA (de blueprint.headline.lines[0])</tspan>
+  <tspan x="80" dy="126">SEGUNDA LINHA (de blueprint.headline.lines[1])</tspan>
 </text>
 
 TÉCNICA 6 — PADRÃO GRID (textura de fundo):
@@ -2944,15 +2954,12 @@ tech-sharp:    grid-pattern visible + monospace + L-brackets + coordinate marks 
 ═══════════════ REGRAS ANTI-FALHA ═══════════════
 ✦ ClipPath PRIMEIRO: antes de qualquer elemento, declare o clipPath id="canvas" e use em <g>
 ✦ text-rendering="optimizeLegibility" em TODOS os headlines
-✦ QUEBRA DE LINHA OBRIGATÓRIA — pixel math para este canvas (safe width: ${dim.w - margin * 2}px):
-    Bebas Neue 120px → max ${Math.floor((dim.w - margin * 2) / (120 * 0.60))} chars/linha
-    Bebas Neue 100px → max ${Math.floor((dim.w - margin * 2) / (100 * 0.60))} chars/linha
-    Bebas Neue  80px → max ${Math.floor((dim.w - margin * 2) / (80 * 0.60))} chars/linha
-    DM Sans    100px → max ${Math.floor((dim.w - margin * 2) / (100 * 0.55))} chars/linha
-    DM Sans     80px → max ${Math.floor((dim.w - margin * 2) / (80 * 0.55))} chars/linha
-  Headline atual: "${brief.headline}" (${brief.headline.length} chars)
-  → Cabe em 1 linha até: ~${Math.floor((dim.w - margin * 2) / (brief.headline.length * 0.60))}px Bebas Neue
-  → SEMPRE use tspans se headline > 1 linha. dy deve ser = fontSize × 1.15
+✦ ⚠️  HEADLINES USAM EXATAMENTE blueprint.headline.lines[] — NÃO re-quebre por conta própria:
+    blueprint.headline.lines tem ${JSON.stringify(blueprint.headline?.lines || ['(calculado pelo Art Director)'])}
+    → Use cada elemento de lines[] como 1 tspan. dy do 1º tspan = 0, demais = line_h do blueprint.
+    → NÃO use o campo .text para renderizar — use .lines[] sempre.
+    → Se lines[] tiver 1 elemento: 1 tspan. 2 elementos: 2 tspans. Simples assim.
+✦ SUBHEADLINE: use blueprint.subheadline.lines[] da mesma forma se existir
 ✦ Body points: CADA item = 1 tspan com dy=line_height (não empilhe sem dy)
 ✦ CTA button: SEMPRE rect + text centrado — text.y = rect.y + pad_y + font_size × 0.75
 ✦ Handle footer: FIXO em y=${dim.h - 28}px | font-size 15-17px | não mude essa posição
@@ -2960,6 +2967,8 @@ tech-sharp:    grid-pattern visible + monospace + L-brackets + coordinate marks 
 ✦ Pelo menos 1 shape com filter blur/glow (cria profundidade premium)
 ✦ Pelo menos 1 gradiente (linear ou radial) — designs planos parecem amadores
 ✦ Elementos decorativos opacity 0.04-0.25 — visíveis mas não competem com conteúdo
+✦ POSIÇÕES SÃO DEFINITIVAS: use as coordenadas x/y EXATAS do blueprint — não ajuste "por intuição"
+✦ NENHUM texto pode ultrapassar x=${dim.w - margin} — se o tspan calculado extrapola, reduza o font-size em 10%
 
 ═══════════════ IMPLEMENTAÇÃO DOS LAYERS ═══════════════
 Para cada item em blueprint.layers[]:
@@ -2978,20 +2987,36 @@ Para filter "glow-N": defina filtro de merge (blur + original) com stdDeviation=
 ═══════════════ BLUEPRINT COMPLETO DO ART DIRECTOR ═══════════════
 ${JSON.stringify(blueprint, null, 2)}`;
 
+  // Injeta as lines[] pré-calculadas pelo Art Director para renderização mecânica
+  const hlLines = Array.isArray(blueprint.headline?.lines) && blueprint.headline.lines.length > 0
+    ? blueprint.headline.lines
+    : [blueprint.headline?.text || brief.headline];
+  const subLines = Array.isArray(blueprint.subheadline?.lines) && blueprint.subheadline.lines.length > 0
+    ? blueprint.subheadline.lines
+    : (blueprint.subheadline?.text ? [blueprint.subheadline.text] : null);
+
+  const linesDirective = `
+⚠️  QUEBRA DE LINHA PRÉ-CALCULADA (USE EXATAMENTE ISTO — NÃO ALTERE):
+HEADLINE lines[]:
+${hlLines.map((l, i) => `  tspan ${i + 1}: "${l}"`).join('\n')}
+${subLines ? `\nSUBHEADLINE lines[]:\n${subLines.map((l, i) => `  tspan ${i + 1}: "${l}"`).join('\n')}` : ''}
+
+Cada tspan usa x=${blueprint.headline?.x || margin} e dy = ${blueprint.headline?.line_h || Math.round((blueprint.headline?.size || 100) * 1.15)} (exceto o 1º que usa dy="0").
+`;
+
   const r = await callClaude({
     system,
     userMsg: `Plataforma: ${DA_NET_LABELS[network] || network}.
-
+${linesDirective}
 Execute o blueprint SEM OMITIR NENHUMA CAMADA. Exigências mínimas:
 ✦ Mínimo 6 camadas visuais distintas (bg + atmosfera + shapes + estrutura + conteúdo + footer)
 ✦ Pelo menos 1 gradiente (bg ou elemento) — zero fundos 100% planos
 ✦ Pelo menos 1 filtro (blur/glow/sombra) — profundidade é obrigatória
-✦ Texto headline em TSPANS se necessário — NUNCA transbordando o canvas
+✦ Headline renderizado com AS LINHAS PRÉ-CALCULADAS ACIMA em tspans — proibido alterar
 ✦ Todo texto com font-family, fill, font-size explícitos
 ✦ ClipPath ativo envolvendo todo conteúdo
 
-Este design vai para o feed de clientes pagantes. Ele deve ser o post mais impactante que eles já viram.
-Nível: top 0.1% dos designs de marketing digital do Brasil. SVG completo agora:`,
+Este design vai para o feed de clientes pagantes. Nível: top 0.1% dos designs de marketing digital do Brasil. SVG completo agora:`,
     maxTokens: 12000,
   });
 
@@ -3381,8 +3406,8 @@ route('POST', '/api/user/design-agent', async (req, res) => {
   const slideIdx  = Math.max(1, parseInt(slideIndex) || 1);
   const totalSl   = Math.max(1, parseInt(totalSlides) || 1);
 
-  // Quota: tweet=4 créditos, padrão=2 créditos; carrossel só consome no 1º slide
-  if (!isCarrossel || slideIdx === 1) {
+  // Quota: tweet=4cr | padrão/carrossel=2cr por slide (2sl=4cr,3sl=6cr,...7sl=14cr)
+  {
     const credits = isTweetFmt ? 4 : 2;
     try { for (let i = 0; i < credits; i++) db.consumeQuota(payload.id); }
     catch(e) {
@@ -3492,7 +3517,7 @@ route('POST', '/api/user/design-agent', async (req, res) => {
 // Cada mensagem consome 1 crédito. Suporta até 14 mensagens de histórico.
 route('POST', '/api/user/brainstorm', async (req, res) => {
   const payload = requireAuth(req, res); if (!payload) return;
-  const { messages, context, brandProfile } = await parseBody(req);
+  const { messages, context, brandProfile, format, network } = await parseBody(req);
   if (!messages || !Array.isArray(messages) || messages.length === 0)
     return err(res, 'messages obrigatório');
 
@@ -3511,16 +3536,26 @@ route('POST', '/api/user/brainstorm', async (req, res) => {
     tiktok: 'roteiro e hook para TikTok',
   }[context] || context || 'conteúdo de marketing';
 
+  const fmtLabel = { post: 'Post único', carrossel: 'Carrossel', story: 'Story', anuncio: 'Anúncio',
+    thumb: 'Thumbnail', banner: 'Banner', reels: 'Reels', tweet: 'Tweet Card' }[format] || (format || 'não especificado');
+  const netLabel = { ig: 'Instagram', li: 'LinkedIn', yt: 'YouTube', tt: 'TikTok', fb: 'Facebook',
+    instagram: 'Instagram', linkedin: 'LinkedIn', youtube: 'YouTube', tiktok: 'TikTok' }[network] || (network || 'não especificado');
+  const fmtCtx = (format || network)
+    ? `\nFORMATO SELECIONADO: ${fmtLabel} | REDE: ${netLabel}`
+    : '\nFORMATO/REDE: ainda não selecionados pelo usuário';
+
   const system =
 `Você é o CREATIVE STRATEGIST — consultor criativo de elite especializado em conteúdo digital viral.
 Missão: ajudar o usuário a desenvolver a ideia mais afiada e específica possível para criar ${ctxLabel}.
 
-MARCA: ${brand.profissao} | Nicho: ${brand.nicho} | Tom: ${brand.tom} | Público: ${brand.publico}
+MARCA: ${brand.profissao} | Nicho: ${brand.nicho} | Tom: ${brand.tom} | Público: ${brand.publico}${fmtCtx}
 
 COMO AGIR:
 — Se a ideia estiver vaga: faça 1-2 perguntas estratégicas (ângulo, dado específico, transformação)
 — Se a ideia estiver clara: confirme, sugira um twist criativo ou um dado que deixe mais impactante
 — Proponha ângulos alternativos quando pertinente (contraste, curiosidade, prova social, urgência)
+— Se FORMATO ou REDE não estiverem confirmados: mencione brevemente qual formato/rede seria ideal para essa ideia
+— SEMPRE leve em conta o formato selecionado ao dar sugestões (ex: carrossel = arco narrativo; story = impacto imediato; linkedin = autoridade)
 — Seja conciso: máx 3 parágrafos. Linguagem direta, em português.
 — Ao final, sempre indique se a ideia está pronta para refinar (✅) ou precisa de mais desenvolvimento (🔄)`;
 
@@ -3542,7 +3577,7 @@ COMO AGIR:
 // Consolida o histórico de brainstorm em um prompt rico e específico. +1 crédito.
 route('POST', '/api/user/brainstorm/refine', async (req, res) => {
   const payload = requireAuth(req, res); if (!payload) return;
-  const { messages, context, brandProfile } = await parseBody(req);
+  const { messages, context, brandProfile, format, network } = await parseBody(req);
   if (!messages || !Array.isArray(messages) || messages.length === 0)
     return err(res, 'messages obrigatório');
 
@@ -3566,9 +3601,15 @@ route('POST', '/api/user/brainstorm/refine', async (req, res) => {
     .map(m => `${m.role === 'user' ? 'Usuário' : 'Consultor'}: ${m.content}`)
     .join('\n\n');
 
+  const rfmtLabel = { post: 'Post único', carrossel: 'Carrossel', story: 'Story', anuncio: 'Anúncio',
+    thumb: 'Thumbnail', banner: 'Banner', reels: 'Reels' }[format] || (format || '');
+  const rnetLabel = { ig: 'Instagram', li: 'LinkedIn', yt: 'YouTube', tt: 'TikTok', fb: 'Facebook',
+    instagram: 'Instagram', linkedin: 'LinkedIn', youtube: 'YouTube', tiktok: 'TikTok' }[network] || (network || '');
+  const fmtHint = (rfmtLabel || rnetLabel) ? `\nFormato: ${rfmtLabel || '-'} | Rede: ${rnetLabel || '-'}` : '';
+
   const system =
 `Você é um especialista em copywriting e direção criativa de nível mundial.
-Com base na conversa de brainstorm abaixo, crie um prompt DETALHADO e ESPECÍFICO para geração de ${ctxType}.
+Com base na conversa de brainstorm abaixo, crie um prompt DETALHADO e ESPECÍFICO para geração de ${ctxType}.${fmtHint}
 
 O prompt deve conter de forma clara:
 • Tema central e ângulo criativo específico
