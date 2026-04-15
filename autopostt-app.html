@@ -863,9 +863,16 @@ tr:hover .td-actions { opacity: 1; }
 .tip-txt { font-size: 12.5px; color: var(--tx-1); line-height: 1.65; padding-left: 10px; }
 
 /* ══════════════════════════════════════════════
-   GENERATE PAGE
+   GENERATE PAGE — 3-column layout
 ══════════════════════════════════════════════ */
-.g-gen { display: grid; grid-template-columns: 1fr 456px; gap: 24px; align-items: start; }
+.g-gen { display: grid; grid-template-columns: 224px 1fr 352px; gap: 20px; align-items: start; }
+.gen-col-left { display: flex; flex-direction: column; gap: 0; }
+.gen-col-mid  { display: flex; flex-direction: column; gap: 0; min-width: 0; }
+.gen-col-right { position: sticky; top: 72px; }
+#gen-visual-slot { min-height: 200px; margin-bottom: 14px; }
+#ref-visual-wrap .drop-zone { min-height: 200px; }
+#ref-visual-wrap .drop-zone .drop-main { font-size: 12px; }
+#ref-visual-wrap .drop-zone .drop-sub  { font-size: 10px; }
 
 .fmt-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }
 .fmt-btn {
@@ -1383,7 +1390,7 @@ tr:hover .td-actions { opacity: 1; }
 ══════════════════════════════════════════════ */
 @media (max-width: 1100px) {
   .kpi-row { grid-template-columns: repeat(2,1fr); }
-  .g-gen { grid-template-columns: 1fr 380px; }
+  .g-gen { grid-template-columns: 200px 1fr 300px; }
 }
 @media (max-width: 900px) {
   .sb { display: none; }
@@ -3373,7 +3380,7 @@ tbody tr:hover{background:rgba(255,255,255,.025)}
 .card,.kpi,.hist-card,.out-panel,.agent-input-panel,.agent-out-panel,.agent-result,.tip-card,.profile-card,.sett-nav,.sett-panel .sett-plan-card,.sett-panel .card,#pg-generate > .g-gen > .card,#pg-dashboard .g-dash > .card,#pg-dashboard .g-dash .tip-card,#pg-profile .profile-card,#pg-settings .card,#pg-settings .sett-nav,#pg-history .hist-card{background:transparent!important;backdrop-filter:none!important;box-shadow:none!important;border:1px solid rgba(255,255,255,.08)!important}
 .card:hover,.kpi:hover,.hist-card:hover,.tip-card:hover,.profile-card:hover{border-color:rgba(255,255,255,.14)!important;box-shadow:0 0 0 1px rgba(245,197,24,.04) inset!important}
 .plan-box,.profile-plan-wrap .plan-box,#pg-settings .sett-plan-card.feat,#pg-settings .sett-plan-card.premium,#pg-settings .sett-plan-card.pro,#pg-settings .sett-plan-card.elite{background:radial-gradient(circle at top right, rgba(245,197,24,.12), transparent 38%),linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)),#17171D!important;border:1px solid rgba(245,197,24,.18)!important;box-shadow:0 18px 60px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.03)!important}
-.g-gen{grid-template-columns:minmax(0,1.04fr) minmax(420px,.96fr)!important;gap:26px!important;align-items:start!important}
+/* .g-gen override neutralizado — layout 3col definido em base CSS */
 #pg-generate .card{padding:0!important;border:none!important}
 #pg-generate .card:hover{box-shadow:none!important}
 #pg-generate .fmt-grid{gap:10px!important}
@@ -5183,7 +5190,7 @@ body.sidebar-collapsed .ni.on::after{
 }
 [data-theme="light"] #pg-dashboard .kpi-val{font-size:58px!important;line-height:1!important}
 [data-theme="light"] #pg-dashboard .kpi-lbl{font-size:14px!important;letter-spacing:.08em!important}
-[data-theme="light"] #pg-generate .g-gen{grid-template-columns:1fr 420px!important;gap:28px!important}
+/* [data-theme="light"] g-gen override neutralizado */
 [data-theme="light"] #pg-generate > .card,
 [data-theme="light"] #pg-generate .card{background:transparent!important;box-shadow:none!important}
 [data-theme="light"] .sec-lbl{color:#C79600!important}
@@ -6193,38 +6200,35 @@ body.image-agent-refining #image-agent-refine-overlay{
     <div class="pg" id="pg-generate">
       <div class="pg-hd"><div class="pg-title">Gerar conteúdo</div><div class="pg-sub">Descreva sua ideia. A IA aplica sua identidade de marca automaticamente.</div></div>
       <div class="g-gen">
-        <div class="card p-20">
-          <!-- format -->
+
+        <!-- ══ COL 1: Formato + Rede Social ══ -->
+        <div class="gen-col-left">
           <div style="margin-bottom:18px">
             <div class="sec-lbl">Formato</div>
             <div class="fmt-grid">
-              <div class="fmt on" id="f-post" onclick="selFmt('post')"><div class="fmt-ico"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#F5C518" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
-  <rect x="4" y="4" width="16" height="16" rx="3"></rect>
-  <circle cx="9" cy="9" r="1.5"></circle>
-  <path d="M4 16l4-4 3 3 4-4 5 5"></path>
-</svg></div><div class="fmt-name">Post único</div></div>
+              <div class="fmt on" id="f-post" onclick="selFmt('post')"><div class="fmt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#F5C518" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><rect x="4" y="4" width="16" height="16" rx="3"></rect><circle cx="9" cy="9" r="1.5"></circle><path d="M4 16l4-4 3 3 4-4 5 5"></path></svg></div><div class="fmt-name">Post único</div></div>
               <div class="fmt" id="f-carrossel" onclick="selFmt('carrossel')"><div class="fmt-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><div class="fmt-name">Carrossel</div></div>
               <div class="fmt" id="f-anuncio" onclick="selFmt('anuncio')"><div class="fmt-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><div class="fmt-name">Anúncio</div></div>
               <div class="fmt" id="f-story" onclick="selFmt('story')"><div class="fmt-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/></svg></div><div class="fmt-name">Story</div></div>
               <div class="fmt" id="f-thumb" onclick="selFmt('thumb')"><div class="fmt-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg></div><div class="fmt-name">Thumbnail</div></div>
               <div class="fmt" id="f-banner" onclick="selFmt('banner')"><div class="fmt-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><div class="fmt-name">Banner</div></div>
             </div>
-          <!-- Slide count selector — only visible when format = carrossel -->
-          <div id="slide-count-row" style="display:none;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap">
-            <span style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">Qtd. de slides</span>
-            <div style="display:flex;gap:4px;flex-wrap:wrap">
-              <button class="sc-btn on" data-n="0" onclick="selSlides(this,0)">IA decide</button>
-              <button class="sc-btn" data-n="2" onclick="selSlides(this,2)">2</button>
-              <button class="sc-btn" data-n="3" onclick="selSlides(this,3)">3</button>
-              <button class="sc-btn" data-n="4" onclick="selSlides(this,4)">4</button>
-              <button class="sc-btn" data-n="5" onclick="selSlides(this,5)">5</button>
-              <button class="sc-btn" data-n="6" onclick="selSlides(this,6)">6</button>
-              <button class="sc-btn" data-n="7" onclick="selSlides(this,7)">7</button>
+            <!-- Slide count selector -->
+            <div id="slide-count-row" style="display:none;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap">
+              <span style="font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">Qtd. slides</span>
+              <div style="display:flex;gap:4px;flex-wrap:wrap">
+                <button class="sc-btn on" data-n="0" onclick="selSlides(this,0)">Auto</button>
+                <button class="sc-btn" data-n="2" onclick="selSlides(this,2)">2 <span style="font-size:9px;opacity:.6">4cr</span></button>
+                <button class="sc-btn" data-n="3" onclick="selSlides(this,3)">3 <span style="font-size:9px;opacity:.6">6cr</span></button>
+                <button class="sc-btn" data-n="4" onclick="selSlides(this,4)">4 <span style="font-size:9px;opacity:.6">8cr</span></button>
+                <button class="sc-btn" data-n="5" onclick="selSlides(this,5)">5 <span style="font-size:9px;opacity:.6">10cr</span></button>
+                <button class="sc-btn" data-n="6" onclick="selSlides(this,6)">6 <span style="font-size:9px;opacity:.6">12cr</span></button>
+                <button class="sc-btn" data-n="7" onclick="selSlides(this,7)">7 <span style="font-size:9px;opacity:.6">14cr</span></button>
+              </div>
             </div>
           </div>
-          </div>
           <!-- network -->
-          <div style="margin-bottom:18px">
+          <div>
             <div class="sec-lbl">Rede social</div>
             <div class="net-row">
               <div class="net on" id="n-ig" onclick="selNet('ig')"><div class="net-ico"><svg class="ico ico-sm" style="color:var(--a)" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg></div><div class="net-name">Instagram</div></div>
@@ -6233,9 +6237,21 @@ body.image-agent-refining #image-agent-refine-overlay{
               <div class="net" id="n-tt" onclick="selNet('tt')"><div class="net-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg></div><div class="net-name">TikTok</div></div>
             </div>
           </div>
-          <!-- textarea + refinador -->
-          <!-- Brainstorm chat UI -->
-          <div class="sec-lbl" style="margin-bottom:8px">Sua ideia <span style="font-size:10px;color:var(--t3);font-weight:400;text-transform:none;letter-spacing:0">— converse com a IA para refinar</span></div>
+          <!-- generate button -->
+          <div style="display:flex;gap:8px;align-items:stretch;margin-top:20px">
+            <button id="btn-gen-main" onclick="startGenPipeline()" style="flex:1;background:var(--a);border:none;border-radius:var(--r2);padding:13px 14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--f);font-size:13px;font-weight:700;color:#fff;letter-spacing:-.02em;transition:all .15s var(--ease);box-shadow:0 4px 20px rgba(243,107,42,.2)">
+              <svg style="width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              Gerar
+            </button>
+            <button class="btn btn-s btn-icon" style="padding:13px" onclick="clearGenForm()" title="Limpar">
+              <svg class="ico" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- ══ COL 2: Creative Strategist ══ -->
+        <div class="gen-col-mid">
+          <div class="sec-lbl" style="margin-bottom:8px">Creative Strategist <span style="font-size:10px;color:var(--t3);font-weight:400;text-transform:none;letter-spacing:0">— 1 crédito por mensagem</span></div>
           <div class="bs-wrap" id="bs-image-wrap">
             <div class="bs-header">
               <span class="bs-header-label">
@@ -6263,9 +6279,8 @@ body.image-agent-refining #image-agent-refine-overlay{
               </button>
             </div>
           </div>
-
           <!-- prompt refinado -->
-          <div class="bs-refined-wrap" id="bs-image-refined-wrap" style="display:none;margin-bottom:16px">
+          <div class="bs-refined-wrap" id="bs-image-refined-wrap" style="display:none;margin-top:12px">
             <div class="bs-refined-header">
               <span class="bs-refined-label">✦ Prompt refinado pela IA</span>
               <div class="bs-refined-actions">
@@ -6275,167 +6290,70 @@ body.image-agent-refining #image-agent-refine-overlay{
             </div>
             <div class="bs-refined-text" id="bs-image-refined-text"></div>
           </div>
-          <!-- hidden textarea mantido para compatibilidade com gerarImagem() -->
+          <!-- compat: hidden textarea + prompt wrap -->
           <textarea id="gen-in" style="display:none"></textarea>
-          <!-- hidden refined-prompt-wrap mantido para compatibilidade -->
           <div id="refined-prompt-wrap" style="display:none"><div id="refined-prompt-box"></div></div>
-          <!-- upload -->
-          <div style="margin-bottom:20px">
-            <div class="sec-lbl">Referência visual <span style="font-size:10px;color:var(--t3);font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></div>
-            <div class="drop-zone" onclick="document.getElementById('ref-img-input').click()" id="drop-zone-el" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleRefDrop(event)">
-              <input type="file" id="ref-img-input" accept="image/*" style="display:none" onchange="handleRefFile(this.files[0])">
-              <div id="drop-zone-content">
-                <div class="drop-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
-                <div class="drop-main"><b>Arraste ou clique</b> para enviar referência</div>
-                <div class="drop-sub">PNG, JPG até 10 MB</div>
-              </div>
-              <div id="ref-img-preview" style="display:none;position:relative">
-                <img id="ref-img-thumb" style="max-width:100%;max-height:120px;border-radius:var(--r);object-fit:cover" src="">
-                <button onclick="clearRefImage(event)" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.7);border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px">×</button>
-              </div>
-            </div>
-          </div>
-          <!-- actions -->
-          <div style="display:flex;gap:8px;align-items:stretch">
-            <button id="btn-gen-main" onclick="startGenPipeline()" style="flex:1;background:var(--a);border:none;border-radius:var(--r2);padding:14px 20px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:var(--f);font-size:14px;font-weight:700;color:#fff;letter-spacing:-.02em;transition:all .15s var(--ease);box-shadow:0 4px 20px rgba(243,107,42,.2)">
-              <svg style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              Gerar conteúdo com IA
-            </button>
-            <button class="btn btn-s btn-icon" style="padding:14px" onclick="clearGenForm()" title="Limpar campos">
-              <svg class="ico" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
-          </div>
         </div>
 
-        <!-- output -->
-        <div>
-          <div class="out-panel">
-            <!-- tabs -->
-            <div class="out-tabs">
-              <div class="out-tab on" id="tab-conceitos" onclick="switchOutTab('conceitos')" style="display:none">Modelos</div>
-              <div class="out-tab" id="tab-imagem" onclick="switchOutTab('imagem')">Imagem gerada</div>
-            </div>
+        <!-- ══ COL 3: Referência Visual + Output ══ -->
+        <div class="gen-col-right out-panel">
 
-            <!-- tab: modelos + conceitos -->
-            <div id="out-tab-conceitos" style="display:none">
-
-              <!-- ── POST FORMAT PICKER ── -->
-              <div id="post-format-section" style="margin-bottom:14px">
-                <div style="font-size:10px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Formato do post</div>
-                <div style="display:flex;gap:7px;flex-wrap:wrap">
-                  <button id="pfmt-none" onclick="selectPostFormat(null)" style="flex:1;padding:8px 10px;background:transparent;border:1.5px solid var(--amber);border-radius:8px;cursor:pointer;font-family:var(--f);font-size:11px;font-weight:600;color:var(--amber);transition:.15s">
-                    ✦ Post padrão
-                  </button>
-                  <button id="pfmt-tweet" onclick="selectPostFormat('tweet')" style="flex:1;padding:8px 10px;background:transparent;border:1.5px solid var(--line-2);border-radius:8px;cursor:pointer;font-family:var(--f);font-size:11px;font-weight:600;color:var(--t2);transition:.15s;display:flex;align-items:center;justify-content:center;gap:5px">
-                    <svg style="width:12px;height:12px;fill:currentColor;flex-shrink:0" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                    Tweet Card
-                  </button>
+          <!-- Visual slot: ref upload OU imagem gerada (mutuamente exclusivos) -->
+          <div id="gen-visual-slot">
+            <!-- Upload de referência (visível por padrão) -->
+            <div id="ref-visual-wrap">
+              <div class="sec-lbl" style="margin-bottom:8px">Referência visual <span style="font-size:10px;color:var(--t3);font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></div>
+              <div class="drop-zone" onclick="document.getElementById('ref-img-input').click()" id="drop-zone-el" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleRefDrop(event)">
+                <input type="file" id="ref-img-input" accept="image/*" style="display:none" onchange="handleRefFile(this.files[0])">
+                <div id="drop-zone-content">
+                  <div class="drop-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+                  <div class="drop-main"><b>Arraste ou clique</b> para enviar referência</div>
+                  <div class="drop-sub">PNG, JPG até 10 MB</div>
                 </div>
-              </div>
-
-              <!-- ── BRAND VOICE PICKER ── -->
-              <div id="voice-picker-section" style="margin-bottom:14px">
-                <div style="font-size:10px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">Tom visual da marca</div>
-                <div style="font-size:11px;color:var(--t3);margin-bottom:10px;line-height:1.4">A IA cria livremente dentro da personalidade escolhida. Salve os que gostar.</div>
-                <div id="voice-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:7px"></div>
-                <button id="voice-none-btn" onclick="selectVoice(null)" style="width:100%;margin-top:7px;padding:7px;background:transparent;border:1px dashed var(--line-2);border-radius:6px;cursor:pointer;font-family:var(--f);font-size:11px;color:var(--t3);transition:.15s">
-                  ✦ Liberdade total (sem estilo fixo)
-                </button>
-              </div>
-              <div class="divider" style="margin:0 0 12px"></div>
-
-              <div class="out-empty" id="out-e">
-                <div class="out-empty-ico"><svg class="ico" style="color:var(--t3)" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
-                <div class="out-empty-txt">Descreva sua ideia e clique em Gerar</div>
-              </div>
-              <div class="sk-wrap" id="sk-w">
-                <div class="sk-txt"><span class="sk-dot"></span><span id="sk-t">Interpretando sua ideia...</span></div>
-                <div class="sk" style="height:60px"></div>
-                <div class="sk" style="height:60px"></div>
-                <div class="sk" style="height:60px"></div>
-              </div>
-              <div class="out-res" id="out-r">
-                <div class="out-hd" id="out-hd-conceitos" style="display:none">
-                  <span style="font-size:10px;font-weight:700;color:var(--a);letter-spacing:.08em;text-transform:uppercase" id="out-hd-lbl">Escolha um modelo</span>
-                  <button class="btn btn-g btn-sm" onclick="regenWithCredit()" title="Consome 1 crédito">
-                    <svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
-                    Regerar <span style="color:var(--a);font-size:10px">−1</span>
-                  </button>
+                <div id="ref-img-preview" style="display:none;position:relative">
+                  <img id="ref-img-thumb" style="max-width:100%;max-height:160px;border-radius:var(--r);object-fit:cover" src="">
+                  <button onclick="clearRefImage(event)" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.7);border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px">×</button>
                 </div>
-                
-                <div id="img-mode-box" style="display:none;margin-top:12px;padding:12px;background:var(--ink-3);border:1px solid var(--line-1);border-radius:8px">
-                  <div style="font-size:11px;font-weight:700;color:var(--a);letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px">Modo da imagem enviada</div>
-                  <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:8px">
-                    <input type="radio" name="img-mode" value="reference" id="img-mode-ref" checked style="width:auto;margin-top:2px;accent-color:var(--a)">
-                    <div>
-                      <div style="font-size:12.5px;font-weight:600;color:var(--t0)">Usar como referência de design</div>
-                      <div style="font-size:11px;color:var(--t2)">A IA copia o estilo visual (cores, layout, tipografia) mas usa o conteúdo do prompt</div>
-                    </div>
-                  </label>
-                  <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
-                    <input type="radio" name="img-mode" value="include" id="img-mode-inc" style="width:auto;margin-top:2px;accent-color:var(--a)">
-                    <div>
-                      <div style="font-size:12.5px;font-weight:600;color:var(--t0)">Incluir imagem no design</div>
-                      <div style="font-size:11px;color:var(--t2)">A IA incorpora sua foto no layout gerado (ex: foto da nutricionista com texto ao redor)</div>
-                    </div>
-                  </label>
-                </div>
-<div class="cmd-box" id="cmd-out" data-prompt="" style="word-break:break-word;font-size:11px"><span id="cmd-out-txt" style="color:var(--t3);font-style:italic">Descreva sua ideia — a IA gera livremente com a personalidade visual escolhida</span><button class="cp-btn" onclick="cpElById('cmd-out')">Copiar</button></div>
-                <button id="btn-gerar-img" onclick="gerarImagem()" style="width:100%;margin-top:12px;background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:var(--f);font-size:14px;font-weight:700;color:#fff;letter-spacing:-.02em;box-shadow:0 4px 20px rgba(243,107,42,.3);transition:all .15s">
-                  <svg style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                  Gerar imagem com IA
-                  <span style="margin-left:auto;font-size:10px;font-weight:500;opacity:.75;background:rgba(0,0,0,.2);border-radius:10px;padding:2px 7px" id="btn-gerar-img-cost">2 créditos</span>
-                </button>
-                <button id="btn-variacoes-img" onclick="gerarVariacoes()" style="width:100%;margin-top:7px;background:transparent;border:1.5px solid var(--amber-30,rgba(245,197,24,.3));border-radius:var(--r2);padding:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--f);font-size:12px;font-weight:600;color:var(--amber);letter-spacing:-.01em;transition:all .15s">
-                  <svg style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-                  Gerar 3 variações
-                  <span style="margin-left:auto;font-size:10px;font-weight:500;opacity:.75;background:rgba(0,0,0,.15);border-radius:10px;padding:2px 7px;border:1px solid currentColor">2 créditos</span>
-                </button>
               </div>
             </div>
-
-            <!-- tab: imagem gerada -->
+            <!-- Imagem gerada (hidden por padrão, mostrada após geração) -->
             <div id="out-tab-imagem" style="display:none">
-              <div class="img-preview-empty" id="img-preview-empty">
+              <div class="img-preview-empty" id="img-preview-empty" style="display:none">
                 <svg style="width:28px;height:28px;fill:none;stroke:var(--t3);stroke-width:1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                Gere uma imagem na aba Conceitos
+                Gerando…
               </div>
               <div class="img-preview-wrap" id="img-preview-wrap">
-                <div class="img-preview-thumb" id="img-preview-thumb" onclick="openImgModal()">
-                  <!-- SVG/Canvas renderizado aqui -->
-                </div>
-                <div style="display:flex;gap:7px;margin-top:2px;flex-wrap:wrap">
+                <div class="img-preview-thumb" id="img-preview-thumb" onclick="openImgModal()"></div>
+                <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
                   <button class="btn btn-p btn-sm" style="flex:1" onclick="openImgModal()">
                     <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    Ver em tela cheia
+                    Ver
                   </button>
                   <button class="btn btn-s btn-sm" onclick="downloadImg()">
                     <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     Baixar
                   </button>
-                  <button class="btn btn-s btn-sm btn-icon" onclick="gerarImagem()" title="Regerar imagem">
+                  <button class="btn btn-s btn-sm btn-icon" onclick="gerarImagem()" title="Regerar">
                     <svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
                   </button>
-                  <button id="btn-save-design" class="btn btn-s btn-sm" onclick="saveCurrentDesign()" title="Salvar nos favoritos" style="background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.3);color:#ef4444">
+                  <button id="btn-save-design" class="btn btn-s btn-sm" onclick="saveCurrentDesign()" title="Salvar" style="background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.3);color:#ef4444">
                     <svg class="ico ico-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                     Salvar
                   </button>
-                  <button class="btn btn-s btn-sm" onclick="saveImageToMemoryBank()" title="Salvar no banco de memória visual" style="background:var(--amber-10);border-color:var(--amber-18);color:var(--amber)">
+                  <button class="btn btn-s btn-sm" onclick="saveImageToMemoryBank()" title="Banco" style="background:var(--amber-10);border-color:var(--amber-18);color:var(--amber)">
                     <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
                     Banco
                   </button>
                 </div>
               </div>
-              <!-- loading state — Design Agent -->
+              <!-- loading state -->
               <div class="img-gen-loading" id="img-gen-loading" style="display:none">
-                <!-- barra de progresso -->
                 <div style="width:100%;background:var(--ink-3,#1a1a1a);border-radius:4px;height:3px;margin-bottom:14px;overflow:hidden">
                   <div id="img-gen-bar" style="height:100%;background:var(--a,#F5C518);width:0%;transition:width .6s ease;border-radius:4px"></div>
                 </div>
                 <div class="img-gen-spin"></div>
                 <div class="img-gen-txt">Design Agent trabalhando...</div>
                 <div class="img-gen-stage" id="img-gen-stage">Inicializando...</div>
-                <!-- brief preview — aparece após estágio 1 -->
                 <div id="img-gen-brief" style="display:none;margin-top:12px;padding:10px 12px;background:var(--ink-3,#111);border-radius:8px;border-left:3px solid var(--a,#F5C518);width:100%;box-sizing:border-box;text-align:left">
                   <div style="font-size:10px;color:var(--a,#F5C518);font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px">Brief extraído</div>
                   <div id="img-gen-headline" style="font-size:13px;font-weight:700;color:var(--t0,#fff);margin-bottom:3px;line-height:1.3"></div>
@@ -6443,11 +6361,84 @@ body.image-agent-refining #image-agent-refine-overlay{
                 </div>
               </div>
             </div>
+          </div><!-- /gen-visual-slot -->
 
+          <div class="divider" style="margin:14px 0 12px"></div>
+
+          <!-- Format do post (tweet vs padrão) + voice picker — sempre visíveis -->
+          <div id="post-format-section" style="margin-bottom:12px">
+            <div style="font-size:10px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px">Formato do post</div>
+            <div style="display:flex;gap:7px;flex-wrap:wrap">
+              <button id="pfmt-none" onclick="selectPostFormat(null)" style="flex:1;padding:7px 10px;background:transparent;border:1.5px solid var(--amber);border-radius:8px;cursor:pointer;font-family:var(--f);font-size:11px;font-weight:600;color:var(--amber);transition:.15s">
+                ✦ Post padrão
+              </button>
+              <button id="pfmt-tweet" onclick="selectPostFormat('tweet')" style="flex:1;padding:7px 10px;background:transparent;border:1.5px solid var(--line-2);border-radius:8px;cursor:pointer;font-family:var(--f);font-size:11px;font-weight:600;color:var(--t2);transition:.15s;display:flex;align-items:center;justify-content:center;gap:5px">
+                <svg style="width:11px;height:11px;fill:currentColor;flex-shrink:0" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                Tweet Card
+              </button>
+            </div>
           </div>
-        </div>
+
+          <!-- Brand Voice Picker -->
+          <div id="voice-picker-section" style="margin-bottom:12px">
+            <div style="font-size:10px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Tom visual da marca</div>
+            <div id="voice-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px"></div>
+            <button id="voice-none-btn" onclick="selectVoice(null)" style="width:100%;margin-top:6px;padding:7px;background:transparent;border:1px dashed var(--line-2);border-radius:6px;cursor:pointer;font-family:var(--f);font-size:11px;color:var(--t3);transition:.15s">
+              ✦ Liberdade total (sem estilo fixo)
+            </button>
+          </div>
+
+          <!-- Conceitos tab content: out-empty + sk-w + out-r -->
+          <div id="out-tab-conceitos" style="display:none">
+            <div class="divider" style="margin:0 0 10px"></div>
+            <div class="out-empty" id="out-e">
+              <div class="out-empty-ico"><svg class="ico" style="color:var(--t3)" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+              <div class="out-empty-txt">Descreva sua ideia e clique em Gerar</div>
+            </div>
+            <div class="sk-wrap" id="sk-w">
+              <div class="sk-txt"><span class="sk-dot"></span><span id="sk-t">Interpretando sua ideia...</span></div>
+              <div class="sk" style="height:50px"></div>
+              <div class="sk" style="height:50px"></div>
+              <div class="sk" style="height:50px"></div>
+            </div>
+            <div class="out-res" id="out-r">
+              <div class="out-hd" id="out-hd-conceitos" style="display:none">
+                <span style="font-size:10px;font-weight:700;color:var(--a);letter-spacing:.08em;text-transform:uppercase" id="out-hd-lbl">Escolha um modelo</span>
+                <button class="btn btn-g btn-sm" onclick="regenWithCredit()" title="Consome 1 crédito">
+                  <svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
+                  Regerar <span style="color:var(--a);font-size:10px">−1</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- img-mode-box + cmd-out + btn-gerar-img -->
+          <div id="img-mode-box" style="display:none;margin-top:10px;padding:11px;background:var(--ink-3);border:1px solid var(--line-1);border-radius:8px">
+            <div style="font-size:10px;font-weight:700;color:var(--a);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px">Modo da imagem enviada</div>
+            <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-bottom:7px">
+              <input type="radio" name="img-mode" value="reference" id="img-mode-ref" checked style="width:auto;margin-top:2px;accent-color:var(--a)">
+              <div><div style="font-size:11.5px;font-weight:600;color:var(--t0)">Referência de design</div><div style="font-size:10px;color:var(--t2)">IA copia o estilo visual mas usa o conteúdo do prompt</div></div>
+            </label>
+            <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer">
+              <input type="radio" name="img-mode" value="include" id="img-mode-inc" style="width:auto;margin-top:2px;accent-color:var(--a)">
+              <div><div style="font-size:11.5px;font-weight:600;color:var(--t0)">Incluir no design</div><div style="font-size:10px;color:var(--t2)">IA incorpora sua foto no layout gerado</div></div>
+            </label>
+          </div>
+          <div class="cmd-box" id="cmd-out" data-prompt="" style="word-break:break-word;font-size:11px;display:none"><span id="cmd-out-txt" style="color:var(--t3);font-style:italic"></span><button class="cp-btn" onclick="cpElById('cmd-out')">Copiar</button></div>
+          <button id="btn-gerar-img" onclick="gerarImagem()" style="width:100%;margin-top:10px;background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--f);font-size:13px;font-weight:700;color:#fff;letter-spacing:-.02em;box-shadow:0 4px 20px rgba(243,107,42,.3);transition:all .15s">
+            <svg style="width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            Gerar imagem com IA
+            <span style="margin-left:auto;font-size:10px;font-weight:500;opacity:.75;background:rgba(0,0,0,.2);border-radius:10px;padding:2px 7px" id="btn-gerar-img-cost">2 créditos</span>
+          </button>
+
+          <!-- hidden tabs bar (mantido para compatibilidade JS) -->
+          <div class="out-tabs" style="display:none">
+            <div class="out-tab on" id="tab-conceitos" onclick="switchOutTab('conceitos')">Modelos</div>
+            <div class="out-tab" id="tab-imagem" onclick="switchOutTab('imagem')">Imagem gerada</div>
+          </div>
+
+        </div><!-- /gen-col-right -->
       </div>
-    </div>
 
     <!-- history -->
     <div class="pg" id="pg-history">
@@ -8315,7 +8306,13 @@ async function sendBrainstorm(ctx) {
     const r = await fetch(API+'/api/user/brainstorm', {
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-      body: JSON.stringify({ messages: state.messages, context: ctx, brandProfile }),
+      body: JSON.stringify({
+        messages: state.messages,
+        context: ctx,
+        brandProfile,
+        format:  _currentFmt || 'post',
+        network: _currentNet || 'ig',
+      }),
     });
     dot.remove();
     if (!r.ok) { const d=await r.json().catch(()=>({})); toast(d.error||'Erro na conversa','err'); state.messages.pop(); _bsRender(ctx); return; }
@@ -8345,7 +8342,13 @@ async function bsRefine(ctx) {
     const r = await fetch(API+'/api/user/brainstorm/refine', {
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-      body: JSON.stringify({ messages: state.messages, context: ctx, brandProfile }),
+      body: JSON.stringify({
+        messages: state.messages,
+        context: ctx,
+        brandProfile,
+        format:  _currentFmt || 'post',
+        network: _currentNet || 'ig',
+      }),
     });
     if (!r.ok) { const d=await r.json().catch(()=>({})); toast(d.error||'Erro ao refinar','err'); return; }
     const d = await r.json();
@@ -8861,9 +8864,12 @@ async function downloadImg() {
 
 function switchOutTab(tab) {
   document.getElementById('out-tab-conceitos').style.display = tab==='conceitos'?'block':'none';
-  document.getElementById('out-tab-imagem').style.display = tab==='imagem'?'block':'none';
+  document.getElementById('out-tab-imagem').style.display   = tab==='imagem'?'block':'none';
   document.getElementById('tab-conceitos').classList.toggle('on', tab==='conceitos');
-  document.getElementById('tab-imagem').classList.toggle('on', tab==='imagem');
+  document.getElementById('tab-imagem').classList.toggle('on',    tab==='imagem');
+  // 3-col layout: ref-visual ↔ imagem gerada são mutuamente exclusivos no visual slot
+  const rv = document.getElementById('ref-visual-wrap');
+  if (rv) rv.style.display = (tab==='imagem') ? 'none' : '';
 }
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('img-modal-bg')?.addEventListener('click', function(e) { if(e.target===this) closeImgModal(); });
