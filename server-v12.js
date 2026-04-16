@@ -2561,6 +2561,453 @@ function daBrand(user, bp) {
   };
 }
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// LAYOUT TEMPLATES — catálogo de modelos visuais por formato e rede social
+// Cada template define zonas como fração do canvas (0.0→1.0) + regras de decoração.
+// resolveLayout() converte para px absolutos — Stage 3 só cria decoração visual.
+// ═══════════════════════════════════════════════════════════════════════════════
+const LAYOUT_TEMPLATES = {
+
+  // ─── POST ÚNICO 1080×1080 ─────────────────────────────────────────────────
+
+  'IG-POST-IMPACTO': {
+    name: 'Impacto Tipográfico',
+    desc: 'Tipografia como herói — afirmações polêmicas e autoridade direta',
+    formats: ['post','anuncio'], networks: ['ig','li'],
+    content_types: ['motivational','educational','storytelling'],
+    hl:  { xf:0.07, yf:0.42, sf:0.130, lhm:1.14, anchor:'start', transform:'uppercase' },
+    sub: { xf:0.07, ybl:0.065, sf:0.028, w:'400' },
+    body: null, cta: null,
+    ft:  { xf:0.07, yf:0.95, sf:0.017 },
+    db:  null,
+    bg_pref: 'dark', texture: 'noise',
+    deco: { mood:'minimal-power',
+      layers:['radial-glow-center','noise-texture','accent-rule-left','corner-brackets'],
+      has_gradient:true, has_glow:true, has_pattern:true, shape_count:3 },
+  },
+
+  'IG-POST-DADO': {
+    name: 'Número Hero',
+    desc: 'Estatística ou dado como elemento visual principal — alta prova social',
+    formats: ['post'], networks: ['ig','li'],
+    content_types: ['data-driven','promotional'],
+    hl:  { xf:0.07, yf:0.74, sf:0.065, lhm:1.18, anchor:'start' },
+    sub: { xf:0.07, ybl:0.050, sf:0.028, w:'400' },
+    body: null,
+    cta: { xf:0.07, yf:0.88 },
+    ft:  { xf:0.07, yf:0.96, sf:0.017 },
+    db:  { xf:0.50, yf:0.44, sf:0.240, anchor:'middle', font:'Bebas Neue' },
+    bg_pref: 'dark', texture: 'grid-micro',
+    deco: { mood:'data-hero',
+      layers:['radial-glow-center','grid-pattern','accent-circle-bg','separator-h'],
+      has_gradient:true, has_glow:true, has_pattern:true, shape_count:4 },
+  },
+
+  'IG-POST-LISTA': {
+    name: 'Lista Educacional',
+    desc: 'Conteúdo escaneável — máxima retenção e compartilhamento',
+    formats: ['post'], networks: ['ig','li'],
+    content_types: ['educational'],
+    hl:  { xf:0.07, yf:0.20, sf:0.078, lhm:1.15, anchor:'start' },
+    sub: null,
+    body:{ xf:0.07, ysf:0.34, sf:0.027, lhm:1.85, prefix:'→' },
+    cta: null,
+    ft:  { xf:0.07, yf:0.95, sf:0.017 },
+    db:  null,
+    bg_pref: 'dark', texture: 'subtle',
+    deco: { mood:'clean-list',
+      layers:['accent-rule-top','separator-h-after-hl','subtle-glow-top'],
+      has_gradient:true, has_glow:false, has_pattern:false, shape_count:2 },
+  },
+
+  'IG-POST-EDITORIAL': {
+    name: 'Editorial Premium',
+    desc: 'Estética de revista — autoridade para nichos premium e consultoria',
+    formats: ['post'], networks: ['ig','li'],
+    content_types: ['educational','storytelling','motivational'],
+    hl:  { xf:0.08, yf:0.50, sf:0.088, lhm:1.20, anchor:'start', font:'Playfair Display' },
+    sub: { xf:0.08, ybl:0.065, sf:0.026, w:'300', font:'DM Sans' },
+    body: null, cta: null,
+    ft:  { xf:0.08, yf:0.94, sf:0.017 },
+    db:  null,
+    bg_pref: 'dark', texture: 'grain',
+    deco: { mood:'editorial',
+      layers:['corner-l-brackets','separator-h-thin','micro-label-above','grain-texture'],
+      has_gradient:false, has_glow:false, has_pattern:true, shape_count:4 },
+  },
+
+  'IG-POST-FRAME': {
+    name: 'Frame Interno',
+    desc: 'Conteúdo dentro de moldura — profundidade e sofisticação',
+    formats: ['post'], networks: ['ig'],
+    content_types: ['promotional','educational','motivational'],
+    hl:  { xf:0.13, yf:0.46, sf:0.085, lhm:1.18, anchor:'start' },
+    sub: { xf:0.13, ybl:0.060, sf:0.028, w:'400' },
+    body: null,
+    cta: { xf:0.13, yf:0.76 },
+    ft:  { xf:0.13, yf:0.90, sf:0.017 },
+    db:  null,
+    bg_pref: 'dark', texture: 'noise',
+    deco: { mood:'frame-depth',
+      layers:['inner-frame-rect','corner-accents','glow-behind','noise-subtle'],
+      has_gradient:true, has_glow:true, has_pattern:false, shape_count:4 },
+  },
+
+  // ─── CARROSSEL 1080×1080 ──────────────────────────────────────────────────
+
+  'CARR-CAPA': {
+    name: 'Carrossel — Capa',
+    desc: 'Primeiro slide — hook visual + promessa de valor irresistível',
+    formats: ['carrossel'], networks: ['ig','li'],
+    content_types: ['educational','motivational','data-driven','promotional'],
+    hl:  { xf:0.07, yf:0.46, sf:0.112, lhm:1.12, anchor:'start' },
+    sub: { xf:0.07, ybl:0.060, sf:0.030, w:'400' },
+    body: null,
+    cta: { xf:0.07, yf:0.82, label:'ARRASTE →' },
+    ft:  { xf:0.07, yf:0.95, sf:0.016 },
+    db:  null, si: { xf:0.93, yf:0.07, anchor:'end' },
+    bg_pref: 'dark', texture: 'noise',
+    deco: { mood:'carousel-cover',
+      layers:['gradient-dramatic','radial-glow-center','accent-diagonal','badge-count'],
+      has_gradient:true, has_glow:true, has_pattern:true, shape_count:4 },
+  },
+
+  'CARR-SLIDE': {
+    name: 'Carrossel — Slide Interno',
+    desc: 'Slide de desenvolvimento — 1 ideia forte por slide',
+    formats: ['carrossel'], networks: ['ig','li'],
+    content_types: ['educational','motivational','data-driven'],
+    hl:  { xf:0.07, yf:0.52, sf:0.086, lhm:1.15, anchor:'start' },
+    sub: { xf:0.07, ybl:0.055, sf:0.028, w:'400' },
+    body:{ xf:0.07, ysf:0.74, sf:0.024, lhm:1.70, prefix:'none' },
+    cta: null,
+    ft:  { xf:0.07, yf:0.95, sf:0.015 },
+    db:  null, si: { xf:0.93, yf:0.07, anchor:'end' },
+    // Número de slide grande e translúcido no canto superior esquerdo
+    slide_num: { xf:0.07, yf:0.28, sf:0.18, alpha:0.15 },
+    bg_pref: 'dark', texture: 'consistent',
+    deco: { mood:'carousel-slide',
+      layers:['accent-rule-left','separator-h-after-num','subtle-bg-lighter'],
+      has_gradient:true, has_glow:false, has_pattern:false, shape_count:2 },
+  },
+
+  'CARR-FINAL': {
+    name: 'Carrossel — Slide Final',
+    desc: 'Último slide — resumo + CTA forte + handle em destaque',
+    formats: ['carrossel'], networks: ['ig','li'],
+    content_types: ['educational','motivational','data-driven','promotional'],
+    hl:  { xf:0.07, yf:0.36, sf:0.094, lhm:1.15, anchor:'start' },
+    sub: { xf:0.07, ybl:0.055, sf:0.030, w:'400' },
+    body: null,
+    cta: { xf:0.07, yf:0.66 },
+    ft:  { xf:0.07, yf:0.88, sf:0.024 },   // handle maior no slide final
+    db:  null, si: { xf:0.93, yf:0.07, anchor:'end' },
+    bg_pref: 'dark', texture: 'noise',
+    deco: { mood:'carousel-final',
+      layers:['radial-glow-cta','separator-h-above-cta','corner-frame','accent-burst'],
+      has_gradient:true, has_glow:true, has_pattern:false, shape_count:3 },
+  },
+
+  // ─── STORY / REELS 1080×1920 ─────────────────────────────────────────────
+
+  'ST-HOOK': {
+    name: 'Story — Hook de Curiosidade',
+    desc: 'Pergunta ou afirmação que para o dedo — impacto imediato nos 3s',
+    formats: ['story','reels'], networks: ['ig','tt'],
+    content_types: ['motivational','educational','promotional'],
+    hl:  { xf:0.07, yf:0.42, sf:0.086, lhm:1.15, anchor:'start' },
+    sub: { xf:0.07, ybl:0.055, sf:0.034, w:'400' },
+    body: null,
+    cta: { xf:0.07, yf:0.80 },
+    ft:  { xf:0.07, yf:0.96, sf:0.018 },
+    db:  null,
+    bg_pref: 'dark', texture: 'gradient-v',
+    deco: { mood:'story-hook',
+      layers:['gradient-top-bottom','accent-shape-abstract','blur-orb-bg'],
+      has_gradient:true, has_glow:true, has_pattern:false, shape_count:3 },
+  },
+
+  'TT-HOOK': {
+    name: 'TikTok — Hook Visual',
+    desc: 'Caption bold orgânico + background expressivo — feel nativo do TikTok',
+    formats: ['story','reels'], networks: ['tt'],
+    content_types: ['motivational','educational','promotional'],
+    hl:  { xf:0.07, yf:0.30, sf:0.068, lhm:1.18, anchor:'start' },
+    sub: { xf:0.07, ybl:0.055, sf:0.038, w:'300' },
+    body: null, cta: null,
+    ft:  { xf:0.07, yf:0.94, sf:0.022 },
+    db:  null,
+    bg_pref: 'dark', texture: 'noise-heavy',
+    deco: { mood:'tiktok-native',
+      layers:['dark-gradient-bottom','accent-vertical-bar','noise-heavy-texture'],
+      has_gradient:true, has_glow:false, has_pattern:false, shape_count:2 },
+  },
+
+  // ─── THUMBNAIL ────────────────────────────────────────────────────────────
+
+  'YT-IMPACTO': {
+    name: 'YouTube — Impacto',
+    desc: 'Thumbnail de alto CTR — texto bold + fundo vibrante (testado MrBeast/Pewdiepie style)',
+    formats: ['thumb'], networks: ['yt'],
+    content_types: ['educational','motivational','data-driven','promotional'],
+    hl:  { xf:0.05, yf:0.60, sf:0.128, lhm:1.10, anchor:'start', font:'Bebas Neue', transform:'uppercase' },
+    sub: { xf:0.05, ybl:0.055, sf:0.052, w:'700', font:'DM Sans' },
+    body: null, cta: null, ft: null,  // thumbs não têm footer
+    db:  null,
+    bg_pref: 'vibrant', texture: 'none',
+    deco: { mood:'youtube-impact',
+      layers:['vibrant-bg-solid','text-drop-shadow-heavy','accent-rectangle-corner','diagonal-stripe'],
+      has_gradient:false, has_glow:false, has_pattern:false, shape_count:3 },
+  },
+
+  'YT-NÚMERO': {
+    name: 'YouTube — Número + Promessa',
+    desc: 'Número grande + promessa clara — CTR alto para listas e tutoriais',
+    formats: ['thumb'], networks: ['yt'],
+    content_types: ['educational','data-driven'],
+    // Número lado esquerdo, headline lado direito
+    hl:  { xf:0.42, yf:0.55, sf:0.095, lhm:1.15, anchor:'start', font:'Bebas Neue' },
+    sub: { xf:0.42, ybl:0.080, sf:0.048, w:'400' },
+    body: null, cta: null, ft: null,
+    db:  { xf:0.08, yf:0.62, sf:0.280, anchor:'start', font:'Bebas Neue' },
+    bg_pref: 'dark', texture: 'none',
+    deco: { mood:'youtube-number',
+      layers:['vertical-divider-center','radial-glow-left','gradient-bg','accent-bar-left'],
+      has_gradient:true, has_glow:true, has_pattern:false, shape_count:3 },
+  },
+
+  'IG-THUMB': {
+    name: 'Instagram Reels Thumbnail',
+    desc: 'Thumbnail 4:5 para Reels — hook visual na grade do perfil',
+    formats: ['thumb'], networks: ['ig','tt'],
+    content_types: ['educational','motivational','promotional'],
+    hl:  { xf:0.07, yf:0.35, sf:0.090, lhm:1.15, anchor:'start' },
+    sub: { xf:0.07, ybl:0.060, sf:0.036, w:'400' },
+    body: null, cta: null,
+    ft:  { xf:0.07, yf:0.94, sf:0.022 },
+    db:  null,
+    bg_pref: 'dark', texture: 'noise',
+    deco: { mood:'reels-cover',
+      layers:['gradient-top-overlay','accent-shape-dynamic','glow-center'],
+      has_gradient:true, has_glow:true, has_pattern:false, shape_count:2 },
+  },
+
+  // ─── BANNER LINKEDIN 1584×396 ─────────────────────────────────────────────
+
+  'BN-LI-POSICIONAMENTO': {
+    name: 'Banner LinkedIn — Posicionamento',
+    desc: 'Headline + especialidade — identidade profissional no perfil',
+    formats: ['banner'], networks: ['li'],
+    content_types: ['educational','promotional'],
+    // Safe zone X: 30-90% (foto de perfil ocupa esquerda)
+    hl:  { xf:0.33, yf:0.48, sf:0.092, lhm:1.15, anchor:'start' },
+    sub: { xf:0.33, ybl:0.090, sf:0.040, w:'400' },
+    body: null, cta: null,
+    ft:  { xf:0.33, yf:0.82, sf:0.034 },
+    db:  null,
+    bg_pref: 'dark', texture: 'subtle',
+    deco: { mood:'linkedin-professional',
+      layers:['gradient-left-fade','vertical-accent-line','decorative-shape-left'],
+      has_gradient:true, has_glow:false, has_pattern:false, shape_count:3 },
+  },
+
+  'BN-LI-METRICA': {
+    name: 'Banner LinkedIn — Métricas',
+    desc: '3 números em destaque horizontal — prova social poderosa',
+    formats: ['banner'], networks: ['li'],
+    content_types: ['data-driven','promotional'],
+    hl:  { xf:0.50, yf:0.30, sf:0.072, lhm:1.15, anchor:'middle' },
+    // métricas: 3 grupos x/y calculados no resolveLayout
+    metrics: { count:3, yf:0.68, sf:0.135, lsf:0.038 },
+    body: null, cta: null, ft: null, db: null,
+    bg_pref: 'dark', texture: 'grid',
+    deco: { mood:'metrics-banner',
+      layers:['gradient-dark','vertical-separators-metrics','glow-center-subtle','grid-pattern-light'],
+      has_gradient:true, has_glow:true, has_pattern:true, shape_count:3 },
+  },
+};
+
+// ── Helpers de layout determinístico ─────────────────────────────────────────
+
+/** Quebra texto em linhas que cabem em maxPx com o fontSize dado. */
+function splitLines(text, maxPx, fontSize, charRatio) {
+  const ratio = charRatio || 0.58;
+  const maxC  = Math.max(1, Math.floor(maxPx / (fontSize * ratio)));
+  const words = String(text || '').split(' ');
+  const lines = []; let cur = '';
+  for (const w of words) {
+    const t = cur ? cur + ' ' + w : w;
+    if (t.length <= maxC) { cur = t; }
+    else { if (cur) lines.push(cur); cur = w; }
+  }
+  if (cur) lines.push(cur);
+  return lines.length ? lines : [text];
+}
+
+/** Seleciona o template mais adequado para o contexto. */
+function selectTemplate(format, network, brief, slideRole) {
+  const ct  = brief.content_type || 'educational';
+  const em  = brief.emphasis     || 'statement';
+  const hasData = !!brief.data_highlight;
+  const net = (network || '').toLowerCase().replace('instagram','ig').replace('linkedin','li')
+    .replace('youtube','yt').replace('tiktok','tt');
+
+  if (format === 'carrossel') {
+    const r = (slideRole || '').toUpperCase();
+    if (r.includes('CAPA') || r.match(/\b1\s*DE\b/)) return 'CARR-CAPA';
+    if (r.includes('FECHAMENTO') || r.includes('FINAL')) return 'CARR-FINAL';
+    return 'CARR-SLIDE';
+  }
+  if (format === 'story' || format === 'reels') {
+    return (net === 'tt') ? 'TT-HOOK' : 'ST-HOOK';
+  }
+  if (format === 'thumb') {
+    if (net === 'yt') return (hasData && em === 'number') ? 'YT-NÚMERO' : 'YT-IMPACTO';
+    return 'IG-THUMB';
+  }
+  if (format === 'banner') {
+    return (hasData && (brief.body_points||[]).length >= 2) ? 'BN-LI-METRICA' : 'BN-LI-POSICIONAMENTO';
+  }
+  // Post único
+  if (hasData && em === 'number') return 'IG-POST-DADO';
+  if (ct === 'educational' && (brief.body_points||[]).length >= 3) return 'IG-POST-LISTA';
+  if ((net === 'li') && (ct === 'storytelling' || ct === 'educational')) return 'IG-POST-EDITORIAL';
+  if (ct === 'motivational' || em === 'statement' || em === 'quote') return 'IG-POST-IMPACTO';
+  return 'IG-POST-IMPACTO';
+}
+
+/** Converte um template + dimensões em blueprint de coordenadas absolutas. */
+function resolveLayout(templateId, dim, brief, brand) {
+  const tpl = LAYOUT_TEMPLATES[templateId];
+  if (!tpl) return null;
+  const W = dim.w, H = dim.h;
+  const BASE = Math.min(W, H);   // escala tipográfica relativa ao menor lado
+  const marg = Math.round(BASE * 0.07);
+
+  function px(frac, base) { return Math.round(frac * (base || W)); }
+  function sz(sf)  { return Math.round(BASE * (sf || 0.05)); }
+  function fontStack(f) { return (f || 'DM Sans').split('|')[0].trim(); }
+
+  const out = { _templateId: templateId, _templateName: tpl.name, layers: [] };
+
+  // Background base
+  out.bg = {
+    type: 'linear-gradient',
+    color: brand.p2,
+    grad_from: brand.p2,
+    grad_to: brand.p2,
+    grad_angle: 135,
+    overlay_type: tpl.texture === 'noise' ? 'noise' : 'none',
+    overlay_color: '#ffffff',
+    overlay_opacity: 0.03,
+  };
+
+  // HEADLINE
+  if (tpl.hl) {
+    const hlSize = sz(tpl.hl.sf);
+    const hlX    = px(tpl.hl.xf, W);
+    const hlY    = px(tpl.hl.yf, H);
+    const hlMaxW = W - hlX - marg;
+    const hlLH   = Math.round(hlSize * (tpl.hl.lhm || 1.15));
+    const hlLines = splitLines(brief.headline, hlMaxW, hlSize, 0.58);
+    out.headline = {
+      text: brief.headline, lines: hlLines,
+      font: fontStack(tpl.hl.font || 'Bebas Neue'),
+      size: hlSize, weight: tpl.hl.weight || '400',
+      color: brand.p3, x: hlX, y: hlY, max_w: hlMaxW,
+      line_h: hlLH, anchor: tpl.hl.anchor || 'start',
+      letter_spacing: 0,
+      transform: tpl.hl.transform || 'none',
+    };
+  }
+
+  // SUBHEADLINE
+  if (tpl.sub && brief.subheadline) {
+    const subSize = sz(tpl.sub.sf);
+    const subX    = px(tpl.sub.xf || tpl.hl?.xf || 0.07, W);
+    const hlRef   = out.headline;
+    const hlBottom= hlRef ? hlRef.y + hlRef.lines.length * hlRef.line_h : px(0.55, H);
+    const subY    = hlBottom + Math.round(H * (tpl.sub.ybl || 0.05));
+    const subMaxW = W - subX - marg;
+    const subLines = splitLines(brief.subheadline, subMaxW, subSize, 0.54);
+    out.subheadline = {
+      text: brief.subheadline, lines: subLines,
+      font: fontStack(tpl.sub.font || 'DM Sans'),
+      size: subSize, weight: tpl.sub.w || '400',
+      color: brand.p4, x: subX, y: subY, max_w: subMaxW,
+    };
+  }
+
+  // BODY POINTS
+  if (tpl.body && (brief.body_points||[]).length > 0) {
+    const bSize = sz(tpl.body.sf);
+    out.body = {
+      font: fontStack('DM Sans'),
+      size: bSize, weight: '400', color: brand.p4,
+      line_h: Math.round(bSize * (tpl.body.lhm || 1.80)),
+      x: px(tpl.body.xf, W),
+      y_start: px(tpl.body.ysf, H),
+      max_w: W - px(tpl.body.xf, W) - marg,
+      prefix: tpl.body.prefix || '→',
+    };
+  }
+
+  // CTA BUTTON
+  const ctaText = brief.cta || (tpl.cta?.label) || 'Saiba mais';
+  if (tpl.cta) {
+    const ctaSize = sz(0.022);
+    out.cta_block = {
+      text: ctaText, font: 'DM Sans',
+      size: ctaSize, weight: '700',
+      color: brand.p2, bg_color: brand.p1,
+      x: px(tpl.cta.xf, W), y: px(tpl.cta.yf, H),
+      pad_x: 32, pad_y: 14, rx: 8, border_color: 'none',
+    };
+  }
+
+  // FOOTER / HANDLE
+  if (tpl.ft) {
+    out.footer = {
+      handle: brand.handle, font: 'DM Sans',
+      size: sz(tpl.ft.sf || 0.017), color: brand.p4,
+      x: px(tpl.ft.xf, W),
+      y: Math.min(px(tpl.ft.yf, H), H - 12),
+    };
+  }
+
+  // DATA BLOCK (número hero)
+  if (tpl.db && brief.data_highlight) {
+    const dbSize = sz(tpl.db.sf || 0.22);
+    const dbX    = px(tpl.db.xf, W);
+    const dbY    = px(tpl.db.yf, H);
+    out.data_block = {
+      number: brief.data_highlight,
+      number_font: fontStack(tpl.db.font || 'Bebas Neue'),
+      number_size: dbSize, number_color: brand.p1,
+      label: (brief.body_points||[])[0] || '',
+      label_font: 'DM Sans', label_size: Math.round(dbSize * 0.18), label_color: brand.p4,
+      x: dbX, y: dbY, bg_rect: null,
+    };
+  }
+
+  // SLIDE INDICATOR
+  if (tpl.si) {
+    out.slide_indicator = {
+      text: '', // preenchido pela rota com slideIndex/totalSlides
+      x: px(tpl.si.xf, W), y: px(tpl.si.yf, H),
+      color: brand.p4, size: sz(0.018), anchor: tpl.si.anchor || 'end',
+    };
+  }
+
+  // Accent + separator placeholder — Stage 3 completa com cor
+  out.accent    = { type: 'none' };
+  out.separator = null;
+  // Decoração: repassa as instruções do template para o Stage 3
+  out._deco = tpl.deco;
+
+  return out;
+}
+
 // ── Estágio 1: Brief Analyst ──────────────────────────────────────────────────
 // Recebe o input bruto e extrai a hierarquia de conteúdo em JSON estruturado.
 // Garante que o texto seja real, específico, no tom da marca.
@@ -2651,233 +3098,63 @@ DATA HIGHLIGHT — O NÚMERO QUE CONVENCE:
 // ── Estágio 2: Art Director ───────────────────────────────────────────────────
 // Recebe o brief estruturado e define um blueprint de design com coordenadas,
 // tipografia, cores e layout exatos — eliminando ambiguidade para o SVG Executor.
-async function daStage2ArtDir({ brief, brand, dim, format, slideIndex, totalSlides }) {
-  // Nova arquitetura: voice tem prioridade; fallback para STYLE_DNA legacy; fallback para livre
-  const voice  = brand.voiceId ? (BRAND_VOICES[brand.voiceId] || '') : '';
-  const dna    = voice || (brand.modelN ? (STYLE_DNA[brand.modelN] || '') : '');
-  const margin = dim.w > 1200 ? 60 : 80;
-  const isVertical  = dim.h > dim.w;
-  const isWide      = dim.w > dim.h;
-  const orientation = isVertical ? 'vertical (story/reels)' : isWide ? 'horizontal (thumb/banner)' : 'quadrado (post)';
+// ── Estágio 2: Template Selector + Palette Finalizer ─────────────────────────
+// Nova arquitetura: layout resolvido deterministicamente (0 tokens de IA para posições).
+// Claude só decide: cores de destaque, gradiente bg, atmosphere mood. ~400 tokens max.
+async function daStage2ArtDir({ brief, brand, dim, format, slideIndex, totalSlides, slideRole, network }) {
+  const voice = brand.voiceId ? (BRAND_VOICES[brand.voiceId] || '') : '';
+  const dna   = voice || (brand.modelN ? (STYLE_DNA[brand.modelN] || '') : '');
 
-  const system =
-`Você é o ART DIRECTOR CHEFE — Estágio 2 do Design Agent. Nível: Pentagram + R/GA + Sagmeister & Walsh combinados.
-MISSÃO: Definir blueprint de design MAGISTRAL — coordenadas precisas, tipografia calibrada, camadas visuais com profundidade e tensão visual que param o scroll e geram desejo instantâneo.
+  // 1) Seleciona template por formato + conteúdo (determinístico)
+  const tplId = selectTemplate(format, network || 'ig', brief, slideRole);
 
-FILOSOFIA DE DESIGN: O melhor post não é o mais bonito — é o mais IRRESISTÍVEL. Cada elemento deve ter função estratégica. Hierarquia visual clara. Tensão criativa controlada. Identidade que marca memória.
+  // 2) Resolve layout completo em px absolutos (sem IA)
+  const blueprint = resolveLayout(tplId, dim, brief, brand);
 
-CANVAS: ${dim.w}×${dim.h}px — ${orientation}
-MARGEM BASE: ${margin}px
-SAFE ZONE X: ${margin} a ${dim.w - margin}px | SAFE ZONE Y: ${margin} a ${dim.h - margin}px
-
-PALETA DA MARCA:
-  P1 primary/accent:   ${brand.p1}
-  P2 background:       ${brand.p2}
-  P3 text-primary:     ${brand.p3}
-  P4 text-secondary:   ${brand.p4}
-ESTILO: ${brand.estilo}${dna ? `\n\n${brand.voiceId ? `VOZ DA MARCA (${brand.voiceName || brand.voiceId})` : `REFERÊNCIA VISUAL (modelo ${brand.modelN})`}:\n${dna}` : '\n\n[LIBERDADE CRIATIVA TOTAL — escolha o melhor estilo visual para este conteúdo, brand colors e mood]'}
-${format === 'carrossel' && slideIndex ? `\nSLIDE ${slideIndex} DE ${totalSlides}` : ''}
-
-BRIEF DO CREATIVE ANALYST:
-${JSON.stringify(brief, null, 2)}
-
-━━━ PRINCÍPIOS INVIOLÁVEIS ━━━
-• HIERARQUIA: headline (maior/mais pesado) > subheadline > body > footer
-• REGRA DOS TERÇOS: headline em y≈${Math.round(dim.h * 0.35)} ou y≈${Math.round(dim.h * 0.6)}
-• CONTRASTE AAA: fundo escuro→texto claro | fundo claro→texto escuro
-• MARGEM SAGRADA: nunca viole ${margin}px das bordas
-• HEADLINE DOMINA: mín 72px, máx 180px | é o herói visual
-• PROFUNDIDADE: mínimo 4 camadas visuais (bg + texture + decorative + content)
-• ACCENT: sempre na cor P1
-
-━━━ ESCALA TIPOGRÁFICA + FÓRMULA ANTI-OVERFLOW (CRÍTICO) ━━━
-Hero: 140-180px | XL: 100-130px | L: 72-96px | M: 28-36px | S: 20-24px | XS: 14-18px
-
-⚠️  CÁLCULO OBRIGATÓRIO — use ANTES de definir qualquer font-size de headline:
-Safe width canvas: ${dim.w - margin * 2}px | Char width média Bebas Neue: 0.60 × fontSize
-
-headline: "${brief.headline}" → ${brief.headline.length} chars
-  → 1 linha max: floor(${dim.w - margin * 2} ÷ (${brief.headline.length} × 0.60)) = ${Math.floor((dim.w - margin * 2) / (brief.headline.length * 0.60))}px
-  → 2 linhas max (${Math.ceil(brief.headline.length / 2)} chars/linha): ${Math.floor((dim.w - margin * 2) / (Math.ceil(brief.headline.length / 2) * 0.60))}px
-
-REGRA DURA: NUNCA defina headline.size acima do valor calculado para 1 linha.
-Se quiser fonte maior → quebre em 2 linhas com line_h e o SVG Executor usará tspans.
-Se headline > 12 chars → PREFIRA 2 linhas a fonte gigante que transborda.
-
-━━━ ZONAS ESPACIAIS (anti-colisão obrigatório) ━━━
-  HEADER ZONE:  y = 0       → ${Math.round(dim.h * 0.15)}  — slide_indicator, badge, label, data_block se for badge
-  HERO ZONE:    y = ${Math.round(dim.h * 0.14)} → ${Math.round(dim.h * 0.65)} — headline + subheadline (zona exclusiva)
-  BODY ZONE:    y = ${Math.round(dim.h * 0.57)} → ${Math.round(dim.h * 0.82)} — separator + body_points
-  CTA ZONE:     y = ${Math.round(dim.h * 0.78)} → ${Math.round(dim.h * 0.91)} — cta_block
-  FOOTER ZONE:  y = ${Math.round(dim.h * 0.91)} → ${dim.h}  — handle (@), foot text
-
-⛔ data_block E headline NÃO podem coexistir na mesma zona:
-  - Se emphasis="number" E data_highlight existe: data_block é HERÓI → ocupa HERO ZONE e headline migra para topo (y≈${Math.round(dim.h * 0.2)}) em tamanho menor
-  - Se headline é o foco principal: data_block vai como badge no HEADER (número pequeno, x=${dim.w - margin - 80}, y=${Math.round(dim.h * 0.12)}) ou na BODY ZONE
-  - NUNCA um número grande sobre um headline grande — escolha quem é o herói
-
-━━━ RETORNE SOMENTE JSON VÁLIDO (números inteiros reais) ━━━
-{
-  "bg": {
-    "type": "solid | linear-gradient | radial-gradient | dual-tone",
-    "color": "#hex",
-    "grad_from": "#hex or null",
-    "grad_to": "#hex or null",
-    "grad_angle": 135,
-    "overlay_type": "grid-pattern | noise | scanlines | none",
-    "overlay_color": "#hex",
-    "overlay_opacity": 0.03
-  },
-  "layers": [
-    {
-      "type": "circle | rect | line | polygon | ellipse",
-      "role": "glow-bg | texture | frame | ornament | divider | badge | corner-bracket",
-      "fill": "#hex or rgba(r,g,b,a) or none",
-      "stroke": "#hex or none",
-      "stroke_w": 0,
-      "x": 0, "y": 0, "r": 0,
-      "width": 0, "height": 0, "rx": 0,
-      "x1": 0, "y1": 0, "x2": 0, "y2": 0,
-      "points": "x1,y1 x2,y2 x3,y3",
-      "opacity": 0.15,
-      "filter": "blur-30 | glow-20 | none"
-    }
-  ],
-  "accent": {
-    "type": "rule-left | rule-right | rule-top | rule-bottom | corner-tl | corner-br | circle-bg | none",
-    "color": "#hex",
-    "x": 0, "y": 0, "w": 0, "h": 0,
-    "rx": 0,
-    "opacity": 1.0
-  },
-  "headline": {
-    "text": "${brief.headline}",
-    "lines": ["OBRIGATÓRIO: quebre o texto aqui", "segunda linha se necessário"],
-    "font": "Bebas Neue | Syne | DM Sans | Playfair Display | Cormorant Garamond | IBM Plex Mono",
-    "size": 100,
-    "weight": "400 | 700 | 800 | 900",
-    "color": "#hex",
-    "x": 0, "y": 0,
-    "max_w": ${dim.w - margin * 2},
-    "line_h": 115,
-    "anchor": "start | middle | end",
-    "letter_spacing": 0,
-    "transform": "none | uppercase",
-    "filter": "glow-8 | shadow | none"
-  },
-  "subheadline": {
-    "text": "${brief.subheadline || ''}",
-    "lines": ["linha 1 do subheadline", "linha 2 se necessário"],
-    "font": "DM Sans | Playfair Display | IBM Plex Mono | Cormorant Garamond",
-    "size": 26,
-    "weight": "300 | 400 | 600",
-    "color": "#hex",
-    "x": 0, "y": 0,
-    "max_w": ${dim.w - margin * 2}
-  },
-  "data_block": {
-    "number": "${brief.data_highlight || ''}",
-    "number_font": "Bebas Neue | Syne",
-    "number_size": 160,
-    "number_color": "#hex",
-    "label": "descrição contextual do dado",
-    "label_font": "DM Sans",
-    "label_size": 20,
-    "label_color": "#hex",
-    "x": 0, "y": 0,
-    "bg_rect": { "x": 0, "y": 0, "w": 0, "h": 0, "rx": 8, "color": "#hex", "opacity": 0.15 }
-  },
-  "body": {
-    "font": "DM Sans | IBM Plex Mono",
-    "size": 22,
-    "weight": "400",
-    "color": "#hex",
-    "line_h": 38,
-    "x": 0, "y_start": 0,
-    "max_w": ${dim.w - margin * 2},
-    "prefix": "• | → | ✓ | ▸ | none"
-  },
-  "separator": { "x1": 0, "y1": 0, "x2": 0, "y2": 0, "color": "#hex", "w": 2 },
-  "cta_block": {
-    "text": "${brief.cta}",
-    "font": "DM Sans",
-    "size": 20,
-    "weight": "700",
-    "color": "#hex",
-    "bg_color": "#hex",
-    "x": 0, "y": 0,
-    "pad_x": 32,
-    "pad_y": 14,
-    "rx": 6,
-    "border_color": "#hex or none"
-  },
-  "footer": {
-    "handle": "${brand.handle}",
-    "font": "DM Sans",
-    "size": 16,
-    "color": "#hex",
-    "x": ${margin},
-    "y": ${dim.h - margin + 16}
-  },
-  "slide_indicator": { "text": "${slideIndex || ''}${totalSlides ? '/' + totalSlides : ''}", "x": ${dim.w - margin}, "y": ${margin}, "color": "#hex", "size": 16, "anchor": "end" },
-  "effects": {
-    "headline_glow": { "active": false, "color": "#hex", "std_dev": 8 },
-    "vignette": { "active": false, "opacity": 0.25 }
+  // 3) Preenche slide indicator se carrossel
+  if (blueprint.slide_indicator && slideIndex) {
+    blueprint.slide_indicator.text = `${slideIndex}${totalSlides ? '/' + totalSlides : ''}`;
   }
-}
 
-ORIENTAÇÕES CRÍTICAS:
-1. layers[] DEVE ter mínimo 3 elementos que criam riqueza visual (glow-bg + ornament + frame/texture)
-2. TEMPLATE DNA É LEI: se DNA especifica cor de fundo explícita (ex: BG: #050505), use ESSA cor no bg.color — NÃO use brand.p2. O template tem identidade própria. Use brand.p1 para accent SEMPRE.
-3. Campos null = não renderizar | todos os números são INTEIROS reais no canvas
-4. Se emphasis="number" E data_highlight existe: decida UMA hierarquia — ou o número é HERÓI (data_hero layout) ou é badge secundário — NUNCA número grande + headline grande no mesmo espaço
-5. Contraste AAA: fundo escuro (#0A0A0A, #050505) → texto branco + accent em P1 | fundo claro → texto escuro
-6. headline.size NUNCA pode exceder o valor calculado na fórmula acima — verifique antes de definir
-7. ⚠️  LINES[] É OBRIGATÓRIO E INVIOLÁVEL:
-   - headline.lines[] e subheadline.lines[] DEVEM ser calculados com a fórmula de chars acima
-   - Se headline cabe em 1 linha: lines = ["texto completo"]
-   - Se headline NÃO cabe: quebre em 2-3 linhas respeitando palavras completas
-   - lines[] determina exatamente o que o SVG Executor vai renderizar em tspans
-   - NÃO repita o texto inteiro em "text" e "lines" contraditórios — lines[] é a verdade`;
+  // 4) Lightweight Claude call: apenas personaliza cores, gradiente bg e atmosphere
+  //    DNA/voice tem prioridade total. Se não há DNA, Claude usa paleta da marca.
+  const palettePrompt =
+`Você é um colorista de design. Dado o brief e paleta abaixo, retorne SOMENTE JSON com as personalizações de cor e atmosfera.
+PALETA: P1=${brand.p1} P2=${brand.p2} P3=${brand.p3} P4=${brand.p4}
+ESTILO: ${brand.estilo} | MOOD: ${brief.visual_mood || 'dark-power'}
+TEMPLATE: ${tplId} — ${LAYOUT_TEMPLATES[tplId]?.name || ''}
+${dna ? `\nDNA/VOZ:\n${dna.slice(0, 600)}` : ''}
+BRIEF: headline="${brief.headline}" | content_type=${brief.content_type}
 
-  const r = await callClaude({
-    system,
-    userMsg: `Defina o blueprint de design completo e rico para este brief. Inclua mínimo 3 layers decorativos:`,
-    maxTokens: 2500,
-  });
+Retorne JSON compacto (sem espaços extras):
+{"bg_color":"#hex","bg_grad_from":"#hex","bg_grad_to":"#hex","bg_grad_angle":135,"hl_color":"#hex","sub_color":"#hex","ft_color":"#hex","accent_color":"#hex","glow_color":"#hex","atmosphere":"${brief.visual_mood || 'dark-power'}"}`;
+
+  let tok = { in: 0, out: 0 };
   try {
-    const m = r.text.match(/\{[\s\S]*\}/);
-    return { data: JSON.parse(m[0]), tok: { in: r.inputTokens, out: r.outputTokens } };
-  } catch {
-    // Blueprint de fallback robusto
-    const mg = margin + 30;
-    return {
-      data: {
-        bg: { type: 'solid', color: brand.p2, grad_from: null, grad_to: null, grad_angle: 135 },
-        accent: { type: 'rule-left', color: brand.p1, x: margin, y: margin, w: 5, h: dim.h - margin * 2, rx: 0, opacity: 1 },
-        headline: {
-          text: brief.headline, font: 'Bebas Neue', size: 96, weight: '400',
-          color: brand.p3, x: mg, y: Math.round(dim.h * 0.4),
-          max_w: dim.w - mg - margin, line_h: 108,
-          anchor: 'start', letter_spacing: 1, transform: 'uppercase',
-        },
-        subheadline: brief.subheadline ? {
-          text: brief.subheadline, font: 'DM Sans', size: 26, color: brand.p4,
-          x: mg, y: Math.round(dim.h * 0.4) + 118, max_w: dim.w - mg - margin,
-        } : null,
-        data_block: null,
-        body: brief.body_points?.length ? {
-          font: 'DM Sans', size: 24, color: brand.p4, line_h: 40,
-          x: mg, y_start: Math.round(dim.h * 0.56), max_w: dim.w - mg - margin, prefix: '→',
-        } : null,
-        separator: { x1: mg, y1: Math.round(dim.h * 0.51), x2: dim.w - margin, y2: Math.round(dim.h * 0.51), color: brand.p1, w: 1 },
-        footer: { handle: brand.handle, font: 'DM Sans', size: 20, color: brand.p4, x: mg, y: dim.h - margin + 10 },
-        slide_indicator: null,
-        cta_block: null,
-      },
-      tok: { in: r.inputTokens || 0, out: r.outputTokens || 0 },
-    };
-  }
+    const r = await callClaude({ system: palettePrompt, userMsg: 'Retorne o JSON de cores:', maxTokens: 300 });
+    tok = { in: r.inputTokens || 0, out: r.outputTokens || 0 };
+    const m = r.text.match(/\{[\s\S]*?\}/);
+    if (m) {
+      const pal = JSON.parse(m[0]);
+      // Aplica cores ao blueprint
+      if (blueprint.bg) {
+        if (pal.bg_color)      blueprint.bg.color      = pal.bg_color;
+        if (pal.bg_grad_from)  blueprint.bg.grad_from  = pal.bg_grad_from;
+        if (pal.bg_grad_to)    blueprint.bg.grad_to    = pal.bg_grad_to;
+        if (pal.bg_grad_angle) blueprint.bg.grad_angle = pal.bg_grad_angle;
+        blueprint.bg.type = (pal.bg_grad_from && pal.bg_grad_to && pal.bg_grad_from !== pal.bg_grad_to)
+          ? 'linear-gradient' : 'solid';
+      }
+      if (blueprint.headline  && pal.hl_color)     blueprint.headline.color     = pal.hl_color;
+      if (blueprint.subheadline && pal.sub_color)  blueprint.subheadline.color  = pal.sub_color;
+      if (blueprint.footer    && pal.ft_color)     blueprint.footer.color       = pal.ft_color;
+      if (pal.glow_color) blueprint._glow_color = pal.glow_color;
+      if (pal.accent_color) blueprint._accent_color = pal.accent_color;
+      if (pal.atmosphere)   blueprint._atmosphere   = pal.atmosphere;
+    }
+  } catch { /* fallback silencioso — blueprint com cores da marca já está ok */ }
+
+  return { data: blueprint, tok };
 }
 
 // ── Helper: pré-renderiza todos os elementos de TEXTO em SVG determinístico ──
@@ -2990,214 +3267,111 @@ function buildTextElements({ brief, blueprint, dim, margin }) {
   return out;
 }
 
-// ── Estágio 3: SVG Executor ───────────────────────────────────────────────────
-// Recebe brief + blueprint e gera o SVG final com alta fidelidade.
-// Não precisa "adivinhar" o design — o blueprint já define tudo.
+// ── Estágio 3: SVG Decoration Artist ─────────────────────────────────────────
+// Recebe blueprint (com texto já pré-renderizado) e adiciona decoração visual.
+// Não posiciona texto — texto vem de buildTextElements() verbatim.
 async function daStage3Svg({ brief, blueprint, brand, dim, format, network }) {
-  const margin = dim.w > 1200 ? 60 : 80;
+  const margin     = dim.w > 1200 ? 60 : 80;
+  const deco       = blueprint._deco || {};
+  const mood       = deco.mood || brief.visual_mood || 'dark-power';
+  const layers     = deco.layers || ['radial-glow-center', 'noise-texture'];
+  const sc         = deco.shape_count || 3;
+  const bgColor    = blueprint.bg?.color     || brand.p2  || '#0D0D0F';
+  const bgFrom     = blueprint.bg?.grad_from || bgColor;
+  const bgTo       = blueprint.bg?.grad_to   || bgColor;
+  const bgAngle    = blueprint.bg?.grad_angle || 135;
+  const accentColor= brand.p1 || '#7C3AED';
+  const glowColor  = blueprint.glow_color    || accentColor;
+
   const system =
-`Você é o SVG EXECUTOR MASTER — o melhor gerador de SVG de design do mundo.
-MISSÃO: Criar SVGs de nível AGÊNCIA INTERNACIONAL (Pentagram, IDEO, R/GA) — designs que param o scroll, impressionam e convertem. Cada pixel é uma decisão de design.
+`Você é o SVG DECORATION ARTIST — especialista em efeitos visuais, atmosfera e profundidade.
+Os elementos de texto já estão pré-renderizados e serão inseridos exatamente como estão.
+SUA ÚNICA MISSÃO: adicionar fundo, atmosfera e decoração visual de nível agência internacional.
 
-═══════════════ LEIS ABSOLUTAS (nunca viole) ═══════════════
-1. Retorne APENAS o SVG. Começa com <svg — termina com </svg>. Zero texto antes/depois.
-2. xmlns="http://www.w3.org/2000/svg" OBRIGATÓRIO na tag <svg>
-3. viewBox="0 0 ${dim.w} ${dim.h}" OBRIGATÓRIO na tag <svg>
-4. NUNCA use <image href="http..."> ou @import — zero recursos externos
-5. ZERO placeholders — use o texto REAL do blueprint
-6. ClipPath OBRIGATÓRIO — SEMPRE declare no defs:
-   <clipPath id="canvas"><rect width="${dim.w}" height="${dim.h}"/></clipPath>
-   E envolva TODO conteúdo (exceto o rect de fundo) em: <g clip-path="url(#canvas)">...</g>
-   Isso previne QUALQUER overflow de texto ou shape para fora do canvas.
-7. Todo <text> com font-family, fill, font-size EXPLÍCITOS no elemento
-8. width="${dim.w}" height="${dim.h}" na tag <svg>
-9. O BLUEPRINT É LEI — use as coordenadas x/y/size EXATAS definidas pelo Art Director.
-   NÃO invente posições. NÃO mova elementos. NÃO ignore camadas.
-10. CHECKLIST DE ESTRUTURA antes de renderizar:
-    ✓ Fundo preenchendo 100% do canvas?
-    ✓ Headline na HERO ZONE (y≈${Math.round(dim.h * 0.30)}–${Math.round(dim.h * 0.60)})?
-    ✓ Subheadline abaixo do headline sem sobreposição?
-    ✓ Body points em lista vertical com espaçamento entre itens?
-    ✓ CTA na CTA ZONE (y≈${Math.round(dim.h * 0.78)}–${Math.round(dim.h * 0.91)})?
-    ✓ Handle/footer fixo em y=${dim.h - Math.round(dim.h * 0.035)}px?
-    ✓ NENHUM elemento além de y=${dim.h - margin}?
+═══════════ LEIS ABSOLUTAS ═══════════
+1. Retorne APENAS o SVG — começa com <svg, termina com </svg>. Zero texto antes/depois.
+2. xmlns="http://www.w3.org/2000/svg" e viewBox="0 0 ${dim.w} ${dim.h}" OBRIGATÓRIOS na tag <svg>.
+3. width="${dim.w}" height="${dim.h}" na tag <svg>.
+4. <clipPath id="canvas"><rect width="${dim.w}" height="${dim.h}"/></clipPath> em defs.
+   Envolva TODO conteúdo (exceto rect base) em <g clip-path="url(#canvas)">.
+5. NUNCA use <image href="http..."> — zero recursos externos.
+6. NUNCA modifique o bloco de texto pré-renderizado — copie verbatim.
 
-═══════════════ FONTES DISPONÍVEIS ═══════════════
+═══════════ FONTES ═══════════
 "Bebas Neue" | "Syne" | "DM Sans" | "Playfair Display" | "Cormorant Garamond" | "IBM Plex Mono"
 
-═══════════════ BIBLIOTECA DE TÉCNICAS SVG AVANÇADAS ═══════════════
+═══════════ TEMPLATE ATIVO: ${blueprint._templateName || blueprint._templateId} ═══════════
+Mood: ${mood} | Layers ativos: ${layers.join(', ')} | Mín. shapes: ${sc}
+Gradiente: ${deco.has_gradient ? 'SIM' : 'NÃO'} | Glow: ${deco.has_glow ? 'SIM' : 'NÃO'} | Pattern: ${deco.has_pattern ? 'SIM' : 'NÃO'}
 
-TÉCNICA 1 — GRADIENTE LINEAR (define em defs, aplica com url(#id)):
-<defs><linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-  <stop offset="0%" stop-color="#1A1A2E"/><stop offset="100%" stop-color="#0F0F1A"/>
-</linearGradient></defs>
-<rect width="${dim.w}" height="${dim.h}" fill="url(#bgGrad)"/>
+═══════════ DICIONÁRIO DE LAYERS (implemente cada um listado acima) ═══════════
+radial-glow-center    → <radialGradient cx="50%" cy="40%" r="55%"> accentColor→transparent; rect fullscreen fill=url() opacity implícita no stop
+radial-glow-cta       → mesmo, mas cy="75%" r="40%"
+gradient-dramatic     → linearGradient diagonal ${bgFrom}→${bgTo} em rect fullscreen
+gradient-top-bottom   → linearGradient y1="0%" y2="100%" ${bgFrom}→${bgTo}
+noise-texture         → <filter><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3"/><feBlend mode="overlay"/></filter> rect opacity:0.04
+grain-texture         → <filter><feTurbulence type="fractalNoise" baseFrequency="0.80" numOctaves="4"/><feColorMatrix type="saturate" values="0"/></filter> rect opacity:0.06
+grid-pattern          → <pattern width="40" height="40"> path grid </pattern> rect fullscreen opacity:0.04
+subtle-bg-lighter     → rect fullscreen fill="${bgFrom}" opacity="0.05"
+accent-rule-left      → <rect x="${Math.round(dim.w*0.07)}" y="${Math.round(dim.h*0.15)}" width="3" height="${Math.round(dim.h*0.25)}" fill="accentColor"/>
+accent-rule-top       → <rect x="${Math.round(dim.w*0.07)}" y="${Math.round(dim.h*0.08)}" width="${Math.round(dim.w*0.12)}" height="2" fill="accentColor"/>
+separator-h           → <line x1="${margin}" y1="${Math.round(dim.h*0.70)}" x2="${dim.w-margin}" y2="${Math.round(dim.h*0.70)}" stroke="p4" opacity="0.25"/>
+separator-h-thin      → mesmo em y="${Math.round(dim.h*0.30)}" opacity="0.15"
+separator-h-after-hl  → line horizontal logo abaixo do headline, p4 opacity:0.20
+separator-h-above-cta → line horizontal y="${Math.round(dim.h*0.72)}" p4 opacity:0.20
+accent-diagonal       → <polygon points="${dim.w-150},0 ${dim.w},0 ${dim.w},150" fill="accentColor" opacity="0.20"/>
+corner-brackets       → 4 L-brackets 60px nos cantos (<path d="M x y L..."/>) stroke=accentColor stroke-width=2 opacity:0.40
+corner-accents        → igual corner-brackets
+corner-frame          → <rect x="${margin}" y="${margin}" width="${dim.w-margin*2}" height="${dim.h-margin*2}" rx="4" fill="none" stroke="p4" opacity="0.20"/>
+inner-frame-rect      → <rect x="${Math.round(dim.w*0.05)}" y="${Math.round(dim.h*0.05)}" width="${Math.round(dim.w*0.90)}" height="${Math.round(dim.h*0.90)}" fill="none" stroke="accentColor" stroke-width="1.5"/>
+accent-circle-bg      → <circle cx="${Math.round(dim.w*0.85)}" cy="${Math.round(dim.h*0.35)}" r="${Math.round(dim.w*0.30)}" fill="accentColor" opacity="0.08"> + <filter><feGaussianBlur stdDeviation="40"/></filter>
+glow-behind           → <circle cx="${Math.round(dim.w*0.50)}" cy="${Math.round(dim.h*0.40)}" r="${Math.round(dim.w*0.25)}" fill="glowColor" opacity="0.20"> + blur filter std=30
+blur-orb-bg           → 2 circles blur: 30%/40%/30% e 70%/60%/25% do canvas, accentColor opacity:0.18
+accent-shape-abstract → polygon ou path abstrato accentColor opacity:0.15
+accent-burst          → círculos concêntricos cx=75% cy=80% accentColor opacity:0.10
+badge-count           → rect arredondado no canto sup-dir com texto do slide_indicator
+micro-label-above     → pequeno texto "— INSIGHT" acima do headline, p4 opacity:0.50
+subtle-glow-top       → radialGradient cx=50% cy=0% r=50% accentColor stop-opacity=0.15 em rect
 
-TÉCNICA 2 — RADIAL GLOW (halo luminoso de fundo):
-<defs><radialGradient id="glow1" cx="50%" cy="40%" r="55%">
-  <stop offset="0%" stop-color="#7C3AED" stop-opacity="0.35"/>
-  <stop offset="100%" stop-color="#7C3AED" stop-opacity="0"/>
-</radialGradient></defs>
-<rect width="${dim.w}" height="${dim.h}" fill="url(#glow1)"/>
+═══════════ ESTRUTURA DO SVG (siga exatamente) ═══════════
+<svg xmlns="http://www.w3.org/2000/svg" width="${dim.w}" height="${dim.h}" viewBox="0 0 ${dim.w} ${dim.h}">
+<defs>
+  <clipPath id="canvas"><rect width="${dim.w}" height="${dim.h}"/></clipPath>
+  <!-- todos gradientes, filtros e patterns aqui -->
+</defs>
+<rect width="${dim.w}" height="${dim.h}" fill="${bgColor}"/>
+<g clip-path="url(#canvas)">
+  <!-- CAMADA 2: gradiente de fundo (se has_gradient) -->
+  <!-- CAMADA 3: atmosfera — noise/grain/grid/glow (se has_pattern ou has_glow) -->
+  <!-- CAMADA 4: shapes decorativos — mínimo ${sc} elementos dos layers acima -->
+  <!-- CAMADA 5: accent elements — linhas, frames, separadores, brackets -->
 
-TÉCNICA 3 — FILTRO GLOW/BLUR em shapes:
-<defs><filter id="glowFx" x="-40%" y="-40%" width="180%" height="180%">
-  <feGaussianBlur stdDeviation="20" result="blur"/>
-  <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-</filter></defs>
-<circle cx="540" cy="300" r="200" fill="#7C3AED" opacity="0.4" filter="url(#glowFx)"/>
+  <!-- ↓ BLOCO DE TEXTO PRÉ-RENDERIZADO — COPIE VERBATIM, SEM ALTERAR NADA ↓ -->
+  <!-- ↑ FIM DO BLOCO DE TEXTO ↑ -->
 
-TÉCNICA 4 — DROP SHADOW em texto/shapes:
-<defs><filter id="textShadow"><feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#000" flood-opacity="0.5"/></filter></defs>
-<text filter="url(#textShadow)" ...>HEADLINE</text>
+  <!-- CAMADA 7: overlay leve final (vignette, scanlines) -->
+</g>
+</svg>
 
-TÉCNICA 5 — TEXTO MULTI-LINHA (USE SEMPRE — substitui texto simples):
-<!-- Safe width ${dim.w - margin * 2}px | Bebas Neue: 120px→${Math.floor((dim.w-margin*2)/(120*0.60))}chars | 100px→${Math.floor((dim.w-margin*2)/(100*0.60))}chars | 80px→${Math.floor((dim.w-margin*2)/(80*0.60))}chars -->
-<!-- ⚠️  REGRA ABSOLUTA: use blueprint.headline.lines[] como a quebra de linha DEFINITIVA -->
-<!-- Se lines=["UMA SÓ LINHA"], use apenas 1 tspan. Se lines=["LINHA 1","LINHA 2"], use 2 tspans -->
-<text x="80" y="380" font-family="Bebas Neue" font-size="110" fill="#FFF" text-rendering="optimizeLegibility">
-  <tspan x="80" dy="0">PRIMEIRA LINHA (de blueprint.headline.lines[0])</tspan>
-  <tspan x="80" dy="126">SEGUNDA LINHA (de blueprint.headline.lines[1])</tspan>
-</text>
+CHECKLIST FINAL:
+✓ Mínimo ${sc} shapes decorativos implementados
+✓ 1+ gradiente (linear ou radial)
+✓ 1+ filtro feGaussianBlur (profundidade premium)
+✓ Shapes com opacity 0.04–0.30 (não competem com texto)
+✓ Bloco de texto copiado verbatim (nem um caractere alterado)`;
 
-TÉCNICA 6 — PADRÃO GRID (textura de fundo):
-<defs><pattern id="gridPat" width="40" height="40" patternUnits="userSpaceOnUse">
-  <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#fff" stroke-width="0.5" opacity="0.2"/>
-</pattern></defs>
-<rect width="${dim.w}" height="${dim.h}" fill="url(#gridPat)"/>
-
-TÉCNICA 7 — CLIP PATH (manter elementos no canvas):
-<defs><clipPath id="bounds"><rect width="${dim.w}" height="${dim.h}"/></clipPath></defs>
-<g clip-path="url(#bounds)"><!-- elementos que extrapolam --></g>
-
-TÉCNICA 8 — NOISE/GRAIN (textura orgânica):
-<defs><filter id="grainFx"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
-<feColorMatrix type="saturate" values="0"/><feBlend in="SourceGraphic" mode="overlay"/></filter></defs>
-<rect width="${dim.w}" height="${dim.h}" filter="url(#grainFx)" opacity="0.04"/>
-
-TÉCNICA 9 — GLASS MORPHISM:
-<defs><filter id="glassFx"><feGaussianBlur stdDeviation="12"/></filter></defs>
-<!-- blob atrás do glass com blur -->
-<circle cx="540" cy="400" r="250" fill="#7C3AED" opacity="0.3" filter="url(#glassFx)"/>
-<!-- glass card -->
-<rect x="80" y="250" width="920" height="380" rx="16" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
-
-TÉCNICA 10 — SHAPES DECORATIVOS (corners, diagonais, polígonos):
-<!-- L-bracket corner (4 cantos) -->
-<path d="M 60 60 L 60 100 M 60 60 L 100 60" fill="none" stroke="#C9A84C" stroke-width="2"/>
-<!-- Triângulo decorativo canto -->
-<polygon points="${dim.w - 200},0 ${dim.w},0 ${dim.w},200" fill="#7C3AED" opacity="0.25"/>
-<!-- Linha diagonal decorativa -->
-<line x1="${dim.w - 80}" y1="0" x2="${dim.w}" y2="80" stroke="#FFFFFF" stroke-width="1" opacity="0.3"/>
-
-═══════════════ CAMADAS VISUAIS OBRIGATÓRIAS (mín. 6) ═══════════════
-CAMADA 1: Fundo base (rect sólido ou gradiente linear)
-CAMADA 2: Atmosfera (radial glow, scanlines, grid, noise)
-CAMADA 3: Shapes decorativos grandes (circles/blobs com blur, polígonos)
-CAMADA 4: Elementos estruturais (linhas, frames, barras, separadores)
-CAMADA 5: Conteúdo principal (headline hero, dado numérico)
-CAMADA 6: Conteúdo secundário (subheadline, body points, data blocks)
-CAMADA 7: Footer/CTA (handle, botão CTA, slide indicator)
-REGRA: design sem profundidade = design fraco. Crie tensão visual entre os planos.
-
-═══════════════ RECEITAS POR VISUAL MOOD ═══════════════
-dark-power:    radial-glow P1 center + blur-blobs 2x + feDropShadow headline + micro-grid opacity:0.025
-clean-premium: zero noise + sharp edges + circle-bullet P1 + subtle separator + CTA button sólido
-bold-energy:   diagonal polygon corners + neon glow + scanlines opacity:0.05 + L-brackets 4 cantos
-soft-trust:    warm grain texture + organic circles 3x + box shadows suaves + warmth nos tons
-tech-sharp:    grid-pattern visible + monospace + L-brackets + coordinate marks + color accent sharp
-
-═══════════════ REGRAS ANTI-FALHA ═══════════════
-✦ ClipPath PRIMEIRO: antes de qualquer elemento, declare o clipPath id="canvas" e use em <g>
-✦ text-rendering="optimizeLegibility" em TODOS os headlines
-✦ ⚠️  HEADLINES USAM EXATAMENTE blueprint.headline.lines[] — NÃO re-quebre por conta própria:
-    blueprint.headline.lines tem ${JSON.stringify(blueprint.headline?.lines || ['(calculado pelo Art Director)'])}
-    → Use cada elemento de lines[] como 1 tspan. dy do 1º tspan = 0, demais = line_h do blueprint.
-    → NÃO use o campo .text para renderizar — use .lines[] sempre.
-    → Se lines[] tiver 1 elemento: 1 tspan. 2 elementos: 2 tspans. Simples assim.
-✦ SUBHEADLINE: use blueprint.subheadline.lines[] da mesma forma se existir
-✦ Body points: CADA item = 1 tspan com dy=line_height (não empilhe sem dy)
-✦ CTA button: SEMPRE rect + text centrado — text.y = rect.y + pad_y + font_size × 0.75
-✦ Handle footer: FIXO em y=${dim.h - 28}px | font-size 15-17px | não mude essa posição
-✦ Handle comprido (>${Math.floor((dim.w - margin * 2) / 9)} chars): font-size 14px
-✦ Pelo menos 1 shape com filter blur/glow (cria profundidade premium)
-✦ Pelo menos 1 gradiente (linear ou radial) — designs planos parecem amadores
-✦ Elementos decorativos opacity 0.04-0.25 — visíveis mas não competem com conteúdo
-✦ POSIÇÕES SÃO DEFINITIVAS: use as coordenadas x/y EXATAS do blueprint — não ajuste "por intuição"
-✦ NENHUM texto pode ultrapassar x=${dim.w - margin} — se o tspan calculado extrapola, reduza o font-size em 10%
-
-═══════════════ IMPLEMENTAÇÃO DOS LAYERS ═══════════════
-Para cada item em blueprint.layers[]:
-- type "circle": <circle cx=x+r cy=y+r r=r fill=fill opacity=opacity [filter se filter≠none]/>
-- type "rect": <rect x=x y=y width=width height=height rx=rx fill=fill stroke=stroke stroke-width=stroke_w opacity=opacity [filter]/>
-- type "line": <line x1=x1 y1=y1 x2=x2 y2=y2 stroke=stroke stroke-width=stroke_w opacity=opacity/>
-- type "polygon": <polygon points=points fill=fill stroke=stroke opacity=opacity/>
-Para filter "blur-N": adicione filter="url(#blur{N})" e defina <filter id="blur{N}"><feGaussianBlur stdDeviation="N"/></filter> em defs
-Para filter "glow-N": defina filtro de merge (blur + original) com stdDeviation=N
-
-═══════════════ CONTEÚDO REAL A IMPLEMENTAR ═══════════════
-• Headline:    "${brief.headline}"${brief.subheadline ? `\n• Subheadline: "${brief.subheadline}"` : ''}${(brief.body_points || []).length ? `\n• Body:        ${JSON.stringify(brief.body_points)}` : ''}${brief.data_highlight ? `\n• Dado:        "${brief.data_highlight}"` : ''}
-• CTA:         "${brief.cta}"
-• Handle:      "${brand.handle}"
-
-═══════════════ BLUEPRINT COMPLETO DO ART DIRECTOR ═══════════════
-${JSON.stringify(blueprint, null, 2)}`;
-
-  // Pré-renderiza TODOS os elementos de texto em SVG determinístico
-  // Stage 3 deve copiar este bloco verbatim — não pode reinventar posições ou fontes
   const preBuiltText = buildTextElements({ brief, blueprint, dim, margin });
-
-  const bgColor = blueprint.bg?.color || brand.p2 || '#0D0D0F';
-  const bgType  = blueprint.bg?.type  || 'solid';
-  const mood    = brief.visual_mood   || 'dark-power';
 
   const r = await callClaude({
     system,
     userMsg: `Plataforma: ${DA_NET_LABELS[network] || network} | Mood: ${mood}
+Accent: ${accentColor} | Glow: ${glowColor} | BgFrom: ${bgFrom} | BgTo: ${bgTo} | Angle: ${bgAngle}°
 
-╔══════════════════════════════════════════════════════════════╗
-║  ⚠️  BLOCO DE TEXTO PRÉ-RENDERIZADO — COPIE EXATAMENTE       ║
-║  NÃO altere x, y, font-size, font-family, fill ou conteúdo  ║
-╠══════════════════════════════════════════════════════════════╣
+BLOCO DE TEXTO PRÉ-RENDERIZADO (copie verbatim na Camada 6, sem alterar nada):
 ${preBuiltText}
-╚══════════════════════════════════════════════════════════════╝
 
-SUA MISSÃO: Construa o SVG completo seguindo ESTE ESQUELETO EXATO:
-
-<svg xmlns="http://www.w3.org/2000/svg" width="${dim.w}" height="${dim.h}" viewBox="0 0 ${dim.w} ${dim.h}">
-<defs>
-  <clipPath id="canvas"><rect width="${dim.w}" height="${dim.h}"/></clipPath>
-  <!-- DEFINA AQUI: gradientes, filtros glow/blur/sombra, patterns -->
-</defs>
-
-<!-- CAMADA 1: fundo base obrigatório -->
-<rect width="${dim.w}" height="${dim.h}" fill="${bgColor}"/>
-
-<g clip-path="url(#canvas)">
-  <!-- CAMADA 2: atmosfera — gradiente radial, glow, noise ou scanlines -->
-  <!-- CAMADA 3: shapes decorativos de blueprint.layers[] (mín. 3 elementos) -->
-  <!-- CAMADA 4: accent de blueprint.accent -->
-  <!-- CAMADA 5: separator de blueprint.separator se existir -->
-
-  <!-- CAMADA 6: ↓ COLE O BLOCO DE TEXTO ABAIXO SEM MODIFICAR NADA ↓ -->
-${preBuiltText}
-  <!-- CAMADA 6 FIM -->
-
-  <!-- CAMADA 7: efeitos finais leves opcionais -->
-</g>
-</svg>
-
-REGRAS INVIOLÁVEIS:
-✦ O bloco de texto acima tem posições e tamanhos CALCULADOS — copie-o sem alterar 1 caractere
-✦ Concentre criatividade nos layers decorativos e efeitos visuais
-✦ Mínimo 3 layers em blueprint.layers[] renderizados (circles, rects, linhas decorativas)
-✦ Pelo menos 1 gradiente linear ou radial
-✦ Pelo menos 1 filtro feGaussianBlur ou feDropShadow (profundidade premium)
-✦ Todo shapes decorativo: opacity entre 0.05 e 0.30 — não compete com texto
-✦ Background type="${bgType}" — implemente conforme blueprint.bg
-
-SVG completo de nível top 0.1% do Brasil agora:`,
-    maxTokens: 12000,
+Construa o SVG completo agora (nível top 0.1% do Brasil). Substitua o comentário da Camada 6 pelo bloco acima:`,
+    maxTokens: 6000,
   });
 
   let svg = '';
@@ -3468,7 +3642,7 @@ route('POST', '/api/user/design-agent/variations', async (req, res) => {
     const taskPromise = isTweet
       ? daStage3Tweet({ brief: moodBrief, brand, dim })
           .then(s3 => ({ s2: { tok: { in: 0, out: 0 } }, s3 }))
-      : daStage2ArtDir({ brief: moodBrief, brand, dim, format, slideIndex: null, totalSlides: null })
+      : daStage2ArtDir({ brief: moodBrief, brand, dim, format, slideIndex: null, totalSlides: null, network })
           .then(s2 => daStage3Svg({ brief: moodBrief, blueprint: s2.data, brand, dim, format, network })
             .then(s3 => ({ s2, s3 })));
     return taskPromise
@@ -3635,7 +3809,7 @@ route('POST', '/api/user/design-agent', async (req, res) => {
       // ── Estágio 2: Art Direction ─────────────────────────────────────────
       send('stage', { stage: 2, total: 3, label: 'Definindo direção de arte...', pct: 32 });
       const s2 = await daStage2ArtDir({
-        brief: s1.data, brand, dim, format, slideIndex: slideIdx, totalSlides: totalSl,
+        brief: s1.data, brand, dim, format, slideIndex: slideIdx, totalSlides: totalSl, slideRole, network,
       });
       totalIn  += s2.tok.in;
       totalOut += s2.tok.out;
