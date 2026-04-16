@@ -4082,22 +4082,40 @@ LANGUAGE: Respond in the SAME language as the conversation (if Portuguese, write
 // Recebe a base do Refinador #1 + formato + tom de marca e produz um blueprint JSON.
 route('POST', '/api/user/brainstorm/refine-format', async (req, res) => {
   const payload = requireAuth(req, res); if (!payload) return;
-  const { refineBase, format, network, voiceName, brandProfile } = await parseBody(req);
+  const { refineBase, format, subFormat, network, voiceName, brandProfile } = await parseBody(req);
   if (!refineBase) return err(res, 'refineBase obrigatório');
 
   const user = db.getUserById(payload.id);
   try { db.consumeQuota(payload.id); } catch(e) { return err(res, e.message, 402); }
 
   const brand = daBrand(user, brandProfile);
-  const fmtLabel = {
-    post: 'Single Post (Big Statement)',
-    carrossel: 'Educational Carousel',
-    story: 'Story',
-    anuncio: 'Photo Overlay Ad',
-    thumb: 'Thumbnail',
-    banner: 'Banner',
-  }[format] || (format || 'post');
-  const netLabel = { ig: 'Instagram', li: 'LinkedIn', yt: 'YouTube', tt: 'TikTok' }[network] || (network || 'Instagram');
+  const subFmtDescriptions = {
+    BIG_STATEMENT: 'Single dominant phrase, centered, lots of white space, no subtitle',
+    QUESTION_HOOK: 'Large question + small complement, vertical accent bar',
+    CONTROVERSIAL_OPINION: 'Strong opinion statement highlighted, generates agree/disagree reaction',
+    QUICK_TIP: 'Pill label + short title + divider + body text, immediately actionable',
+    MINI_LIST: 'Hook title + 3 numbered items, 3-second read',
+    QUOTE_AUTHORITY: 'Quote marks + elegant text + divider + author name',
+    BEFORE_AFTER: 'Vertical split: left=before (muted), right=after (accent color)',
+    CTA_POST: 'Strong headline + body + prominent CTA button',
+    STAT_POST: 'Large number as hero + accent divider + explanation',
+    BRAND_STATEMENT: 'Clean sophisticated positioning, accent lines top/bottom, brand logo area',
+    LIST_CAROUSEL: 'Hook slide → 1 item per slide with numbered circles → CTA slide',
+    EDUCATIONAL_CAROUSEL: 'Hook block → progressive content blocks → conclusion block',
+    MISTAKE_CAROUSEL: 'Hook → mistakes (red markers) per slide → solution slide',
+    STEP_BY_STEP: 'Hook → numbered steps on timeline → result slide',
+    STORY_CAROUSEL: 'Emotional hook → development → climax (accent block) → conclusion',
+    CONTRAST_CAROUSEL: 'Two-column comparison: left=old/bad, right=new/good (accent)',
+    CHECKLIST_CAROUSEL: 'Hook → checklist items (filled=done, empty=todo) → CTA',
+    MYTH_BUSTING: 'Hook → alternating MYTH (red) / TRUTH (green) pairs',
+    TIPS_CAROUSEL: 'Hook → bullet tips per slide → CTA',
+    TRANSFORMATION: 'Before block (muted) → arrow/divider → After block (bright/accent)',
+    TWEET_CARD: 'Twitter/X card with avatar, handle, text content, engagement row',
+    TWEET_THREAD: 'Twitter/X thread: connected tweet cards, narrative sequence',
+  };
+  const fmtLabel = { post:'Post único', carousel:'Carrossel', tweet:'Tweet Card' }[format] || (format || 'post');
+  const subFmtLabel = subFormat ? (subFmtDescriptions[subFormat] || subFormat) : '';
+  const netLabel = { ig:'Instagram', li:'LinkedIn', yt:'YouTube', tt:'TikTok' }[network] || (network || 'Instagram');
   const brandTone = voiceName || brand.tom || 'flexible';
   const brandColors = `background=${brand.p2||'#0D0D0F'} text=${brand.p3||'#FFFFFF'} accent=${brand.p1||'#7C3AED'}`;
 
@@ -4108,7 +4126,8 @@ Your job is to transform a structured content base into a final design blueprint
 
 INPUTS:
 - Content base (from previous step)
-- Selected FORMAT: ${fmtLabel}
+- Selected FORMAT TYPE: ${fmtLabel}
+- Selected SUB-FORMAT: ${subFormat || 'default'} — ${subFmtLabel}
 - Selected BRAND TONE: ${brandTone}
 - Brand colors: ${brandColors}
 - Network: ${netLabel}
@@ -4125,12 +4144,11 @@ RULES:
 - Keep content short and impactful
 - Optimize for readability and engagement
 
-FORMATS BEHAVIOR:
-- Single Post / Big Statement: single strong headline, subheadline optional, slides=null
-- Educational Carousel: hook slide → 3-5 value slides → payoff/CTA slide
-- Story: short punchy text, portrait-friendly
-- Photo Overlay / Ad: short overlay text, dominant image
-- Thumbnail: bold short text, high contrast
+SUB-FORMAT BEHAVIOR (follow the selected sub-format strictly):
+${subFmtLabel ? `- ${subFormat}: ${subFmtLabel}` : '- Default post: strong headline, clean layout'}
+- For carousel sub-formats (LIST_CAROUSEL, EDUCATIONAL_CAROUSEL, etc.): set type="carousel", generate slides array
+- For post sub-formats (BIG_STATEMENT, QUESTION_HOOK, etc.): set type="post", slides=null
+- For tweet/thread: set type="post", adapt headline to Twitter card style
 
 Output ONLY valid JSON matching this exact structure (zero extra text):
 {
