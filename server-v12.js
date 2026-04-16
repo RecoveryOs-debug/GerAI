@@ -854,6 +854,52 @@ function callClaudeMessages({ system, messages, maxTokens = 2500 }) {
   });
 }
 
+// ── Anthropic web search (beta: web-search-2025-03-05) ────────────────────────
+// Igual ao callClaudeMessages mas com a tool web_search disponível para o modelo.
+// O response pode ter múltiplos blocos (tool_use + tool_result + text) — extrai o último text.
+function callClaudeMessagesWithSearch({ system, messages, maxTokens = 1400 }) {
+  return new Promise((resolve, reject) => {
+    if (!ANTHROPIC_KEY) return reject(new Error('ANTHROPIC_API_KEY não configurada.'));
+    const body = JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: maxTokens,
+      system,
+      messages,
+      tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 3 }],
+    });
+    const opts = {
+      hostname: 'api.anthropic.com', path: '/v1/messages', method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-beta': 'web-search-2025-03-05',
+        'Content-Length': Buffer.byteLength(body),
+      },
+    };
+    const req = https.request(opts, res => {
+      let data = '';
+      res.on('data', c => data += c);
+      res.on('end', () => {
+        try {
+          const p = JSON.parse(data);
+          if (p.error) return reject(new Error(p.error.message || 'Erro Anthropic'));
+          // Busca o último bloco de texto (tool_use/tool_result precedem a resposta final)
+          const textBlocks = (p.content || []).filter(b => b.type === 'text');
+          const text = textBlocks.length > 0 ? textBlocks[textBlocks.length - 1].text : '';
+          resolve({
+            text,
+            inputTokens: p.usage?.input_tokens || 0,
+            outputTokens: p.usage?.output_tokens || 0,
+          });
+        } catch { reject(new Error('Resposta inválida da API')); }
+      });
+    });
+    req.on('error', reject);
+    req.write(body); req.end();
+  });
+}
+
 /**
  * STREAMING — Server-Sent Events (SSE)
  * Envia chunks para o cliente à medida que Claude responde.
@@ -2834,6 +2880,116 @@ ORIENTAÇÕES CRÍTICAS:
   }
 }
 
+// ── Helper: pré-renderiza todos os elementos de TEXTO em SVG determinístico ──
+// O resultado é injetado verbatim no Stage 3 — elimina posicionamento errado pela IA.
+function buildTextElements({ brief, blueprint, dim, margin }) {
+  function esc(s) {
+    return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function fontStack(f) { return esc((f || 'DM Sans').split('|')[0].trim()) + ',sans-serif'; }
+
+  const hl  = blueprint.headline  || {};
+  const sub = blueprint.subheadline;
+  const ft  = blueprint.footer    || {};
+  const cta = blueprint.cta_block;
+  const bdy = blueprint.body;
+  const db  = blueprint.data_block;
+  const si  = blueprint.slide_indicator;
+
+  const hlLines = (Array.isArray(hl.lines) && hl.lines.length > 0)
+    ? hl.lines : [hl.text || brief.headline];
+  const subLines = sub ? ((Array.isArray(sub.lines) && sub.lines.length > 0)
+    ? sub.lines : (sub.text ? [sub.text] : [])) : [];
+
+  const hlX    = hl.x    != null ? hl.x    : margin;
+  const hlY    = hl.y    != null ? hl.y    : Math.round(dim.h * 0.40);
+  const hlSize = hl.size || 96;
+  const hlLH   = hl.line_h || Math.round(hlSize * 1.18);
+  const hlLS   = hl.letter_spacing ? ` letter-spacing="${hl.letter_spacing}"` : '';
+
+  let out = '<!-- ╔══ TEXTO PRÉ-CALCULADO — NÃO ALTERE NENHUMA DESTAS LINHAS ══╗ -->\n';
+
+  // HEADLINE
+  out += `<text x="${hlX}" y="${hlY}" font-family="${fontStack(hl.font)}" font-size="${hlSize}" font-weight="${hl.weight || 400}" fill="${esc(hl.color || '#FFFFFF')}" text-anchor="${hl.anchor || 'start'}"${hlLS} text-rendering="optimizeLegibility">`;
+  hlLines.forEach((line, i) => {
+    out += `<tspan x="${hlX}" dy="${i === 0 ? 0 : hlLH}">${esc(line)}</tspan>`;
+  });
+  out += `</text>\n`;
+
+  // SUBHEADLINE
+  if (sub && subLines.length > 0) {
+    const subX    = sub.x    != null ? sub.x    : margin;
+    const subY    = sub.y    != null ? sub.y    : hlY + hlLines.length * hlLH + Math.round(hlSize * 0.35);
+    const subSize = sub.size || 26;
+    const subLH   = Math.round(subSize * 1.45);
+    out += `<text x="${subX}" y="${subY}" font-family="${fontStack(sub.font)}" font-size="${subSize}" font-weight="${sub.weight || 400}" fill="${esc(sub.color || '#CCCCCC')}" text-rendering="optimizeLegibility">`;
+    subLines.forEach((line, i) => {
+      out += `<tspan x="${subX}" dy="${i === 0 ? 0 : subLH}">${esc(line)}</tspan>`;
+    });
+    out += `</text>\n`;
+  }
+
+  // BODY POINTS
+  if (bdy && (brief.body_points || []).length > 0) {
+    let bY   = bdy.y_start != null ? bdy.y_start : Math.round(dim.h * 0.58);
+    const bX = bdy.x != null ? bdy.x : margin;
+    const bSize = bdy.size || 22;
+    const bLH   = bdy.line_h || Math.round(bSize * 1.75);
+    const pfx   = (!bdy.prefix || bdy.prefix === 'none') ? '' : bdy.prefix + ' ';
+    brief.body_points.forEach(pt => {
+      out += `<text x="${bX}" y="${bY}" font-family="${fontStack(bdy.font)}" font-size="${bSize}" font-weight="${bdy.weight || 400}" fill="${esc(bdy.color || '#AAAAAA')}" text-rendering="optimizeLegibility">${esc(pfx + pt)}</text>\n`;
+      bY += bLH;
+    });
+  }
+
+  // CTA BUTTON (rect + text)
+  if (cta && cta.text && cta.x != null && cta.y != null) {
+    const ctaSize = cta.size || 20;
+    const padX    = cta.pad_x || 32;
+    const padY    = cta.pad_y || 14;
+    const btnW    = Math.round(cta.text.length * ctaSize * 0.56 + padX * 2);
+    const btnH    = Math.round(ctaSize + padY * 2);
+    const txtX    = Math.round(cta.x + btnW / 2);
+    const txtY    = Math.round(cta.y + padY + ctaSize * 0.78);
+    const bdr     = (cta.border_color && cta.border_color !== 'none')
+      ? ` stroke="${esc(cta.border_color)}" stroke-width="1.5"` : '';
+    out += `<rect x="${cta.x}" y="${cta.y}" width="${btnW}" height="${btnH}" rx="${cta.rx || 8}" fill="${esc(cta.bg_color || '#F5C518')}"${bdr}/>\n`;
+    out += `<text x="${txtX}" y="${txtY}" text-anchor="middle" font-family="${fontStack(cta.font)}" font-size="${ctaSize}" font-weight="${cta.weight || 700}" fill="${esc(cta.color || '#000000')}">${esc(cta.text)}</text>\n`;
+  }
+
+  // FOOTER / HANDLE
+  if (ft.handle) {
+    const ftX    = ft.x != null ? ft.x : margin;
+    const ftY    = Math.min(ft.y != null ? ft.y : dim.h - 28, dim.h - 12);
+    const ftSize = ft.size || 18;
+    out += `<text x="${ftX}" y="${ftY}" font-family="${fontStack(ft.font)}" font-size="${ftSize}" fill="${esc(ft.color || '#888888')}">${esc(ft.handle)}</text>\n`;
+  }
+
+  // DATA BLOCK (número hero)
+  if (db && db.number) {
+    const dbX     = db.x != null ? db.x : Math.round(dim.w * 0.55);
+    const dbY     = db.y != null ? db.y : Math.round(dim.h * 0.30);
+    const dbNSize = db.number_size || 120;
+    if (db.bg_rect) {
+      const br = db.bg_rect;
+      out += `<rect x="${br.x}" y="${br.y}" width="${br.w}" height="${br.h}" rx="${br.rx || 8}" fill="${esc(br.color || '#333333')}" opacity="${br.opacity || 0.15}"/>\n`;
+    }
+    out += `<text x="${dbX}" y="${dbY}" font-family="${fontStack(db.number_font || 'Bebas Neue')}" font-size="${dbNSize}" fill="${esc(db.number_color || '#F5C518')}" text-anchor="middle" text-rendering="optimizeLegibility">${esc(db.number)}</text>\n`;
+    if (db.label) {
+      const lblY = Math.round(dbY + (db.label_size || 20) * 1.4);
+      out += `<text x="${dbX}" y="${lblY}" font-family="${fontStack(db.label_font || 'DM Sans')}" font-size="${db.label_size || 20}" fill="${esc(db.label_color || '#AAAAAA')}" text-anchor="middle">${esc(db.label)}</text>\n`;
+    }
+  }
+
+  // SLIDE INDICATOR
+  if (si && si.text) {
+    out += `<text x="${si.x || dim.w - margin}" y="${si.y || margin}" font-family="DM Sans,sans-serif" font-size="${si.size || 16}" fill="${esc(si.color || '#888888')}" text-anchor="${si.anchor || 'end'}">${esc(si.text)}</text>\n`;
+  }
+
+  out += '<!-- ╚══ FIM DO TEXTO PRÉ-CALCULADO ══╝ -->';
+  return out;
+}
+
 // ── Estágio 3: SVG Executor ───────────────────────────────────────────────────
 // Recebe brief + blueprint e gera o SVG final com alta fidelidade.
 // Não precisa "adivinhar" o design — o blueprint já define tudo.
@@ -2987,36 +3143,60 @@ Para filter "glow-N": defina filtro de merge (blur + original) com stdDeviation=
 ═══════════════ BLUEPRINT COMPLETO DO ART DIRECTOR ═══════════════
 ${JSON.stringify(blueprint, null, 2)}`;
 
-  // Injeta as lines[] pré-calculadas pelo Art Director para renderização mecânica
-  const hlLines = Array.isArray(blueprint.headline?.lines) && blueprint.headline.lines.length > 0
-    ? blueprint.headline.lines
-    : [blueprint.headline?.text || brief.headline];
-  const subLines = Array.isArray(blueprint.subheadline?.lines) && blueprint.subheadline.lines.length > 0
-    ? blueprint.subheadline.lines
-    : (blueprint.subheadline?.text ? [blueprint.subheadline.text] : null);
+  // Pré-renderiza TODOS os elementos de texto em SVG determinístico
+  // Stage 3 deve copiar este bloco verbatim — não pode reinventar posições ou fontes
+  const preBuiltText = buildTextElements({ brief, blueprint, dim, margin });
 
-  const linesDirective = `
-⚠️  QUEBRA DE LINHA PRÉ-CALCULADA (USE EXATAMENTE ISTO — NÃO ALTERE):
-HEADLINE lines[]:
-${hlLines.map((l, i) => `  tspan ${i + 1}: "${l}"`).join('\n')}
-${subLines ? `\nSUBHEADLINE lines[]:\n${subLines.map((l, i) => `  tspan ${i + 1}: "${l}"`).join('\n')}` : ''}
-
-Cada tspan usa x=${blueprint.headline?.x || margin} e dy = ${blueprint.headline?.line_h || Math.round((blueprint.headline?.size || 100) * 1.15)} (exceto o 1º que usa dy="0").
-`;
+  const bgColor = blueprint.bg?.color || brand.p2 || '#0D0D0F';
+  const bgType  = blueprint.bg?.type  || 'solid';
+  const mood    = brief.visual_mood   || 'dark-power';
 
   const r = await callClaude({
     system,
-    userMsg: `Plataforma: ${DA_NET_LABELS[network] || network}.
-${linesDirective}
-Execute o blueprint SEM OMITIR NENHUMA CAMADA. Exigências mínimas:
-✦ Mínimo 6 camadas visuais distintas (bg + atmosfera + shapes + estrutura + conteúdo + footer)
-✦ Pelo menos 1 gradiente (bg ou elemento) — zero fundos 100% planos
-✦ Pelo menos 1 filtro (blur/glow/sombra) — profundidade é obrigatória
-✦ Headline renderizado com AS LINHAS PRÉ-CALCULADAS ACIMA em tspans — proibido alterar
-✦ Todo texto com font-family, fill, font-size explícitos
-✦ ClipPath ativo envolvendo todo conteúdo
+    userMsg: `Plataforma: ${DA_NET_LABELS[network] || network} | Mood: ${mood}
 
-Este design vai para o feed de clientes pagantes. Nível: top 0.1% dos designs de marketing digital do Brasil. SVG completo agora:`,
+╔══════════════════════════════════════════════════════════════╗
+║  ⚠️  BLOCO DE TEXTO PRÉ-RENDERIZADO — COPIE EXATAMENTE       ║
+║  NÃO altere x, y, font-size, font-family, fill ou conteúdo  ║
+╠══════════════════════════════════════════════════════════════╣
+${preBuiltText}
+╚══════════════════════════════════════════════════════════════╝
+
+SUA MISSÃO: Construa o SVG completo seguindo ESTE ESQUELETO EXATO:
+
+<svg xmlns="http://www.w3.org/2000/svg" width="${dim.w}" height="${dim.h}" viewBox="0 0 ${dim.w} ${dim.h}">
+<defs>
+  <clipPath id="canvas"><rect width="${dim.w}" height="${dim.h}"/></clipPath>
+  <!-- DEFINA AQUI: gradientes, filtros glow/blur/sombra, patterns -->
+</defs>
+
+<!-- CAMADA 1: fundo base obrigatório -->
+<rect width="${dim.w}" height="${dim.h}" fill="${bgColor}"/>
+
+<g clip-path="url(#canvas)">
+  <!-- CAMADA 2: atmosfera — gradiente radial, glow, noise ou scanlines -->
+  <!-- CAMADA 3: shapes decorativos de blueprint.layers[] (mín. 3 elementos) -->
+  <!-- CAMADA 4: accent de blueprint.accent -->
+  <!-- CAMADA 5: separator de blueprint.separator se existir -->
+
+  <!-- CAMADA 6: ↓ COLE O BLOCO DE TEXTO ABAIXO SEM MODIFICAR NADA ↓ -->
+${preBuiltText}
+  <!-- CAMADA 6 FIM -->
+
+  <!-- CAMADA 7: efeitos finais leves opcionais -->
+</g>
+</svg>
+
+REGRAS INVIOLÁVEIS:
+✦ O bloco de texto acima tem posições e tamanhos CALCULADOS — copie-o sem alterar 1 caractere
+✦ Concentre criatividade nos layers decorativos e efeitos visuais
+✦ Mínimo 3 layers em blueprint.layers[] renderizados (circles, rects, linhas decorativas)
+✦ Pelo menos 1 gradiente linear ou radial
+✦ Pelo menos 1 filtro feGaussianBlur ou feDropShadow (profundidade premium)
+✦ Todo shapes decorativo: opacity entre 0.05 e 0.30 — não compete com texto
+✦ Background type="${bgType}" — implemente conforme blueprint.bg
+
+SVG completo de nível top 0.1% do Brasil agora:`,
     maxTokens: 12000,
   });
 
@@ -3551,19 +3731,22 @@ Missão: ajudar o usuário a desenvolver a ideia mais afiada e específica poss�
 MARCA: ${brand.profissao} | Nicho: ${brand.nicho} | Tom: ${brand.tom} | Público: ${brand.publico}${fmtCtx}
 
 COMO AGIR:
-— Se a ideia estiver vaga: faça 1-2 perguntas estratégicas (ângulo, dado específico, transformação)
-— Se a ideia estiver clara: confirme, sugira um twist criativo ou um dado que deixe mais impactante
-— Proponha ângulos alternativos quando pertinente (contraste, curiosidade, prova social, urgência)
-— Se FORMATO ou REDE não estiverem confirmados: mencione brevemente qual formato/rede seria ideal para essa ideia
-— SEMPRE leve em conta o formato selecionado ao dar sugestões (ex: carrossel = arco narrativo; story = impacto imediato; linkedin = autoridade)
+— ADAPTE seu estilo ao tom do usuário detectado na conversa (direto/casual/formal/agressivo) — espelhe e amplifique
+— Se a ideia estiver vaga: faça 1-2 perguntas estratégicas (ângulo, dado específico, transformação esperada)
+— Se a ideia estiver clara: confirme, sugira um twist criativo ou dado que deixe mais impactante
+— Use web_search para buscar dados reais, tendências recentes e exemplos do nicho "${brand.nicho}" quando isso fortalecer a ideia
+— Proponha ângulos alternativos (contraste, curiosidade, prova social, urgência, identidade)
+— Se FORMATO ou REDE não estiverem confirmados: mencione qual seria ideal para essa ideia
+— SEMPRE leve em conta o formato selecionado (carrossel = arco narrativo; story = impacto imediato; linkedin = autoridade)
 — Seja conciso: máx 3 parágrafos. Linguagem direta, em português.
-— Ao final, sempre indique se a ideia está pronta para refinar (✅) ou precisa de mais desenvolvimento (🔄)`;
+— Indique se a ideia está pronta (✅) ou precisa de mais desenvolvimento (🔄)
+— Quando ✅: instrua explicitamente: "Clique em ✦ Refinar Prompt — a imagem será gerada automaticamente."`;
 
   try {
-    const r = await callClaudeMessages({
+    const r = await callClaudeMessagesWithSearch({
       system,
       messages: messages.slice(-14).map(m => ({ role: m.role, content: String(m.content) })),
-      maxTokens: 600,
+      maxTokens: 800,
     });
     const tok = { in: r.inputTokens || 0, out: r.outputTokens || 0 };
     const cost_usd = parseFloat(((tok.in / 1_000_000 * 3) + (tok.out / 1_000_000 * 15)).toFixed(6));

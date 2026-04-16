@@ -6344,16 +6344,7 @@ body.image-agent-refining #image-agent-refine-overlay{
               <div class="net" id="n-tt" onclick="selNet('tt')"><div class="net-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg></div><div class="net-name">TikTok</div></div>
             </div>
           </div>
-          <!-- generate button -->
-          <div style="display:flex;gap:8px;align-items:stretch;margin-top:20px">
-            <button id="btn-gen-main" onclick="startGenPipeline()" style="flex:1;background:var(--a);border:none;border-radius:var(--r2);padding:13px 14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--f);font-size:13px;font-weight:700;color:#fff;letter-spacing:-.02em;transition:all .15s var(--ease);box-shadow:0 4px 20px rgba(243,107,42,.2)">
-              <svg style="width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              Gerar
-            </button>
-            <button class="btn btn-s btn-icon" style="padding:13px" onclick="clearGenForm()" title="Limpar">
-              <svg class="ico" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
-          </div>
+          <!-- generate button removed — geração inicia automaticamente após Refinar Prompt -->
         </div>
 
         <!-- ══ COL 2: Creative Strategist ══ -->
@@ -8367,7 +8358,7 @@ function _bsRender(ctx) {
   if (!msgsEl) return;
   if (state.messages.length === 0) {
     const hints = {
-      image: 'Descreva sua ideia. A IA vai te ajudar a desenvolvê-la até ficar irresistível.',
+      image: 'Descreva sua ideia. Quando estiver pronta, clique em ✦ Refinar Prompt — a imagem será gerada automaticamente.',
       legenda: 'Descreva sua ideia. A IA vai refinar até ficar perfeita.',
       'roteiro-yt': 'Sobre o que é o vídeo? A IA vai ajudar a estruturar o roteiro.',
       'roteiro-reels': 'Qual é a ideia do Reels? A IA vai criar um hook inesquecível.',
@@ -8478,6 +8469,8 @@ function _bsShowRefined(ctx, text) {
   if (ctx === 'image') {
     window._refinedPrompt = text;
     const h = document.getElementById('gen-in'); if (h) h.value = text;
+    // Auto-trigger: gera a imagem automaticamente após o prompt ser refinado
+    setTimeout(() => gerarImagem(), 400);
   } else {
     const h = document.getElementById(`ag-${ctx}-in`); if (h) h.value = text;
   }
