@@ -8512,8 +8512,8 @@ function _bsShowRefined(ctx, text, blueprint) {
     // Esconde gerar btn e painel (podem estar visíveis de sessão anterior)
     const gb = document.getElementById('bs-image-gerar-btn');
     if (gb) gb.style.display = 'none';
-    const fp = document.getElementById('bs-image-fmt-voice-panel');
-    if (fp) fp.style.display = 'none';
+    const sp0 = document.getElementById('bs-sel-panel');
+    if (sp0) sp0.style.display = 'none';
   } else {
     const h = document.getElementById(`ag-${ctx}-in`); if (h) h.value = text;
   }
@@ -8608,9 +8608,12 @@ function renderPanelVoiceGrid() {
   if (!grid || !BRAND_VOICES_UI) return;
   grid.innerHTML = BRAND_VOICES_UI.map((v, i) => {
     const active = _panelVoiceChosen && _panelVoiceObj && _panelVoiceObj.id === v.id;
-    return `<button onclick="panelSelVoice(${i})" style="padding:7px 10px;background:${active?'rgba(243,107,42,.12)':'rgba(255,255,255,.04)'};border:1px solid ${active?'var(--a)':'rgba(255,255,255,.08)'};border-radius:7px;cursor:pointer;font-family:var(--f);text-align:left;transition:.15s;width:100%">
-      <div style="font-size:11px;font-weight:700;color:${active?'var(--a)':'var(--tx-0)'};line-height:1.2">${v.icon} ${v.name}</div>
-      <div style="font-size:9px;color:var(--tx-2);margin-top:2px">${v.desc||''}</div>
+    return `<button onclick="panelSelVoice(${i})" style="padding:8px;background:${active?'rgba(243,107,42,.12)':'rgba(255,255,255,.04)'};border:1px solid ${active?'var(--a)':'rgba(255,255,255,.08)'};border-radius:8px;cursor:pointer;font-family:var(--f);text-align:left;transition:.15s;width:100%;display:flex;flex-direction:column;gap:6px">
+      <div style="width:100%;border-radius:5px;overflow:hidden;aspect-ratio:5/6">${v.sample||''}</div>
+      <div>
+        <div style="font-size:10.5px;font-weight:700;color:${active?'var(--a)':'var(--tx-0)'};line-height:1.2">${v.icon} ${v.name}</div>
+        <div style="font-size:9px;color:var(--tx-2);margin-top:1px">${v.desc||''}</div>
+      </div>
     </button>`;
   }).join('');
   const noneBtn = document.getElementById('bs-panel-voice-none');
@@ -8822,6 +8825,7 @@ async function gerarImagem() {
           brandProfile, slideIndex: sIdx, totalSlides: total, slideRole,
           postFormat: _selectedPostFormat || undefined,
           blueprint: window._refinedBlueprint || undefined,
+          subFormat: _panelSubFmt || undefined,
         });
         _renderCarouselSlide(sIdx, svg, total);
       } catch(e) {
@@ -8848,6 +8852,7 @@ async function gerarImagem() {
       brandProfile,
       postFormat: _selectedPostFormat || undefined,
       blueprint: window._refinedBlueprint || undefined,
+      subFormat: _panelSubFmt || undefined,
     });
     window._currentSVG = svg;
     _currentSVG = svg;
@@ -11423,14 +11428,22 @@ const BS_TWEET_FORMAT = { id:'TWEET_CARD', name:'Tweet Card', desc:'Card estilo 
 var _selectedVoice = null;
 
 const BRAND_VOICES_UI = [
-  { id: 'luxury',   name: 'Luxury Premium',      desc: 'Luxo silencioso, elegância atemporal',    icon: '💎' },
-  { id: 'bold',     name: 'Bold Impact',          desc: 'Energia máxima, para o scroll',           icon: '⚡' },
-  { id: 'clean',    name: 'Clean Pro',            desc: 'Confiança pela simplicidade',             icon: '✦' },
-  { id: 'editorial',name: 'Editorial',            desc: 'Tipografia como design, autoridade',      icon: '📰' },
-  { id: 'tech',     name: 'Tech & Digital',       desc: 'Grid, precisão, inovação sistemática',    icon: '⬡' },
-  { id: 'warm',     name: 'Warm & Human',         desc: 'Conexão emocional, acolhimento',          icon: '🌿' },
-  { id: 'creative', name: 'Creative',             desc: 'Surpresa visual, quebra as regras',       icon: '✦' },
-  { id: 'data',     name: 'Data & Authority',     desc: 'O número como herói do design',           icon: '◈' },
+  { id:'luxury',    name:'Luxury Premium',  desc:'Luxo silencioso, elegância atemporal', icon:'💎',
+    sample:`<svg viewBox="0 0 50 60" xmlns="http://www.w3.org/2000/svg"><rect width="50" height="60" fill="#0D0D0D"/><line x1="8" y1="15" x2="42" y2="15" stroke="#D4AF37" stroke-width="0.5"/><rect x="16" y="22" width="18" height="2" fill="#D4AF37" rx="0.5"/><rect x="12" y="27" width="26" height="1" fill="rgba(212,175,55,0.5)" rx="0.3"/><rect x="15" y="31" width="20" height="1" fill="rgba(212,175,55,0.3)" rx="0.3"/><line x1="8" y1="42" x2="42" y2="42" stroke="#D4AF37" stroke-width="0.5"/><circle cx="25" cy="50" r="2" fill="none" stroke="#D4AF37" stroke-width="0.5"/></svg>` },
+  { id:'bold',      name:'Bold Impact',     desc:'Energia máxima, para o scroll', icon:'⚡',
+    sample:`<svg viewBox="0 0 50 60" xmlns="http://www.w3.org/2000/svg"><rect width="50" height="60" fill="#F3F3F0"/><rect x="5" y="10" width="40" height="22" fill="#0D0D0D" rx="1"/><rect x="5" y="36" width="30" height="4.5" fill="#222" rx="0.5"/><rect x="5" y="44" width="20" height="3" fill="#CCC" rx="0.5"/><rect x="5" y="51" width="16" height="4" fill="#F36B2A" rx="1"/></svg>` },
+  { id:'clean',     name:'Clean Pro',       desc:'Confiança pela simplicidade', icon:'✦',
+    sample:`<svg viewBox="0 0 50 60" xmlns="http://www.w3.org/2000/svg"><rect width="50" height="60" fill="#FAFAFA"/><line x1="5" y1="20" x2="45" y2="20" stroke="#E5E5E5" stroke-width="0.5"/><line x1="5" y1="40" x2="45" y2="40" stroke="#E5E5E5" stroke-width="0.5"/><rect x="10" y="24" width="20" height="5" fill="#1A1A1A" rx="1.5"/><rect x="10" y="33" width="30" height="2.5" fill="#AAA" rx="0.7"/><rect x="10" y="44" width="14" height="6" fill="#1A1A1A" rx="1.5"/></svg>` },
+  { id:'editorial', name:'Editorial',       desc:'Tipografia como design, autoridade', icon:'📰',
+    sample:`<svg viewBox="0 0 50 60" xmlns="http://www.w3.org/2000/svg"><rect width="50" height="60" fill="#F0EDE8"/><rect x="5" y="8" width="40" height="8" fill="#1A1A1A" rx="0.5"/><line x1="5" y1="20" x2="45" y2="20" stroke="#1A1A1A" stroke-width="0.8"/><rect x="5" y="23" width="19" height="2" fill="#555" rx="0.3"/><rect x="5" y="27" width="19" height="1.5" fill="#999" rx="0.3"/><rect x="5" y="30.5" width="19" height="1.5" fill="#999" rx="0.3"/><rect x="5" y="34" width="19" height="1.5" fill="#999" rx="0.3"/><rect x="26" y="23" width="19" height="15" fill="#DDD" rx="0.5"/><line x1="5" y1="43" x2="45" y2="43" stroke="#1A1A1A" stroke-width="0.4"/><rect x="5" y="46" width="12" height="4" fill="#1A1A1A" rx="0.5"/></svg>` },
+  { id:'tech',      name:'Tech & Digital',  desc:'Grid, precisão, inovação sistemática', icon:'⬡',
+    sample:`<svg viewBox="0 0 50 60" xmlns="http://www.w3.org/2000/svg"><rect width="50" height="60" fill="#0A0E18"/><rect x="5" y="9" width="24" height="5" fill="rgba(0,210,255,0.85)" rx="0.5"/><rect x="5" y="17" width="36" height="1.5" fill="rgba(0,210,255,0.3)" rx="0.3"/><rect x="5" y="21" width="28" height="1.5" fill="rgba(0,210,255,0.2)" rx="0.3"/><rect x="6" y="29" width="8" height="20" fill="rgba(0,210,255,0.15)" rx="0.5"/><rect x="16" y="35" width="8" height="14" fill="rgba(0,210,255,0.25)" rx="0.5"/><rect x="26" y="25" width="8" height="24" fill="rgba(0,210,255,0.5)" rx="0.5"/><rect x="36" y="31" width="8" height="18" fill="rgba(0,210,255,0.2)" rx="0.5"/></svg>` },
+  { id:'warm',      name:'Warm & Human',    desc:'Conexão emocional, acolhimento', icon:'🌿',
+    sample:`<svg viewBox="0 0 50 60" xmlns="http://www.w3.org/2000/svg"><rect width="50" height="60" fill="#FDF6EC"/><ellipse cx="25" cy="20" rx="15" ry="10" fill="#F3D9B5" opacity="0.7"/><rect x="10" y="33" width="30" height="5" fill="#7C5C3A" rx="2.5"/><rect x="14" y="42" width="22" height="3.5" fill="#A07850" rx="1.5" opacity="0.7"/><rect x="18" y="48.5" width="14" height="3" fill="#C09870" rx="1.5" opacity="0.5"/></svg>` },
+  { id:'creative',  name:'Creative',        desc:'Surpresa visual, quebra as regras', icon:'✦',
+    sample:`<svg viewBox="0 0 50 60" xmlns="http://www.w3.org/2000/svg"><rect width="50" height="60" fill="#1A1220"/><rect x="0" y="0" width="23" height="33" fill="#7C2FE0" opacity="0.75"/><rect x="25" y="8" width="25" height="22" fill="#F36B2A" opacity="0.8"/><rect x="8" y="35" width="20" height="20" fill="#F5C518" opacity="0.65"/><rect x="30" y="33" width="20" height="16" fill="#2AE0B0" opacity="0.55"/><rect x="4" y="13" width="11" height="5" fill="#fff" rx="1" opacity="0.95"/></svg>` },
+  { id:'data',      name:'Data & Authority', desc:'O número como herói do design', icon:'◈',
+    sample:`<svg viewBox="0 0 50 60" xmlns="http://www.w3.org/2000/svg"><rect width="50" height="60" fill="#0D1117"/><rect x="5" y="8" width="40" height="15" fill="rgba(245,197,24,0.1)" rx="1.5"/><rect x="12" y="13" width="26" height="6" fill="rgba(245,197,24,0.6)" rx="1"/><rect x="5" y="27" width="40" height="1.5" fill="rgba(245,197,24,0.2)" rx="0.5"/><rect x="5" y="31" width="35" height="3.5" fill="rgba(245,197,24,0.5)" rx="1"/><rect x="5" y="37" width="22" height="3.5" fill="rgba(245,197,24,0.3)" rx="1"/><rect x="5" y="43" width="28" height="3.5" fill="rgba(245,197,24,0.2)" rx="1"/><rect x="5" y="49" width="40" height="1.5" fill="rgba(245,197,24,0.2)" rx="0.5"/></svg>` },
 ];
 
 function renderVoiceGrid() {
