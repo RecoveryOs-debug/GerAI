@@ -8457,14 +8457,16 @@ async function bsRefine(ctx) {
     if (!r.ok) { const d=await r.json().catch(()=>({})); toast(d.error||'Erro ao refinar','err'); return; }
     const d = await r.json();
     state.refined = d.refinedPrompt;
+    state.blueprint = d.blueprint || null;
+    if (d.blueprint) window._refinedBlueprint = d.blueprint;
     if (me) { me.quota_used=(me.quota_used||0)+1; updateQuota(); }
-    _bsShowRefined(ctx, d.refinedPrompt);
+    _bsShowRefined(ctx, d.refinedPrompt, d.blueprint);
     toast('Prompt refinado!','ok');
   } catch(e) { toast('Erro de conexão','err'); }
   finally { if (refEl) { refEl.disabled=false; refEl.innerHTML=prevHtml; } }
 }
 
-function _bsShowRefined(ctx, text) {
+function _bsShowRefined(ctx, text, blueprint) {
   const wrapEl = document.getElementById(`bs-${ctx}-refined-wrap`);
   const textEl = document.getElementById(`bs-${ctx}-refined-text`);
   if (!wrapEl||!textEl) return;
@@ -8474,6 +8476,7 @@ function _bsShowRefined(ctx, text) {
   // sync to compatible inputs
   if (ctx === 'image') {
     window._refinedPrompt = text;
+    if (blueprint) window._refinedBlueprint = blueprint;
     const h = document.getElementById('gen-in'); if (h) h.value = text;
     // Exibe botão de gerar — usuário confirma formato antes de disparar
     const gb = document.getElementById('bs-image-gerar-btn');
@@ -8505,6 +8508,7 @@ function bsReset(ctx) {
   const r=document.getElementById(`bs-${ctx}-refine`); if(r) r.disabled=true;
   if (ctx==='image') {
     window._refinedPrompt='';
+    window._refinedBlueprint=null;
     const h=document.getElementById('gen-in'); if(h)h.value='';
     const gb=document.getElementById('bs-image-gerar-btn'); if(gb) gb.style.display='none';
   } else { const h=document.getElementById(`ag-${ctx}-in`);if(h)h.value=''; }
@@ -8641,6 +8645,7 @@ async function gerarImagem() {
           network: _netMap[_currentNet] || 'instagram',
           brandProfile, slideIndex: sIdx, totalSlides: total, slideRole,
           postFormat: _selectedPostFormat || undefined,
+          blueprint: window._refinedBlueprint || undefined,
         });
         _renderCarouselSlide(sIdx, svg, total);
       } catch(e) {
@@ -8666,6 +8671,7 @@ async function gerarImagem() {
       network: _netMap[_currentNet] || 'instagram',
       brandProfile,
       postFormat: _selectedPostFormat || undefined,
+      blueprint: window._refinedBlueprint || undefined,
     });
     window._currentSVG = svg;
     _currentSVG = svg;

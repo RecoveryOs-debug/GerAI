@@ -3011,7 +3011,7 @@ function resolveLayout(templateId, dim, brief, brand) {
 // ── Estágio 1: Brief Analyst ──────────────────────────────────────────────────
 // Recebe o input bruto e extrai a hierarquia de conteúdo em JSON estruturado.
 // Garante que o texto seja real, específico, no tom da marca.
-async function daStage1Brief({ prompt, format, network, brand, slideRole }) {
+async function daStage1Brief({ prompt, format, network, brand, slideRole, blueprint, slideIndex }) {
   const fmtLabel = { post:'Post', carrossel:'Carrossel', story:'Story', reels:'Reels',
                      thumb:'Thumbnail', banner:'Banner', anuncio:'Anúncio' }[format] || format;
   const system =
@@ -3075,6 +3075,30 @@ DATA HIGHLIGHT — O NÚMERO QUE CONVENCE:
   "composition_hint": "text-dominant | data-hero | split-layout | quote-focus | list-view"
 }`;
 
+  // Fast path: structured blueprint from refiner — 0 tokens needed
+  if (blueprint && blueprint.headline && format !== 'carrossel') {
+    const styleMap = { minimal:'clean-premium', editorial:'editorial-warm', luxury:'clean-premium',
+      modern:'tech-sharp', bold:'bold-energy', typographic:'dark-power', warm:'soft-trust' };
+    const fontMap = { 'bold-uppercase':'display-bold', 'mixed-weight':'display-bold',
+      'serif-italic':'serif-elegant', 'display-black':'display-bold', editorial:'editorial' };
+    return {
+      data: {
+        headline: blueprint.headline,
+        subheadline: blueprint.subheadline || null,
+        body_points: [],
+        cta: 'Saiba mais',
+        data_highlight: null,
+        visual_mood: styleMap[blueprint.visual?.style] || 'dark-power',
+        content_type: blueprint.type === 'carousel' ? 'educational' : 'motivational',
+        emphasis: 'statement',
+        font_mood: fontMap[blueprint.typography?.headline_style] || 'display-bold',
+        composition_hint: 'text-dominant',
+        _blueprint: blueprint,
+      },
+      tok: { in: 0, out: 0 },
+    };
+  }
+
   const r = await callClaude({
     system,
     userMsg: `INPUT: "${prompt}"\n\nAnalise e extraia a hierarquia de conteúdo com copywriting de nível mundial:`,
@@ -3116,18 +3140,33 @@ async function daStage2ArtDir({ brief, brand, dim, format, slideIndex, totalSlid
     blueprint.slide_indicator.text = `${slideIndex}${totalSlides ? '/' + totalSlides : ''}`;
   }
 
-  // 4) Lightweight Claude call: apenas personaliza cores, gradiente bg e atmosphere
-  //    DNA/voice tem prioridade total. Se não há DNA, Claude usa paleta da marca.
-  const palettePrompt =
-`Você é um colorista de design. Dado o brief e paleta abaixo, retorne SOMENTE JSON com as personalizações de cor e atmosfera.
-PALETA: P1=${brand.p1} P2=${brand.p2} P3=${brand.p3} P4=${brand.p4}
-ESTILO: ${brand.estilo} | MOOD: ${brief.visual_mood || 'dark-power'}
-TEMPLATE: ${tplId} — ${LAYOUT_TEMPLATES[tplId]?.name || ''}
-${dna ? `\nDNA/VOZ:\n${dna.slice(0, 600)}` : ''}
-BRIEF: headline="${brief.headline}" | content_type=${brief.content_type}
+  // 4) Apply colors: use blueprint colors if available (0 tokens), else Claude palette call
+  const brief_bp = brief._blueprint;
+  if (brief_bp?.colors) {
+    const c = brief_bp.colors;
+    blueprint.bg.color      = c.background || brand.p2;
+    blueprint.bg.grad_from  = c.background || brand.p2;
+    blueprint.bg.grad_to    = c.background || brand.p2;
+    blueprint.glow_color    = c.accent     || brand.p1;
+    if (blueprint.headline)    blueprint.headline.color    = c.text   || brand.p3;
+    if (blueprint.subheadline) blueprint.subheadline.color = c.text   || brand.p4;
+    if (blueprint.footer)      blueprint.footer.color      = c.text   || brand.p4;
+    if (blueprint.cta_block)   blueprint.cta_block.bg_color = c.accent || brand.p1;
+    blueprint._accent_color = c.accent || brand.p1;
+    const toneAtmo = { bold:'strong typographic power', editorial:'editorial precision', luxury:'premium refinement',
+      minimal:'clean breathing space', authoritative:'confident dark depth', warm:'organic warmth' };
+    blueprint._atmosphere = toneAtmo[brief_bp.tone] || 'strong visual impact';
+    return { data: blueprint, tok: { in: 0, out: 0 } };
+  }
 
-Retorne JSON compacto (sem espaços extras):
-{"bg_color":"#hex","bg_grad_from":"#hex","bg_grad_to":"#hex","bg_grad_angle":135,"hl_color":"#hex","sub_color":"#hex","ft_color":"#hex","accent_color":"#hex","glow_color":"#hex","atmosphere":"${brief.visual_mood || 'dark-power'}"}`;
+  // Lightweight Claude call: palette only (~300 tokens) — fallback when no blueprint colors
+  const palettePrompt = `Você é um colorista de design. Baseado no brief e DNA da marca, retorne JSON compacto de cores:
+{"bg_color":"#hex","bg_grad_from":"#hex","bg_grad_to":"#hex","bg_grad_angle":135,"hl_color":"#hex","sub_color":"#hex","ft_color":"#hex","accent_color":"#hex","glow_color":"#hex","atmosphere":"..."}
+
+Marca: ${brand.profissao} | Nicho: ${brand.nicho} | Tom: ${brand.tom}
+Paleta base: p1=${brand.p1} p2=${brand.p2} p3=${brand.p3} p4=${brand.p4}
+Template: ${blueprint._templateName} | Visual mood: ${brief.visual_mood || 'dark-power'}
+Headline: "${brief.headline}"`;
 
   let tok = { in: 0, out: 0 };
   try {
@@ -3136,23 +3175,16 @@ Retorne JSON compacto (sem espaços extras):
     const m = r.text.match(/\{[\s\S]*?\}/);
     if (m) {
       const pal = JSON.parse(m[0]);
-      // Aplica cores ao blueprint
-      if (blueprint.bg) {
-        if (pal.bg_color)      blueprint.bg.color      = pal.bg_color;
-        if (pal.bg_grad_from)  blueprint.bg.grad_from  = pal.bg_grad_from;
-        if (pal.bg_grad_to)    blueprint.bg.grad_to    = pal.bg_grad_to;
-        if (pal.bg_grad_angle) blueprint.bg.grad_angle = pal.bg_grad_angle;
-        blueprint.bg.type = (pal.bg_grad_from && pal.bg_grad_to && pal.bg_grad_from !== pal.bg_grad_to)
-          ? 'linear-gradient' : 'solid';
-      }
-      if (blueprint.headline  && pal.hl_color)     blueprint.headline.color     = pal.hl_color;
-      if (blueprint.subheadline && pal.sub_color)  blueprint.subheadline.color  = pal.sub_color;
-      if (blueprint.footer    && pal.ft_color)     blueprint.footer.color       = pal.ft_color;
-      if (pal.glow_color) blueprint._glow_color = pal.glow_color;
-      if (pal.accent_color) blueprint._accent_color = pal.accent_color;
-      if (pal.atmosphere)   blueprint._atmosphere   = pal.atmosphere;
+      if (pal.bg_color)      { blueprint.bg.color = pal.bg_color; blueprint.bg.grad_from = pal.bg_grad_from||pal.bg_color; blueprint.bg.grad_to = pal.bg_grad_to||pal.bg_color; blueprint.bg.grad_angle = pal.bg_grad_angle||135; }
+      if (pal.hl_color && blueprint.headline)    blueprint.headline.color    = pal.hl_color;
+      if (pal.sub_color && blueprint.subheadline) blueprint.subheadline.color = pal.sub_color;
+      if (pal.ft_color && blueprint.footer)      blueprint.footer.color      = pal.ft_color;
+      if (pal.glow_color)    blueprint.glow_color    = pal.glow_color;
+      if (pal.accent_color)  blueprint._accent_color = pal.accent_color;
+      if (pal.atmosphere)    blueprint._atmosphere   = pal.atmosphere;
+      if (pal.accent_color && blueprint.cta_block) blueprint.cta_block.bg_color = pal.accent_color;
     }
-  } catch { /* fallback silencioso — blueprint com cores da marca já está ok */ }
+  } catch { /* silent fallback */ }
 
   return { data: blueprint, tok };
 }
@@ -3364,13 +3396,31 @@ CHECKLIST FINAL:
 
   const r = await callClaude({
     system,
-    userMsg: `Plataforma: ${DA_NET_LABELS[network] || network} | Mood: ${mood}
+    userMsg: (() => {
+      const bp = brief._blueprint;
+      if (bp) {
+        return `Platform: ${DA_NET_LABELS[network]||network} | Canvas: ${dim.w}×${dim.h}px
+HEADLINE: "${brief.headline}"${brief.subheadline ? `\nSUBHEADLINE: "${brief.subheadline}"` : ''}
+VISUAL: ${bp.visual?.style||mood} | bg: ${bp.visual?.background||'solid'}
+COLORS: bg=${bgColor} text=${bp.colors?.text||'#FFFFFF'} accent=${accentColor}
+LAYOUT: ${bp.layout?.alignment||'center'} | ${bp.layout?.hierarchy||'headline-dominant'} | ${bp.layout?.spacing||'airy'}
+TYPOGRAPHY: headline=${bp.typography?.headline_style||'bold-uppercase'} body=${bp.typography?.body_style||'none'}
+ELEMENTS: shapes=${bp.elements?.shapes||'none'} accents=${bp.elements?.accents||'minimal'}
+TONE: ${bp.tone||mood}
+
+Pre-rendered text (copy verbatim into Layer 6):
+${preBuiltText}
+
+Build the complete SVG now. Replace the Layer 6 comment with the pre-rendered text block above:`;
+      }
+      return `Plataforma: ${DA_NET_LABELS[network] || network} | Mood: ${mood}
 Accent: ${accentColor} | Glow: ${glowColor} | BgFrom: ${bgFrom} | BgTo: ${bgTo} | Angle: ${bgAngle}°
 
 BLOCO DE TEXTO PRÉ-RENDERIZADO (copie verbatim na Camada 6, sem alterar nada):
 ${preBuiltText}
 
-Construa o SVG completo agora (nível top 0.1% do Brasil). Substitua o comentário da Camada 6 pelo bloco acima:`,
+Construa o SVG completo agora (nível top 0.1% do Brasil). Substitua o comentário da Camada 6 pelo bloco acima:`;
+    })(),
     maxTokens: 6000,
   });
 
@@ -3745,6 +3795,7 @@ route('POST', '/api/user/design-agent', async (req, res) => {
   const {
     prompt, format = 'post', network = 'instagram', brandProfile,
     slideIndex, totalSlides, slideRole, postFormat,
+    blueprint,
   } = await parseBody(req);
 
   if (!prompt) {
@@ -3792,7 +3843,7 @@ route('POST', '/api/user/design-agent', async (req, res) => {
     // ── Estágio 1: Brief Analysis ──────────────────────────────────────────
     send('stage', { stage: 1, total: isTweet ? 2 : 3, label: 'Analisando conteúdo...', pct: 8 });
 
-    const s1 = await daStage1Brief({ prompt, format, network, brand, slideRole });
+    const s1 = await daStage1Brief({ prompt, format, network, brand, slideRole, blueprint, slideIndex: slideIdx });
     totalIn  += s1.tok.in;
     totalOut += s1.tok.out;
 
@@ -3926,10 +3977,13 @@ REGRA 4 — 1 PERGUNTA NO MÁXIMO:
 Se precisar clarificar: escolha 1 pergunta — a mais cirúrgica.
 Não faça lista. Uma só.
 
-REGRA 5 — ÂNGULOS CONCRETOS:
-Bom: "e se o ângulo for: a meta impossível que queima vendedor em 6 meses?"
+REGRA 5 — ÂNGULOS CONCRETOS + HEADLINE VISUAL:
+Ao propor um ângulo, sempre traduza em 1-2 headlines visuais (máx 8 palavras).
+Ex ângulo: "a meta impossível que queima vendedor em 6 meses"
+→ "Sua meta foi desenhada para te quebrar"
+→ "A meta impossível que queima quem vende"
+Isso mostra o post antes de existir. Pense: o que PARA O SCROLL?
 Ruim: "você pode explorar a exaustão profissional de forma geral"
-Proponha o twist que torna a ideia do usuário irresistível — mas sem mudar o tópico.
 
 REGRA 6 — WEB SEARCH COM CRITÉRIO:
 Use para dado concreto sobre o tópico EXATO mencionado.
@@ -3987,32 +4041,73 @@ route('POST', '/api/user/brainstorm/refine', async (req, res) => {
     thumb: 'Thumbnail', banner: 'Banner', reels: 'Reels' }[format] || (format || '');
   const rnetLabel = { ig: 'Instagram', li: 'LinkedIn', yt: 'YouTube', tt: 'TikTok', fb: 'Facebook',
     instagram: 'Instagram', linkedin: 'LinkedIn', youtube: 'YouTube', tiktok: 'TikTok' }[network] || (network || '');
-  const fmtHint = (rfmtLabel || rnetLabel) ? `\nFormato: ${rfmtLabel || '-'} | Rede: ${rnetLabel || '-'}` : '';
+  const brandColors = `p1=${brand.p1||'#7C3AED'} p2=${brand.p2||'#0D0D0F'} p3=${brand.p3||'#FFFFFF'} p4=${brand.p4||'#AAAAAA'}`;
 
   const system =
-`Você é um especialista em copywriting e direção criativa de nível mundial.
-Com base na conversa de brainstorm abaixo, crie um prompt DETALHADO e ESPECÍFICO para geração de ${ctxType}.${fmtHint}
+`You are an elite visual design strategist. Convert the brainstorm conversation into a structured design blueprint.
+Output ONLY valid JSON. Zero extra text. Zero explanations.
 
-O prompt deve conter de forma clara:
-• Tema central e ângulo criativo específico
-• Tom, estilo e intensidade desejados
-• Dados, números ou elementos concretos mencionados
-• Objetivo (educar, vender, engajar, inspirar)
-• Público-alvo e transformação que o conteúdo deve provocar
+RULES:
+- headline and subheadline: write in the SAME language used in the conversation (detect it — if Portuguese, write Portuguese; if English, write English)
+- slides array: write in the SAME language as the conversation
+- All structural keys (visual, layout, colors, etc): use ONLY the English labels listed below
+- headline: max 8 words — must stop the scroll, visual impact
+- subheadline: max 14 words, or null
+- For carousel: slides = array of short strings, one per slide. First = hook, last = CTA. 4-7 slides.
+- For post: slides = null
+- Colors: use brand palette as base, adapt to visual style. Brand: ${brandColors}
+- Format: ${rfmtLabel || 'post'} | Network: ${rnetLabel || 'instagram'}
+- Brand: ${brand.profissao} | ${brand.nicho} | tone: ${brand.tom}
 
-Marca: ${brand.profissao} | Nicho: ${brand.nicho} | Tom: ${brand.tom} | Público: ${brand.publico}
-
-RETORNE APENAS O PROMPT REFINADO — sem introdução, sem explicação, direto ao ponto.
-Tamanho: 80-200 palavras. Seja específico, rico e direto.`;
+OUTPUT — return exactly this JSON structure, nothing else:
+{
+  "type": "post|carousel",
+  "headline": "...",
+  "subheadline": "...|null",
+  "slides": ["hook slide text", "slide 2", "...", "CTA slide text"]|null,
+  "visual": {
+    "background": "solid|gradient|texture",
+    "style": "minimal|editorial|luxury|modern|bold|typographic",
+    "image_usage": "none|subtle|dominant"
+  },
+  "layout": {
+    "alignment": "center|left|mixed",
+    "hierarchy": "headline-dominant|data-hero|list-flow|editorial",
+    "spacing": "airy|balanced|compact"
+  },
+  "colors": {
+    "background": "#hex",
+    "text": "#hex",
+    "accent": "#hex"
+  },
+  "typography": {
+    "headline_style": "bold-uppercase|mixed-weight|serif-italic|display-black|editorial",
+    "body_style": "none|minimal|small-regular"
+  },
+  "elements": {
+    "shapes": "none|lines|geometric|brackets",
+    "accents": "none|minimal|arrows|numbers|rule-left"
+  },
+  "tone": "bold|emotional|minimal|luxury|authoritative|warm"
+}`;
 
   try {
     const r = await callClaudeMessages({
       system,
-      messages: [{ role: 'user', content: `Conversa de brainstorm:\n\n${conversationStr}\n\nGere o prompt refinado:` }],
-      maxTokens: 450,
+      messages: [{ role: 'user', content: `Brainstorm conversation:\n\n${conversationStr}\n\nGenerate the design blueprint JSON:` }],
+      maxTokens: 600,
     });
     const tok = { in: r.inputTokens || 0, out: r.outputTokens || 0 };
-    res.end(JSON.stringify({ ok: true, refinedPrompt: r.text.trim(), tok }));
+    let blueprint = null;
+    try {
+      const m = r.text.match(/\{[\s\S]*\}/);
+      if (m) blueprint = JSON.parse(m[0]);
+    } catch { /* blueprint stays null */ }
+    // refinedPrompt is a human-readable summary for display
+    const refinedPrompt = blueprint
+      ? [blueprint.headline, blueprint.subheadline].filter(Boolean).join(' — ')
+      : r.text.trim();
+    res.end(JSON.stringify({ ok: true, refinedPrompt, blueprint, tok }));
   } catch(e) {
     return err(res, 'Erro ao refinar: ' + e.message);
   }
