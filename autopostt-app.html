@@ -6387,8 +6387,27 @@ body.image-agent-refining #image-agent-refine-overlay{
               </div>
             </div>
             <div class="bs-refined-text" id="bs-image-refined-text"></div>
+
+            <!-- Passo 2: Avançar para escolha de formato+tom -->
+            <div id="bs-image-advance-btn" style="display:none;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.07);text-align:right">
+              <button onclick="bsAdvance()" style="background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:8px 20px;cursor:pointer;font-family:var(--f);font-size:12px;font-weight:700;color:#fff;letter-spacing:-.02em;box-shadow:0 2px 12px rgba(243,107,42,.28)">
+                Gerar →
+              </button>
+            </div>
+
+            <!-- Passo 3: Escolha de formato + tom de marca (auto-dispara Refinador #2) -->
+            <div id="bs-image-fmt-voice-panel" style="display:none;margin-top:12px;padding:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px">
+              <!-- Grade de formatos (renderizada por renderBsFormatPanel) -->
+              <div id="bs-panel-fmt-container"></div>
+              <!-- Tom de marca -->
+              <div style="font-size:9.5px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.12em;margin-top:14px;margin-bottom:8px">Tom de marca</div>
+              <div id="bs-panel-voice-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:5px"></div>
+              <button id="bs-panel-voice-none" onclick="panelSelVoice(null)" style="width:100%;margin-top:5px;padding:7px;background:transparent;border:1px dashed rgba(255,255,255,0.15);border-radius:6px;cursor:pointer;font-family:var(--f);font-size:11px;color:var(--t3);transition:.15s">✦ Liberdade total (sem estilo fixo)</button>
+            </div>
+
+            <!-- Passo 4: Gerar (aparece só após Refinador #2) -->
             <div id="bs-image-gerar-btn" style="display:none;align-items:center;gap:10px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.07)">
-              <span style="font-size:10.5px;color:var(--t3);flex:1">Confirme o formato acima e clique para gerar</span>
+              <span style="font-size:10.5px;color:var(--t3);flex:1">Tudo pronto. Clique para gerar sua imagem.</span>
               <button onclick="startGenPipeline()" style="background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:8px 18px;cursor:pointer;font-family:var(--f);font-size:12px;font-weight:700;color:#fff;letter-spacing:-.02em;box-shadow:0 2px 12px rgba(243,107,42,.28);white-space:nowrap;flex-shrink:0">
                 Gerar imagem →
               </button>
@@ -7742,15 +7761,22 @@ let _currentNet = 'ig';
 const _netMap = { ig:'instagram', li:'linkedin', yt:'youtube', tt:'tiktok' };
 const skt = ['Interpretando sua ideia...','Aplicando perfil de marca...','Refinando com contexto da marca...','Finalizando prompt...'];
 
+// Refinador #2: estado do painel de formato+tom
+let _panelFmt         = null;      // tipo principal: 'post'|'carousel'|'tweet'
+let _panelSubFmt      = null;      // sub-formato: 'BIG_STATEMENT'|'LIST_CAROUSEL'|etc.
+let _panelTab         = 'post';    // aba ativa no painel
+let _panelVoiceChosen = false;     // usuário já escolheu algo (inclui "liberdade total")
+let _panelVoiceObj    = undefined; // null=liberdade total, obj=brand voice
+
+const _panelFmtLabels = { post:'Post único', carousel:'Carrossel', tweet:'Tweet Card' };
+
 function selFmt(f) {
   _currentFmt = f;
   document.querySelectorAll('.fmt').forEach(c => c.classList.remove('on'));
   const el = document.getElementById('f-' + f);
   if (el) { el.classList.add('on'); el.querySelector('svg').style.color='var(--a)'; }
-  // Mostra seletor de slides só para carrossel
   var sc = document.getElementById('slide-count-row');
   if (sc) sc.style.display = (f === 'carrossel') ? 'flex' : 'none';
-  // Reset contagem ao trocar formato
   if (f !== 'carrossel') {
     _slideCount = 0;
     document.querySelectorAll('.sc-btn').forEach(function(b) { b.classList.remove('on'); });
@@ -8457,10 +8483,11 @@ async function bsRefine(ctx) {
     if (!r.ok) { const d=await r.json().catch(()=>({})); toast(d.error||'Erro ao refinar','err'); return; }
     const d = await r.json();
     state.refined = d.refinedPrompt;
-    state.blueprint = d.blueprint || null;
-    if (d.blueprint) window._refinedBlueprint = d.blueprint;
+    state.blueprint = null;
+    window._refinedBase1   = d.refinedPrompt; // base para Refinador #2
+    window._refinedBlueprint = null;            // limpa blueprint anterior
     if (me) { me.quota_used=(me.quota_used||0)+1; updateQuota(); }
-    _bsShowRefined(ctx, d.refinedPrompt, d.blueprint);
+    _bsShowRefined(ctx, d.refinedPrompt, null);
     toast('Prompt refinado!','ok');
   } catch(e) { toast('Erro de conexão','err'); }
   finally { if (refEl) { refEl.disabled=false; refEl.innerHTML=prevHtml; } }
@@ -8476,11 +8503,15 @@ function _bsShowRefined(ctx, text, blueprint) {
   // sync to compatible inputs
   if (ctx === 'image') {
     window._refinedPrompt = text;
-    if (blueprint) window._refinedBlueprint = blueprint;
     const h = document.getElementById('gen-in'); if (h) h.value = text;
-    // Exibe botão de gerar — usuário confirma formato antes de disparar
+    // Mostra botão de avançar para escolha de formato+tom
+    const ab = document.getElementById('bs-image-advance-btn');
+    if (ab) ab.style.display = 'block';
+    // Esconde gerar btn e painel (podem estar visíveis de sessão anterior)
     const gb = document.getElementById('bs-image-gerar-btn');
-    if (gb) gb.style.display = 'flex';
+    if (gb) gb.style.display = 'none';
+    const fp = document.getElementById('bs-image-fmt-voice-panel');
+    if (fp) fp.style.display = 'none';
   } else {
     const h = document.getElementById(`ag-${ctx}-in`); if (h) h.value = text;
   }
@@ -8509,9 +8540,166 @@ function bsReset(ctx) {
   if (ctx==='image') {
     window._refinedPrompt='';
     window._refinedBlueprint=null;
+    window._refinedBase1='';
+    _panelFmt=null; _panelSubFmt=null; _panelVoiceChosen=false; _panelVoiceObj=undefined;
     const h=document.getElementById('gen-in'); if(h)h.value='';
-    const gb=document.getElementById('bs-image-gerar-btn'); if(gb) gb.style.display='none';
+    const ab=document.getElementById('bs-image-advance-btn'); if(ab)ab.style.display='none';
+    const fp=document.getElementById('bs-image-fmt-voice-panel'); if(fp)fp.style.display='none';
+    const gb=document.getElementById('bs-image-gerar-btn'); if(gb)gb.style.display='none';
   } else { const h=document.getElementById(`ag-${ctx}-in`);if(h)h.value=''; }
+}
+
+// ── Refinador #2: formato + tom de marca ─────────────────────────────────────
+
+function bsAdvance() {
+  const ab = document.getElementById('bs-image-advance-btn');
+  if (ab) ab.style.display = 'none';
+  const fp = document.getElementById('bs-image-fmt-voice-panel');
+  if (fp) { fp.style.display = 'block'; fp.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
+  _panelFmt = null; _panelSubFmt = null; _panelTab = 'post';
+  _panelVoiceChosen = false; _panelVoiceObj = undefined;
+  renderBsFormatPanel();
+  renderPanelVoiceGrid();
+}
+
+function bsFmtTab(tab) {
+  _panelTab = tab;
+  var btnPost = document.getElementById('bs-fmt-tab-post');
+  var btnCar  = document.getElementById('bs-fmt-tab-car');
+  if (btnPost) { btnPost.style.background = tab==='post' ? 'rgba(243,107,42,.18)' : 'rgba(255,255,255,.05)'; btnPost.style.borderColor = tab==='post' ? 'var(--a)' : 'rgba(255,255,255,.08)'; btnPost.style.color = tab==='post' ? 'var(--a)' : 'var(--t3)'; }
+  if (btnCar)  { btnCar.style.background  = tab==='car'  ? 'rgba(243,107,42,.18)' : 'rgba(255,255,255,.05)'; btnCar.style.borderColor  = tab==='car'  ? 'var(--a)' : 'rgba(255,255,255,.08)'; btnCar.style.color  = tab==='car'  ? 'var(--a)' : 'var(--t3)'; }
+  var secPost = document.getElementById('bs-fmt-section-post');
+  var secCar  = document.getElementById('bs-fmt-section-car');
+  if (secPost) secPost.style.display = tab==='post' ? 'grid' : 'none';
+  if (secCar)  secCar.style.display  = tab==='car'  ? 'grid' : 'none';
+}
+
+function renderBsFormatPanel() {
+  var container = document.getElementById('bs-panel-fmt-container');
+  if (!container) return;
+  var tile = function(fmt, mainType) {
+    return '<div onclick="panelSelFmt(\''+fmt.id+'\',\''+mainType+'\')" id="bsp-ft-'+fmt.id+'" title="'+fmt.desc+'" style="cursor:pointer;border-radius:8px;overflow:hidden;border:1.5px solid rgba(255,255,255,.06);transition:.15s;background:rgba(255,255,255,.03);display:flex;flex-direction:column;align-items:center">'
+      + fmt.svg.replace('viewBox="0 0 80 100"','viewBox="0 0 80 100" width="100%" height="auto" style="display:block"')
+      + '<div style="font-size:9px;font-weight:600;color:rgba(255,255,255,.6);padding:4px 2px;text-align:center;line-height:1.2;width:100%">'+fmt.name+'</div>'
+    + '</div>';
+  };
+  var tabBtn = function(id, label, isActive) {
+    return '<button id="'+id+'" onclick="bsFmtTab(\''+( id==='bs-fmt-tab-post'?'post':'car')+'\')" style="flex:1;padding:6px 4px;font-family:var(--f);font-size:10.5px;font-weight:700;border-radius:6px;cursor:pointer;transition:.15s;border:1px solid '+(isActive?'var(--a)':'rgba(255,255,255,.08)')+';background:'+(isActive?'rgba(243,107,42,.18)':'rgba(255,255,255,.05)')+';color:'+(isActive?'var(--a)':'var(--t3)')+'">'+label+'</button>';
+  };
+  var postTiles = BS_POST_FORMATS.map(function(f){ return tile(f,'post'); }).join('')
+    + tile(BS_TWEET_FORMAT, 'tweet');
+  var carTiles = BS_CAROUSEL_FORMATS.map(function(f){ return tile(f,'carousel'); }).join('')
+    + tile(Object.assign({},BS_TWEET_FORMAT,{id:'TWEET_THREAD',name:'Thread / X'}), 'tweet');
+
+  container.innerHTML =
+    '<div style="display:flex;gap:5px;margin-bottom:10px">'
+      + tabBtn('bs-fmt-tab-post','Post único',true)
+      + tabBtn('bs-fmt-tab-car','Carrossel',false)
+    + '</div>'
+    + '<div id="bs-fmt-section-post" style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;max-height:320px;overflow-y:auto;padding-right:2px">'+postTiles+'</div>'
+    + '<div id="bs-fmt-section-car"  style="display:none;grid-template-columns:repeat(3,1fr);gap:5px;max-height:320px;overflow-y:auto;padding-right:2px">'+carTiles+'</div>';
+}
+
+function panelSelFmt(subId, mainType) {
+  _panelFmt    = mainType;
+  _panelSubFmt = subId;
+  document.querySelectorAll('[id^="bsp-ft-"]').forEach(function(t){
+    t.style.borderColor = 'rgba(255,255,255,.06)';
+    t.style.background  = 'rgba(255,255,255,.03)';
+  });
+  var el = document.getElementById('bsp-ft-'+subId);
+  if (el) { el.style.borderColor = 'var(--a)'; el.style.background = 'rgba(243,107,42,.1)'; }
+  _panelCheckReady();
+}
+
+function panelSelVoice(idx) {
+  _panelVoiceObj    = (idx !== null && idx >= 0) ? BRAND_VOICES_UI[idx] : null;
+  _panelVoiceChosen = true;
+  renderPanelVoiceGrid();
+  _panelCheckReady();
+}
+
+function renderPanelVoiceGrid() {
+  const grid = document.getElementById('bs-panel-voice-grid');
+  if (!grid || !BRAND_VOICES_UI) return;
+  grid.innerHTML = BRAND_VOICES_UI.map((v, i) => {
+    const active = _panelVoiceChosen && _panelVoiceObj && _panelVoiceObj.id === v.id;
+    return `<button onclick="panelSelVoice(${i})" style="padding:7px 10px;background:${active?'rgba(243,107,42,.12)':'rgba(255,255,255,.04)'};border:1px solid ${active?'var(--a)':'rgba(255,255,255,.08)'};border-radius:7px;cursor:pointer;font-family:var(--f);text-align:left;transition:.15s;width:100%">
+      <div style="font-size:11px;font-weight:700;color:${active?'var(--a)':'var(--tx-0)'};line-height:1.2">${v.icon} ${v.name}</div>
+      <div style="font-size:9px;color:var(--tx-2);margin-top:2px">${v.desc||''}</div>
+    </button>`;
+  }).join('');
+  const noneBtn = document.getElementById('bs-panel-voice-none');
+  if (noneBtn) {
+    const noneActive = _panelVoiceChosen && _panelVoiceObj === null;
+    noneBtn.style.borderColor = noneActive ? 'var(--a)' : 'rgba(255,255,255,.15)';
+    noneBtn.style.color       = noneActive ? 'var(--a)' : 'var(--t3)';
+  }
+}
+
+function _panelCheckReady() {
+  if (_panelFmt !== null && _panelVoiceChosen) {
+    setTimeout(bsRefine2, 350);
+  }
+}
+
+async function bsRefine2() {
+  const base = window._refinedBase1 || window._refinedPrompt || '';
+  if (!base) { toast('Refine o prompt primeiro','err'); return; }
+
+  // Fecha o painel
+  const fp = document.getElementById('bs-image-fmt-voice-panel');
+  if (fp) fp.style.display = 'none';
+
+  // Mostra overlay divertido
+  const overlay = document.getElementById('refine2-overlay');
+  const fmtName  = _panelFmtLabels[_panelFmt] || _panelFmt;
+  const vName    = _panelVoiceObj ? _panelVoiceObj.name : 'Liberdade total';
+  if (overlay) {
+    document.getElementById('refine2-title').textContent = `Refinando para ${fmtName}...`;
+    document.getElementById('refine2-msg').textContent   = `Tom: ${vName} · Calculando o scroll-stop perfeito`;
+    overlay.style.display = 'flex';
+  }
+
+  try {
+    const brandProfile = BrandProfileModule ? BrandProfileModule.toGenerationPayload({
+      voiceId: _panelVoiceObj?.id||'', voiceName: _panelVoiceObj?.name||'',
+      modelN:'', modelName:'', modelSvg:'',
+      userName: me?.name||'', logoData: window._logoData||null,
+    }) : {};
+    const resp = await fetch(API+'/api/user/brainstorm/refine-format', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({
+        refineBase: base,
+        format:    _panelFmt,
+        subFormat: _panelSubFmt,
+        network:   _currentNet || 'ig',
+        voiceName: _panelVoiceObj?.name || '',
+        brandProfile,
+      }),
+    });
+    if (!resp.ok) { const d=await resp.json().catch(()=>({})); throw new Error(d.error||'Erro'); }
+    const d = await resp.json();
+    // Aplica resultado
+    window._refinedBlueprint = d.blueprint;
+    if (_panelVoiceObj !== undefined) {
+      _selectedVoice = _panelVoiceObj;
+      window._selectedVoice = _panelVoiceObj;
+    }
+    _currentFmt = _panelFmt;
+    selFmt(_panelFmt); // sincroniza seletor visual principal
+    if (me) { me.quota_used=(me.quota_used||0)+1; updateQuota(); }
+    // Mostra botão final
+    const gb = document.getElementById('bs-image-gerar-btn');
+    if (gb) gb.style.display = 'flex';
+  } catch(e) {
+    toast('Erro ao refinar: '+e.message,'err');
+    // Restaura painel para o usuário tentar de novo
+    if (fp) fp.style.display = 'block';
+  } finally {
+    if (overlay) overlay.style.display = 'none';
+  }
 }
 
 // Legacy: startGenPipeline calls gerarImagem only if refined or brainstorm has content
@@ -11191,6 +11379,58 @@ function selectPostFormat(fmt) {
   if (costEl) costEl.textContent = fmt === 'tweet' ? '4 créditos' : '2 créditos';
 }
 
+// ─── FORMAT MOCK DEFINITIONS ─────────────────────────────────────────────────
+// SVG viewBox="0 0 80 100" — displayed at 56×70px. Colors: Autopostt brand.
+const BS_POST_FORMATS = [
+  { id:'BIG_STATEMENT', name:'Big Statement', desc:'1 frase central, muito espaço',
+    svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="100" fill="#0D0D0F"/><rect x="10" y="36" width="60" height="8" rx="2" fill="rgba(255,255,255,.88)"/><rect x="14" y="48" width="52" height="8" rx="2" fill="rgba(255,255,255,.88)"/><circle cx="40" cy="68" r="2.5" fill="#F36B2A"/></svg>` },
+  { id:'QUESTION_HOOK', name:'Question Hook', desc:'Pergunta que para o scroll',
+    svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="100" fill="#0D0D0F"/><rect x="8" y="26" width="3.5" height="26" rx="1.75" fill="#F36B2A" opacity=".75"/><rect x="16" y="28" width="54" height="7" rx="2" fill="rgba(255,255,255,.85)"/><rect x="16" y="39" width="42" height="7" rx="2" fill="rgba(255,255,255,.85)"/><rect x="16" y="56" width="36" height="3.5" rx="1.5" fill="rgba(255,255,255,.25)"/></svg>` },
+  { id:'CONTROVERSIAL_OPINION', name:'Controversial', desc:'Opinião forte, gera reação',
+    svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="100" fill="#0D0D0F"/><rect x="6" y="32" width="68" height="14" rx="3" fill="rgba(243,107,42,.13)"/><rect x="10" y="36" width="56" height="6" rx="2" fill="rgba(255,255,255,.88)"/><rect x="10" y="52" width="60" height="6" rx="2" fill="rgba(255,255,255,.6)"/><rect x="10" y="62" width="44" height="6" rx="2" fill="rgba(255,255,255,.6)"/><rect x="10" y="76" width="18" height="2" rx="1" fill="#F36B2A"/></svg>` },
+  { id:'QUICK_TIP', name:'Quick Tip', desc:'Dica imediata + aplicável',
+    svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="100" fill="#0D0D0F"/><rect x="8" y="16" width="32" height="8" rx="4" fill="rgba(243,107,42,.22)"/><rect x="12" y="19" width="24" height="3" rx="1.5" fill="#F36B2A" opacity=".85"/><rect x="8" y="32" width="52" height="6" rx="2" fill="rgba(255,255,255,.85)"/><rect x="8" y="44" width="64" height=".8" fill="rgba(255,255,255,.06)"/><rect x="8" y="52" width="60" height="4" rx="1.5" fill="rgba(255,255,255,.35)"/><rect x="8" y="60" width="50" height="4" rx="1.5" fill="rgba(255,255,255,.35)"/></svg>` },
+  { id:'MINI_LIST', name:'Mini List (3)', desc:'Leitura em 3 segundos',
+    svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="100" fill="#0D0D0F"/><rect x="8" y="12" width="52" height="5.5" rx="2" fill="rgba(255,255,255,.72)"/><rect x="8" y="24" width="64" height=".8" fill="rgba(255,255,255,.06)"/><circle cx="15" cy="37" r="5.5" fill="#F36B2A"/><rect x="25" y="34" width="42" height="5" rx="1.5" fill="rgba(255,255,255,.7)"/><circle cx="15" cy="52" r="5.5" fill="#F36B2A"/><rect x="25" y="49" width="38" height="5" rx="1.5" fill="rgba(255,255,255,.7)"/><circle cx="15" cy="67" r="5.5" fill="#F36B2A"/><rect x="25" y="64" width="40" height="5" rx="1.5" fill="rgba(255,255,255,.7)"/></svg>` },
+  { id:'QUOTE_AUTHORITY', name:'Quote Authority', desc:'Citação + autoridade',
+    svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="100" fill="#0D0D0F"/><rect x="8" y="18" width="4" height="12" rx="1.5" fill="rgba(243,107,42,.65)"/><rect x="14" y="18" width="4" height="12" rx="1.5" fill="rgba(243,107,42,.65)"/><rect x="8" y="38" width="64" height="6" rx="2" fill="rgba(255,255,255,.8)"/><rect x="8" y="48" width="52" height="6" rx="2" fill="rgba(255,255,255,.8)"/><rect x="8" y="62" width="32" height=".8" fill="rgba(255,255,255,.15)"/><rect x="8" y="69" width="40" height="4" rx="1.5" fill="rgba(255,255,255,.35)"/></svg>` },
+  { id:'BEFORE_AFTER', name:'Before / After', desc:'Contraste visual claro',
+    svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="100" fill="#0D0D0F"/><rect x="2" y="8" width="36" height="84" rx="3" fill="rgba(255,255,255,.04)"/><rect x="42" y="8" width="36" height="84" rx="3" fill="rgba(243,107,42,.07)"/><rect x="39" y="8" width="2" height="84" fill="#0D0D0F"/><rect x="7" y="18" width="24" height="4" rx="2" fill="rgba(255,255,255,.35)"/><rect x="47" y="18" width="24" height="4" rx="2" fill="rgba(243,107,42,.85)"/><rect x="7" y="36" width="22" height="3.5" rx="1.5" fill="rgba(255,255,255,.3)"/><rect x="7" y="44" width="18" height="3.5" rx="1.5" fill="rgba(255,255,255,.3)"/><rect x="47" y="36" width="22" height="3.5" rx="1.5" fill="rgba(255,255,255,.72)"/><rect x="47" y="44" width="18" height="3.5" rx="1.5" fill="rgba(255,255,255,.72)"/></svg>` },
+  { id:'CTA_POST', name:'CTA Post', desc:'Texto forte + call to action',
+    svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="100" fill="#0D0D0F"/><rect x="10" y="24" width="60" height="7" rx="2" fill="rgba(255,255,255,.85)"/><rect x="14" y="35" width="52" height="7" rx="2" fill="rgba(255,255,255,.85)"/><rect x="14" y="50" width="48" height="3.5" rx="1.5" fill="rgba(255,255,255,.3)"/><rect x="14" y="64" width="52" height="14" rx="7" fill="#F36B2A"/><rect x="24" y="69" width="32" height="4" rx="2" fill="rgba(255,255,255,.9)"/></svg>` },
+  { id:'STAT_POST', name:'Stat Post', desc:'Dado numérico como herói',
+    svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="100" fill="#0D0D0F"/><rect x="8" y="18" width="64" height="28" rx="4" fill="rgba(255,255,255,.04)"/><rect x="16" y="24" width="48" height="14" rx="3" fill="rgba(255,255,255,.88)"/><rect x="28" y="52" width="24" height="2" rx="1" fill="#F36B2A"/><rect x="10" y="60" width="60" height="5" rx="2" fill="rgba(255,255,255,.5)"/><rect x="16" y="69" width="48" height="5" rx="2" fill="rgba(255,255,255,.3)"/></svg>` },
+  { id:'BRAND_STATEMENT', name:'Brand Statement', desc:'Posicionamento da marca',
+    svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="100" fill="#0D0D0F"/><rect x="30" y="20" width="20" height="1.5" rx=".75" fill="#F36B2A"/><rect x="12" y="30" width="56" height="6" rx="2" fill="rgba(255,255,255,.82)"/><rect x="16" y="40" width="48" height="6" rx="2" fill="rgba(255,255,255,.82)"/><rect x="30" y="54" width="20" height="1.5" rx=".75" fill="#F36B2A"/><rect x="28" y="68" width="24" height="4" rx="2" fill="rgba(255,255,255,.2)"/></svg>` },
+];
+
+// Carousel SVGs: right-edge peek + slide dots at bottom (y=94)
+const BS_CAROUSEL_FORMATS = [
+  { id:'LIST_CAROUSEL', name:'List Carousel', desc:'Hook + 1 item/slide + CTA',
+    svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="100" fill="#0D0D0F"/><rect x="74" y="6" width="4" height="82" rx="2" fill="rgba(255,255,255,.06)"/><rect x="8" y="10" width="54" height="6" rx="2" fill="rgba(255,255,255,.8)"/><rect x="8" y="20" width="42" height="4" rx="1.5" fill="rgba(255,255,255,.4)"/><rect x="8" y="30" width="64" height=".8" fill="rgba(255,255,255,.06)"/><circle cx="14" cy="42" r="4.5" fill="#F36B2A"/><rect x="23" y="39" width="40" height="5" rx="1.5" fill="rgba(255,255,255,.68)"/><circle cx="14" cy="55" r="4.5" fill="#F36B2A"/><rect x="23" y="52" width="36" height="5" rx="1.5" fill="rgba(255,255,255,.68)"/><circle cx="14" cy="68" r="4.5" fill="#F36B2A"/><rect x="23" y="65" width="38" height="5" rx="1.5" fill="rgba(255,255,255,.68)"/><circle cx="28" cy="94" r="2.5" fill="#F36B2A"/><circle cx="35" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/><circle cx="41" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/><circle cx="47" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/></svg>` },
+  { id:'EDUCATIONAL_CAROUSEL', name:'Educational', desc:'Hook → valor → payoff',
+    svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="100" fill="#0D0D0F"/><rect x="74" y="6" width="4" height="82" rx="2" fill="rgba(255,255,255,.06)"/><rect x="6" y="8" width="66" height="18" rx="3" fill="rgba(243,107,42,.1)"/><rect x="10" y="13" width="54" height="7" rx="2" fill="rgba(255,255,255,.85)"/><rect x="10" y="34" width="60" height="5" rx="1.5" fill="rgba(255,255,255,.5)"/><rect x="10" y="43" width="52" height="5" rx="1.5" fill="rgba(255,255,255,.5)"/><rect x="10" y="52" width="44" height="5" rx="1.5" fill="rgba(255,255,255,.5)"/><rect x="6" y="64" width="66" height="14" rx="3" fill="rgba(255,255,255,.04)"/><rect x="10" y="69" width="46" height="5" rx="1.5" fill="rgba(255,255,255,.65)"/><circle cx="28" cy="94" r="2.5" fill="#F36B2A"/><circle cx="35" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/><circle cx="41" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/><circle cx="47" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/></svg>` },
+  { id:'MISTAKE_CAROUSEL', name:'Mistake Carousel', desc:'Erros + solução',
+    svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="100" fill="#0D0D0F"/><rect x="74" y="6" width="4" height="82" rx="2" fill="rgba(255,255,255,.06)"/><rect x="8" y="10" width="54" height="6" rx="2" fill="rgba(255,255,255,.8)"/><rect x="6" y="26" width="8" height="8" rx="2" fill="rgba(220,60,60,.75)"/><rect x="18" y="28" width="44" height="4" rx="1.5" fill="rgba(255,255,255,.65)"/><rect x="6" y="40" width="8" height="8" rx="2" fill="rgba(220,60,60,.75)"/><rect x="18" y="42" width="40" height="4" rx="1.5" fill="rgba(255,255,255,.65)"/><rect x="6" y="54" width="8" height="8" rx="2" fill="rgba(220,60,60,.75)"/><rect x="18" y="56" width="42" height="4" rx="1.5" fill="rgba(255,255,255,.65)"/><rect x="6" y="70" width="66" height="12" rx="3" fill="rgba(243,107,42,.15)"/><rect x="10" y="74" width="44" height="4" rx="1.5" fill="#F36B2A" opacity=".8"/><circle cx="28" cy="94" r="2.5" fill="#F36B2A"/><circle cx="35" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/><circle cx="41" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/><circle cx="47" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/></svg>` },
+  { id:'STEP_BY_STEP', name:'Step by Step', desc:'Sequência clara + resultado',
+    svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="100" fill="#0D0D0F"/><rect x="74" y="6" width="4" height="82" rx="2" fill="rgba(255,255,255,.06)"/><rect x="8" y="10" width="52" height="5.5" rx="2" fill="rgba(255,255,255,.78)"/><rect x="14" y="22" width="1.5" height="52" rx=".75" fill="rgba(255,255,255,.1)"/><circle cx="14.75" cy="30" r="5" fill="#F36B2A"/><rect x="24" y="27" width="42" height="5" rx="1.5" fill="rgba(255,255,255,.7)"/><circle cx="14.75" cy="46" r="5" fill="#F36B2A" opacity=".7"/><rect x="24" y="43" width="38" height="5" rx="1.5" fill="rgba(255,255,255,.6)"/><circle cx="14.75" cy="62" r="5" fill="#F36B2A" opacity=".5"/><rect x="24" y="59" width="40" height="5" rx="1.5" fill="rgba(255,255,255,.5)"/><rect x="8" y="74" width="64" height="8" rx="3" fill="rgba(243,107,42,.15)"/><rect x="12" y="77" width="36" height="3" rx="1.5" fill="rgba(255,255,255,.5)"/><circle cx="28" cy="94" r="2.5" fill="#F36B2A"/><circle cx="35" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/><circle cx="41" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/><circle cx="47" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/></svg>` },
+  { id:'STORY_CAROUSEL', name:'Story Carousel', desc:'Flow narrativo emocional',
+    svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="100" fill="#0D0D0F"/><rect x="74" y="6" width="4" height="82" rx="2" fill="rgba(255,255,255,.06)"/><rect x="6" y="8" width="66" height="22" rx="3" fill="rgba(255,255,255,.04)"/><rect x="10" y="14" width="56" height="7" rx="2" fill="rgba(255,255,255,.82)"/><rect x="10" y="38" width="60" height="5" rx="1.5" fill="rgba(255,255,255,.45)"/><rect x="10" y="47" width="52" height="5" rx="1.5" fill="rgba(255,255,255,.45)"/><rect x="6" y="60" width="66" height="16" rx="3" fill="rgba(243,107,42,.1)"/><rect x="10" y="65" width="54" height="6" rx="2" fill="rgba(255,255,255,.75)"/><circle cx="28" cy="94" r="2.5" fill="#F36B2A"/><circle cx="35" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/><circle cx="41" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/><circle cx="47" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/></svg>` },
+  { id:'CONTRAST_CAROUSEL', name:'Contrast Carousel', desc:'Comparação + dualidade',
+    svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="100" fill="#0D0D0F"/><rect x="74" y="6" width="4" height="82" rx="2" fill="rgba(255,255,255,.06)"/><rect x="4" y="8" width="32" height="78" rx="3" fill="rgba(255,255,255,.04)"/><rect x="40" y="8" width="32" height="78" rx="3" fill="rgba(243,107,42,.07)"/><rect x="37" y="8" width="2" height="78" fill="#0D0D0F"/><rect x="8" y="18" width="22" height="4" rx="2" fill="rgba(255,255,255,.35)"/><rect x="44" y="18" width="22" height="4" rx="2" fill="rgba(243,107,42,.85)"/><rect x="8" y="36" width="20" height="3" rx="1.5" fill="rgba(255,255,255,.28)"/><rect x="8" y="44" width="18" height="3" rx="1.5" fill="rgba(255,255,255,.28)"/><rect x="44" y="36" width="20" height="3" rx="1.5" fill="rgba(255,255,255,.68)"/><rect x="44" y="44" width="18" height="3" rx="1.5" fill="rgba(255,255,255,.68)"/><circle cx="28" cy="94" r="2.5" fill="#F36B2A"/><circle cx="35" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/><circle cx="41" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/><circle cx="47" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/></svg>` },
+  { id:'CHECKLIST_CAROUSEL', name:'Checklist', desc:'Simples e escaneável',
+    svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="100" fill="#0D0D0F"/><rect x="74" y="6" width="4" height="82" rx="2" fill="rgba(255,255,255,.06)"/><rect x="8" y="10" width="52" height="5.5" rx="2" fill="rgba(255,255,255,.8)"/><rect x="8" y="28" width="7" height="7" rx="1.5" fill="#F36B2A"/><rect x="19" y="29.5" width="42" height="4" rx="1.5" fill="rgba(255,255,255,.7)"/><rect x="8" y="40" width="7" height="7" rx="1.5" fill="#F36B2A"/><rect x="19" y="41.5" width="38" height="4" rx="1.5" fill="rgba(255,255,255,.7)"/><rect x="8" y="52" width="7" height="7" rx="1.5" fill="rgba(255,255,255,.12)"/><rect x="19" y="53.5" width="40" height="4" rx="1.5" fill="rgba(255,255,255,.4)"/><rect x="8" y="64" width="7" height="7" rx="1.5" fill="rgba(255,255,255,.12)"/><rect x="19" y="65.5" width="36" height="4" rx="1.5" fill="rgba(255,255,255,.4)"/><circle cx="28" cy="94" r="2.5" fill="#F36B2A"/><circle cx="35" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/><circle cx="41" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/><circle cx="47" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/></svg>` },
+  { id:'MYTH_BUSTING', name:'Myth Busting', desc:'Mito → Verdade',
+    svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="100" fill="#0D0D0F"/><rect x="74" y="6" width="4" height="82" rx="2" fill="rgba(255,255,255,.06)"/><rect x="8" y="10" width="52" height="5.5" rx="2" fill="rgba(255,255,255,.8)"/><rect x="6" y="25" width="66" height="14" rx="2" fill="rgba(220,60,60,.1)"/><rect x="8" y="28" width="18" height="3.5" rx="1.5" fill="rgba(220,100,100,.8)"/><rect x="30" y="28" width="38" height="3.5" rx="1.5" fill="rgba(255,255,255,.5)"/><rect x="6" y="45" width="66" height="14" rx="2" fill="rgba(80,200,120,.08)"/><rect x="8" y="48" width="22" height="3.5" rx="1.5" fill="rgba(80,200,120,.8)"/><rect x="34" y="48" width="34" height="3.5" rx="1.5" fill="rgba(255,255,255,.6)"/><rect x="6" y="65" width="66" height="14" rx="2" fill="rgba(220,60,60,.1)"/><rect x="8" y="68" width="18" height="3.5" rx="1.5" fill="rgba(220,100,100,.8)"/><rect x="30" y="68" width="38" height="3.5" rx="1.5" fill="rgba(255,255,255,.5)"/><circle cx="28" cy="94" r="2.5" fill="#F36B2A"/><circle cx="35" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/><circle cx="41" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/><circle cx="47" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/></svg>` },
+  { id:'TIPS_CAROUSEL', name:'Tips Carousel', desc:'Dicas rápidas de valor',
+    svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="100" fill="#0D0D0F"/><rect x="74" y="6" width="4" height="82" rx="2" fill="rgba(255,255,255,.06)"/><rect x="8" y="10" width="52" height="5.5" rx="2" fill="rgba(255,255,255,.8)"/><rect x="8" y="20" width="38" height="3.5" rx="1.5" fill="rgba(255,255,255,.35)"/><rect x="8" y="32" width="3" height="3" rx="1" fill="#F36B2A"/><rect x="15" y="32" width="52" height="4" rx="1.5" fill="rgba(255,255,255,.65)"/><rect x="8" y="44" width="3" height="3" rx="1" fill="#F36B2A"/><rect x="15" y="44" width="48" height="4" rx="1.5" fill="rgba(255,255,255,.65)"/><rect x="8" y="56" width="3" height="3" rx="1" fill="#F36B2A"/><rect x="15" y="56" width="50" height="4" rx="1.5" fill="rgba(255,255,255,.65)"/><rect x="8" y="68" width="3" height="3" rx="1" fill="#F36B2A"/><rect x="15" y="68" width="44" height="4" rx="1.5" fill="rgba(255,255,255,.65)"/><circle cx="28" cy="94" r="2.5" fill="#F36B2A"/><circle cx="35" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/><circle cx="41" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/><circle cx="47" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/></svg>` },
+  { id:'TRANSFORMATION', name:'Transformation', desc:'Antes → processo → depois',
+    svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="100" fill="#0D0D0F"/><rect x="74" y="6" width="4" height="82" rx="2" fill="rgba(255,255,255,.06)"/><rect x="6" y="8" width="66" height="22" rx="3" fill="rgba(255,255,255,.04)"/><rect x="10" y="14" width="54" height="5.5" rx="2" fill="rgba(255,255,255,.5)"/><rect x="34" y="36" width="12" height="2" rx="1" fill="#F36B2A" opacity=".7"/><rect x="36" y="38" width="8" height="2" rx="1" fill="#F36B2A" opacity=".7"/><rect x="38" y="40" width="4" height="2" rx="1" fill="#F36B2A" opacity=".7"/><rect x="6" y="50" width="66" height="28" rx="3" fill="rgba(243,107,42,.1)"/><rect x="10" y="57" width="54" height="6.5" rx="2" fill="rgba(255,255,255,.85)"/><rect x="10" y="67" width="42" height="4" rx="1.5" fill="rgba(255,255,255,.4)"/><circle cx="28" cy="94" r="2.5" fill="#F36B2A"/><circle cx="35" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/><circle cx="41" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/><circle cx="47" cy="94" r="1.8" fill="rgba(255,255,255,.2)"/></svg>` },
+];
+
+const BS_TWEET_FORMAT = { id:'TWEET_CARD', name:'Tweet Card', desc:'Card estilo Twitter/X',
+  svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="100" fill="#0D0D0F"/><rect x="4" y="4" width="72" height="92" rx="8" fill="#0F1117"/><rect x="4" y="4" width="72" height="92" rx="8" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="1"/><circle cx="18" cy="20" r="7" fill="rgba(255,255,255,.12)"/><rect x="30" y="16" width="30" height="4" rx="2" fill="rgba(255,255,255,.7)"/><rect x="30" y="23" width="20" height="3" rx="1.5" fill="rgba(255,255,255,.3)"/><rect x="12" y="38" width="56" height="5.5" rx="2" fill="rgba(255,255,255,.8)"/><rect x="12" y="47" width="52" height="5.5" rx="2" fill="rgba(255,255,255,.8)"/><rect x="12" y="56" width="44" height="5.5" rx="2" fill="rgba(255,255,255,.8)"/><rect x="12" y="72" width="14" height="3" rx="1.5" fill="rgba(255,255,255,.2)"/><rect x="30" y="72" width="14" height="3" rx="1.5" fill="rgba(255,255,255,.2)"/><rect x="48" y="72" width="14" height="3" rx="1.5" fill="rgba(255,255,255,.2)"/></svg>` };
+
 // ─── BRAND VOICE SYSTEM ──────────────────────────────────────────────────────
 var _selectedVoice = null;
 
@@ -13105,5 +13345,18 @@ document.addEventListener('DOMContentLoaded', function () {
 })();
 </script>
 
+<!-- ── Refinador #2: overlay de loading divertido ── -->
+<div id="refine2-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(5,5,8,.92);backdrop-filter:blur(16px);align-items:center;justify-content:center;flex-direction:column">
+  <div style="text-align:center;padding:40px 24px;max-width:380px">
+    <div style="font-size:40px;margin-bottom:20px;display:inline-block;animation:spin 1.8s linear infinite;color:var(--a)">✦</div>
+    <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:8px;letter-spacing:-.03em;line-height:1.2" id="refine2-title">Refinando para o formato...</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.45);margin-bottom:28px;line-height:1.5" id="refine2-msg">Adaptando layout, tom e headline</div>
+    <div style="display:flex;gap:8px;justify-content:center">
+      <div style="width:6px;height:6px;border-radius:50%;background:var(--a);animation:pulse .7s ease-in-out infinite"></div>
+      <div style="width:6px;height:6px;border-radius:50%;background:var(--a);animation:pulse .7s .2s ease-in-out infinite"></div>
+      <div style="width:6px;height:6px;border-radius:50%;background:var(--a);animation:pulse .7s .4s ease-in-out infinite"></div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
