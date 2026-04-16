@@ -6333,8 +6333,7 @@ body.image-agent-refining #image-agent-refine-overlay{
                 <button class="sc-btn" data-n="7" onclick="selSlides(this,7)">7 <span style="font-size:9px;opacity:.6">14cr</span></button>
               </div>
             </div>
-            <!-- Sub-formato: aparece contextualmente para post/carrossel -->
-            <div id="left-subfmt-panel" style="display:none;margin-top:14px"></div>
+            <!-- Sub-formato: movido para coluna direita (bs-sel-panel) -->
           </div>
           <!-- network -->
           <div>
@@ -6397,20 +6396,7 @@ body.image-agent-refining #image-agent-refine-overlay{
               </button>
             </div>
 
-            <!-- Passo 3: Tom de marca (formato já escolhido na coluna lateral) -->
-            <div id="bs-image-fmt-voice-panel" style="display:none;margin-top:12px;padding:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px">
-              <div style="font-size:9.5px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">Tom visual de marca</div>
-              <div id="bs-panel-voice-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:5px"></div>
-              <button id="bs-panel-voice-none" onclick="panelSelVoice(null)" style="width:100%;margin-top:5px;padding:7px;background:transparent;border:1px dashed rgba(255,255,255,0.15);border-radius:6px;cursor:pointer;font-family:var(--f);font-size:11px;color:var(--t3);transition:.15s">✦ Liberdade total (sem estilo fixo)</button>
-            </div>
-
-            <!-- Passo 4: Gerar (aparece só após Refinador #2) -->
-            <div id="bs-image-gerar-btn" style="display:none;align-items:center;gap:10px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.07)">
-              <span style="font-size:10.5px;color:var(--t3);flex:1">Tudo pronto. Clique para gerar sua imagem.</span>
-              <button onclick="startGenPipeline()" style="background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:8px 18px;cursor:pointer;font-family:var(--f);font-size:12px;font-weight:700;color:#fff;letter-spacing:-.02em;box-shadow:0 2px 12px rgba(243,107,42,.28);white-space:nowrap;flex-shrink:0">
-                Gerar imagem →
-              </button>
-            </div>
+            <!-- bs-image-fmt-voice-panel e bs-image-gerar-btn movidos para gen-col-right (bs-sel-panel) -->
           </div>
           <!-- compat: hidden textarea + prompt wrap -->
           <textarea id="gen-in" style="display:none"></textarea>
@@ -6485,6 +6471,21 @@ body.image-agent-refining #image-agent-refine-overlay{
             </div>
           </div><!-- /gen-visual-slot -->
 
+          <!-- Brainstorm: formato sub + tom (aparece após "Gerar →") -->
+          <div id="bs-sel-panel" style="display:none;margin-top:14px">
+            <div id="bs-sel-subfmt-container"></div>
+            <div style="font-size:9.5px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.12em;margin-top:14px;margin-bottom:8px">Tom visual de marca</div>
+            <div id="bs-panel-voice-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:5px"></div>
+            <button id="bs-panel-voice-none" onclick="panelSelVoice(null)" style="width:100%;margin-top:5px;padding:7px;background:transparent;border:1px dashed rgba(255,255,255,0.15);border-radius:6px;cursor:pointer;font-family:var(--f);font-size:11px;color:var(--t3);transition:.15s">✦ Liberdade total (sem estilo fixo)</button>
+            <!-- Gerar imagem (aparece após Refinador #2) -->
+            <div id="bs-image-gerar-btn" style="display:none;align-items:center;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07)">
+              <span style="font-size:10.5px;color:var(--t3);flex:1">Tudo pronto. Clique para gerar sua imagem.</span>
+              <button onclick="startGenPipeline()" style="background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:8px 18px;cursor:pointer;font-family:var(--f);font-size:12px;font-weight:700;color:#fff;letter-spacing:-.02em;box-shadow:0 2px 12px rgba(243,107,42,.28);white-space:nowrap;flex-shrink:0">
+                Gerar imagem →
+              </button>
+            </div>
+          </div>
+
           <div class="divider" style="margin:14px 0 12px"></div>
 
           <!-- Format do post (tweet vs padrão) + voice picker — sempre visíveis -->
@@ -6547,7 +6548,7 @@ body.image-agent-refining #image-agent-refine-overlay{
             </label>
           </div>
           <div class="cmd-box" id="cmd-out" data-prompt="" style="word-break:break-word;font-size:11px;display:none"><span id="cmd-out-txt" style="color:var(--t3);font-style:italic"></span><button class="cp-btn" onclick="cpElById('cmd-out')">Copiar</button></div>
-          <button id="btn-gerar-img" onclick="gerarImagem()" style="width:100%;margin-top:10px;background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--f);font-size:13px;font-weight:700;color:#fff;letter-spacing:-.02em;box-shadow:0 4px 20px rgba(243,107,42,.3);transition:all .15s">
+          <button id="btn-gerar-img" onclick="gerarImagem()" style="display:none;width:100%;margin-top:10px;background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:13px;cursor:pointer;align-items:center;justify-content:center;gap:8px;font-family:var(--f);font-size:13px;font-weight:700;color:#fff;letter-spacing:-.02em;box-shadow:0 4px 20px rgba(243,107,42,.3);transition:all .15s">
             <svg style="width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             Gerar imagem com IA
             <span style="margin-left:auto;font-size:10px;font-weight:500;opacity:.75;background:rgba(0,0,0,.2);border-radius:10px;padding:2px 7px" id="btn-gerar-img-cost">2 créditos</span>
@@ -7784,7 +7785,6 @@ function selFmt(f) {
     var first = document.querySelector('.sc-btn[data-n="0"]');
     if (first) first.classList.add('on');
   }
-  renderLeftSubFmtGrid(f);
 }
 
 // Slide count state
@@ -8546,8 +8546,9 @@ function bsReset(ctx) {
     _panelSubFmt=null; _panelVoiceChosen=false; _panelVoiceObj=undefined; _bsAdvanced=false;
     const h=document.getElementById('gen-in'); if(h)h.value='';
     const ab=document.getElementById('bs-image-advance-btn'); if(ab)ab.style.display='none';
-    const fp=document.getElementById('bs-image-fmt-voice-panel'); if(fp)fp.style.display='none';
+    const sp=document.getElementById('bs-sel-panel'); if(sp)sp.style.display='none';
     const gb=document.getElementById('bs-image-gerar-btn'); if(gb)gb.style.display='none';
+    const btnGerar = document.getElementById('btn-gerar-img'); if(btnGerar) btnGerar.style.display='none';
   } else { const h=document.getElementById(`ag-${ctx}-in`);if(h)h.value=''; }
 }
 
@@ -8557,26 +8558,15 @@ function bsAdvance() {
   _bsAdvanced = true;
   const ab = document.getElementById('bs-image-advance-btn');
   if (ab) ab.style.display = 'none';
-  const fp = document.getElementById('bs-image-fmt-voice-panel');
-  if (fp) { fp.style.display = 'block'; fp.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
   _panelVoiceChosen = false; _panelVoiceObj = undefined;
+  const sp = document.getElementById('bs-sel-panel');
+  if (sp) { sp.style.display = 'block'; sp.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
+  renderBsSubFmtGrid(_currentFmt);
   renderPanelVoiceGrid();
 }
 
-function bsFmtTab(tab) {
-  _panelTab = tab;
-  var btnPost = document.getElementById('bs-fmt-tab-post');
-  var btnCar  = document.getElementById('bs-fmt-tab-car');
-  if (btnPost) { btnPost.style.background = tab==='post' ? 'rgba(243,107,42,.18)' : 'rgba(255,255,255,.05)'; btnPost.style.borderColor = tab==='post' ? 'var(--a)' : 'rgba(255,255,255,.08)'; btnPost.style.color = tab==='post' ? 'var(--a)' : 'var(--t3)'; }
-  if (btnCar)  { btnCar.style.background  = tab==='car'  ? 'rgba(243,107,42,.18)' : 'rgba(255,255,255,.05)'; btnCar.style.borderColor  = tab==='car'  ? 'var(--a)' : 'rgba(255,255,255,.08)'; btnCar.style.color  = tab==='car'  ? 'var(--a)' : 'var(--t3)'; }
-  var secPost = document.getElementById('bs-fmt-section-post');
-  var secCar  = document.getElementById('bs-fmt-section-car');
-  if (secPost) secPost.style.display = tab==='post' ? 'grid' : 'none';
-  if (secCar)  secCar.style.display  = tab==='car'  ? 'grid' : 'none';
-}
-
-function renderLeftSubFmtGrid(fmt) {
-  var panel = document.getElementById('left-subfmt-panel');
+function renderBsSubFmtGrid(fmt) {
+  var panel = document.getElementById('bs-sel-subfmt-container');
   if (!panel) return;
   if (fmt !== 'post' && fmt !== 'carrossel') {
     panel.style.display = 'none';
@@ -8584,10 +8574,9 @@ function renderLeftSubFmtGrid(fmt) {
     return;
   }
   var formats = fmt === 'post' ? BS_POST_FORMATS : BS_CAROUSEL_FORMATS;
-  var mainType = fmt; // 'post' or 'carrossel'
   var tiles = formats.map(function(f) {
     var isActive = (_panelSubFmt === f.id);
-    return '<div onclick="panelSelFmt(\''+f.id+'\',\''+mainType+'\')" id="bsp-ft-'+f.id+'" title="'+f.desc+'"'
+    return '<div onclick="panelSelFmt(\''+f.id+'\',\''+fmt+'\')" id="bsp-ft-'+f.id+'" title="'+f.desc+'"'
       +' style="cursor:pointer;border-radius:8px;overflow:hidden;border:1.5px solid '+(isActive?'var(--a)':'rgba(255,255,255,.06)')+';transition:.15s;background:'+(isActive?'rgba(243,107,42,.1)':'rgba(255,255,255,.03)')+';display:flex;flex-direction:column;align-items:center">'
       + f.svg.replace('viewBox="0 0 80 100"','viewBox="0 0 80 100" width="100%" height="auto" style="display:block"')
       + '<div style="font-size:9px;font-weight:600;color:rgba(255,255,255,.6);padding:4px 2px;text-align:center;line-height:1.2;width:100%">'+f.name+'</div>'
@@ -8602,8 +8591,8 @@ function renderLeftSubFmtGrid(fmt) {
 function panelSelFmt(subId, mainType) {
   _panelFmt    = mainType;
   _panelSubFmt = subId;
-  // Re-render left grid to update tile highlights
-  renderLeftSubFmtGrid(mainType);
+  // Re-render grid to update tile highlights
+  renderBsSubFmtGrid(mainType);
   _panelCheckReady();
 }
 
@@ -8646,8 +8635,8 @@ async function bsRefine2() {
   if (!base) { toast('Refine o prompt primeiro','err'); return; }
 
   // Fecha o painel
-  const fp = document.getElementById('bs-image-fmt-voice-panel');
-  if (fp) fp.style.display = 'none';
+  const sp = document.getElementById('bs-sel-panel');
+  if (sp) sp.style.display = 'none';
 
   // Mostra overlay divertido
   const overlay = document.getElementById('refine2-overlay');
@@ -8689,10 +8678,13 @@ async function bsRefine2() {
     // Mostra botão final
     const gb = document.getElementById('bs-image-gerar-btn');
     if (gb) gb.style.display = 'flex';
+    const btnGerar = document.getElementById('btn-gerar-img');
+    if (btnGerar) btnGerar.style.display = 'flex';
   } catch(e) {
     toast('Erro ao refinar: '+e.message,'err');
     // Restaura painel para o usuário tentar de novo
-    if (fp) fp.style.display = 'block';
+    const spErr = document.getElementById('bs-sel-panel');
+    if (spErr) spErr.style.display = 'block';
   } finally {
     if (overlay) overlay.style.display = 'none';
   }
