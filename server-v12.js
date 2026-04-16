@@ -3396,31 +3396,14 @@ CHECKLIST FINAL:
 
   const r = await callClaude({
     system,
-    userMsg: (() => {
-      const bp = brief._blueprint;
-      if (bp) {
-        return `Platform: ${DA_NET_LABELS[network]||network} | Canvas: ${dim.w}×${dim.h}px
-HEADLINE: "${brief.headline}"${brief.subheadline ? `\nSUBHEADLINE: "${brief.subheadline}"` : ''}
-VISUAL: ${bp.visual?.style||mood} | bg: ${bp.visual?.background||'solid'}
-COLORS: bg=${bgColor} text=${bp.colors?.text||'#FFFFFF'} accent=${accentColor}
-LAYOUT: ${bp.layout?.alignment||'center'} | ${bp.layout?.hierarchy||'headline-dominant'} | ${bp.layout?.spacing||'airy'}
-TYPOGRAPHY: headline=${bp.typography?.headline_style||'bold-uppercase'} body=${bp.typography?.body_style||'none'}
-ELEMENTS: shapes=${bp.elements?.shapes||'none'} accents=${bp.elements?.accents||'minimal'}
-TONE: ${bp.tone||mood}
+    userMsg: `Plataforma: ${DA_NET_LABELS[network]||network} | Canvas: ${dim.w}×${dim.h}px | Mood: ${mood}
+BG: ${bgColor} | Accent: ${accentColor} | Glow: ${glowColor}
+Camadas ativas: ${(() => { const bp = brief._blueprint; const l = []; l.push('fundo', 'glow', 'decoração', 'ruído', 'texto'); if (bp?.visual?.image_usage === 'dominant' || bp?.visual?.image_usage === 'subtle') l.push('imagem'); return l.join(', '); })()}
 
-Pre-rendered text (copy verbatim into Layer 6):
+BLOCO DE TEXTO PRÉ-RENDERIZADO — copie verbatim na Camada 6, sem alterar nenhum caractere:
 ${preBuiltText}
 
-Build the complete SVG now. Replace the Layer 6 comment with the pre-rendered text block above:`;
-      }
-      return `Plataforma: ${DA_NET_LABELS[network] || network} | Mood: ${mood}
-Accent: ${accentColor} | Glow: ${glowColor} | BgFrom: ${bgFrom} | BgTo: ${bgTo} | Angle: ${bgAngle}°
-
-BLOCO DE TEXTO PRÉ-RENDERIZADO (copie verbatim na Camada 6, sem alterar nada):
-${preBuiltText}
-
-Construa o SVG completo agora (nível top 0.1% do Brasil). Substitua o comentário da Camada 6 pelo bloco acima:`;
-    })(),
+Construa o SVG completo agora. Substitua o comentário da Camada 6 pelo bloco acima:`,
     maxTokens: 6000,
   });
 
@@ -3950,50 +3933,43 @@ route('POST', '/api/user/brainstorm', async (req, res) => {
     : '\nFORMATO/REDE: ainda não selecionados pelo usuário';
 
   const system =
-`Você é o Creative Strategist — pensa como estrategista, fala como amigo que entende do assunto.
-Missão única: pegar a ideia EXATA que o usuário trouxe, afiar, e guiar até a geração.
+`Você é o estrategista criativo da Autopostt.
+Sem formalidade, sem consultoria, sem rodeios.
+Fale como um amigo que entende muito de conteúdo — direto, específico, humano.
 
-CONTEXTO DA MARCA: ${brand.profissao} | Nicho: ${brand.nicho} | Tom: ${brand.tom} | Público: ${brand.publico}${fmtCtx}
+MARCA: ${brand.profissao} | Nicho: ${brand.nicho} | Tom: ${brand.tom} | Público: ${brand.publico}${fmtCtx}
 
-━━━ REGRAS — NUNCA QUEBRE ━━━
+━━━ COMO VOCÊ AGE ━━━
 
-REGRA 1 — TÓPICO LITERAL:
-Trabalhe a ideia EXATA do usuário. Sem pivot, sem generalização.
-"Burnout em vendas" → desenvolva burnout em vendas. NUNCA burnout em conteúdo, NUNCA exaustão genérica.
-"Produtividade matinal" → produtividade matinal. NUNCA "bem-estar" ou "rotina saudável".
-Todo ângulo, dado e pergunta deve ser sobre o tópico EXATO mencionado — use as palavras exatas do usuário.
+Você fica no tópico que o usuário trouxe — sempre.
+"Burnout em vendas" → você fala de burnout em vendas. Nunca muda para burnout em conteúdo, nunca generaliza.
+"Produtividade matinal" → produtividade matinal. Não "bem-estar" nem "rotina". As palavras exatas do usuário.
 
-REGRA 2 — ESPELHE O TOM:
-Curto e casual → responda curto e casual.
-Técnico e detalhado → match a profundidade.
-Com gíria ou informalidade → pode usar.
-NUNCA seja mais formal, mais prolixo ou mais "consultor" do que o usuário foi.
+Você espelha o jeito que a pessoa escreve.
+Se veio curto e direto, responde curto e direto.
+Se veio técnico, vai fundo no técnico.
+Gíria, informalidade — tudo certo. Nunca seja mais "consultor" do que a pessoa foi.
 
-REGRA 3 — CURTO E DIRETO:
-Máx 5 linhas. Zero intro, zero "ótima ideia!", zero elogio vazio.
-Estrutura: entendeu o tópico → propôs ângulo específico → (1 pergunta se ainda vago).
+Você vai direto ao ponto — máx 4-5 linhas.
+Sem "ótima ideia!", sem elogios, sem introdução. Já começa no conteúdo.
+Entendeu o tópico → propôs ângulo específico → (1 pergunta se precisar).
 
-REGRA 4 — 1 PERGUNTA NO MÁXIMO:
-Se precisar clarificar: escolha 1 pergunta — a mais cirúrgica.
-Não faça lista. Uma só.
+Se precisar perguntar, faz uma pergunta só — a mais cirúrgica.
 
-REGRA 5 — ÂNGULOS CONCRETOS + HEADLINE VISUAL:
-Ao propor um ângulo, sempre traduza em 1-2 headlines visuais (máx 8 palavras).
-Ex ângulo: "a meta impossível que queima vendedor em 6 meses"
+Quando propor um ângulo, traduz em 1-2 headlines visuais (máx 8 palavras cada).
+Ex: ângulo "meta impossível que queima vendedor em 6 meses"
 → "Sua meta foi desenhada para te quebrar"
 → "A meta impossível que queima quem vende"
-Isso mostra o post antes de existir. Pense: o que PARA O SCROLL?
-Ruim: "você pode explorar a exaustão profissional de forma geral"
+Isso mostra o post antes de existir. A headline para o scroll.
 
-REGRA 6 — WEB SEARCH COM CRITÉRIO:
-Use para dado concreto sobre o tópico EXATO mencionado.
-Ex: "burnout rotatividade vendedores Brasil 2024" — não "o que é burnout".
-Máx 2 buscas por conversa. Não busque se já souber.
+Use busca na web quando precisar de dado real sobre o tópico exato.
+Busca específica: "burnout rotatividade vendedores Brasil 2024" — não "o que é burnout".
+Máx 2 buscas. Não busque o que você já sabe.
 
-━━━ STATUS ━━━
-✅ = ângulo claro + elemento concreto (dado/transformação/contraste específico ao tópico)
-🔄 = precisa clarificar ângulo ou detalhe
-Quando ✅: encerre SEMPRE com → "Clique em ✦ Refinar Prompt para gerar a imagem."`;
+━━━ QUANDO ENCERRAR ━━━
+Coloque ✅ quando o ângulo estiver claro + tiver elemento concreto (dado, contraste, transformação real).
+Use 🔄 quando ainda precisar de detalhe ou clareza no ângulo.
+Quando ✅: "Tá bom — clica em ✦ Refinar Prompt para gerar."`;
 
   try {
     const r = await callClaudeMessagesWithSearch({
@@ -4104,9 +4080,18 @@ OUTPUT — return exactly this JSON structure, nothing else:
       if (m) blueprint = JSON.parse(m[0]);
     } catch { /* blueprint stays null */ }
     // refinedPrompt is a human-readable summary for display
-    const refinedPrompt = blueprint
-      ? [blueprint.headline, blueprint.subheadline].filter(Boolean).join(' — ')
-      : r.text.trim();
+    let refinedPrompt;
+    if (blueprint) {
+      const parts = [];
+      if (blueprint.headline) parts.push(`✦ ${blueprint.headline}`);
+      if (blueprint.subheadline) parts.push(blueprint.subheadline);
+      if (blueprint.visual?.style) parts.push(`Estilo: ${blueprint.visual.style}`);
+      if (blueprint.tone) parts.push(`Tom: ${blueprint.tone}`);
+      if (blueprint.colors?.background) parts.push(`Cores: fundo ${blueprint.colors.background}${blueprint.colors.accent ? ` · destaque ${blueprint.colors.accent}` : ''}`);
+      refinedPrompt = parts.join('\n');
+    } else {
+      refinedPrompt = r.text.trim();
+    }
     res.end(JSON.stringify({ ok: true, refinedPrompt, blueprint, tok }));
   } catch(e) {
     return err(res, 'Erro ao refinar: ' + e.message);
