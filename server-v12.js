@@ -4013,65 +4013,146 @@ route('POST', '/api/user/brainstorm/refine', async (req, res) => {
     .map(m => `${m.role === 'user' ? 'Usuário' : 'Consultor'}: ${m.content}`)
     .join('\n\n');
 
-  const rfmtLabel = { post: 'Post único', carrossel: 'Carrossel', story: 'Story', anuncio: 'Anúncio',
-    thumb: 'Thumbnail', banner: 'Banner', reels: 'Reels' }[format] || (format || '');
-  const rnetLabel = { ig: 'Instagram', li: 'LinkedIn', yt: 'YouTube', tt: 'TikTok', fb: 'Facebook',
-    instagram: 'Instagram', linkedin: 'LinkedIn', youtube: 'YouTube', tiktok: 'TikTok' }[network] || (network || '');
-  const brandColors = `p1=${brand.p1||'#7C3AED'} p2=${brand.p2||'#0D0D0F'} p3=${brand.p3||'#FFFFFF'} p4=${brand.p4||'#AAAAAA'}`;
-
   const system =
-`You are an elite visual design strategist. Convert the brainstorm conversation into a structured design blueprint.
-Output ONLY valid JSON. Zero extra text. Zero explanations.
+`You are a prompt refiner specialized in extracting structured intent from conversations.
+
+Your job is to analyze the FULL conversation between the user and the Creative Strategist and convert it into a clean, structured base for visual generation.
+
+IMPORTANT:
+- Do NOT decide format
+- Do NOT decide visual style
+- Do NOT add creative ideas
+- Only extract and organize
+
+GOAL:
+Create a clear content foundation that can later be adapted into different formats and styles.
 
 RULES:
-- headline and subheadline: write in the SAME language used in the conversation (detect it — if Portuguese, write Portuguese; if English, write English)
-- slides array: write in the SAME language as the conversation
-- All structural keys (visual, layout, colors, etc): use ONLY the English labels listed below
-- headline: max 8 words — must stop the scroll, visual impact
-- subheadline: max 14 words, or null
-- For carousel: slides = array of short strings, one per slide. First = hook, last = CTA. 4-7 slides.
-- For post: slides = null
-- Colors: use brand palette as base, adapt to visual style. Brand: ${brandColors}
-- Format: ${rfmtLabel || 'post'} | Network: ${rnetLabel || 'instagram'}
-- Brand: ${brand.profissao} | ${brand.nicho} | tone: ${brand.tom}
+- Capture the real intention of the content
+- Remove repetition and noise
+- Keep it concise
+- Focus on what will be VISUALIZED
 
-OUTPUT — return exactly this JSON structure, nothing else:
-{
-  "type": "post|carousel",
-  "headline": "...",
-  "subheadline": "...|null",
-  "slides": ["hook slide text", "slide 2", "...", "CTA slide text"]|null,
-  "visual": {
-    "background": "solid|gradient|texture",
-    "style": "minimal|editorial|luxury|modern|bold|typographic",
-    "image_usage": "none|subtle|dominant"
-  },
-  "layout": {
-    "alignment": "center|left|mixed",
-    "hierarchy": "headline-dominant|data-hero|list-flow|editorial",
-    "spacing": "airy|balanced|compact"
-  },
-  "colors": {
-    "background": "#hex",
-    "text": "#hex",
-    "accent": "#hex"
-  },
-  "typography": {
-    "headline_style": "bold-uppercase|mixed-weight|serif-italic|display-black|editorial",
-    "body_style": "none|minimal|small-regular"
-  },
-  "elements": {
-    "shapes": "none|lines|geometric|brackets",
-    "accents": "none|minimal|arrows|numbers|rule-left"
-  },
-  "tone": "bold|emotional|minimal|luxury|authoritative|warm"
-}`;
+OUTPUT FORMAT:
+
+CORE_MESSAGE:
+(what is the main idea)
+
+HEADLINE_OPTIONS:
+(3–5 short options, max 8 words each)
+
+CONTENT_POINTS:
+(key ideas or steps, bullet format)
+
+EMOTION:
+(desired feeling)
+
+AUDIENCE:
+(target audience)
+
+GOAL:
+(engagement | authority | sales)
+
+CONSTRAINTS:
+- simple
+- clear
+- visual-friendly
+
+RULE:
+Do not format into slides.
+Do not define layout.
+This is a neutral base.
+
+LANGUAGE: Respond in the SAME language as the conversation (if Portuguese, write in Portuguese; if English, write in English).`;
 
   try {
     const r = await callClaudeMessages({
       system,
-      messages: [{ role: 'user', content: `Brainstorm conversation:\n\n${conversationStr}\n\nGenerate the design blueprint JSON:` }],
-      maxTokens: 600,
+      messages: [{ role: 'user', content: `Conversa completa:\n\n${conversationStr}\n\nExtraia a base estruturada:` }],
+      maxTokens: 800,
+    });
+    const tok = { in: r.inputTokens || 0, out: r.outputTokens || 0 };
+    res.end(JSON.stringify({ ok: true, refinedPrompt: r.text.trim(), blueprint: null, tok }));
+  } catch(e) {
+    return err(res, 'Erro ao refinar: ' + e.message);
+  }
+});
+
+// ── Rota: Refinar para formato e tom de marca (Refinador #2) ──────────────────
+// Recebe a base do Refinador #1 + formato + tom de marca e produz um blueprint JSON.
+route('POST', '/api/user/brainstorm/refine-format', async (req, res) => {
+  const payload = requireAuth(req, res); if (!payload) return;
+  const { refineBase, format, network, voiceName, brandProfile } = await parseBody(req);
+  if (!refineBase) return err(res, 'refineBase obrigatório');
+
+  const user = db.getUserById(payload.id);
+  try { db.consumeQuota(payload.id); } catch(e) { return err(res, e.message, 402); }
+
+  const brand = daBrand(user, brandProfile);
+  const fmtLabel = {
+    post: 'Single Post (Big Statement)',
+    carrossel: 'Educational Carousel',
+    story: 'Story',
+    anuncio: 'Photo Overlay Ad',
+    thumb: 'Thumbnail',
+    banner: 'Banner',
+  }[format] || (format || 'post');
+  const netLabel = { ig: 'Instagram', li: 'LinkedIn', yt: 'YouTube', tt: 'TikTok' }[network] || (network || 'Instagram');
+  const brandTone = voiceName || brand.tom || 'flexible';
+  const brandColors = `background=${brand.p2||'#0D0D0F'} text=${brand.p3||'#FFFFFF'} accent=${brand.p1||'#7C3AED'}`;
+
+  const system =
+`You are a senior prompt engineer specialized in social media design systems.
+
+Your job is to transform a structured content base into a final design blueprint.
+
+INPUTS:
+- Content base (from previous step)
+- Selected FORMAT: ${fmtLabel}
+- Selected BRAND TONE: ${brandTone}
+- Brand colors: ${brandColors}
+- Network: ${netLabel}
+- Brand: ${brand.profissao} | ${brand.nicho}
+
+CRITICAL:
+Now you MUST adapt everything to:
+1. The selected FORMAT
+2. The selected BRAND TONE
+
+RULES:
+- Respect the format structure strictly
+- Adapt tone into visual decisions
+- Keep content short and impactful
+- Optimize for readability and engagement
+
+FORMATS BEHAVIOR:
+- Single Post / Big Statement: single strong headline, subheadline optional, slides=null
+- Educational Carousel: hook slide → 3-5 value slides → payoff/CTA slide
+- Story: short punchy text, portrait-friendly
+- Photo Overlay / Ad: short overlay text, dominant image
+- Thumbnail: bold short text, high contrast
+
+Output ONLY valid JSON matching this exact structure (zero extra text):
+{
+  "type": "post|carousel",
+  "headline": "...",
+  "subheadline": "...|null",
+  "slides": ["hook", "slide 2", "...", "CTA"]|null,
+  "visual": { "background": "solid|gradient|texture", "style": "minimal|editorial|luxury|modern|bold|typographic", "image_usage": "none|subtle|dominant" },
+  "layout": { "alignment": "center|left|mixed", "hierarchy": "headline-dominant|data-hero|list-flow|editorial", "spacing": "airy|balanced|compact" },
+  "colors": { "background": "${brand.p2||'#0D0D0F'}", "text": "${brand.p3||'#FFFFFF'}", "accent": "${brand.p1||'#7C3AED'}" },
+  "typography": { "headline_style": "bold-uppercase|mixed-weight|serif-italic|display-black|editorial", "body_style": "none|minimal|small-regular" },
+  "elements": { "shapes": "none|lines|geometric|brackets", "accents": "none|minimal|arrows|numbers|rule-left" },
+  "tone": "bold|emotional|minimal|luxury|authoritative|warm"
+}
+
+RULE: Output ONLY the JSON. Headline/subheadline/slides: write in SAME language as the content base. Never change the core message.`;
+
+  try {
+    const r = await callClaudeMessages({
+      system,
+      messages: [{ role: 'user', content: `Content base:\n\n${refineBase}\n\nGenerate the design blueprint JSON:` }],
+      maxTokens: 800,
     });
     const tok = { in: r.inputTokens || 0, out: r.outputTokens || 0 };
     let blueprint = null;
@@ -4079,22 +4160,19 @@ OUTPUT — return exactly this JSON structure, nothing else:
       const m = r.text.match(/\{[\s\S]*\}/);
       if (m) blueprint = JSON.parse(m[0]);
     } catch { /* blueprint stays null */ }
-    // refinedPrompt is a human-readable summary for display
-    let refinedPrompt;
+    let refinedPrompt = '';
     if (blueprint) {
       const parts = [];
       if (blueprint.headline) parts.push(`✦ ${blueprint.headline}`);
       if (blueprint.subheadline) parts.push(blueprint.subheadline);
-      if (blueprint.visual?.style) parts.push(`Estilo: ${blueprint.visual.style}`);
-      if (blueprint.tone) parts.push(`Tom: ${blueprint.tone}`);
-      if (blueprint.colors?.background) parts.push(`Cores: fundo ${blueprint.colors.background}${blueprint.colors.accent ? ` · destaque ${blueprint.colors.accent}` : ''}`);
+      if (blueprint.visual?.style) parts.push(`Estilo: ${blueprint.visual.style} · Tom: ${blueprint.tone||''}`);
       refinedPrompt = parts.join('\n');
     } else {
       refinedPrompt = r.text.trim();
     }
     res.end(JSON.stringify({ ok: true, refinedPrompt, blueprint, tok }));
   } catch(e) {
-    return err(res, 'Erro ao refinar: ' + e.message);
+    return err(res, 'Erro ao refinar formato: ' + e.message);
   }
 });
 
