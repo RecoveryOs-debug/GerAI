@@ -7742,8 +7742,20 @@ let _currentNet = 'ig';
 const _netMap = { ig:'instagram', li:'linkedin', yt:'youtube', tt:'tiktok' };
 const skt = ['Interpretando sua ideia...','Aplicando perfil de marca...','Refinando com contexto da marca...','Finalizando prompt...'];
 
+// Gerar-btn gate: só aparece quando os 3 estão prontos
+let _fmtChosen   = false;
+let _voiceChosen = false;
+let _bsRefined   = false;
+
+function _updateGerarBtn() {
+  const gb = document.getElementById('bs-image-gerar-btn');
+  if (!gb) return;
+  gb.style.display = (_bsRefined && _fmtChosen && _voiceChosen) ? 'flex' : 'none';
+}
+
 function selFmt(f) {
   _currentFmt = f;
+  _fmtChosen  = true;
   document.querySelectorAll('.fmt').forEach(c => c.classList.remove('on'));
   const el = document.getElementById('f-' + f);
   if (el) { el.classList.add('on'); el.querySelector('svg').style.color='var(--a)'; }
@@ -7757,6 +7769,7 @@ function selFmt(f) {
     var first = document.querySelector('.sc-btn[data-n="0"]');
     if (first) first.classList.add('on');
   }
+  _updateGerarBtn();
 }
 
 // Slide count state
@@ -8478,9 +8491,8 @@ function _bsShowRefined(ctx, text, blueprint) {
     window._refinedPrompt = text;
     if (blueprint) window._refinedBlueprint = blueprint;
     const h = document.getElementById('gen-in'); if (h) h.value = text;
-    // Exibe botão de gerar — usuário confirma formato antes de disparar
-    const gb = document.getElementById('bs-image-gerar-btn');
-    if (gb) gb.style.display = 'flex';
+    _bsRefined = true;
+    _updateGerarBtn();
   } else {
     const h = document.getElementById(`ag-${ctx}-in`); if (h) h.value = text;
   }
@@ -8509,8 +8521,9 @@ function bsReset(ctx) {
   if (ctx==='image') {
     window._refinedPrompt='';
     window._refinedBlueprint=null;
+    _bsRefined=false;
     const h=document.getElementById('gen-in'); if(h)h.value='';
-    const gb=document.getElementById('bs-image-gerar-btn'); if(gb) gb.style.display='none';
+    _updateGerarBtn();
   } else { const h=document.getElementById(`ag-${ctx}-in`);if(h)h.value=''; }
 }
 
@@ -11234,7 +11247,9 @@ function renderVoiceGrid() {
 function selectVoice(idx) {
   _selectedVoice = (idx !== null && idx >= 0) ? BRAND_VOICES_UI[idx] : null;
   window._selectedVoice = _selectedVoice;
+  _voiceChosen = true;
   renderVoiceGrid();
+  _updateGerarBtn();
 }
 
 // Legacy stubs — mantidos para não quebrar chamadas existentes
