@@ -3011,16 +3011,38 @@ function resolveLayout(templateId, dim, brief, brand) {
 // ── Estágio 1: Brief Analyst ──────────────────────────────────────────────────
 // Recebe o input bruto e extrai a hierarquia de conteúdo em JSON estruturado.
 // Garante que o texto seja real, específico, no tom da marca.
-async function daStage1Brief({ prompt, format, network, brand, slideRole, blueprint, slideIndex }) {
+async function daStage1Brief({ prompt, format, network, brand, slideRole, blueprint, slideIndex, subFormat }) {
   const fmtLabel = { post:'Post', carrossel:'Carrossel', story:'Story', reels:'Reels',
                      thumb:'Thumbnail', banner:'Banner', anuncio:'Anúncio' }[format] || format;
+  const subFmtDescriptions = {
+    BIG_STATEMENT:'Single dominant phrase, centered, lots of white space',
+    QUESTION_HOOK:'Large question + small complement, vertical accent bar',
+    CONTROVERSIAL_OPINION:'Strong opinion statement highlighted',
+    QUICK_TIP:'Pill label + short title + divider + body text',
+    MINI_LIST:'Hook title + 3 numbered items',
+    QUOTE_AUTHORITY:'Quote marks + elegant text + author name',
+    BEFORE_AFTER:'Vertical split: left=before (muted), right=after (accent)',
+    CTA_POST:'Strong headline + body + prominent CTA button',
+    STAT_POST:'Large number as hero + accent divider + explanation',
+    BRAND_STATEMENT:'Clean sophisticated positioning, accent lines, brand logo area',
+    LIST_CAROUSEL:'Hook slide → 1 item per slide with numbered circles → CTA slide',
+    EDUCATIONAL_CAROUSEL:'Hook block → progressive content blocks → conclusion',
+    MISTAKE_CAROUSEL:'Hook → mistakes (red markers) per slide → solution slide',
+    STEP_BY_STEP:'Hook → numbered steps on timeline → result slide',
+    STORY_CAROUSEL:'Emotional hook → development → climax → conclusion',
+    CONTRAST_CAROUSEL:'Two-column comparison: left=old/bad, right=new/good',
+    CHECKLIST_CAROUSEL:'Hook → checklist items → CTA',
+    MYTH_BUSTING:'Hook → alternating MYTH/TRUTH pairs',
+    TIPS_CAROUSEL:'Hook → bullet tips per slide → CTA',
+    TRANSFORMATION:'Before block (muted) → arrow/divider → After block (bright)',
+  };
   const system =
 `Você é o CREATIVE BRIEF MASTER — Estágio 1 do Design Agent de elite mundial.
 MISSÃO: Transformar qualquer input em hierarquia de conteúdo IRRESISTÍVEL que para o scroll e converte.
 
 CONTEXTO DA MARCA:
 Profissão: ${brand.profissao} | Nicho: ${brand.nicho} | Tom: ${brand.tom} | Público: ${brand.publico}
-Formato: ${fmtLabel} → ${DA_NET_LABELS[network] || network}${slideRole ? `\nFunção do slide: ${slideRole}` : ''}
+Formato: ${fmtLabel} → ${DA_NET_LABELS[network] || network}${subFormat ? `\nSub-formato obrigatório: ${subFormat} — ${subFmtDescriptions[subFormat]||subFormat}\nIMPORTANTE: A composition_hint deve refletir este sub-formato.` : ''}${slideRole ? `\nFunção do slide: ${slideRole}` : ''}
 
 ━━━ PSICOLOGIA DO SCROLL-STOP + COPYWRITING DE CONVERSÃO ━━━
 
@@ -3778,7 +3800,7 @@ route('POST', '/api/user/design-agent', async (req, res) => {
   const {
     prompt, format = 'post', network = 'instagram', brandProfile,
     slideIndex, totalSlides, slideRole, postFormat,
-    blueprint,
+    blueprint, subFormat,
   } = await parseBody(req);
 
   if (!prompt) {
@@ -3826,7 +3848,7 @@ route('POST', '/api/user/design-agent', async (req, res) => {
     // ── Estágio 1: Brief Analysis ──────────────────────────────────────────
     send('stage', { stage: 1, total: isTweet ? 2 : 3, label: 'Analisando conteúdo...', pct: 8 });
 
-    const s1 = await daStage1Brief({ prompt, format, network, brand, slideRole, blueprint, slideIndex: slideIdx });
+    const s1 = await daStage1Brief({ prompt, format, network, brand, slideRole, blueprint, slideIndex: slideIdx, subFormat });
     totalIn  += s1.tok.in;
     totalOut += s1.tok.out;
 

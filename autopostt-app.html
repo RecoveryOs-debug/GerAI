@@ -6333,8 +6333,7 @@ body.image-agent-refining #image-agent-refine-overlay{
                 <button class="sc-btn" data-n="7" onclick="selSlides(this,7)">7 <span style="font-size:9px;opacity:.6">14cr</span></button>
               </div>
             </div>
-            <!-- Sub-formato: aparece contextualmente para post/carrossel -->
-            <div id="left-subfmt-panel" style="display:none;margin-top:14px"></div>
+            <!-- Sub-formato: movido para coluna direita (bs-sel-panel) -->
           </div>
           <!-- network -->
           <div>
@@ -6397,20 +6396,7 @@ body.image-agent-refining #image-agent-refine-overlay{
               </button>
             </div>
 
-            <!-- Passo 3: Tom de marca (formato já escolhido na coluna lateral) -->
-            <div id="bs-image-fmt-voice-panel" style="display:none;margin-top:12px;padding:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px">
-              <div style="font-size:9.5px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">Tom visual de marca</div>
-              <div id="bs-panel-voice-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:5px"></div>
-              <button id="bs-panel-voice-none" onclick="panelSelVoice(null)" style="width:100%;margin-top:5px;padding:7px;background:transparent;border:1px dashed rgba(255,255,255,0.15);border-radius:6px;cursor:pointer;font-family:var(--f);font-size:11px;color:var(--t3);transition:.15s">✦ Liberdade total (sem estilo fixo)</button>
-            </div>
-
-            <!-- Passo 4: Gerar (aparece só após Refinador #2) -->
-            <div id="bs-image-gerar-btn" style="display:none;align-items:center;gap:10px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.07)">
-              <span style="font-size:10.5px;color:var(--t3);flex:1">Tudo pronto. Clique para gerar sua imagem.</span>
-              <button onclick="startGenPipeline()" style="background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:8px 18px;cursor:pointer;font-family:var(--f);font-size:12px;font-weight:700;color:#fff;letter-spacing:-.02em;box-shadow:0 2px 12px rgba(243,107,42,.28);white-space:nowrap;flex-shrink:0">
-                Gerar imagem →
-              </button>
-            </div>
+            <!-- bs-image-fmt-voice-panel e bs-image-gerar-btn movidos para gen-col-right (bs-sel-panel) -->
           </div>
           <!-- compat: hidden textarea + prompt wrap -->
           <textarea id="gen-in" style="display:none"></textarea>
@@ -6485,6 +6471,21 @@ body.image-agent-refining #image-agent-refine-overlay{
             </div>
           </div><!-- /gen-visual-slot -->
 
+          <!-- Brainstorm: formato sub + tom (aparece após "Gerar →") -->
+          <div id="bs-sel-panel" style="display:none;margin-top:14px">
+            <div id="bs-sel-subfmt-container"></div>
+            <div style="font-size:9.5px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.12em;margin-top:14px;margin-bottom:8px">Tom visual de marca</div>
+            <div id="bs-panel-voice-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:5px"></div>
+            <button id="bs-panel-voice-none" onclick="panelSelVoice(null)" style="width:100%;margin-top:5px;padding:7px;background:transparent;border:1px dashed rgba(255,255,255,0.15);border-radius:6px;cursor:pointer;font-family:var(--f);font-size:11px;color:var(--t3);transition:.15s">✦ Liberdade total (sem estilo fixo)</button>
+            <!-- Gerar imagem (aparece após Refinador #2) -->
+            <div id="bs-image-gerar-btn" style="display:none;align-items:center;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07)">
+              <span style="font-size:10.5px;color:var(--t3);flex:1">Tudo pronto. Clique para gerar sua imagem.</span>
+              <button onclick="startGenPipeline()" style="background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:8px 18px;cursor:pointer;font-family:var(--f);font-size:12px;font-weight:700;color:#fff;letter-spacing:-.02em;box-shadow:0 2px 12px rgba(243,107,42,.28);white-space:nowrap;flex-shrink:0">
+                Gerar imagem →
+              </button>
+            </div>
+          </div>
+
           <div class="divider" style="margin:14px 0 12px"></div>
 
           <!-- Format do post (tweet vs padrão) + voice picker — sempre visíveis -->
@@ -6547,7 +6548,7 @@ body.image-agent-refining #image-agent-refine-overlay{
             </label>
           </div>
           <div class="cmd-box" id="cmd-out" data-prompt="" style="word-break:break-word;font-size:11px;display:none"><span id="cmd-out-txt" style="color:var(--t3);font-style:italic"></span><button class="cp-btn" onclick="cpElById('cmd-out')">Copiar</button></div>
-          <button id="btn-gerar-img" onclick="gerarImagem()" style="width:100%;margin-top:10px;background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--f);font-size:13px;font-weight:700;color:#fff;letter-spacing:-.02em;box-shadow:0 4px 20px rgba(243,107,42,.3);transition:all .15s">
+          <button id="btn-gerar-img" onclick="gerarImagem()" style="display:none;width:100%;margin-top:10px;background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:13px;cursor:pointer;align-items:center;justify-content:center;gap:8px;font-family:var(--f);font-size:13px;font-weight:700;color:#fff;letter-spacing:-.02em;box-shadow:0 4px 20px rgba(243,107,42,.3);transition:all .15s">
             <svg style="width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             Gerar imagem com IA
             <span style="margin-left:auto;font-size:10px;font-weight:500;opacity:.75;background:rgba(0,0,0,.2);border-radius:10px;padding:2px 7px" id="btn-gerar-img-cost">2 créditos</span>
@@ -7784,7 +7785,6 @@ function selFmt(f) {
     var first = document.querySelector('.sc-btn[data-n="0"]');
     if (first) first.classList.add('on');
   }
-  renderLeftSubFmtGrid(f);
 }
 
 // Slide count state
@@ -8512,8 +8512,8 @@ function _bsShowRefined(ctx, text, blueprint) {
     // Esconde gerar btn e painel (podem estar visíveis de sessão anterior)
     const gb = document.getElementById('bs-image-gerar-btn');
     if (gb) gb.style.display = 'none';
-    const fp = document.getElementById('bs-image-fmt-voice-panel');
-    if (fp) fp.style.display = 'none';
+    const sp0 = document.getElementById('bs-sel-panel');
+    if (sp0) sp0.style.display = 'none';
   } else {
     const h = document.getElementById(`ag-${ctx}-in`); if (h) h.value = text;
   }
@@ -8546,8 +8546,9 @@ function bsReset(ctx) {
     _panelSubFmt=null; _panelVoiceChosen=false; _panelVoiceObj=undefined; _bsAdvanced=false;
     const h=document.getElementById('gen-in'); if(h)h.value='';
     const ab=document.getElementById('bs-image-advance-btn'); if(ab)ab.style.display='none';
-    const fp=document.getElementById('bs-image-fmt-voice-panel'); if(fp)fp.style.display='none';
+    const sp=document.getElementById('bs-sel-panel'); if(sp)sp.style.display='none';
     const gb=document.getElementById('bs-image-gerar-btn'); if(gb)gb.style.display='none';
+    const btnGerar = document.getElementById('btn-gerar-img'); if(btnGerar) btnGerar.style.display='none';
   } else { const h=document.getElementById(`ag-${ctx}-in`);if(h)h.value=''; }
 }
 
@@ -8557,26 +8558,15 @@ function bsAdvance() {
   _bsAdvanced = true;
   const ab = document.getElementById('bs-image-advance-btn');
   if (ab) ab.style.display = 'none';
-  const fp = document.getElementById('bs-image-fmt-voice-panel');
-  if (fp) { fp.style.display = 'block'; fp.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
   _panelVoiceChosen = false; _panelVoiceObj = undefined;
+  const sp = document.getElementById('bs-sel-panel');
+  if (sp) { sp.style.display = 'block'; sp.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
+  renderBsSubFmtGrid(_currentFmt);
   renderPanelVoiceGrid();
 }
 
-function bsFmtTab(tab) {
-  _panelTab = tab;
-  var btnPost = document.getElementById('bs-fmt-tab-post');
-  var btnCar  = document.getElementById('bs-fmt-tab-car');
-  if (btnPost) { btnPost.style.background = tab==='post' ? 'rgba(243,107,42,.18)' : 'rgba(255,255,255,.05)'; btnPost.style.borderColor = tab==='post' ? 'var(--a)' : 'rgba(255,255,255,.08)'; btnPost.style.color = tab==='post' ? 'var(--a)' : 'var(--t3)'; }
-  if (btnCar)  { btnCar.style.background  = tab==='car'  ? 'rgba(243,107,42,.18)' : 'rgba(255,255,255,.05)'; btnCar.style.borderColor  = tab==='car'  ? 'var(--a)' : 'rgba(255,255,255,.08)'; btnCar.style.color  = tab==='car'  ? 'var(--a)' : 'var(--t3)'; }
-  var secPost = document.getElementById('bs-fmt-section-post');
-  var secCar  = document.getElementById('bs-fmt-section-car');
-  if (secPost) secPost.style.display = tab==='post' ? 'grid' : 'none';
-  if (secCar)  secCar.style.display  = tab==='car'  ? 'grid' : 'none';
-}
-
-function renderLeftSubFmtGrid(fmt) {
-  var panel = document.getElementById('left-subfmt-panel');
+function renderBsSubFmtGrid(fmt) {
+  var panel = document.getElementById('bs-sel-subfmt-container');
   if (!panel) return;
   if (fmt !== 'post' && fmt !== 'carrossel') {
     panel.style.display = 'none';
@@ -8584,10 +8574,9 @@ function renderLeftSubFmtGrid(fmt) {
     return;
   }
   var formats = fmt === 'post' ? BS_POST_FORMATS : BS_CAROUSEL_FORMATS;
-  var mainType = fmt; // 'post' or 'carrossel'
   var tiles = formats.map(function(f) {
     var isActive = (_panelSubFmt === f.id);
-    return '<div onclick="panelSelFmt(\''+f.id+'\',\''+mainType+'\')" id="bsp-ft-'+f.id+'" title="'+f.desc+'"'
+    return '<div onclick="panelSelFmt(\''+f.id+'\',\''+fmt+'\')" id="bsp-ft-'+f.id+'" title="'+f.desc+'"'
       +' style="cursor:pointer;border-radius:8px;overflow:hidden;border:1.5px solid '+(isActive?'var(--a)':'rgba(255,255,255,.06)')+';transition:.15s;background:'+(isActive?'rgba(243,107,42,.1)':'rgba(255,255,255,.03)')+';display:flex;flex-direction:column;align-items:center">'
       + f.svg.replace('viewBox="0 0 80 100"','viewBox="0 0 80 100" width="100%" height="auto" style="display:block"')
       + '<div style="font-size:9px;font-weight:600;color:rgba(255,255,255,.6);padding:4px 2px;text-align:center;line-height:1.2;width:100%">'+f.name+'</div>'
@@ -8602,8 +8591,8 @@ function renderLeftSubFmtGrid(fmt) {
 function panelSelFmt(subId, mainType) {
   _panelFmt    = mainType;
   _panelSubFmt = subId;
-  // Re-render left grid to update tile highlights
-  renderLeftSubFmtGrid(mainType);
+  // Re-render grid to update tile highlights
+  renderBsSubFmtGrid(mainType);
   _panelCheckReady();
 }
 
@@ -8619,9 +8608,12 @@ function renderPanelVoiceGrid() {
   if (!grid || !BRAND_VOICES_UI) return;
   grid.innerHTML = BRAND_VOICES_UI.map((v, i) => {
     const active = _panelVoiceChosen && _panelVoiceObj && _panelVoiceObj.id === v.id;
-    return `<button onclick="panelSelVoice(${i})" style="padding:7px 10px;background:${active?'rgba(243,107,42,.12)':'rgba(255,255,255,.04)'};border:1px solid ${active?'var(--a)':'rgba(255,255,255,.08)'};border-radius:7px;cursor:pointer;font-family:var(--f);text-align:left;transition:.15s;width:100%">
-      <div style="font-size:11px;font-weight:700;color:${active?'var(--a)':'var(--tx-0)'};line-height:1.2">${v.icon} ${v.name}</div>
-      <div style="font-size:9px;color:var(--tx-2);margin-top:2px">${v.desc||''}</div>
+    return `<button onclick="panelSelVoice(${i})" style="padding:8px;background:${active?'rgba(243,107,42,.12)':'rgba(255,255,255,.04)'};border:1px solid ${active?'var(--a)':'rgba(255,255,255,.08)'};border-radius:8px;cursor:pointer;font-family:var(--f);text-align:left;transition:.15s;width:100%;display:flex;flex-direction:column;gap:6px">
+      <div style="width:100%;border-radius:5px;overflow:hidden;aspect-ratio:5/6">${v.sample||''}</div>
+      <div>
+        <div style="font-size:10.5px;font-weight:700;color:${active?'var(--a)':'var(--tx-0)'};line-height:1.2">${v.icon} ${v.name}</div>
+        <div style="font-size:9px;color:var(--tx-2);margin-top:1px">${v.desc||''}</div>
+      </div>
     </button>`;
   }).join('');
   const noneBtn = document.getElementById('bs-panel-voice-none');
@@ -8646,8 +8638,8 @@ async function bsRefine2() {
   if (!base) { toast('Refine o prompt primeiro','err'); return; }
 
   // Fecha o painel
-  const fp = document.getElementById('bs-image-fmt-voice-panel');
-  if (fp) fp.style.display = 'none';
+  const sp = document.getElementById('bs-sel-panel');
+  if (sp) sp.style.display = 'none';
 
   // Mostra overlay divertido
   const overlay = document.getElementById('refine2-overlay');
@@ -8689,10 +8681,13 @@ async function bsRefine2() {
     // Mostra botão final
     const gb = document.getElementById('bs-image-gerar-btn');
     if (gb) gb.style.display = 'flex';
+    const btnGerar = document.getElementById('btn-gerar-img');
+    if (btnGerar) btnGerar.style.display = 'flex';
   } catch(e) {
     toast('Erro ao refinar: '+e.message,'err');
     // Restaura painel para o usuário tentar de novo
-    if (fp) fp.style.display = 'block';
+    const spErr = document.getElementById('bs-sel-panel');
+    if (spErr) spErr.style.display = 'block';
   } finally {
     if (overlay) overlay.style.display = 'none';
   }
@@ -8830,6 +8825,7 @@ async function gerarImagem() {
           brandProfile, slideIndex: sIdx, totalSlides: total, slideRole,
           postFormat: _selectedPostFormat || undefined,
           blueprint: window._refinedBlueprint || undefined,
+          subFormat: _panelSubFmt || undefined,
         });
         _renderCarouselSlide(sIdx, svg, total);
       } catch(e) {
@@ -8856,6 +8852,7 @@ async function gerarImagem() {
       brandProfile,
       postFormat: _selectedPostFormat || undefined,
       blueprint: window._refinedBlueprint || undefined,
+      subFormat: _panelSubFmt || undefined,
     });
     window._currentSVG = svg;
     _currentSVG = svg;
@@ -11431,14 +11428,22 @@ const BS_TWEET_FORMAT = { id:'TWEET_CARD', name:'Tweet Card', desc:'Card estilo 
 var _selectedVoice = null;
 
 const BRAND_VOICES_UI = [
-  { id: 'luxury',   name: 'Luxury Premium',      desc: 'Luxo silencioso, elegância atemporal',    icon: '💎' },
-  { id: 'bold',     name: 'Bold Impact',          desc: 'Energia máxima, para o scroll',           icon: '⚡' },
-  { id: 'clean',    name: 'Clean Pro',            desc: 'Confiança pela simplicidade',             icon: '✦' },
-  { id: 'editorial',name: 'Editorial',            desc: 'Tipografia como design, autoridade',      icon: '📰' },
-  { id: 'tech',     name: 'Tech & Digital',       desc: 'Grid, precisão, inovação sistemática',    icon: '⬡' },
-  { id: 'warm',     name: 'Warm & Human',         desc: 'Conexão emocional, acolhimento',          icon: '🌿' },
-  { id: 'creative', name: 'Creative',             desc: 'Surpresa visual, quebra as regras',       icon: '✦' },
-  { id: 'data',     name: 'Data & Authority',     desc: 'O número como herói do design',           icon: '◈' },
+  { id:'luxury',    name:'Luxury Premium',  desc:'Luxo silencioso, elegância atemporal', icon:'💎',
+    sample:`<svg viewBox="0 0 50 60" xmlns="http://www.w3.org/2000/svg"><rect width="50" height="60" fill="#0D0D0D"/><line x1="8" y1="15" x2="42" y2="15" stroke="#D4AF37" stroke-width="0.5"/><rect x="16" y="22" width="18" height="2" fill="#D4AF37" rx="0.5"/><rect x="12" y="27" width="26" height="1" fill="rgba(212,175,55,0.5)" rx="0.3"/><rect x="15" y="31" width="20" height="1" fill="rgba(212,175,55,0.3)" rx="0.3"/><line x1="8" y1="42" x2="42" y2="42" stroke="#D4AF37" stroke-width="0.5"/><circle cx="25" cy="50" r="2" fill="none" stroke="#D4AF37" stroke-width="0.5"/></svg>` },
+  { id:'bold',      name:'Bold Impact',     desc:'Energia máxima, para o scroll', icon:'⚡',
+    sample:`<svg viewBox="0 0 50 60" xmlns="http://www.w3.org/2000/svg"><rect width="50" height="60" fill="#F3F3F0"/><rect x="5" y="10" width="40" height="22" fill="#0D0D0D" rx="1"/><rect x="5" y="36" width="30" height="4.5" fill="#222" rx="0.5"/><rect x="5" y="44" width="20" height="3" fill="#CCC" rx="0.5"/><rect x="5" y="51" width="16" height="4" fill="#F36B2A" rx="1"/></svg>` },
+  { id:'clean',     name:'Clean Pro',       desc:'Confiança pela simplicidade', icon:'✦',
+    sample:`<svg viewBox="0 0 50 60" xmlns="http://www.w3.org/2000/svg"><rect width="50" height="60" fill="#FAFAFA"/><line x1="5" y1="20" x2="45" y2="20" stroke="#E5E5E5" stroke-width="0.5"/><line x1="5" y1="40" x2="45" y2="40" stroke="#E5E5E5" stroke-width="0.5"/><rect x="10" y="24" width="20" height="5" fill="#1A1A1A" rx="1.5"/><rect x="10" y="33" width="30" height="2.5" fill="#AAA" rx="0.7"/><rect x="10" y="44" width="14" height="6" fill="#1A1A1A" rx="1.5"/></svg>` },
+  { id:'editorial', name:'Editorial',       desc:'Tipografia como design, autoridade', icon:'📰',
+    sample:`<svg viewBox="0 0 50 60" xmlns="http://www.w3.org/2000/svg"><rect width="50" height="60" fill="#F0EDE8"/><rect x="5" y="8" width="40" height="8" fill="#1A1A1A" rx="0.5"/><line x1="5" y1="20" x2="45" y2="20" stroke="#1A1A1A" stroke-width="0.8"/><rect x="5" y="23" width="19" height="2" fill="#555" rx="0.3"/><rect x="5" y="27" width="19" height="1.5" fill="#999" rx="0.3"/><rect x="5" y="30.5" width="19" height="1.5" fill="#999" rx="0.3"/><rect x="5" y="34" width="19" height="1.5" fill="#999" rx="0.3"/><rect x="26" y="23" width="19" height="15" fill="#DDD" rx="0.5"/><line x1="5" y1="43" x2="45" y2="43" stroke="#1A1A1A" stroke-width="0.4"/><rect x="5" y="46" width="12" height="4" fill="#1A1A1A" rx="0.5"/></svg>` },
+  { id:'tech',      name:'Tech & Digital',  desc:'Grid, precisão, inovação sistemática', icon:'⬡',
+    sample:`<svg viewBox="0 0 50 60" xmlns="http://www.w3.org/2000/svg"><rect width="50" height="60" fill="#0A0E18"/><rect x="5" y="9" width="24" height="5" fill="rgba(0,210,255,0.85)" rx="0.5"/><rect x="5" y="17" width="36" height="1.5" fill="rgba(0,210,255,0.3)" rx="0.3"/><rect x="5" y="21" width="28" height="1.5" fill="rgba(0,210,255,0.2)" rx="0.3"/><rect x="6" y="29" width="8" height="20" fill="rgba(0,210,255,0.15)" rx="0.5"/><rect x="16" y="35" width="8" height="14" fill="rgba(0,210,255,0.25)" rx="0.5"/><rect x="26" y="25" width="8" height="24" fill="rgba(0,210,255,0.5)" rx="0.5"/><rect x="36" y="31" width="8" height="18" fill="rgba(0,210,255,0.2)" rx="0.5"/></svg>` },
+  { id:'warm',      name:'Warm & Human',    desc:'Conexão emocional, acolhimento', icon:'🌿',
+    sample:`<svg viewBox="0 0 50 60" xmlns="http://www.w3.org/2000/svg"><rect width="50" height="60" fill="#FDF6EC"/><ellipse cx="25" cy="20" rx="15" ry="10" fill="#F3D9B5" opacity="0.7"/><rect x="10" y="33" width="30" height="5" fill="#7C5C3A" rx="2.5"/><rect x="14" y="42" width="22" height="3.5" fill="#A07850" rx="1.5" opacity="0.7"/><rect x="18" y="48.5" width="14" height="3" fill="#C09870" rx="1.5" opacity="0.5"/></svg>` },
+  { id:'creative',  name:'Creative',        desc:'Surpresa visual, quebra as regras', icon:'✦',
+    sample:`<svg viewBox="0 0 50 60" xmlns="http://www.w3.org/2000/svg"><rect width="50" height="60" fill="#1A1220"/><rect x="0" y="0" width="23" height="33" fill="#7C2FE0" opacity="0.75"/><rect x="25" y="8" width="25" height="22" fill="#F36B2A" opacity="0.8"/><rect x="8" y="35" width="20" height="20" fill="#F5C518" opacity="0.65"/><rect x="30" y="33" width="20" height="16" fill="#2AE0B0" opacity="0.55"/><rect x="4" y="13" width="11" height="5" fill="#fff" rx="1" opacity="0.95"/></svg>` },
+  { id:'data',      name:'Data & Authority', desc:'O número como herói do design', icon:'◈',
+    sample:`<svg viewBox="0 0 50 60" xmlns="http://www.w3.org/2000/svg"><rect width="50" height="60" fill="#0D1117"/><rect x="5" y="8" width="40" height="15" fill="rgba(245,197,24,0.1)" rx="1.5"/><rect x="12" y="13" width="26" height="6" fill="rgba(245,197,24,0.6)" rx="1"/><rect x="5" y="27" width="40" height="1.5" fill="rgba(245,197,24,0.2)" rx="0.5"/><rect x="5" y="31" width="35" height="3.5" fill="rgba(245,197,24,0.5)" rx="1"/><rect x="5" y="37" width="22" height="3.5" fill="rgba(245,197,24,0.3)" rx="1"/><rect x="5" y="43" width="28" height="3.5" fill="rgba(245,197,24,0.2)" rx="1"/><rect x="5" y="49" width="40" height="1.5" fill="rgba(245,197,24,0.2)" rx="0.5"/></svg>` },
 ];
 
 function renderVoiceGrid() {
