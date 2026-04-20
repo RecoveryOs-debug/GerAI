@@ -2653,6 +2653,73 @@ const LAYOUT_TEMPLATES = {
       has_gradient:true, has_glow:true, has_pattern:false, shape_count:4 },
   },
 
+  // ─── POST ÚNICO — TEMPLATES POR SUB-FORMATO ──────────────────────────────
+
+  'IG-POST-CENTERED': {
+    name: 'Big Statement — Central',
+    desc: 'Frase única dominante centralizada — espaço em branco como design intencional',
+    formats: ['post','anuncio'], networks: ['ig','li'],
+    content_types: ['motivational','educational','storytelling'],
+    hl:  { xf:0.50, yf:0.48, sf:0.128, lhm:1.12, anchor:'middle', transform:'uppercase' },
+    sub: null,
+    body: null, cta: null,
+    ft:  { xf:0.07, yf:0.95, sf:0.017 },
+    db:  null,
+    bg_pref: 'dark', texture: 'noise',
+    deco: { mood:'big-statement-centered',
+      layers:['radial-glow-center','noise-texture','accent-rule-top','accent-rule-bottom-sym'],
+      has_gradient:true, has_glow:true, has_pattern:false, shape_count:3 },
+  },
+
+  'IG-POST-QUESTION': {
+    name: 'Question Hook — Gancho',
+    desc: 'Pergunta provocadora que para o scroll — curiosidade imediata em 0,3s',
+    formats: ['post'], networks: ['ig','li'],
+    content_types: ['educational','motivational'],
+    hl:  { xf:0.12, yf:0.46, sf:0.105, lhm:1.20, anchor:'start' },
+    sub: { xf:0.12, ybl:0.075, sf:0.028, w:'300' },
+    body: null, cta: null,
+    ft:  { xf:0.12, yf:0.95, sf:0.017 },
+    db:  null,
+    bg_pref: 'dark', texture: 'subtle',
+    deco: { mood:'question-hook',
+      layers:['accent-bar-left-full','radial-glow-top-left','noise-texture'],
+      has_gradient:true, has_glow:true, has_pattern:false, shape_count:3 },
+  },
+
+  'IG-POST-QUOTE': {
+    name: 'Quote de Autoridade',
+    desc: 'Citação elegante com aspas grandes — credibilidade e autoridade máximas',
+    formats: ['post'], networks: ['ig','li'],
+    content_types: ['motivational','storytelling'],
+    hl:  { xf:0.09, yf:0.54, sf:0.072, lhm:1.30, anchor:'start', font:'Playfair Display' },
+    sub: { xf:0.09, ybl:0.090, sf:0.024, w:'300', font:'DM Sans' },
+    body: null, cta: null,
+    ft:  { xf:0.09, yf:0.95, sf:0.017 },
+    db:  null,
+    bg_pref: 'dark', texture: 'grain',
+    deco: { mood:'quote-authority',
+      layers:['large-quote-marks','separator-h-thin','grain-texture','accent-rule-left'],
+      has_gradient:false, has_glow:false, has_pattern:true, shape_count:3 },
+  },
+
+  'IG-POST-SPLIT': {
+    name: 'Antes / Depois — Contraste',
+    desc: 'Divisão visual clara entre antes e depois — transformação que converte',
+    formats: ['post'], networks: ['ig','li'],
+    content_types: ['promotional','educational'],
+    hl:  { xf:0.07, yf:0.28, sf:0.078, lhm:1.15, anchor:'start' },
+    sub: { xf:0.07, ybl:0.065, sf:0.026, w:'300' },
+    body:{ xf:0.07, ysf:0.57, sf:0.027, lhm:1.85, prefix:'→' },
+    cta: null,
+    ft:  { xf:0.07, yf:0.95, sf:0.017 },
+    db:  null,
+    bg_pref: 'dark', texture: 'subtle',
+    deco: { mood:'before-after-split',
+      layers:['horizontal-split-divider','accent-tone-bottom-half','noise-texture'],
+      has_gradient:true, has_glow:false, has_pattern:false, shape_count:3 },
+  },
+
   // ─── CARROSSEL 1080×1080 ──────────────────────────────────────────────────
 
   'CARR-CAPA': {
@@ -2844,8 +2911,27 @@ function splitLines(text, maxPx, fontSize, charRatio) {
   return lines.length ? lines : [text];
 }
 
+// Maps sub-format IDs (from user selection) to the best matching layout template.
+const SUB_FORMAT_TEMPLATE_MAP = {
+  BIG_STATEMENT:         'IG-POST-CENTERED',
+  QUESTION_HOOK:         'IG-POST-QUESTION',
+  CONTROVERSIAL_OPINION: 'IG-POST-IMPACTO',
+  QUICK_TIP:             'IG-POST-LISTA',
+  MINI_LIST:             'IG-POST-LISTA',
+  QUOTE_AUTHORITY:       'IG-POST-QUOTE',
+  BEFORE_AFTER:          'IG-POST-SPLIT',
+  CTA_POST:              'IG-POST-FRAME',
+  STAT_POST:             'IG-POST-DADO',
+  BRAND_STATEMENT:       'IG-POST-EDITORIAL',
+};
+
 /** Seleciona o template mais adequado para o contexto. */
-function selectTemplate(format, network, brief, slideRole) {
+function selectTemplate(format, network, brief, slideRole, subFormat) {
+  // Sub-format override: user explicitly chose a visual template — always honor it.
+  if (subFormat && (format === 'post' || format === 'anuncio')) {
+    const mapped = SUB_FORMAT_TEMPLATE_MAP[subFormat];
+    if (mapped && LAYOUT_TEMPLATES[mapped]) return mapped;
+  }
   const ct  = brief.content_type || 'educational';
   const em  = brief.emphasis     || 'statement';
   const hasData = !!brief.data_highlight;
@@ -2907,7 +2993,7 @@ function resolveLayout(templateId, dim, brief, brand) {
     const hlSize = sz(tpl.hl.sf);
     const hlX    = px(tpl.hl.xf, W);
     const hlY    = px(tpl.hl.yf, H);
-    const hlMaxW = W - hlX - marg;
+    const hlMaxW = (tpl.hl.anchor === 'middle') ? (W - marg * 2) : (W - hlX - marg);
     const hlLH   = Math.round(hlSize * (tpl.hl.lhm || 1.15));
     const hlLines = splitLines(brief.headline, hlMaxW, hlSize, 0.58);
     out.headline = {
@@ -3103,18 +3189,35 @@ DATA HIGHLIGHT — O NÚMERO QUE CONVENCE:
       modern:'tech-sharp', bold:'bold-energy', typographic:'dark-power', warm:'soft-trust' };
     const fontMap = { 'bold-uppercase':'display-bold', 'mixed-weight':'display-bold',
       'serif-italic':'serif-elegant', 'display-black':'display-bold', editorial:'editorial' };
+    // Derive emphasis and content_type from the user-selected sub-format
+    const emphasisMap = {
+      STAT_POST:'number', MINI_LIST:'list', QUICK_TIP:'list', QUOTE_AUTHORITY:'quote',
+      QUESTION_HOOK:'question', BIG_STATEMENT:'statement', CONTROVERSIAL_OPINION:'statement',
+      BEFORE_AFTER:'statement', CTA_POST:'statement', BRAND_STATEMENT:'statement',
+    };
+    const ctypeMap = {
+      STAT_POST:'data-driven', QUOTE_AUTHORITY:'storytelling', BEFORE_AFTER:'promotional',
+      CTA_POST:'promotional', BRAND_STATEMENT:'educational', MINI_LIST:'educational',
+      QUICK_TIP:'educational',
+    };
+    const compositionMap = {
+      BIG_STATEMENT:'text-dominant', QUESTION_HOOK:'text-dominant', STAT_POST:'data-hero',
+      MINI_LIST:'list-view', QUICK_TIP:'list-view', QUOTE_AUTHORITY:'quote-focus',
+      BEFORE_AFTER:'split-layout', CTA_POST:'text-dominant', BRAND_STATEMENT:'editorial',
+    };
     return {
       data: {
         headline: blueprint.headline,
         subheadline: blueprint.subheadline || null,
-        body_points: [],
-        cta: 'Saiba mais',
-        data_highlight: null,
+        body_points: Array.isArray(blueprint.body_points) ? blueprint.body_points : [],
+        cta: blueprint.cta || 'Saiba mais',
+        data_highlight: blueprint.data_highlight || null,
         visual_mood: styleMap[blueprint.visual?.style] || 'dark-power',
-        content_type: blueprint.type === 'carousel' ? 'educational' : 'motivational',
-        emphasis: 'statement',
+        content_type: blueprint.type === 'carousel' ? 'educational'
+          : (ctypeMap[subFormat] || 'motivational'),
+        emphasis: emphasisMap[subFormat] || 'statement',
         font_mood: fontMap[blueprint.typography?.headline_style] || 'display-bold',
-        composition_hint: 'text-dominant',
+        composition_hint: compositionMap[subFormat] || 'text-dominant',
         _blueprint: blueprint,
       },
       tok: { in: 0, out: 0 },
@@ -3147,12 +3250,12 @@ DATA HIGHLIGHT — O NÚMERO QUE CONVENCE:
 // ── Estágio 2: Template Selector + Palette Finalizer ─────────────────────────
 // Nova arquitetura: layout resolvido deterministicamente (0 tokens de IA para posições).
 // Claude só decide: cores de destaque, gradiente bg, atmosphere mood. ~400 tokens max.
-async function daStage2ArtDir({ brief, brand, dim, format, slideIndex, totalSlides, slideRole, network }) {
+async function daStage2ArtDir({ brief, brand, dim, format, slideIndex, totalSlides, slideRole, network, subFormat }) {
   const voice = brand.voiceId ? (BRAND_VOICES[brand.voiceId] || '') : '';
   const dna   = voice || (brand.modelN ? (STYLE_DNA[brand.modelN] || '') : '');
 
-  // 1) Seleciona template por formato + conteúdo (determinístico)
-  const tplId = selectTemplate(format, network || 'ig', brief, slideRole);
+  // 1) Seleciona template por formato + conteúdo (determinístico) — subFormat tem prioridade
+  const tplId = selectTemplate(format, network || 'ig', brief, slideRole, subFormat);
 
   // 2) Resolve layout completo em px absolutos (sem IA)
   const blueprint = resolveLayout(tplId, dim, brief, brand);
@@ -3386,6 +3489,12 @@ accent-burst          → círculos concêntricos cx=75% cy=80% accentColor opac
 badge-count           → rect arredondado no canto sup-dir com texto do slide_indicator
 micro-label-above     → pequeno texto "— INSIGHT" acima do headline, p4 opacity:0.50
 subtle-glow-top       → radialGradient cx=50% cy=0% r=50% accentColor stop-opacity=0.15 em rect
+accent-bar-left-full  → <rect x="${Math.round(dim.w*0.07)}" y="0" width="5" height="${dim.h}" fill="accentColor" opacity="0.75"/> — barra vertical dominante à esquerda
+accent-rule-bottom-sym → <rect x="${dim.w-margin-Math.round(dim.w*0.18)}" y="${Math.round(dim.h*0.88)}" width="${Math.round(dim.w*0.18)}" height="2" fill="accentColor"/> — linha simétrica inferior direita
+radial-glow-top-left  → radialGradient cx="15%" cy="15%" r="55%"> accentColor→transparent; rect fullscreen fill=url() opacity via stop
+large-quote-marks     → <text x="${Math.round(dim.w*0.07)}" y="${Math.round(dim.h*0.36)}" font-family="Playfair Display,Georgia,serif" font-size="180" fill="accentColor" opacity="0.22">"</text> — aspas gigantes decorativas à esquerda
+horizontal-split-divider → <line x1="${margin}" y1="${Math.round(dim.h*0.50)}" x2="${dim.w-margin}" y2="${Math.round(dim.h*0.50)}" stroke="accentColor" opacity="0.40" stroke-width="1.5"/> — divisor horizontal no meio
+accent-tone-bottom-half  → <rect x="0" y="${Math.round(dim.h*0.50)}" width="${dim.w}" height="${Math.round(dim.h*0.50)}" fill="accentColor" opacity="0.05"/> — tom de cor sutil na metade inferior
 
 ═══════════ ESTRUTURA DO SVG (siga exatamente) ═══════════
 <svg xmlns="http://www.w3.org/2000/svg" width="${dim.w}" height="${dim.h}" viewBox="0 0 ${dim.w} ${dim.h}">
@@ -3865,7 +3974,7 @@ route('POST', '/api/user/design-agent', async (req, res) => {
       // ── Estágio 2: Art Direction ─────────────────────────────────────────
       send('stage', { stage: 2, total: 3, label: 'Definindo direção de arte...', pct: 32 });
       const s2 = await daStage2ArtDir({
-        brief: s1.data, brand, dim, format, slideIndex: slideIdx, totalSlides: totalSl, slideRole, network,
+        brief: s1.data, brand, dim, format, slideIndex: slideIdx, totalSlides: totalSl, slideRole, network, subFormat,
       });
       totalIn  += s2.tok.in;
       totalOut += s2.tok.out;
@@ -4177,6 +4286,9 @@ Output ONLY valid JSON matching this exact structure (zero extra text):
   "type": "post|carousel",
   "headline": "...",
   "subheadline": "...|null",
+  "body_points": ["short point 1 ≤8 words", "short point 2", "short point 3"]|null,
+  "data_highlight": "specific stat/number e.g. '3x' or '87%' or 'R$12k'"|null,
+  "cta": "max 4-word action"|null,
   "slides": ["hook", "slide 2", "...", "CTA"]|null,
   "visual": { "background": "solid|gradient|texture", "style": "minimal|editorial|luxury|modern|bold|typographic", "image_usage": "none|subtle|dominant" },
   "layout": { "alignment": "center|left|mixed", "hierarchy": "headline-dominant|data-hero|list-flow|editorial", "spacing": "airy|balanced|compact" },
@@ -4185,6 +4297,11 @@ Output ONLY valid JSON matching this exact structure (zero extra text):
   "elements": { "shapes": "none|lines|geometric|brackets", "accents": "none|minimal|arrows|numbers|rule-left" },
   "tone": "bold|emotional|minimal|luxury|authoritative|warm"
 }
+
+FIELD RULES:
+- body_points: required for MINI_LIST, QUICK_TIP, CTA_POST (3 short points each ≤8 words). null for others.
+- data_highlight: required for STAT_POST (the hero number). Optional for data-heavy content. null otherwise.
+- cta: required for CTA_POST. Optional for others.
 
 RULE: Output ONLY the JSON. Headline/subheadline/slides: write in SAME language as the content base. Never change the core message.`;
 
