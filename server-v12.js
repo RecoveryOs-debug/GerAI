@@ -39,6 +39,7 @@ const { DatabaseSync } = require('node:sqlite');
 const PORT           = process.env.PORT || 3001;
 const HOST           = '0.0.0.0';
 const ANTHROPIC_KEY  = process.env.ANTHROPIC_API_KEY || '';
+const OPENAI_KEY     = process.env.OPENAI_API_KEY    || '';
 const DB_PATH        = process.env.DB_PATH || path.join(__dirname, 'autopostt.db');
 const LEGACY_JSON    = process.env.LEGACY_JSON || path.join(__dirname, 'gerai.db.json');
 // Em produção, defina ALLOWED_ORIGIN=https://seudominio.com no Railway
@@ -959,6 +960,177 @@ function callClaudeStream({ system, messages, maxTokens = 2500, onChunk, onDone,
   req.on('error', onError);
   req.write(body);
   req.end();
+}
+
+// ── GPT-5.2 — Chat Completions (Strategist) ──────────────────────────────────
+// Fallback automático para Sonnet se OPENAI_KEY não estiver configurada.
+function callGPT5Messages({ system, messages, maxTokens = 800 }) {
+  if (!OPENAI_KEY) return callClaudeMessages({ system, messages, maxTokens });
+  return new Promise((resolve, reject) => {
+    const oaiMsgs = [
+      { role: 'system', content: system },
+      ...messages.map(m => ({ role: m.role, content: String(m.content) })),
+    ];
+    const body = JSON.stringify({ model: 'gpt-5.2', messages: oaiMsgs, max_tokens: maxTokens });
+    const opts = {
+      hostname: 'api.openai.com', path: '/v1/chat/completions', method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + OPENAI_KEY,
+        'Content-Length': Buffer.byteLength(body),
+      },
+    };
+    let data = '';
+    const req = https.request(opts, res => {
+      res.on('data', c => data += c);
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          if (json.error) return reject(new Error('GPT-5.2: ' + (json.error.message || JSON.stringify(json.error))));
+          const text         = json.choices?.[0]?.message?.content || '';
+          const inputTokens  = json.usage?.prompt_tokens     || 0;
+          const outputTokens = json.usage?.completion_tokens || 0;
+          resolve({ text, inputTokens, outputTokens });
+        } catch (e) { reject(new Error('Resposta inválida GPT-5.2: ' + e.message)); }
+      });
+    });
+    req.on('error', reject);
+    req.write(body);
+    req.end();
+  });
+}
+
+// ── Claude Haiku 4.5 — Refinadores (tarefas JSON estruturadas) ────────────────
+function callHaiku({ system, messages, maxTokens = 900 }) {
+  return new Promise((resolve, reject) => {
+    if (!ANTHROPIC_KEY) return reject(new Error('ANTHROPIC_API_KEY não configurada.'));
+    const body = JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: maxTokens,
+      system,
+      messages,
+    });
+    const opts = {
+      hostname: 'api.anthropic.com', path: '/v1/messages', method: 'POST',
+      headers: {
+        'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY,
+        'anthropic-version': '2023-06-01', 'Content-Length': Buffer.byteLength(body),
+      },
+    };
+    let data = '';
+    const req = https.request(opts, res => {
+      res.on('data', c => data += c);
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          if (json.error) return reject(new Error('Haiku: ' + (json.error.type || json.error.message || JSON.stringify(json.error))));
+          const text         = (json.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
+          const inputTokens  = json.usage?.input_tokens  || 0;
+          const outputTokens = json.usage?.output_tokens || 0;
+          resolve({ text, inputTokens, outputTokens });
+        } catch (e) { reject(new Error('Resposta inválida Haiku: ' + e.message)); }
+      });
+    });
+    req.on('error', reject);
+    req.write(body);
+    req.end();
+  });
+}
+
+// ── OpenAI Image Generation (GPT-image-2 / DALL-E) ───────────────────────────// Retorna { b64: string, tok: {in,out} }
+// size: '1024x1024' | '1024x1792' | '1792x1024'
+// quality: 'low' | 'medium' | 'high'
+function callOpenAIImage({ prompt, size = '1024x1024', quality = 'medium', model = 'gpt-image-2' }) {
+  return new Promise((resolve, reject) => {
+    if (!OPENAI_KEY) return reject(new Error('OPENAI_API_KEY não configurada no servidor.'));
+    const body = JSON.stringify({ model, prompt, n: 1, size, quality, output_format: 'b64_json' });
+    const opts = {
+      hostname: 'api.openai.com', path: '/v1/images/generations', method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + OPENAI_KEY,
+        'Content-Length': Buffer.byteLength(body),
+      },
+    };
+    let data = '';
+    const req = https.request(opts, res => {
+      res.on('data', c => data += c);
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          if (json.error) return reject(new Error('OpenAI: ' + (json.error.message || JSON.stringify(json.error))));
+          const b64 = json.data?.[0]?.b64_json;
+          if (!b64) return reject(new Error('Sem imagem na resposta OpenAI. Verifique o modelo e a chave.'));
+          resolve({ b64, tok: { in: 0, out: 0 } });
+        } catch (e) { reject(new Error('Resposta inválida da OpenAI: ' + e.message)); }
+      });
+    });
+    req.on('error', reject);
+    req.write(body);
+    req.end();
+  });
+}
+
+// Monta o prompt de fundo visual para o GPT-image-2 baseado no sub-formato e voz da marca.
+// REGRA CRÍTICA: zero texto/letras na imagem — é só fundo para sobrepor texto depois.
+function buildImageBgPrompt({ brief, brand, subFormat, voiceId }) {
+  const voiceMap = {
+    luxury:        'ultra-premium dark marble texture with subtle gold veins, editorial fashion magazine ambiance, cinematic ambient light',
+    bold:          'high-contrast graphic design, electric energy, bold geometric shapes, urban dynamic pulse',
+    editorial:     'clean editorial photography style, magazine-quality negative space, charcoal and ivory tones',
+    warm:          'warm earth tones, natural linen and wood grain texture, soft golden-hour ambient light',
+    tech:          'dark gradient with glowing circuit micro-patterns, deep blue-purple tech glow, futuristic interface feel',
+    playful:       'vibrant gradient with dynamic shapes, energetic pop-art influence, bright youthful palette',
+    authoritative: 'deep dark power background, architectural geometric precision, commanding depth and shadow',
+    minimal:       'pure Swiss-design minimalism, single bold accent color element, vast precise negative space',
+  };
+  const compMap = {
+    BIG_STATEMENT:         'vast open center with subtle radial vignette, maximum breathing room for a large centered headline',
+    QUESTION_HOOK:         'strong dark vertical band on the left fading into open space on the right, dramatic split lighting',
+    STAT_POST:             'radial glow emanating from left-center area, subtle grid texture overlay, data-visualization aesthetic',
+    QUOTE_AUTHORITY:       'editorial grain texture, faint oversized quotation marks suggested in the upper-left background',
+    BEFORE_AFTER:          'split-tone composition: left half darker and cooler, right half subtly warmer and brighter',
+    MINI_LIST:             'clean structured professional look, subtle horizontal depth layers, organized corporate feel',
+    CTA_POST:              'dynamic diagonal composition with strong visual pull, darker gradient at bottom for CTA area',
+    CONTROVERSIAL_OPINION: 'high-contrast dramatic side-lighting, bold visual tension, cinematic noir mood',
+    BRAND_STATEMENT:       'elegant spacious premium feel, luxury brand positioning cues, sophisticated negative space',
+    QUICK_TIP:             'clean organized modern background, subtle grid, professional calm energy',
+  };
+  const style = voiceMap[voiceId] || voiceMap.authoritative;
+  const comp  = compMap[subFormat] || 'professional dark textured background with subtle depth and premium feel';
+  const bg    = brand.p2 || '#0D0D0F';
+  const acc   = brand.p1 || '#7C3AED';
+  return `Professional social media post BACKGROUND IMAGE ONLY. Composition: ${comp}. Style: ${style}. Dominant color: ${bg}, accent glow: ${acc}. ABSOLUTE RULE: NO TEXT, NO LETTERS, NO WORDS, NO NUMBERS anywhere in the image — this is a pure abstract/textural background. Ultra high quality, sharp, commercial graphic design level.`;
+}
+
+// Tamanho OpenAI mais próximo para cada formato de canvas
+function openAiSizeFor(dim) {
+  const ratio = dim.w / dim.h;
+  if (ratio > 1.2) return '1792x1024'; // banner, thumb landscape
+  if (ratio < 0.7) return '1024x1792'; // story, reels
+  return '1024x1024';                  // post, carrossel
+}
+
+// Monta SVG híbrido: fundo = imagem base64 + overlay escuro + texto determinístico
+function buildHybridSvg({ b64Image, brief, blueprint, brand, dim }) {
+  const W = dim.w, H = dim.h;
+  const margin = W > 1200 ? 60 : 80;
+  const preText = buildTextElements({ brief, blueprint, dim, margin });
+  const overlayOpacity = 0.42; // garante legibilidade do texto em qualquer fundo
+  const accentColor = blueprint._accent_color || brand.p1 || '#7C3AED';
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+<defs>
+  <clipPath id="hcv"><rect width="${W}" height="${H}"/></clipPath>
+</defs>
+<g clip-path="url(#hcv)">
+  <image href="data:image/png;base64,${b64Image}" x="0" y="0" width="${W}" height="${H}" preserveAspectRatio="xMidYMid slice"/>
+  <rect width="${W}" height="${H}" fill="#000000" opacity="${overlayOpacity}"/>
+  <radialGradient id="hglow" cx="50%" cy="40%" r="55%"><stop offset="0%" stop-color="${accentColor}" stop-opacity="0.18"/><stop offset="100%" stop-color="${accentColor}" stop-opacity="0"/></radialGradient>
+  <rect width="${W}" height="${H}" fill="url(#hglow)"/>
+  ${preText}
+</g>
+</svg>`;
 }
 
 // ─────────────────────────────────────────────
@@ -2653,6 +2825,73 @@ const LAYOUT_TEMPLATES = {
       has_gradient:true, has_glow:true, has_pattern:false, shape_count:4 },
   },
 
+  // ─── POST ÚNICO — TEMPLATES POR SUB-FORMATO ──────────────────────────────
+
+  'IG-POST-CENTERED': {
+    name: 'Big Statement — Central',
+    desc: 'Frase única dominante centralizada — espaço em branco como design intencional',
+    formats: ['post','anuncio'], networks: ['ig','li'],
+    content_types: ['motivational','educational','storytelling'],
+    hl:  { xf:0.50, yf:0.48, sf:0.128, lhm:1.12, anchor:'middle', transform:'uppercase' },
+    sub: null,
+    body: null, cta: null,
+    ft:  { xf:0.07, yf:0.95, sf:0.017 },
+    db:  null,
+    bg_pref: 'dark', texture: 'noise',
+    deco: { mood:'big-statement-centered',
+      layers:['radial-glow-center','noise-texture','accent-rule-top','accent-rule-bottom-sym'],
+      has_gradient:true, has_glow:true, has_pattern:false, shape_count:3 },
+  },
+
+  'IG-POST-QUESTION': {
+    name: 'Question Hook — Gancho',
+    desc: 'Pergunta provocadora que para o scroll — curiosidade imediata em 0,3s',
+    formats: ['post'], networks: ['ig','li'],
+    content_types: ['educational','motivational'],
+    hl:  { xf:0.12, yf:0.46, sf:0.105, lhm:1.20, anchor:'start' },
+    sub: { xf:0.12, ybl:0.075, sf:0.028, w:'300' },
+    body: null, cta: null,
+    ft:  { xf:0.12, yf:0.95, sf:0.017 },
+    db:  null,
+    bg_pref: 'dark', texture: 'subtle',
+    deco: { mood:'question-hook',
+      layers:['accent-bar-left-full','radial-glow-top-left','noise-texture'],
+      has_gradient:true, has_glow:true, has_pattern:false, shape_count:3 },
+  },
+
+  'IG-POST-QUOTE': {
+    name: 'Quote de Autoridade',
+    desc: 'Citação elegante com aspas grandes — credibilidade e autoridade máximas',
+    formats: ['post'], networks: ['ig','li'],
+    content_types: ['motivational','storytelling'],
+    hl:  { xf:0.09, yf:0.54, sf:0.072, lhm:1.30, anchor:'start', font:'Playfair Display' },
+    sub: { xf:0.09, ybl:0.090, sf:0.024, w:'300', font:'DM Sans' },
+    body: null, cta: null,
+    ft:  { xf:0.09, yf:0.95, sf:0.017 },
+    db:  null,
+    bg_pref: 'dark', texture: 'grain',
+    deco: { mood:'quote-authority',
+      layers:['large-quote-marks','separator-h-thin','grain-texture','accent-rule-left'],
+      has_gradient:false, has_glow:false, has_pattern:true, shape_count:3 },
+  },
+
+  'IG-POST-SPLIT': {
+    name: 'Antes / Depois — Contraste',
+    desc: 'Divisão visual clara entre antes e depois — transformação que converte',
+    formats: ['post'], networks: ['ig','li'],
+    content_types: ['promotional','educational'],
+    hl:  { xf:0.07, yf:0.28, sf:0.078, lhm:1.15, anchor:'start' },
+    sub: { xf:0.07, ybl:0.065, sf:0.026, w:'300' },
+    body:{ xf:0.07, ysf:0.57, sf:0.027, lhm:1.85, prefix:'→' },
+    cta: null,
+    ft:  { xf:0.07, yf:0.95, sf:0.017 },
+    db:  null,
+    bg_pref: 'dark', texture: 'subtle',
+    deco: { mood:'before-after-split',
+      layers:['horizontal-split-divider','accent-tone-bottom-half','noise-texture'],
+      has_gradient:true, has_glow:false, has_pattern:false, shape_count:3 },
+  },
+
   // ─── CARROSSEL 1080×1080 ──────────────────────────────────────────────────
 
   'CARR-CAPA': {
@@ -2844,8 +3083,27 @@ function splitLines(text, maxPx, fontSize, charRatio) {
   return lines.length ? lines : [text];
 }
 
+// Maps sub-format IDs (from user selection) to the best matching layout template.
+const SUB_FORMAT_TEMPLATE_MAP = {
+  BIG_STATEMENT:         'IG-POST-CENTERED',
+  QUESTION_HOOK:         'IG-POST-QUESTION',
+  CONTROVERSIAL_OPINION: 'IG-POST-IMPACTO',
+  QUICK_TIP:             'IG-POST-LISTA',
+  MINI_LIST:             'IG-POST-LISTA',
+  QUOTE_AUTHORITY:       'IG-POST-QUOTE',
+  BEFORE_AFTER:          'IG-POST-SPLIT',
+  CTA_POST:              'IG-POST-FRAME',
+  STAT_POST:             'IG-POST-DADO',
+  BRAND_STATEMENT:       'IG-POST-EDITORIAL',
+};
+
 /** Seleciona o template mais adequado para o contexto. */
-function selectTemplate(format, network, brief, slideRole) {
+function selectTemplate(format, network, brief, slideRole, subFormat) {
+  // Sub-format override: user explicitly chose a visual template — always honor it.
+  if (subFormat && (format === 'post' || format === 'anuncio')) {
+    const mapped = SUB_FORMAT_TEMPLATE_MAP[subFormat];
+    if (mapped && LAYOUT_TEMPLATES[mapped]) return mapped;
+  }
   const ct  = brief.content_type || 'educational';
   const em  = brief.emphasis     || 'statement';
   const hasData = !!brief.data_highlight;
@@ -2907,7 +3165,7 @@ function resolveLayout(templateId, dim, brief, brand) {
     const hlSize = sz(tpl.hl.sf);
     const hlX    = px(tpl.hl.xf, W);
     const hlY    = px(tpl.hl.yf, H);
-    const hlMaxW = W - hlX - marg;
+    const hlMaxW = (tpl.hl.anchor === 'middle') ? (W - marg * 2) : (W - hlX - marg);
     const hlLH   = Math.round(hlSize * (tpl.hl.lhm || 1.15));
     const hlLines = splitLines(brief.headline, hlMaxW, hlSize, 0.58);
     out.headline = {
@@ -3103,18 +3361,35 @@ DATA HIGHLIGHT — O NÚMERO QUE CONVENCE:
       modern:'tech-sharp', bold:'bold-energy', typographic:'dark-power', warm:'soft-trust' };
     const fontMap = { 'bold-uppercase':'display-bold', 'mixed-weight':'display-bold',
       'serif-italic':'serif-elegant', 'display-black':'display-bold', editorial:'editorial' };
+    // Derive emphasis and content_type from the user-selected sub-format
+    const emphasisMap = {
+      STAT_POST:'number', MINI_LIST:'list', QUICK_TIP:'list', QUOTE_AUTHORITY:'quote',
+      QUESTION_HOOK:'question', BIG_STATEMENT:'statement', CONTROVERSIAL_OPINION:'statement',
+      BEFORE_AFTER:'statement', CTA_POST:'statement', BRAND_STATEMENT:'statement',
+    };
+    const ctypeMap = {
+      STAT_POST:'data-driven', QUOTE_AUTHORITY:'storytelling', BEFORE_AFTER:'promotional',
+      CTA_POST:'promotional', BRAND_STATEMENT:'educational', MINI_LIST:'educational',
+      QUICK_TIP:'educational',
+    };
+    const compositionMap = {
+      BIG_STATEMENT:'text-dominant', QUESTION_HOOK:'text-dominant', STAT_POST:'data-hero',
+      MINI_LIST:'list-view', QUICK_TIP:'list-view', QUOTE_AUTHORITY:'quote-focus',
+      BEFORE_AFTER:'split-layout', CTA_POST:'text-dominant', BRAND_STATEMENT:'editorial',
+    };
     return {
       data: {
         headline: blueprint.headline,
         subheadline: blueprint.subheadline || null,
-        body_points: [],
-        cta: 'Saiba mais',
-        data_highlight: null,
+        body_points: Array.isArray(blueprint.body_points) ? blueprint.body_points : [],
+        cta: blueprint.cta || 'Saiba mais',
+        data_highlight: blueprint.data_highlight || null,
         visual_mood: styleMap[blueprint.visual?.style] || 'dark-power',
-        content_type: blueprint.type === 'carousel' ? 'educational' : 'motivational',
-        emphasis: 'statement',
+        content_type: blueprint.type === 'carousel' ? 'educational'
+          : (ctypeMap[subFormat] || 'motivational'),
+        emphasis: emphasisMap[subFormat] || 'statement',
         font_mood: fontMap[blueprint.typography?.headline_style] || 'display-bold',
-        composition_hint: 'text-dominant',
+        composition_hint: compositionMap[subFormat] || 'text-dominant',
         _blueprint: blueprint,
       },
       tok: { in: 0, out: 0 },
@@ -3147,12 +3422,12 @@ DATA HIGHLIGHT — O NÚMERO QUE CONVENCE:
 // ── Estágio 2: Template Selector + Palette Finalizer ─────────────────────────
 // Nova arquitetura: layout resolvido deterministicamente (0 tokens de IA para posições).
 // Claude só decide: cores de destaque, gradiente bg, atmosphere mood. ~400 tokens max.
-async function daStage2ArtDir({ brief, brand, dim, format, slideIndex, totalSlides, slideRole, network }) {
+async function daStage2ArtDir({ brief, brand, dim, format, slideIndex, totalSlides, slideRole, network, subFormat }) {
   const voice = brand.voiceId ? (BRAND_VOICES[brand.voiceId] || '') : '';
   const dna   = voice || (brand.modelN ? (STYLE_DNA[brand.modelN] || '') : '');
 
-  // 1) Seleciona template por formato + conteúdo (determinístico)
-  const tplId = selectTemplate(format, network || 'ig', brief, slideRole);
+  // 1) Seleciona template por formato + conteúdo (determinístico) — subFormat tem prioridade
+  const tplId = selectTemplate(format, network || 'ig', brief, slideRole, subFormat);
 
   // 2) Resolve layout completo em px absolutos (sem IA)
   const blueprint = resolveLayout(tplId, dim, brief, brand);
@@ -3386,6 +3661,12 @@ accent-burst          → círculos concêntricos cx=75% cy=80% accentColor opac
 badge-count           → rect arredondado no canto sup-dir com texto do slide_indicator
 micro-label-above     → pequeno texto "— INSIGHT" acima do headline, p4 opacity:0.50
 subtle-glow-top       → radialGradient cx=50% cy=0% r=50% accentColor stop-opacity=0.15 em rect
+accent-bar-left-full  → <rect x="${Math.round(dim.w*0.07)}" y="0" width="5" height="${dim.h}" fill="accentColor" opacity="0.75"/> — barra vertical dominante à esquerda
+accent-rule-bottom-sym → <rect x="${dim.w-margin-Math.round(dim.w*0.18)}" y="${Math.round(dim.h*0.88)}" width="${Math.round(dim.w*0.18)}" height="2" fill="accentColor"/> — linha simétrica inferior direita
+radial-glow-top-left  → radialGradient cx="15%" cy="15%" r="55%"> accentColor→transparent; rect fullscreen fill=url() opacity via stop
+large-quote-marks     → <text x="${Math.round(dim.w*0.07)}" y="${Math.round(dim.h*0.36)}" font-family="Playfair Display,Georgia,serif" font-size="180" fill="accentColor" opacity="0.22">"</text> — aspas gigantes decorativas à esquerda
+horizontal-split-divider → <line x1="${margin}" y1="${Math.round(dim.h*0.50)}" x2="${dim.w-margin}" y2="${Math.round(dim.h*0.50)}" stroke="accentColor" opacity="0.40" stroke-width="1.5"/> — divisor horizontal no meio
+accent-tone-bottom-half  → <rect x="0" y="${Math.round(dim.h*0.50)}" width="${dim.w}" height="${Math.round(dim.h*0.50)}" fill="accentColor" opacity="0.05"/> — tom de cor sutil na metade inferior
 
 ═══════════ ESTRUTURA DO SVG (siga exatamente) ═══════════
 <svg xmlns="http://www.w3.org/2000/svg" width="${dim.w}" height="${dim.h}" viewBox="0 0 ${dim.w} ${dim.h}">
@@ -3800,7 +4081,7 @@ route('POST', '/api/user/design-agent', async (req, res) => {
   const {
     prompt, format = 'post', network = 'instagram', brandProfile,
     slideIndex, totalSlides, slideRole, postFormat,
-    blueprint, subFormat,
+    blueprint, subFormat, useAiBackground = false,
   } = await parseBody(req);
 
   if (!prompt) {
@@ -3861,11 +4142,32 @@ route('POST', '/api/user/design-agent', async (req, res) => {
       // ── Tweet Format: Stage 2 bypassed — SVG determinístico ───────────────
       send('stage', { stage: 2, total: 2, label: 'Gerando tweet card...', pct: 55 });
       svgResult = await daStage3Tweet({ brief: s1.data, brand, dim });
+    } else if (useAiBackground && OPENAI_KEY) {
+      // ── Modo Híbrido: GPT-image-2 (fundo) + SVG determinístico (texto) ────
+      send('stage', { stage: 2, total: 3, label: 'Definindo layout...', pct: 32 });
+      const s2 = await daStage2ArtDir({
+        brief: s1.data, brand, dim, format, slideIndex: slideIdx, totalSlides: totalSl, slideRole, network, subFormat,
+      });
+      totalIn  += s2.tok.in;
+      totalOut += s2.tok.out;
+      send('blueprint', { blueprint: s2.data });
+      send('stage',     { stage: 2, total: 3, label: 'Layout definido ✓', pct: 42 });
+
+      // Stage 2b: Geração do fundo com GPT-image-2
+      send('stage', { stage: 3, total: 3, label: 'Gerando fundo com IA...', pct: 50 });
+      const voiceId = s2.data._voiceId || brand.voiceId || '';
+      const bgPrompt = buildImageBgPrompt({ brief: s1.data, brand, subFormat, voiceId });
+      const imgSize  = openAiSizeFor(dim);
+      const imgRes   = await callOpenAIImage({ prompt: bgPrompt, size: imgSize, quality: 'medium' });
+      send('stage', { stage: 3, total: 3, label: 'Compondo design final...', pct: 85 });
+
+      const hybridSvg = buildHybridSvg({ b64Image: imgRes.b64, brief: s1.data, blueprint: s2.data, brand, dim });
+      svgResult = { svg: sanitizeSvg(hybridSvg), tok: { in: 0, out: 0 } };
     } else {
-      // ── Estágio 2: Art Direction ─────────────────────────────────────────
+      // ── Pipeline SVG padrão ──────────────────────────────────────────────
       send('stage', { stage: 2, total: 3, label: 'Definindo direção de arte...', pct: 32 });
       const s2 = await daStage2ArtDir({
-        brief: s1.data, brand, dim, format, slideIndex: slideIdx, totalSlides: totalSl, slideRole, network,
+        brief: s1.data, brand, dim, format, slideIndex: slideIdx, totalSlides: totalSl, slideRole, network, subFormat,
       });
       totalIn  += s2.tok.in;
       totalOut += s2.tok.out;
@@ -3955,53 +4257,45 @@ route('POST', '/api/user/brainstorm', async (req, res) => {
     : '\nFORMATO/REDE: ainda não selecionados pelo usuário';
 
   const system =
-`Você é o estrategista criativo da Autopostt.
-Sem formalidade, sem consultoria, sem rodeios.
-Fale como um amigo que entende muito de conteúdo — direto, específico, humano.
+`Você é o estrategista de conteúdo da AutoPostt — sem enrolação, sem consultoria.
+Pensa e responde como quem vive dentro de conteúdo viral todo dia.
 
-MARCA: ${brand.profissao} | Nicho: ${brand.nicho} | Tom: ${brand.tom} | Público: ${brand.publico}${fmtCtx}
+**MARCA:** ${brand.profissao} | Nicho: ${brand.nicho} | Tom: ${brand.tom} | Público: ${brand.publico}${fmtCtx}
 
-━━━ COMO VOCÊ AGE ━━━
+## Regras de comportamento
 
-Você fica no tópico que o usuário trouxe — sempre.
-"Burnout em vendas" → você fala de burnout em vendas. Nunca muda para burnout em conteúdo, nunca generaliza.
-"Produtividade matinal" → produtividade matinal. Não "bem-estar" nem "rotina". As palavras exatas do usuário.
+**Foco absoluto no tópico do usuário.**
+"Burnout em vendas" → burnout em vendas. Ponto. Nunca generaliza, nunca muda o assunto.
 
-Você espelha o jeito que a pessoa escreve.
-Se veio curto e direto, responde curto e direto.
-Se veio técnico, vai fundo no técnico.
-Gíria, informalidade — tudo certo. Nunca seja mais "consultor" do que a pessoa foi.
+**Espelha o estilo de quem escreve.**
+Curto e direto → responde curto. Técnico → vai fundo. Informal → informal. Nunca seja mais formal do que a pessoa.
 
-Você vai direto ao ponto — máx 4-5 linhas.
-Sem "ótima ideia!", sem elogios, sem introdução. Já começa no conteúdo.
-Entendeu o tópico → propôs ângulo específico → (1 pergunta se precisar).
+**Máx 4–5 linhas por resposta.** Sem "ótima ideia!", sem elogio, sem introdução. Começa direto no conteúdo.
 
-Se precisar perguntar, faz uma pergunta só — a mais cirúrgica.
+**1 pergunta no máximo** — só quando realmente necessário. A mais cirúrgica possível.
 
-Quando propor um ângulo, traduz em 1-2 headlines visuais (máx 8 palavras cada).
-Ex: ângulo "meta impossível que queima vendedor em 6 meses"
+**Sempre propõe 1–2 headlines concretos** ao sugerir um ângulo (máx 8 palavras cada).
+Exemplo: ângulo "meta impossível que queima vendedor"
 → "Sua meta foi desenhada para te quebrar"
 → "A meta impossível que queima quem vende"
-Isso mostra o post antes de existir. A headline para o scroll.
+A headline mostra o post antes de existir.
 
-Use busca na web quando precisar de dado real sobre o tópico exato.
-Busca específica: "burnout rotatividade vendedores Brasil 2024" — não "o que é burnout".
-Máx 2 buscas. Não busque o que você já sabe.
+## Quando fechar
 
-━━━ QUANDO ENCERRAR ━━━
-Coloque ✅ quando o ângulo estiver claro + tiver elemento concreto (dado, contraste, transformação real).
-Use 🔄 quando ainda precisar de detalhe ou clareza no ângulo.
-Quando ✅: "Tá bom — clica em ✦ Refinar Prompt para gerar."`;
+Coloca ✅ quando o ângulo estiver claro + tiver elemento concreto (dado, contraste, transformação).
+Usa 🔄 quando ainda falta clareza.
+Quando ✅: "Fechado — clica em ✦ Refinar Prompt para gerar."`;
 
   try {
-    const r = await callClaudeMessagesWithSearch({
+    const r = await callGPT5Messages({
       system,
       messages: messages.slice(-14).map(m => ({ role: m.role, content: String(m.content) })),
       maxTokens: 600,
     });
     const tok = { in: r.inputTokens || 0, out: r.outputTokens || 0 };
-    const cost_usd = parseFloat(((tok.in / 1_000_000 * 3) + (tok.out / 1_000_000 * 15)).toFixed(6));
-    res.end(JSON.stringify({ ok: true, reply: r.text, tok, cost_usd }));
+    // GPT-5.2 pricing: $1.75 input / $14 output per MTok
+    const cost_usd = parseFloat(((tok.in / 1_000_000 * 1.75) + (tok.out / 1_000_000 * 14)).toFixed(6));
+    res.end(JSON.stringify({ ok: true, reply: r.text, tok, cost_usd, model: 'gpt-5.2' }));
   } catch(e) {
     return err(res, 'Erro na conversa: ' + e.message);
   }
@@ -4036,65 +4330,50 @@ route('POST', '/api/user/brainstorm/refine', async (req, res) => {
     .join('\n\n');
 
   const system =
-`You are a prompt refiner specialized in extracting structured intent from conversations.
+`You are a content extractor. Task: read a conversation and output a structured content base. Nothing else.
 
-Your job is to analyze the FULL conversation between the user and the Creative Strategist and convert it into a clean, structured base for visual generation.
+STRICT RULES:
+- Do NOT add ideas that aren't in the conversation
+- Do NOT choose format or visual style
+- Do NOT write commentary or explanations
+- ONLY extract, organize, and clean what's already there
+- Respond in the SAME language as the conversation
 
-IMPORTANT:
-- Do NOT decide format
-- Do NOT decide visual style
-- Do NOT add creative ideas
-- Only extract and organize
-
-GOAL:
-Create a clear content foundation that can later be adapted into different formats and styles.
-
-RULES:
-- Capture the real intention of the content
-- Remove repetition and noise
-- Keep it concise
-- Focus on what will be VISUALIZED
-
-OUTPUT FORMAT:
+OUTPUT — copy this structure exactly, fill in the brackets:
 
 CORE_MESSAGE:
-(what is the main idea)
+[The single main idea in 1-2 sentences. Exact topic, no generalization.]
 
 HEADLINE_OPTIONS:
-(3–5 short options, max 8 words each)
+- [Option 1 — max 8 words]
+- [Option 2 — max 8 words]
+- [Option 3 — max 8 words]
+- [Option 4 — max 8 words, if exists]
 
 CONTENT_POINTS:
-(key ideas or steps, bullet format)
+- [Key supporting idea, fact, or step]
+- [Key supporting idea, fact, or step]
+- [Key supporting idea, fact, or step]
 
 EMOTION:
-(desired feeling)
+[One word or short phrase: e.g. urgency, empowerment, curiosity, relief]
 
 AUDIENCE:
-(target audience)
+[Who this content targets — be specific]
 
 GOAL:
-(engagement | authority | sales)
+[engagement | authority | sales — pick one]
 
-CONSTRAINTS:
-- simple
-- clear
-- visual-friendly
-
-RULE:
-Do not format into slides.
-Do not define layout.
-This is a neutral base.
-
-LANGUAGE: Respond in the SAME language as the conversation (if Portuguese, write in Portuguese; if English, write in English).`;
+OUTPUT NOTHING ELSE. No intro, no closing, no "here is the analysis".`;
 
   try {
-    const r = await callClaudeMessages({
+    const r = await callHaiku({
       system,
-      messages: [{ role: 'user', content: `Conversa completa:\n\n${conversationStr}\n\nExtraia a base estruturada:` }],
+      messages: [{ role: 'user', content: `Full conversation:\n\n${conversationStr}\n\nExtract the structured content base now:` }],
       maxTokens: 800,
     });
     const tok = { in: r.inputTokens || 0, out: r.outputTokens || 0 };
-    res.end(JSON.stringify({ ok: true, refinedPrompt: r.text.trim(), blueprint: null, tok }));
+    res.end(JSON.stringify({ ok: true, refinedPrompt: r.text.trim(), blueprint: null, tok, model: 'haiku-4-5' }));
   } catch(e) {
     return err(res, 'Erro ao refinar: ' + e.message);
   }
@@ -4142,56 +4421,31 @@ route('POST', '/api/user/brainstorm/refine-format', async (req, res) => {
   const brandColors = `background=${brand.p2||'#0D0D0F'} text=${brand.p3||'#FFFFFF'} accent=${brand.p1||'#7C3AED'}`;
 
   const system =
-`You are a senior prompt engineer specialized in social media design systems.
+`You are a design blueprint generator. Input: structured content base. Output: ONE valid JSON object. Nothing else.
 
-Your job is to transform a structured content base into a final design blueprint.
+FORMAT: ${fmtLabel} | SUB-FORMAT: ${subFormat || 'default'} — ${subFmtLabel}
+TONE: ${brandTone} | NETWORK: ${netLabel} | BRAND: ${brand.profissao} / ${brand.nicho}
+COLORS: ${brandColors}
 
-INPUTS:
-- Content base (from previous step)
-- Selected FORMAT TYPE: ${fmtLabel}
-- Selected SUB-FORMAT: ${subFormat || 'default'} — ${subFmtLabel}
-- Selected BRAND TONE: ${brandTone}
-- Brand colors: ${brandColors}
-- Network: ${netLabel}
-- Brand: ${brand.profissao} | ${brand.nicho}
+SUB-FORMAT RULE (follow strictly):
+${subFmtLabel ? `${subFormat}: ${subFmtLabel}` : 'Default post: strong headline, clean layout'}
+- Carousel sub-formats → type="carousel", fill slides array with hook + content slides + CTA
+- Post sub-formats → type="post", slides=null
+- Tweet → type="post", concise Twitter-style headline
 
-CRITICAL:
-Now you MUST adapt everything to:
-1. The selected FORMAT
-2. The selected BRAND TONE
+FIELD RULES:
+- body_points: REQUIRED for MINI_LIST / QUICK_TIP / CTA_POST (exactly 3 items, ≤8 words each). null otherwise.
+- data_highlight: REQUIRED for STAT_POST (the hero number e.g. "3.4x" "87%" "R$12k"). null otherwise.
+- cta: REQUIRED for CTA_POST (max 4 words). null otherwise.
+- headline/subheadline/slides: SAME language as the content base input.
 
-RULES:
-- Respect the format structure strictly
-- Adapt tone into visual decisions
-- Keep content short and impactful
-- Optimize for readability and engagement
-
-SUB-FORMAT BEHAVIOR (follow the selected sub-format strictly):
-${subFmtLabel ? `- ${subFormat}: ${subFmtLabel}` : '- Default post: strong headline, clean layout'}
-- For carousel sub-formats (LIST_CAROUSEL, EDUCATIONAL_CAROUSEL, etc.): set type="carousel", generate slides array
-- For post sub-formats (BIG_STATEMENT, QUESTION_HOOK, etc.): set type="post", slides=null
-- For tweet/thread: set type="post", adapt headline to Twitter card style
-
-Output ONLY valid JSON matching this exact structure (zero extra text):
-{
-  "type": "post|carousel",
-  "headline": "...",
-  "subheadline": "...|null",
-  "slides": ["hook", "slide 2", "...", "CTA"]|null,
-  "visual": { "background": "solid|gradient|texture", "style": "minimal|editorial|luxury|modern|bold|typographic", "image_usage": "none|subtle|dominant" },
-  "layout": { "alignment": "center|left|mixed", "hierarchy": "headline-dominant|data-hero|list-flow|editorial", "spacing": "airy|balanced|compact" },
-  "colors": { "background": "${brand.p2||'#0D0D0F'}", "text": "${brand.p3||'#FFFFFF'}", "accent": "${brand.p1||'#7C3AED'}" },
-  "typography": { "headline_style": "bold-uppercase|mixed-weight|serif-italic|display-black|editorial", "body_style": "none|minimal|small-regular" },
-  "elements": { "shapes": "none|lines|geometric|brackets", "accents": "none|minimal|arrows|numbers|rule-left" },
-  "tone": "bold|emotional|minimal|luxury|authoritative|warm"
-}
-
-RULE: Output ONLY the JSON. Headline/subheadline/slides: write in SAME language as the content base. Never change the core message.`;
+OUTPUT — return ONLY this JSON, no text before or after:
+{"type":"post|carousel","headline":"...","subheadline":"...|null","body_points":["≤8w","≤8w","≤8w"]|null,"data_highlight":"stat"|null,"cta":"≤4w"|null,"slides":["hook","...","CTA"]|null,"visual":{"background":"solid|gradient|texture","style":"minimal|editorial|luxury|modern|bold|typographic","image_usage":"none|subtle|dominant"},"layout":{"alignment":"center|left|mixed","hierarchy":"headline-dominant|data-hero|list-flow|editorial","spacing":"airy|balanced|compact"},"colors":{"background":"${brand.p2||'#0D0D0F'}","text":"${brand.p3||'#FFFFFF'}","accent":"${brand.p1||'#7C3AED'}"},"typography":{"headline_style":"bold-uppercase|mixed-weight|serif-italic|display-black|editorial","body_style":"none|minimal|small-regular"},"elements":{"shapes":"none|lines|geometric|brackets","accents":"none|minimal|arrows|numbers|rule-left"},"tone":"bold|emotional|minimal|luxury|authoritative|warm"}`;
 
   try {
-    const r = await callClaudeMessages({
+    const r = await callHaiku({
       system,
-      messages: [{ role: 'user', content: `Content base:\n\n${refineBase}\n\nGenerate the design blueprint JSON:` }],
+      messages: [{ role: 'user', content: `Content base:\n\n${refineBase}\n\nReturn the JSON blueprint:` }],
       maxTokens: 800,
     });
     const tok = { in: r.inputTokens || 0, out: r.outputTokens || 0 };
@@ -4210,7 +4464,9 @@ RULE: Output ONLY the JSON. Headline/subheadline/slides: write in SAME language 
     } else {
       refinedPrompt = r.text.trim();
     }
-    res.end(JSON.stringify({ ok: true, refinedPrompt, blueprint, tok }));
+    // Haiku pricing: $0.80 input / $4.00 output per MTok
+    const cost_usd = parseFloat(((tok.in / 1_000_000 * 0.80) + (tok.out / 1_000_000 * 4.00)).toFixed(6));
+    res.end(JSON.stringify({ ok: true, refinedPrompt, blueprint, tok, cost_usd, model: 'haiku-4-5' }));
   } catch(e) {
     return err(res, 'Erro ao refinar formato: ' + e.message);
   }
