@@ -962,8 +962,82 @@ function callClaudeStream({ system, messages, maxTokens = 2500, onChunk, onDone,
   req.end();
 }
 
-// ── OpenAI Image Generation (GPT-image-2 / DALL-E) ───────────────────────────
-// Retorna { b64: string, tok: {in,out} }
+// ── GPT-5.2 — Chat Completions (Strategist) ──────────────────────────────────
+// Fallback automático para Sonnet se OPENAI_KEY não estiver configurada.
+function callGPT5Messages({ system, messages, maxTokens = 800 }) {
+  if (!OPENAI_KEY) return callClaudeMessages({ system, messages, maxTokens });
+  return new Promise((resolve, reject) => {
+    const oaiMsgs = [
+      { role: 'system', content: system },
+      ...messages.map(m => ({ role: m.role, content: String(m.content) })),
+    ];
+    const body = JSON.stringify({ model: 'gpt-5.2', messages: oaiMsgs, max_tokens: maxTokens });
+    const opts = {
+      hostname: 'api.openai.com', path: '/v1/chat/completions', method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + OPENAI_KEY,
+        'Content-Length': Buffer.byteLength(body),
+      },
+    };
+    let data = '';
+    const req = https.request(opts, res => {
+      res.on('data', c => data += c);
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          if (json.error) return reject(new Error('GPT-5.2: ' + (json.error.message || JSON.stringify(json.error))));
+          const text         = json.choices?.[0]?.message?.content || '';
+          const inputTokens  = json.usage?.prompt_tokens     || 0;
+          const outputTokens = json.usage?.completion_tokens || 0;
+          resolve({ text, inputTokens, outputTokens });
+        } catch (e) { reject(new Error('Resposta inválida GPT-5.2: ' + e.message)); }
+      });
+    });
+    req.on('error', reject);
+    req.write(body);
+    req.end();
+  });
+}
+
+// ── Claude Haiku 4.5 — Refinadores (tarefas JSON estruturadas) ────────────────
+function callHaiku({ system, messages, maxTokens = 900 }) {
+  return new Promise((resolve, reject) => {
+    if (!ANTHROPIC_KEY) return reject(new Error('ANTHROPIC_API_KEY não configurada.'));
+    const body = JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: maxTokens,
+      system,
+      messages,
+    });
+    const opts = {
+      hostname: 'api.anthropic.com', path: '/v1/messages', method: 'POST',
+      headers: {
+        'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY,
+        'anthropic-version': '2023-06-01', 'Content-Length': Buffer.byteLength(body),
+      },
+    };
+    let data = '';
+    const req = https.request(opts, res => {
+      res.on('data', c => data += c);
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          if (json.error) return reject(new Error('Haiku: ' + (json.error.type || json.error.message || JSON.stringify(json.error))));
+          const text         = (json.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
+          const inputTokens  = json.usage?.input_tokens  || 0;
+          const outputTokens = json.usage?.output_tokens || 0;
+          resolve({ text, inputTokens, outputTokens });
+        } catch (e) { reject(new Error('Resposta inválida Haiku: ' + e.message)); }
+      });
+    });
+    req.on('error', reject);
+    req.write(body);
+    req.end();
+  });
+}
+
+// ── OpenAI Image Generation (GPT-image-2 / DALL-E) ───────────────────────────// Retorna { b64: string, tok: {in,out} }
 // size: '1024x1024' | '1024x1792' | '1792x1024'
 // quality: 'low' | 'medium' | 'high'
 function callOpenAIImage({ prompt, size = '1024x1024', quality = 'medium', model = 'gpt-image-2' }) {
@@ -4183,53 +4257,45 @@ route('POST', '/api/user/brainstorm', async (req, res) => {
     : '\nFORMATO/REDE: ainda não selecionados pelo usuário';
 
   const system =
-`Você é o estrategista criativo da Autopostt.
-Sem formalidade, sem consultoria, sem rodeios.
-Fale como um amigo que entende muito de conteúdo — direto, específico, humano.
+`Você é o estrategista de conteúdo da AutoPostt — sem enrolação, sem consultoria.
+Pensa e responde como quem vive dentro de conteúdo viral todo dia.
 
-MARCA: ${brand.profissao} | Nicho: ${brand.nicho} | Tom: ${brand.tom} | Público: ${brand.publico}${fmtCtx}
+**MARCA:** ${brand.profissao} | Nicho: ${brand.nicho} | Tom: ${brand.tom} | Público: ${brand.publico}${fmtCtx}
 
-━━━ COMO VOCÊ AGE ━━━
+## Regras de comportamento
 
-Você fica no tópico que o usuário trouxe — sempre.
-"Burnout em vendas" → você fala de burnout em vendas. Nunca muda para burnout em conteúdo, nunca generaliza.
-"Produtividade matinal" → produtividade matinal. Não "bem-estar" nem "rotina". As palavras exatas do usuário.
+**Foco absoluto no tópico do usuário.**
+"Burnout em vendas" → burnout em vendas. Ponto. Nunca generaliza, nunca muda o assunto.
 
-Você espelha o jeito que a pessoa escreve.
-Se veio curto e direto, responde curto e direto.
-Se veio técnico, vai fundo no técnico.
-Gíria, informalidade — tudo certo. Nunca seja mais "consultor" do que a pessoa foi.
+**Espelha o estilo de quem escreve.**
+Curto e direto → responde curto. Técnico → vai fundo. Informal → informal. Nunca seja mais formal do que a pessoa.
 
-Você vai direto ao ponto — máx 4-5 linhas.
-Sem "ótima ideia!", sem elogios, sem introdução. Já começa no conteúdo.
-Entendeu o tópico → propôs ângulo específico → (1 pergunta se precisar).
+**Máx 4–5 linhas por resposta.** Sem "ótima ideia!", sem elogio, sem introdução. Começa direto no conteúdo.
 
-Se precisar perguntar, faz uma pergunta só — a mais cirúrgica.
+**1 pergunta no máximo** — só quando realmente necessário. A mais cirúrgica possível.
 
-Quando propor um ângulo, traduz em 1-2 headlines visuais (máx 8 palavras cada).
-Ex: ângulo "meta impossível que queima vendedor em 6 meses"
+**Sempre propõe 1–2 headlines concretos** ao sugerir um ângulo (máx 8 palavras cada).
+Exemplo: ângulo "meta impossível que queima vendedor"
 → "Sua meta foi desenhada para te quebrar"
 → "A meta impossível que queima quem vende"
-Isso mostra o post antes de existir. A headline para o scroll.
+A headline mostra o post antes de existir.
 
-Use busca na web quando precisar de dado real sobre o tópico exato.
-Busca específica: "burnout rotatividade vendedores Brasil 2024" — não "o que é burnout".
-Máx 2 buscas. Não busque o que você já sabe.
+## Quando fechar
 
-━━━ QUANDO ENCERRAR ━━━
-Coloque ✅ quando o ângulo estiver claro + tiver elemento concreto (dado, contraste, transformação real).
-Use 🔄 quando ainda precisar de detalhe ou clareza no ângulo.
-Quando ✅: "Tá bom — clica em ✦ Refinar Prompt para gerar."`;
+Coloca ✅ quando o ângulo estiver claro + tiver elemento concreto (dado, contraste, transformação).
+Usa 🔄 quando ainda falta clareza.
+Quando ✅: "Fechado — clica em ✦ Refinar Prompt para gerar."`;
 
   try {
-    const r = await callClaudeMessagesWithSearch({
+    const r = await callGPT5Messages({
       system,
       messages: messages.slice(-14).map(m => ({ role: m.role, content: String(m.content) })),
       maxTokens: 600,
     });
     const tok = { in: r.inputTokens || 0, out: r.outputTokens || 0 };
-    const cost_usd = parseFloat(((tok.in / 1_000_000 * 3) + (tok.out / 1_000_000 * 15)).toFixed(6));
-    res.end(JSON.stringify({ ok: true, reply: r.text, tok, cost_usd }));
+    // GPT-5.2 pricing: $1.75 input / $14 output per MTok
+    const cost_usd = parseFloat(((tok.in / 1_000_000 * 1.75) + (tok.out / 1_000_000 * 14)).toFixed(6));
+    res.end(JSON.stringify({ ok: true, reply: r.text, tok, cost_usd, model: 'gpt-5.2' }));
   } catch(e) {
     return err(res, 'Erro na conversa: ' + e.message);
   }
@@ -4264,65 +4330,50 @@ route('POST', '/api/user/brainstorm/refine', async (req, res) => {
     .join('\n\n');
 
   const system =
-`You are a prompt refiner specialized in extracting structured intent from conversations.
+`You are a content extractor. Task: read a conversation and output a structured content base. Nothing else.
 
-Your job is to analyze the FULL conversation between the user and the Creative Strategist and convert it into a clean, structured base for visual generation.
+STRICT RULES:
+- Do NOT add ideas that aren't in the conversation
+- Do NOT choose format or visual style
+- Do NOT write commentary or explanations
+- ONLY extract, organize, and clean what's already there
+- Respond in the SAME language as the conversation
 
-IMPORTANT:
-- Do NOT decide format
-- Do NOT decide visual style
-- Do NOT add creative ideas
-- Only extract and organize
-
-GOAL:
-Create a clear content foundation that can later be adapted into different formats and styles.
-
-RULES:
-- Capture the real intention of the content
-- Remove repetition and noise
-- Keep it concise
-- Focus on what will be VISUALIZED
-
-OUTPUT FORMAT:
+OUTPUT — copy this structure exactly, fill in the brackets:
 
 CORE_MESSAGE:
-(what is the main idea)
+[The single main idea in 1-2 sentences. Exact topic, no generalization.]
 
 HEADLINE_OPTIONS:
-(3–5 short options, max 8 words each)
+- [Option 1 — max 8 words]
+- [Option 2 — max 8 words]
+- [Option 3 — max 8 words]
+- [Option 4 — max 8 words, if exists]
 
 CONTENT_POINTS:
-(key ideas or steps, bullet format)
+- [Key supporting idea, fact, or step]
+- [Key supporting idea, fact, or step]
+- [Key supporting idea, fact, or step]
 
 EMOTION:
-(desired feeling)
+[One word or short phrase: e.g. urgency, empowerment, curiosity, relief]
 
 AUDIENCE:
-(target audience)
+[Who this content targets — be specific]
 
 GOAL:
-(engagement | authority | sales)
+[engagement | authority | sales — pick one]
 
-CONSTRAINTS:
-- simple
-- clear
-- visual-friendly
-
-RULE:
-Do not format into slides.
-Do not define layout.
-This is a neutral base.
-
-LANGUAGE: Respond in the SAME language as the conversation (if Portuguese, write in Portuguese; if English, write in English).`;
+OUTPUT NOTHING ELSE. No intro, no closing, no "here is the analysis".`;
 
   try {
-    const r = await callClaudeMessages({
+    const r = await callHaiku({
       system,
-      messages: [{ role: 'user', content: `Conversa completa:\n\n${conversationStr}\n\nExtraia a base estruturada:` }],
+      messages: [{ role: 'user', content: `Full conversation:\n\n${conversationStr}\n\nExtract the structured content base now:` }],
       maxTokens: 800,
     });
     const tok = { in: r.inputTokens || 0, out: r.outputTokens || 0 };
-    res.end(JSON.stringify({ ok: true, refinedPrompt: r.text.trim(), blueprint: null, tok }));
+    res.end(JSON.stringify({ ok: true, refinedPrompt: r.text.trim(), blueprint: null, tok, model: 'haiku-4-5' }));
   } catch(e) {
     return err(res, 'Erro ao refinar: ' + e.message);
   }
@@ -4370,64 +4421,31 @@ route('POST', '/api/user/brainstorm/refine-format', async (req, res) => {
   const brandColors = `background=${brand.p2||'#0D0D0F'} text=${brand.p3||'#FFFFFF'} accent=${brand.p1||'#7C3AED'}`;
 
   const system =
-`You are a senior prompt engineer specialized in social media design systems.
+`You are a design blueprint generator. Input: structured content base. Output: ONE valid JSON object. Nothing else.
 
-Your job is to transform a structured content base into a final design blueprint.
+FORMAT: ${fmtLabel} | SUB-FORMAT: ${subFormat || 'default'} — ${subFmtLabel}
+TONE: ${brandTone} | NETWORK: ${netLabel} | BRAND: ${brand.profissao} / ${brand.nicho}
+COLORS: ${brandColors}
 
-INPUTS:
-- Content base (from previous step)
-- Selected FORMAT TYPE: ${fmtLabel}
-- Selected SUB-FORMAT: ${subFormat || 'default'} — ${subFmtLabel}
-- Selected BRAND TONE: ${brandTone}
-- Brand colors: ${brandColors}
-- Network: ${netLabel}
-- Brand: ${brand.profissao} | ${brand.nicho}
-
-CRITICAL:
-Now you MUST adapt everything to:
-1. The selected FORMAT
-2. The selected BRAND TONE
-
-RULES:
-- Respect the format structure strictly
-- Adapt tone into visual decisions
-- Keep content short and impactful
-- Optimize for readability and engagement
-
-SUB-FORMAT BEHAVIOR (follow the selected sub-format strictly):
-${subFmtLabel ? `- ${subFormat}: ${subFmtLabel}` : '- Default post: strong headline, clean layout'}
-- For carousel sub-formats (LIST_CAROUSEL, EDUCATIONAL_CAROUSEL, etc.): set type="carousel", generate slides array
-- For post sub-formats (BIG_STATEMENT, QUESTION_HOOK, etc.): set type="post", slides=null
-- For tweet/thread: set type="post", adapt headline to Twitter card style
-
-Output ONLY valid JSON matching this exact structure (zero extra text):
-{
-  "type": "post|carousel",
-  "headline": "...",
-  "subheadline": "...|null",
-  "body_points": ["short point 1 ≤8 words", "short point 2", "short point 3"]|null,
-  "data_highlight": "specific stat/number e.g. '3x' or '87%' or 'R$12k'"|null,
-  "cta": "max 4-word action"|null,
-  "slides": ["hook", "slide 2", "...", "CTA"]|null,
-  "visual": { "background": "solid|gradient|texture", "style": "minimal|editorial|luxury|modern|bold|typographic", "image_usage": "none|subtle|dominant" },
-  "layout": { "alignment": "center|left|mixed", "hierarchy": "headline-dominant|data-hero|list-flow|editorial", "spacing": "airy|balanced|compact" },
-  "colors": { "background": "${brand.p2||'#0D0D0F'}", "text": "${brand.p3||'#FFFFFF'}", "accent": "${brand.p1||'#7C3AED'}" },
-  "typography": { "headline_style": "bold-uppercase|mixed-weight|serif-italic|display-black|editorial", "body_style": "none|minimal|small-regular" },
-  "elements": { "shapes": "none|lines|geometric|brackets", "accents": "none|minimal|arrows|numbers|rule-left" },
-  "tone": "bold|emotional|minimal|luxury|authoritative|warm"
-}
+SUB-FORMAT RULE (follow strictly):
+${subFmtLabel ? `${subFormat}: ${subFmtLabel}` : 'Default post: strong headline, clean layout'}
+- Carousel sub-formats → type="carousel", fill slides array with hook + content slides + CTA
+- Post sub-formats → type="post", slides=null
+- Tweet → type="post", concise Twitter-style headline
 
 FIELD RULES:
-- body_points: required for MINI_LIST, QUICK_TIP, CTA_POST (3 short points each ≤8 words). null for others.
-- data_highlight: required for STAT_POST (the hero number). Optional for data-heavy content. null otherwise.
-- cta: required for CTA_POST. Optional for others.
+- body_points: REQUIRED for MINI_LIST / QUICK_TIP / CTA_POST (exactly 3 items, ≤8 words each). null otherwise.
+- data_highlight: REQUIRED for STAT_POST (the hero number e.g. "3.4x" "87%" "R$12k"). null otherwise.
+- cta: REQUIRED for CTA_POST (max 4 words). null otherwise.
+- headline/subheadline/slides: SAME language as the content base input.
 
-RULE: Output ONLY the JSON. Headline/subheadline/slides: write in SAME language as the content base. Never change the core message.`;
+OUTPUT — return ONLY this JSON, no text before or after:
+{"type":"post|carousel","headline":"...","subheadline":"...|null","body_points":["≤8w","≤8w","≤8w"]|null,"data_highlight":"stat"|null,"cta":"≤4w"|null,"slides":["hook","...","CTA"]|null,"visual":{"background":"solid|gradient|texture","style":"minimal|editorial|luxury|modern|bold|typographic","image_usage":"none|subtle|dominant"},"layout":{"alignment":"center|left|mixed","hierarchy":"headline-dominant|data-hero|list-flow|editorial","spacing":"airy|balanced|compact"},"colors":{"background":"${brand.p2||'#0D0D0F'}","text":"${brand.p3||'#FFFFFF'}","accent":"${brand.p1||'#7C3AED'}"},"typography":{"headline_style":"bold-uppercase|mixed-weight|serif-italic|display-black|editorial","body_style":"none|minimal|small-regular"},"elements":{"shapes":"none|lines|geometric|brackets","accents":"none|minimal|arrows|numbers|rule-left"},"tone":"bold|emotional|minimal|luxury|authoritative|warm"}`;
 
   try {
-    const r = await callClaudeMessages({
+    const r = await callHaiku({
       system,
-      messages: [{ role: 'user', content: `Content base:\n\n${refineBase}\n\nGenerate the design blueprint JSON:` }],
+      messages: [{ role: 'user', content: `Content base:\n\n${refineBase}\n\nReturn the JSON blueprint:` }],
       maxTokens: 800,
     });
     const tok = { in: r.inputTokens || 0, out: r.outputTokens || 0 };
@@ -4446,7 +4464,9 @@ RULE: Output ONLY the JSON. Headline/subheadline/slides: write in SAME language 
     } else {
       refinedPrompt = r.text.trim();
     }
-    res.end(JSON.stringify({ ok: true, refinedPrompt, blueprint, tok }));
+    // Haiku pricing: $0.80 input / $4.00 output per MTok
+    const cost_usd = parseFloat(((tok.in / 1_000_000 * 0.80) + (tok.out / 1_000_000 * 4.00)).toFixed(6));
+    res.end(JSON.stringify({ ok: true, refinedPrompt, blueprint, tok, cost_usd, model: 'haiku-4-5' }));
   } catch(e) {
     return err(res, 'Erro ao refinar formato: ' + e.message);
   }
