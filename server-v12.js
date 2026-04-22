@@ -971,7 +971,7 @@ function callGPT5Messages({ system, messages, maxTokens = 800 }) {
       { role: 'system', content: system },
       ...messages.map(m => ({ role: m.role, content: String(m.content) })),
     ];
-    const body = JSON.stringify({ model: 'gpt-5.2', messages: oaiMsgs, max_tokens: maxTokens });
+    const body = JSON.stringify({ model: 'gpt-5.2', messages: oaiMsgs, max_completion_tokens: maxTokens });
     const opts = {
       hostname: 'api.openai.com', path: '/v1/chat/completions', method: 'POST',
       headers: {
