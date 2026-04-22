@@ -4580,6 +4580,83 @@ OUTPUT — return ONLY this JSON, no text before or after:
   }
 });
 
+// ── buildGPT2Prompt: Haiku → rich English prose prompt for GPT-image-2 ────────
+async function buildGPT2Prompt({ messages, format, network, brand, slideIndex = null, totalSlides = null }) {
+  const conversationStr = messages.slice(-12).map(m =>
+    `${m.role === 'user' ? 'User' : 'Strategist'}: ${m.content}`
+  ).join('\n\n');
+
+  const fmtGuide = {
+    post:      'Square 1:1. Large bold headline + body text left half, high-quality product/device mockup right half.',
+    carrossel: 'Square 1:1 carousel slide. Slide number top-left. ONE bold message per slide.',
+    story:     'Vertical 9:16. Full-bleed dramatic background. Bold oversized headline centered.',
+    anuncio:   'Square 1:1 ad. Logo top-left. Bold headline + 2-3 benefit lines + CTA button bottom.',
+    thumb:     'Landscape 16:9 thumbnail. Maximum contrast. Huge bold text on left third.',
+    banner:    'Wide landscape 16:9. Horizontal layout. Product on right, text on left.',
+  };
+
+  let slideCtx = '';
+  if (slideIndex && totalSlides) {
+    const roles = { 1: 'hook/capa — grab attention', [totalSlides]: 'CTA — clear call to action' };
+    slideCtx = `\nThis is slide ${slideIndex} of ${totalSlides}. Role: ${roles[slideIndex] || 'content — one key insight or benefit'}.`;
+  }
+
+  const brandStr = brand ? `Brand: ${brand.companyName || ''}, primary color ${brand.primaryColor || '#F36B2A'}, accent ${brand.accentColor || '#ffffff'}.` : '';
+
+  const system = `You are a world-class art director creating prompts for GPT-image-2 image generation.
+Convert the marketing conversation below into a single rich English prose prompt (max 450 tokens) that produces a STUNNING, professional marketing image.
+
+Format guidance: ${fmtGuide[format] || fmtGuide.post}
+${slideCtx}
+${brandStr}
+
+Your prompt MUST specify:
+1. EXACT TEXT on image: main headline (max 6 words, ALL CAPS), subheadline (max 10 words), optional body copy. Wrap each text in quotes.
+2. Typography: font weight (Black/ExtraBold), size hierarchy, HEX color codes for each text element.
+3. Layout precision: exact positioning (left third, centered, top-left quadrant, etc.).
+4. Background & atmosphere: near-black or very dark background (#0a0a0a to #1a1a1a), dramatic professional lighting.
+5. Accent color: specify EXACTLY where the brand accent color appears (underline, icon, CTA button, divider line, etc.).
+6. Visual element: realistic 3D product mockup (phone showing dashboard UI, laptop with analytics screen, or relevant product), high detail.
+7. Quality: photorealistic, 8K render, ultra-sharp, commercial photography quality.
+
+Write ONLY the prompt. No explanations. No markdown. Just the prompt text.`;
+
+  const r = await callHaiku({
+    system,
+    messages: [{ role: 'user', content: `Conversation:\n${conversationStr}\n\nNetwork: ${network || 'Instagram'}. Generate the image prompt now.` }],
+    maxTokens: 480,
+  });
+  return r.text.trim();
+}
+
+// ── Rota: Generate V2 (GPT-image-2 full image) ────────────────────────────────
+route('POST', '/api/user/generate-v2', async (req, res) => {
+  const payload = requireAuth(req, res); if (!payload) return;
+  const { messages, format = 'post', network = 'Instagram', brandProfile, slideIndex = null, totalSlides = null } = await parseBody(req);
+  if (!messages || !messages.length) return err(res, 'Sem mensagens para gerar imagem');
+
+  const uid = payload.sub;
+  const quota = await consumeQuota(uid, 2);
+  if (!quota.ok) return err(res, quota.error || 'Sem créditos', 402);
+
+  const brand = brandProfile || null;
+  const netFull = network;
+
+  const sizeMap = {
+    post:'1024x1024', carrossel:'1024x1024', anuncio:'1024x1024',
+    story:'1024x1536', thumb:'1536x1024', banner:'1536x1024',
+  };
+  const size = sizeMap[format] || '1024x1024';
+
+  try {
+    const imgPrompt = await buildGPT2Prompt({ messages, format, network: netFull, brand, slideIndex, totalSlides });
+    const imgRes    = await callOpenAIImage({ prompt: imgPrompt, size, quality: 'high' });
+    res.end(JSON.stringify({ ok: true, image_b64: imgRes.b64, prompt_used: imgPrompt, model: 'gpt-image-2' }));
+  } catch(e) {
+    return err(res, 'Erro ao gerar imagem: ' + e.message);
+  }
+});
+
 // ── Rota: Export SVG → PNG/JPG ────────────────────────────────────────────────
 // Recebe o SVG, injeta as fontes em base64 e rasteriza via sharp.
 // fmt: 'png' (padrão) | 'jpg'   quality: 60–100 (padrão 90, só JPG)

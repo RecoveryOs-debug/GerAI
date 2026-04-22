@@ -2555,6 +2555,11 @@ tr:hover .td-actions { opacity: 1; }
 .img-preview-thumb{width:100%;aspect-ratio:1;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r2);overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:12px;cursor:pointer;transition:border-color .12s;min-height:280px}
 .img-preview-thumb:hover{border-color:var(--a)}
 .img-preview-thumb svg{width:100%;height:100%}
+.v2-fmt{padding:5px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:6px;cursor:pointer;font-family:var(--f);font-size:11px;font-weight:600;color:var(--t2);transition:.12s;white-space:nowrap}
+.v2-fmt.on{background:rgba(243,107,42,.15);border-color:var(--a);color:var(--a)}
+.v2-fmt:hover{background:rgba(255,255,255,.08);color:var(--tx)}
+.v2-net{padding:4px 8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:6px;cursor:pointer;font-family:var(--f);font-size:10px;font-weight:700;color:var(--t2);transition:.12s;display:flex;align-items:center;gap:3px}
+.v2-net.on{background:rgba(243,107,42,.15);border-color:var(--a);color:var(--a)}
 .img-preview-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;color:var(--t3);font-size:12px;min-height:200px}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
@@ -6305,51 +6310,38 @@ body.image-agent-refining #image-agent-refine-overlay{
 
     <!-- generate -->
     <div class="pg" id="pg-generate">
-      <div class="pg-hd"><div class="pg-title">Gerar conteúdo</div><div class="pg-sub">Descreva sua ideia. A IA aplica sua identidade de marca automaticamente.</div></div>
-      <div class="g-gen">
+      <div class="pg-hd"><div class="pg-title">Gerar conteúdo</div><div class="pg-sub">Converse com a IA e gere imagens profissionais com GPT-image-2.</div></div>
 
-        <!-- ══ COL 1: Formato + Rede Social ══ -->
-        <div class="gen-col-left">
-          <div style="margin-bottom:18px">
-            <div class="sec-lbl">Formato</div>
-            <div class="fmt-grid">
-              <div class="fmt on" id="f-post" onclick="selFmt('post')"><div class="fmt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#F5C518" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><rect x="4" y="4" width="16" height="16" rx="3"></rect><circle cx="9" cy="9" r="1.5"></circle><path d="M4 16l4-4 3 3 4-4 5 5"></path></svg></div><div class="fmt-name">Post único</div></div>
-              <div class="fmt" id="f-carrossel" onclick="selFmt('carrossel')"><div class="fmt-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><div class="fmt-name">Carrossel</div></div>
-              <div class="fmt" id="f-anuncio" onclick="selFmt('anuncio')"><div class="fmt-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><div class="fmt-name">Anúncio</div></div>
-              <div class="fmt" id="f-story" onclick="selFmt('story')"><div class="fmt-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/></svg></div><div class="fmt-name">Story</div></div>
-              <div class="fmt" id="f-thumb" onclick="selFmt('thumb')"><div class="fmt-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg></div><div class="fmt-name">Thumbnail</div></div>
-              <div class="fmt" id="f-banner" onclick="selFmt('banner')"><div class="fmt-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><div class="fmt-name">Banner</div></div>
-            </div>
-            <!-- Slide count selector -->
-            <div id="slide-count-row" style="display:none;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap">
-              <span style="font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">Qtd. slides</span>
-              <div style="display:flex;gap:4px;flex-wrap:wrap">
-                <button class="sc-btn on" data-n="0" onclick="selSlides(this,0)">Auto</button>
-                <button class="sc-btn" data-n="2" onclick="selSlides(this,2)">2 <span style="font-size:9px;opacity:.6">4cr</span></button>
-                <button class="sc-btn" data-n="3" onclick="selSlides(this,3)">3 <span style="font-size:9px;opacity:.6">6cr</span></button>
-                <button class="sc-btn" data-n="4" onclick="selSlides(this,4)">4 <span style="font-size:9px;opacity:.6">8cr</span></button>
-                <button class="sc-btn" data-n="5" onclick="selSlides(this,5)">5 <span style="font-size:9px;opacity:.6">10cr</span></button>
-                <button class="sc-btn" data-n="6" onclick="selSlides(this,6)">6 <span style="font-size:9px;opacity:.6">12cr</span></button>
-                <button class="sc-btn" data-n="7" onclick="selSlides(this,7)">7 <span style="font-size:9px;opacity:.6">14cr</span></button>
-              </div>
-            </div>
-            <!-- Sub-formato: movido para coluna direita (bs-sel-panel) -->
-          </div>
-          <!-- network -->
-          <div>
-            <div class="sec-lbl">Rede social</div>
-            <div class="net-row">
-              <div class="net on" id="n-ig" onclick="selNet('ig')"><div class="net-ico"><svg class="ico ico-sm" style="color:var(--a)" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg></div><div class="net-name">Instagram</div></div>
-              <div class="net" id="n-li" onclick="selNet('li')"><div class="net-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></div><div class="net-name">LinkedIn</div></div>
-              <div class="net" id="n-yt" onclick="selNet('yt')"><div class="net-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg></div><div class="net-name">YouTube</div></div>
-              <div class="net" id="n-tt" onclick="selNet('tt')"><div class="net-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg></div><div class="net-name">TikTok</div></div>
-            </div>
-          </div>
-          <!-- generate button removed — geração inicia automaticamente após Refinar Prompt -->
+      <!-- ══ Top bar: Format + Network ══ -->
+      <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:14px">
+        <button class="fmt v2-fmt on" id="f-post" onclick="selFmt('post')">Post</button>
+        <button class="fmt v2-fmt" id="f-carrossel" onclick="selFmt('carrossel')">Carrossel</button>
+        <button class="fmt v2-fmt" id="f-story" onclick="selFmt('story')">Story</button>
+        <button class="fmt v2-fmt" id="f-anuncio" onclick="selFmt('anuncio')">Anúncio</button>
+        <button class="fmt v2-fmt" id="f-thumb" onclick="selFmt('thumb')">Thumbnail</button>
+        <button class="fmt v2-fmt" id="f-banner" onclick="selFmt('banner')">Banner</button>
+        <div style="width:1px;height:18px;background:rgba(255,255,255,.1);margin:0 2px;flex-shrink:0"></div>
+        <button class="v2-net on" id="n-ig" onclick="selNet('ig')" title="Instagram"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg>IG</button>
+        <button class="v2-net" id="n-li" onclick="selNet('li')" title="LinkedIn"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>LI</button>
+        <button class="v2-net" id="n-yt" onclick="selNet('yt')" title="YouTube"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>YT</button>
+        <button class="v2-net" id="n-tt" onclick="selNet('tt')" title="TikTok"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>TT</button>
+      </div>
+      <!-- Slide count row (only for carrossel) -->
+      <div id="slide-count-row" style="display:none;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">Qtd. slides</span>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          <button class="sc-btn on" data-n="0" onclick="selSlides(this,0)">Auto</button>
+          <button class="sc-btn" data-n="3" onclick="selSlides(this,3)">3</button>
+          <button class="sc-btn" data-n="4" onclick="selSlides(this,4)">4</button>
+          <button class="sc-btn" data-n="5" onclick="selSlides(this,5)">5</button>
+          <button class="sc-btn" data-n="6" onclick="selSlides(this,6)">6</button>
         </div>
+      </div>
 
-        <!-- ══ COL 2: Creative Strategist ══ -->
-        <div class="gen-col-mid">
+      <div class="g-gen" style="grid-template-columns:1fr 1fr;gap:16px">
+
+        <!-- ══ COL LEFT: Creative Strategist ══ -->
+        <div>
           <div class="sec-lbl" style="margin-bottom:8px">Creative Strategist <span style="font-size:10px;color:var(--t3);font-weight:400;text-transform:none;letter-spacing:0">— 1 crédito por mensagem</span></div>
           <div class="bs-wrap" id="bs-image-wrap">
             <div class="bs-header">
@@ -6373,186 +6365,106 @@ body.image-agent-refining #image-agent-refine-overlay{
             </div>
             <div class="bs-footer">
               <span class="bs-cost-hint">Enter para enviar · Shift+Enter nova linha</span>
-              <span class="bs-cost-hint" id="bs-image-strategist-hint" style="color:var(--t3)">Selecione formato e tom → Refinar</span>
             </div>
           </div>
-          <!-- prompt refinado -->
-          <div class="bs-refined-wrap" id="bs-image-refined-wrap" style="display:none;margin-top:12px">
-            <div class="bs-refined-header">
-              <span class="bs-refined-label">✦ Prompt refinado pela IA</span>
-              <div class="bs-refined-actions">
-                <button class="btn btn-g btn-sm" onclick="bsEditRefined('image')" style="font-size:10px">Editar</button>
-                <button class="btn btn-g btn-sm" onclick="bsReset('image')" style="font-size:10px">Nova conversa</button>
-              </div>
-            </div>
-            <div class="bs-refined-text" id="bs-image-refined-text"></div>
-
-            <!-- bs-image-fmt-voice-panel e bs-image-gerar-btn movidos para gen-col-right (bs-sel-panel) -->
-          </div>
-          <!-- compat: hidden textarea + prompt wrap -->
+          <button id="btn-gerar-v2" onclick="gerarV2()" style="width:100%;margin-top:10px;background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:13px 16px;cursor:pointer;font-family:var(--f);font-size:14px;font-weight:800;color:#fff;letter-spacing:-.02em;box-shadow:0 4px 20px rgba(243,107,42,.32);display:flex;align-items:center;justify-content:center;gap:8px;transition:.15s">
+            <svg style="width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span id="btn-gerar-v2-label">Gerar Post único</span>
+            <span style="margin-left:auto;font-size:10px;font-weight:500;opacity:.75;background:rgba(0,0,0,.2);border-radius:10px;padding:2px 7px">2 créditos</span>
+          </button>
+          <!-- compat hidden elements -->
           <textarea id="gen-in" style="display:none"></textarea>
           <div id="refined-prompt-wrap" style="display:none"><div id="refined-prompt-box"></div></div>
+          <div id="bs-image-refined-wrap" style="display:none"><div id="bs-image-refined-text"></div></div>
+          <div id="bs-image-gerar-btn" style="display:none">
+            <div id="bs-blueprint-preview" style="display:none"><div id="bs-blueprint-headline"></div><div id="bs-blueprint-style"></div></div>
+            <button id="bs-image-gerar-main-btn" style="display:none" onclick="startGenPipeline()"></button>
+          </div>
+          <div id="bs-refine-unified-wrap" style="display:none">
+            <button id="bs-refine-unified-btn" onclick="bsRefineUnified()">✦ Refinar para o formato</button>
+          </div>
+          <div id="bs-image-strategist-hint" style="display:none"></div>
         </div>
 
-        <!-- ══ COL 3: Referência Visual + Output ══ -->
-        <div class="gen-col-right out-panel">
-
-          <!-- Visual slot: ref upload OU imagem gerada (mutuamente exclusivos) -->
-          <div id="gen-visual-slot">
-            <!-- Upload de referência (visível por padrão) -->
-            <div id="ref-visual-wrap">
-              <div class="sec-lbl" style="margin-bottom:8px">Referência visual <span style="font-size:10px;color:var(--t3);font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></div>
-              <div class="drop-zone" onclick="document.getElementById('ref-img-input').click()" id="drop-zone-el" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleRefDrop(event)">
-                <input type="file" id="ref-img-input" accept="image/*" style="display:none" onchange="handleRefFile(this.files[0])">
-                <div id="drop-zone-content">
-                  <div class="drop-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
-                  <div class="drop-main"><b>Arraste ou clique</b> para enviar referência</div>
-                  <div class="drop-sub">PNG, JPG até 10 MB</div>
-                </div>
-                <div id="ref-img-preview" style="display:none;position:relative">
-                  <img id="ref-img-thumb" style="max-width:100%;max-height:160px;border-radius:var(--r);object-fit:cover" src="">
-                  <button onclick="clearRefImage(event)" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.7);border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px">×</button>
-                </div>
-              </div>
+        <!-- ══ COL RIGHT: Output ══ -->
+        <div>
+          <!-- Empty state -->
+          <div id="gen-v2-empty" style="aspect-ratio:1;background:var(--ink-2,#111);border:1.5px dashed rgba(255,255,255,.1);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center;box-sizing:border-box">
+            <svg style="width:32px;height:32px;fill:none;stroke:rgba(255,255,255,.2);stroke-width:1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <div style="font-size:12px;color:var(--t3);line-height:1.5">Converse com a IA e clique em<br><strong style="color:var(--tx)">Gerar</strong> para criar sua imagem</div>
+          </div>
+          <!-- Loading state -->
+          <div id="gen-v2-loading" style="display:none;aspect-ratio:1;background:var(--ink-2,#111);border:1px solid rgba(255,255,255,.07);border-radius:12px;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;box-sizing:border-box">
+            <div style="width:100%;background:rgba(255,255,255,.07);border-radius:4px;height:3px;overflow:hidden">
+              <div id="gen-v2-bar" style="height:100%;background:var(--a);border-radius:4px;width:0%;transition:width .8s ease"></div>
             </div>
-            <!-- Imagem gerada (hidden por padrão, mostrada após geração) -->
-            <div id="out-tab-imagem" style="display:none">
-              <div class="img-preview-empty" id="img-preview-empty" style="display:none">
-                <svg style="width:28px;height:28px;fill:none;stroke:var(--t3);stroke-width:1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                Gerando…
-              </div>
-              <div class="img-preview-wrap" id="img-preview-wrap">
-                <div class="img-preview-thumb" id="img-preview-thumb" onclick="openImgModal()"></div>
-                <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
-                  <button class="btn btn-p btn-sm" style="flex:1" onclick="openImgModal()">
-                    <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    Ver
-                  </button>
-                  <button class="btn btn-s btn-sm" onclick="downloadImg()">
-                    <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    Baixar
-                  </button>
-                  <button class="btn btn-s btn-sm btn-icon" onclick="gerarImagem()" title="Regerar">
-                    <svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
-                  </button>
-                  <button id="btn-save-design" class="btn btn-s btn-sm" onclick="saveCurrentDesign()" title="Salvar" style="background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.3);color:#ef4444">
-                    <svg class="ico ico-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                    Salvar
-                  </button>
-                  <button class="btn btn-s btn-sm" onclick="saveImageToMemoryBank()" title="Banco" style="background:var(--amber-10);border-color:var(--amber-18);color:var(--amber)">
-                    <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-                    Banco
-                  </button>
-                </div>
-              </div>
-              <!-- loading state -->
-              <div class="img-gen-loading" id="img-gen-loading" style="display:none">
-                <div style="width:100%;background:var(--ink-3,#1a1a1a);border-radius:4px;height:3px;margin-bottom:14px;overflow:hidden">
-                  <div id="img-gen-bar" style="height:100%;background:var(--a,#F5C518);width:0%;transition:width .6s ease;border-radius:4px"></div>
-                </div>
-                <div class="img-gen-spin"></div>
-                <div class="img-gen-txt">Design Agent trabalhando...</div>
-                <div class="img-gen-stage" id="img-gen-stage">Inicializando...</div>
-                <div id="img-gen-brief" style="display:none;margin-top:12px;padding:10px 12px;background:var(--ink-3,#111);border-radius:8px;border-left:3px solid var(--a,#F5C518);width:100%;box-sizing:border-box;text-align:left">
-                  <div style="font-size:10px;color:var(--a,#F5C518);font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px">Brief extraído</div>
-                  <div id="img-gen-headline" style="font-size:13px;font-weight:700;color:var(--t0,#fff);margin-bottom:3px;line-height:1.3"></div>
-                  <div id="img-gen-mood" style="font-size:11px;color:var(--t2,#888)"></div>
-                </div>
-              </div>
+            <div style="width:24px;height:24px;border:2.5px solid rgba(255,255,255,.12);border-top-color:var(--a);border-radius:50%;animation:spin .7s linear infinite"></div>
+            <div style="font-size:13px;font-weight:700;color:var(--tx)">GPT-image-2 trabalhando...</div>
+            <div id="gen-v2-stage" style="font-size:11px;color:var(--t3);margin-top:4px">Montando prompt visual...</div>
+          </div>
+          <!-- Result state -->
+          <div id="gen-v2-result" style="display:none">
+            <div style="border-radius:12px;overflow:hidden;margin-bottom:10px">
+              <img id="gen-v2-img" style="width:100%;display:block;border-radius:12px;cursor:pointer" src="" alt="Imagem gerada" onclick="openImgModalV2()">
             </div>
-          </div><!-- /gen-visual-slot -->
-
-          <!-- Formato do post + Tom visual de marca (sempre visíveis) -->
-          <div id="bs-sel-panel" style="display:block;margin-top:14px">
-            <div id="bs-sel-subfmt-container"></div>
-            <div style="font-size:9.5px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.12em;margin-top:14px;margin-bottom:8px">Tom visual de marca</div>
-            <div id="bs-panel-voice-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:5px"></div>
-            <button id="bs-panel-voice-none" onclick="panelSelVoice(null)" style="width:100%;margin-top:5px;padding:7px;background:transparent;border:1px dashed rgba(255,255,255,0.15);border-radius:6px;cursor:pointer;font-family:var(--f);font-size:11px;color:var(--t3);transition:.15s">✦ Liberdade total (sem estilo fixo)</button>
-            <!-- Refinar unificado (aparece após Strategist ter respostas) -->
-            <div id="bs-refine-unified-wrap" style="display:none;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07)">
-              <button id="bs-refine-unified-btn" onclick="bsRefineUnified()" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);border-radius:var(--r2);padding:10px;cursor:pointer;font-family:var(--f);font-size:12px;font-weight:700;color:var(--tx);letter-spacing:-.01em;display:flex;align-items:center;justify-content:center;gap:7px;transition:.15s">
-                ✦ Refinar para o formato
-                <span style="background:rgba(243,107,42,.18);color:var(--a);border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">+1 crédito</span>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <button class="btn btn-p btn-sm" style="flex:1" onclick="downloadImgV2()">
+                <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Baixar PNG
+              </button>
+              <button class="btn btn-s btn-sm" onclick="openImgModalV2()">
+                <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                Ver
+              </button>
+              <button class="btn btn-s btn-sm" onclick="gerarV2()" title="Regerar">
+                <svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
               </button>
             </div>
-            <!-- Gerar (aparece após refinamento unificado) -->
-            <div id="bs-image-gerar-btn" style="display:none;flex-direction:column;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07)">
-              <!-- Preview do blueprint -->
-              <div id="bs-blueprint-preview" style="display:none;padding:9px 10px;background:rgba(243,107,42,.07);border:1px solid rgba(243,107,42,.2);border-radius:8px">
-                <div style="font-size:9px;color:var(--a);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Pronto para gerar</div>
-                <div id="bs-blueprint-headline" style="font-size:12px;font-weight:700;color:var(--tx);line-height:1.3"></div>
-                <div id="bs-blueprint-style" style="font-size:10px;color:var(--t3);margin-top:2px"></div>
-              </div>
-              <!-- Toggle: Fundo com IA -->
-              <button id="bs-ai-bg-toggle" onclick="toggleAiBg()" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.10);border-radius:8px;cursor:pointer;font-family:var(--f)">
-                <div style="display:flex;align-items:center;gap:7px">
-                  <span style="font-size:14px">✨</span>
-                  <div style="text-align:left">
-                    <div style="font-size:11px;font-weight:600;color:var(--tx)">Fundo com IA (GPT-image-2)</div>
-                    <div style="font-size:9.5px;color:var(--t3)">Imagem real como fundo + texto preciso</div>
-                  </div>
-                </div>
-                <div id="bs-ai-bg-pill" style="width:36px;height:20px;border-radius:10px;background:rgba(255,255,255,0.12);position:relative;transition:.2s;flex-shrink:0">
-                  <div id="bs-ai-bg-dot" style="position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#888;transition:.2s"></div>
-                </div>
-              </button>
-              <button id="bs-image-gerar-main-btn" onclick="startGenPipeline()" style="width:100%;background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:11px;cursor:pointer;font-family:var(--f);font-size:13px;font-weight:700;color:#fff;letter-spacing:-.02em;box-shadow:0 2px 12px rgba(243,107,42,.28)">
-                Gerar Post único
-              </button>
-            </div>
+            <details style="margin-top:8px">
+              <summary style="font-size:10px;color:var(--t3);cursor:pointer">Ver prompt usado</summary>
+              <div id="gen-v2-prompt-used" style="margin-top:6px;padding:8px;background:var(--ink-2,#111);border-radius:8px;font-size:10px;color:var(--t3);line-height:1.5;word-break:break-word"></div>
+            </details>
+          </div>
+          <!-- Carousel result -->
+          <div id="gen-v2-carousel" style="display:none">
+            <div id="gen-v2-carousel-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+            <button class="btn btn-s btn-sm" onclick="gerarV2()" style="width:100%;margin-top:10px">
+              <svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
+              Regerar carrossel
+            </button>
           </div>
 
-          <!-- Conceitos tab content: out-empty + sk-w + out-r -->
-          <div id="out-tab-conceitos" style="display:none">
-            <div class="divider" style="margin:0 0 10px"></div>
-            <div class="out-empty" id="out-e">
-              <div class="out-empty-ico"><svg class="ico" style="color:var(--t3)" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
-              <div class="out-empty-txt">Descreva sua ideia e clique em Gerar</div>
-            </div>
-            <div class="sk-wrap" id="sk-w">
-              <div class="sk-txt"><span class="sk-dot"></span><span id="sk-t">Interpretando sua ideia...</span></div>
-              <div class="sk" style="height:50px"></div>
-              <div class="sk" style="height:50px"></div>
-              <div class="sk" style="height:50px"></div>
-            </div>
-            <div class="out-res" id="out-r">
-              <div class="out-hd" id="out-hd-conceitos" style="display:none">
-                <span style="font-size:10px;font-weight:700;color:var(--a);letter-spacing:.08em;text-transform:uppercase" id="out-hd-lbl">Escolha um modelo</span>
-                <button class="btn btn-g btn-sm" onclick="regenWithCredit()" title="Consome 1 crédito">
-                  <svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
-                  Regerar <span style="color:var(--a);font-size:10px">−1</span>
-                </button>
-              </div>
-            </div>
+          <!-- Legacy hidden output elements (JS compat) -->
+          <div style="display:none">
+            <div id="gen-visual-slot"><div id="ref-visual-wrap"></div><div id="out-tab-imagem">
+              <div id="img-preview-empty"></div>
+              <div id="img-preview-wrap"><div id="img-preview-thumb"></div></div>
+              <div id="img-gen-loading"><div id="img-gen-bar"></div><div id="img-gen-stage"></div><div id="img-gen-brief"><div id="img-gen-headline"></div><div id="img-gen-mood"></div></div></div>
+            </div></div>
+            <div id="bs-sel-panel"><div id="bs-sel-subfmt-container"></div><div id="bs-panel-voice-grid"></div><div id="bs-refine-unified-wrap2"></div></div>
+            <div id="out-tab-conceitos"><div id="out-e"></div><div id="sk-w"><div id="sk-t"></div></div><div id="out-r"><div id="out-hd-conceitos"><span id="out-hd-lbl"></span></div></div></div>
+            <div id="img-mode-box"></div>
+            <div id="cmd-out"><span id="cmd-out-txt"></span></div>
+            <button id="btn-gerar-img"></button>
+            <div class="out-tabs"><div id="tab-conceitos"></div><div id="tab-imagem"></div></div>
           </div>
-
-          <!-- img-mode-box + cmd-out + btn-gerar-img -->
-          <div id="img-mode-box" style="display:none;margin-top:10px;padding:11px;background:var(--ink-3);border:1px solid var(--line-1);border-radius:8px">
-            <div style="font-size:10px;font-weight:700;color:var(--a);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px">Modo da imagem enviada</div>
-            <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-bottom:7px">
-              <input type="radio" name="img-mode" value="reference" id="img-mode-ref" checked style="width:auto;margin-top:2px;accent-color:var(--a)">
-              <div><div style="font-size:11.5px;font-weight:600;color:var(--t0)">Referência de design</div><div style="font-size:10px;color:var(--t2)">IA copia o estilo visual mas usa o conteúdo do prompt</div></div>
-            </label>
-            <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer">
-              <input type="radio" name="img-mode" value="include" id="img-mode-inc" style="width:auto;margin-top:2px;accent-color:var(--a)">
-              <div><div style="font-size:11.5px;font-weight:600;color:var(--t0)">Incluir no design</div><div style="font-size:10px;color:var(--t2)">IA incorpora sua foto no layout gerado</div></div>
-            </label>
-          </div>
-          <div class="cmd-box" id="cmd-out" data-prompt="" style="word-break:break-word;font-size:11px;display:none"><span id="cmd-out-txt" style="color:var(--t3);font-style:italic"></span><button class="cp-btn" onclick="cpElById('cmd-out')">Copiar</button></div>
-          <button id="btn-gerar-img" onclick="gerarImagem()" style="display:none;width:100%;margin-top:10px;background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:13px;cursor:pointer;align-items:center;justify-content:center;gap:8px;font-family:var(--f);font-size:13px;font-weight:700;color:#fff;letter-spacing:-.02em;box-shadow:0 4px 20px rgba(243,107,42,.3);transition:all .15s">
-            <svg style="width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            Gerar imagem com IA
-            <span style="margin-left:auto;font-size:10px;font-weight:500;opacity:.75;background:rgba(0,0,0,.2);border-radius:10px;padding:2px 7px" id="btn-gerar-img-cost">2 créditos</span>
-          </button>
-
-          <!-- hidden tabs bar (mantido para compatibilidade JS) -->
-          <div class="out-tabs" style="display:none">
-            <div class="out-tab on" id="tab-conceitos" onclick="switchOutTab('conceitos')">Modelos</div>
-            <div class="out-tab" id="tab-imagem" onclick="switchOutTab('imagem')">Imagem gerada</div>
-          </div>
-
-        </div><!-- /gen-col-right -->
+        </div>
       </div>
+
+    <!-- ← remove legacy g-gen col-left wrapper; history starts below -->
+    <!-- dummy gen-col-left for compat -->
+    <div style="display:none">
+      <div class="gen-col-left">
+        <div class="fmt-grid"></div>
+        <div class="net-row">
+          <div class="net on" id="_n-ig-legacy"></div>
+          <div class="net" id="_n-li-legacy"></div>
+          <div class="net" id="_n-yt-legacy"></div>
+          <div class="net" id="_n-tt-legacy"></div>
+        </div>
+      </div>
+    </div>
+    </div><!-- /pg-generate -->
 
     <!-- history -->
     <div class="pg" id="pg-history">
@@ -7781,7 +7693,9 @@ function selFmt(f) {
   window._refinedPrompt = '';
   document.querySelectorAll('.fmt').forEach(c => c.classList.remove('on'));
   const el = document.getElementById('f-' + f);
-  if (el) { el.classList.add('on'); el.querySelector('svg').style.color='var(--a)'; }
+  if (el) { el.classList.add('on'); const svg = el.querySelector('svg'); if (svg) svg.style.color='var(--a)'; }
+  var lbl = document.getElementById('btn-gerar-v2-label');
+  if (lbl) { var _fn={post:'Post único',carrossel:'Carrossel',story:'Story',anuncio:'Anúncio',thumb:'Thumbnail',banner:'Banner'}; lbl.textContent='Gerar '+(_fn[f]||f); }
   var sc = document.getElementById('slide-count-row');
   if (sc) sc.style.display = (f === 'carrossel') ? 'flex' : 'none';
   if (f !== 'carrossel') {
@@ -7840,7 +7754,9 @@ async function sendFeedback(slug, rating, btnEl) {
 function selNet(n) {
   _currentNet = n;
   document.querySelectorAll('.net').forEach(c => c.classList.remove('on'));
-  document.getElementById('n-' + n).classList.add('on');
+  document.querySelectorAll('.v2-net').forEach(c => c.classList.remove('on'));
+  const netEl = document.getElementById('n-' + n);
+  if (netEl) netEl.classList.add('on');
 }
 
 function ucc() {
@@ -8888,6 +8804,131 @@ async function gerarImagem() {
     showGenError(e.message);
   }
 }
+
+// ── V2 Generation (GPT-image-2) ─────────────────────────────────────────────
+let _currentImgB64 = null;
+const _netMap2 = { ig:'Instagram', li:'LinkedIn', yt:'YouTube', tt:'TikTok', fb:'Facebook' };
+
+async function gerarV2() {
+  const state = _bsGet('image');
+  if (!state.messages.length) { toast('Converse com a IA primeiro para criar sua imagem','err'); return; }
+
+  const fmt = _currentFmt || 'post';
+  const net = _netMap2[_currentNet] || 'Instagram';
+  const isCarrossel = fmt === 'carrossel';
+  const totalSlides = isCarrossel ? (_slideCount > 0 ? _slideCount : 4) : null;
+
+  const brandProfile = BrandProfileModule.toGenerationPayload({
+    voiceId: (window._selectedVoice||{}).id || '',
+    voiceName: (window._selectedVoice||{}).name || '',
+    modelN: '', modelName: '', modelSvg: '',
+    userName: me?.name || '',
+    logoData: window._logoData || null,
+  });
+
+  const emptyEl    = document.getElementById('gen-v2-empty');
+  const loadingEl  = document.getElementById('gen-v2-loading');
+  const resultEl   = document.getElementById('gen-v2-result');
+  const carouselEl = document.getElementById('gen-v2-carousel');
+  const stageEl    = document.getElementById('gen-v2-stage');
+  const barEl      = document.getElementById('gen-v2-bar');
+
+  function showV2(id) {
+    [emptyEl, loadingEl, resultEl, carouselEl].forEach(function(el){ if (el) el.style.display = 'none'; });
+    const t = document.getElementById(id);
+    if (t) t.style.display = (id === 'gen-v2-loading') ? 'flex' : 'block';
+  }
+  function setBar(p) { if (barEl) barEl.style.width = p + '%'; }
+  function setStage(t) { if (stageEl) stageEl.textContent = t; }
+
+  showV2('gen-v2-loading');
+  setBar(5); setStage('Montando prompt visual...');
+
+  async function callGenV2(slideIndex, total) {
+    const r = await fetch(API + '/api/user/generate-v2', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ messages: state.messages, format: fmt, network: net, brandProfile, slideIndex, totalSlides: total })
+    });
+    if (!r.ok) { const d = await r.json().catch(()=>({})); throw new Error(d.error || 'Erro ' + r.status); }
+    return r.json();
+  }
+
+  try {
+    if (isCarrossel) {
+      showV2('gen-v2-carousel');
+      if (loadingEl) loadingEl.style.display = 'flex';
+      const grid = document.getElementById('gen-v2-carousel-grid');
+      if (grid) {
+        grid.innerHTML = '';
+        for (let i=1; i<=totalSlides; i++) {
+          grid.innerHTML += '<div id="cv2-'+i+'" style="aspect-ratio:1;background:#111;border:1px solid rgba(255,255,255,.07);border-radius:8px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center"><span style="color:#555;font-size:11px">Slide '+i+'...</span></div>';
+        }
+      }
+      for (let i = 0; i < totalSlides; i++) {
+        setStage('Gerando slide ' + (i+1) + ' de ' + totalSlides + '...');
+        setBar(Math.round(10 + (i / totalSlides) * 85));
+        const d = await callGenV2(i + 1, totalSlides);
+        const cell = document.getElementById('cv2-' + (i+1));
+        if (cell && d.image_b64) {
+          const b64 = d.image_b64;
+          const sn = 'slide-' + (i+1);
+          cell.innerHTML = '<img src="data:image/png;base64,' + b64 + '" style="width:100%;display:block;border-radius:8px">'
+            + '<button onclick="downloadSingleB64(\'' + b64 + '\',\'' + sn + '\')" style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,.7);border:none;border-radius:4px;padding:3px 6px;cursor:pointer;color:#fff;font-size:9px">↓</button>';
+        }
+      }
+      if (loadingEl) loadingEl.style.display = 'none';
+      setBar(100); setStage('Carrossel completo!');
+      toast('Carrossel gerado! ' + totalSlides + ' slides prontos.', 'ok');
+      if (me) { me.quota_used = (me.quota_used||0) + totalSlides; updateQuota(); }
+    } else {
+      setStage('Construindo prompt visual com IA...'); setBar(20);
+      const d = await callGenV2(null, null);
+      setBar(100); setStage('Imagem gerada!');
+      _currentImgB64 = d.image_b64;
+      const img = document.getElementById('gen-v2-img');
+      if (img) img.src = 'data:image/png;base64,' + d.image_b64;
+      const promptUsed = document.getElementById('gen-v2-prompt-used');
+      if (promptUsed) promptUsed.textContent = d.prompt_used || '';
+      showV2('gen-v2-result');
+      toast('Imagem gerada!', 'ok');
+      if (me) { me.quota_used = (me.quota_used||0) + 2; updateQuota(); }
+    }
+  } catch(e) {
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (emptyEl) {
+      emptyEl.style.display = 'flex';
+      emptyEl.innerHTML = '<span style="color:var(--red);text-align:center;font-size:12px">' + esc(e.message) + '</span>'
+        + '<button class="btn btn-g btn-sm" style="margin-top:8px" onclick="gerarV2()">Tentar novamente</button>';
+    }
+    toast(e.message, 'err');
+  }
+}
+
+function downloadImgV2() {
+  if (!_currentImgB64) return;
+  const a = document.createElement('a');
+  a.href = 'data:image/png;base64,' + _currentImgB64;
+  a.download = 'autopostt-' + (_currentFmt || 'post') + '-' + Date.now() + '.png';
+  a.click();
+}
+
+function openImgModalV2() {
+  const img = document.getElementById('gen-v2-img');
+  if (!img || !img.src) return;
+  const modal = document.getElementById('img-modal');
+  const modalImg = document.getElementById('img-modal-img');
+  if (modal && modalImg) { modalImg.src = img.src; modal.style.display = 'flex'; }
+  else { window.open(img.src, '_blank'); }
+}
+
+function downloadSingleB64(b64, name) {
+  const a = document.createElement('a');
+  a.href = 'data:image/png;base64,' + b64;
+  a.download = 'autopostt-' + name + '-' + Date.now() + '.png';
+  a.click();
+}
+// ── end V2 ──────────────────────────────────────────────────────────────────
 
 function clearGenLoading() {
   document.getElementById('img-gen-loading').style.display = 'none';
