@@ -39,6 +39,7 @@ const { DatabaseSync } = require('node:sqlite');
 const PORT           = process.env.PORT || 3001;
 const HOST           = '0.0.0.0';
 const ANTHROPIC_KEY  = process.env.ANTHROPIC_API_KEY || '';
+const OPENAI_KEY     = process.env.OPENAI_API_KEY    || '';
 const DB_PATH        = process.env.DB_PATH || path.join(__dirname, 'autopostt.db');
 const LEGACY_JSON    = process.env.LEGACY_JSON || path.join(__dirname, 'gerai.db.json');
 // Em produção, defina ALLOWED_ORIGIN=https://seudominio.com no Railway
@@ -959,6 +960,103 @@ function callClaudeStream({ system, messages, maxTokens = 2500, onChunk, onDone,
   req.on('error', onError);
   req.write(body);
   req.end();
+}
+
+// ── OpenAI Image Generation (GPT-image-2 / DALL-E) ───────────────────────────
+// Retorna { b64: string, tok: {in,out} }
+// size: '1024x1024' | '1024x1792' | '1792x1024'
+// quality: 'low' | 'medium' | 'high'
+function callOpenAIImage({ prompt, size = '1024x1024', quality = 'medium', model = 'gpt-image-2' }) {
+  return new Promise((resolve, reject) => {
+    if (!OPENAI_KEY) return reject(new Error('OPENAI_API_KEY não configurada no servidor.'));
+    const body = JSON.stringify({ model, prompt, n: 1, size, quality, output_format: 'b64_json' });
+    const opts = {
+      hostname: 'api.openai.com', path: '/v1/images/generations', method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + OPENAI_KEY,
+        'Content-Length': Buffer.byteLength(body),
+      },
+    };
+    let data = '';
+    const req = https.request(opts, res => {
+      res.on('data', c => data += c);
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          if (json.error) return reject(new Error('OpenAI: ' + (json.error.message || JSON.stringify(json.error))));
+          const b64 = json.data?.[0]?.b64_json;
+          if (!b64) return reject(new Error('Sem imagem na resposta OpenAI. Verifique o modelo e a chave.'));
+          resolve({ b64, tok: { in: 0, out: 0 } });
+        } catch (e) { reject(new Error('Resposta inválida da OpenAI: ' + e.message)); }
+      });
+    });
+    req.on('error', reject);
+    req.write(body);
+    req.end();
+  });
+}
+
+// Monta o prompt de fundo visual para o GPT-image-2 baseado no sub-formato e voz da marca.
+// REGRA CRÍTICA: zero texto/letras na imagem — é só fundo para sobrepor texto depois.
+function buildImageBgPrompt({ brief, brand, subFormat, voiceId }) {
+  const voiceMap = {
+    luxury:        'ultra-premium dark marble texture with subtle gold veins, editorial fashion magazine ambiance, cinematic ambient light',
+    bold:          'high-contrast graphic design, electric energy, bold geometric shapes, urban dynamic pulse',
+    editorial:     'clean editorial photography style, magazine-quality negative space, charcoal and ivory tones',
+    warm:          'warm earth tones, natural linen and wood grain texture, soft golden-hour ambient light',
+    tech:          'dark gradient with glowing circuit micro-patterns, deep blue-purple tech glow, futuristic interface feel',
+    playful:       'vibrant gradient with dynamic shapes, energetic pop-art influence, bright youthful palette',
+    authoritative: 'deep dark power background, architectural geometric precision, commanding depth and shadow',
+    minimal:       'pure Swiss-design minimalism, single bold accent color element, vast precise negative space',
+  };
+  const compMap = {
+    BIG_STATEMENT:         'vast open center with subtle radial vignette, maximum breathing room for a large centered headline',
+    QUESTION_HOOK:         'strong dark vertical band on the left fading into open space on the right, dramatic split lighting',
+    STAT_POST:             'radial glow emanating from left-center area, subtle grid texture overlay, data-visualization aesthetic',
+    QUOTE_AUTHORITY:       'editorial grain texture, faint oversized quotation marks suggested in the upper-left background',
+    BEFORE_AFTER:          'split-tone composition: left half darker and cooler, right half subtly warmer and brighter',
+    MINI_LIST:             'clean structured professional look, subtle horizontal depth layers, organized corporate feel',
+    CTA_POST:              'dynamic diagonal composition with strong visual pull, darker gradient at bottom for CTA area',
+    CONTROVERSIAL_OPINION: 'high-contrast dramatic side-lighting, bold visual tension, cinematic noir mood',
+    BRAND_STATEMENT:       'elegant spacious premium feel, luxury brand positioning cues, sophisticated negative space',
+    QUICK_TIP:             'clean organized modern background, subtle grid, professional calm energy',
+  };
+  const style = voiceMap[voiceId] || voiceMap.authoritative;
+  const comp  = compMap[subFormat] || 'professional dark textured background with subtle depth and premium feel';
+  const bg    = brand.p2 || '#0D0D0F';
+  const acc   = brand.p1 || '#7C3AED';
+  return `Professional social media post BACKGROUND IMAGE ONLY. Composition: ${comp}. Style: ${style}. Dominant color: ${bg}, accent glow: ${acc}. ABSOLUTE RULE: NO TEXT, NO LETTERS, NO WORDS, NO NUMBERS anywhere in the image — this is a pure abstract/textural background. Ultra high quality, sharp, commercial graphic design level.`;
+}
+
+// Tamanho OpenAI mais próximo para cada formato de canvas
+function openAiSizeFor(dim) {
+  const ratio = dim.w / dim.h;
+  if (ratio > 1.2) return '1792x1024'; // banner, thumb landscape
+  if (ratio < 0.7) return '1024x1792'; // story, reels
+  return '1024x1024';                  // post, carrossel
+}
+
+// Monta SVG híbrido: fundo = imagem base64 + overlay escuro + texto determinístico
+function buildHybridSvg({ b64Image, brief, blueprint, brand, dim }) {
+  const W = dim.w, H = dim.h;
+  const margin = W > 1200 ? 60 : 80;
+  const preText = buildTextElements({ brief, blueprint, dim, margin });
+  const overlayOpacity = 0.42; // garante legibilidade do texto em qualquer fundo
+  const accentColor = blueprint._accent_color || brand.p1 || '#7C3AED';
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+<defs>
+  <clipPath id="hcv"><rect width="${W}" height="${H}"/></clipPath>
+</defs>
+<g clip-path="url(#hcv)">
+  <image href="data:image/png;base64,${b64Image}" x="0" y="0" width="${W}" height="${H}" preserveAspectRatio="xMidYMid slice"/>
+  <rect width="${W}" height="${H}" fill="#000000" opacity="${overlayOpacity}"/>
+  <radialGradient id="hglow" cx="50%" cy="40%" r="55%"><stop offset="0%" stop-color="${accentColor}" stop-opacity="0.18"/><stop offset="100%" stop-color="${accentColor}" stop-opacity="0"/></radialGradient>
+  <rect width="${W}" height="${H}" fill="url(#hglow)"/>
+  ${preText}
+</g>
+</svg>`;
 }
 
 // ─────────────────────────────────────────────
@@ -3909,7 +4007,7 @@ route('POST', '/api/user/design-agent', async (req, res) => {
   const {
     prompt, format = 'post', network = 'instagram', brandProfile,
     slideIndex, totalSlides, slideRole, postFormat,
-    blueprint, subFormat,
+    blueprint, subFormat, useAiBackground = false,
   } = await parseBody(req);
 
   if (!prompt) {
@@ -3970,8 +4068,29 @@ route('POST', '/api/user/design-agent', async (req, res) => {
       // ── Tweet Format: Stage 2 bypassed — SVG determinístico ───────────────
       send('stage', { stage: 2, total: 2, label: 'Gerando tweet card...', pct: 55 });
       svgResult = await daStage3Tweet({ brief: s1.data, brand, dim });
+    } else if (useAiBackground && OPENAI_KEY) {
+      // ── Modo Híbrido: GPT-image-2 (fundo) + SVG determinístico (texto) ────
+      send('stage', { stage: 2, total: 3, label: 'Definindo layout...', pct: 32 });
+      const s2 = await daStage2ArtDir({
+        brief: s1.data, brand, dim, format, slideIndex: slideIdx, totalSlides: totalSl, slideRole, network, subFormat,
+      });
+      totalIn  += s2.tok.in;
+      totalOut += s2.tok.out;
+      send('blueprint', { blueprint: s2.data });
+      send('stage',     { stage: 2, total: 3, label: 'Layout definido ✓', pct: 42 });
+
+      // Stage 2b: Geração do fundo com GPT-image-2
+      send('stage', { stage: 3, total: 3, label: 'Gerando fundo com IA...', pct: 50 });
+      const voiceId = s2.data._voiceId || brand.voiceId || '';
+      const bgPrompt = buildImageBgPrompt({ brief: s1.data, brand, subFormat, voiceId });
+      const imgSize  = openAiSizeFor(dim);
+      const imgRes   = await callOpenAIImage({ prompt: bgPrompt, size: imgSize, quality: 'medium' });
+      send('stage', { stage: 3, total: 3, label: 'Compondo design final...', pct: 85 });
+
+      const hybridSvg = buildHybridSvg({ b64Image: imgRes.b64, brief: s1.data, blueprint: s2.data, brand, dim });
+      svgResult = { svg: sanitizeSvg(hybridSvg), tok: { in: 0, out: 0 } };
     } else {
-      // ── Estágio 2: Art Direction ─────────────────────────────────────────
+      // ── Pipeline SVG padrão ──────────────────────────────────────────────
       send('stage', { stage: 2, total: 3, label: 'Definindo direção de arte...', pct: 32 });
       const s2 = await daStage2ArtDir({
         brief: s1.data, brand, dim, format, slideIndex: slideIdx, totalSlides: totalSl, slideRole, network, subFormat,
