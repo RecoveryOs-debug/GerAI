@@ -8660,6 +8660,8 @@ async function bsRefine2() {
     const d = await resp.json();
     // Aplica resultado
     window._refinedBlueprint = d.blueprint;
+    // Garante que o prompt está disponível para gerarImagem()
+    if (!window._refinedPrompt) window._refinedPrompt = window._refinedBase1 || '';
     if (_panelVoiceObj !== undefined) {
       _selectedVoice = _panelVoiceObj;
       window._selectedVoice = _panelVoiceObj;
@@ -8680,11 +8682,20 @@ async function bsRefine2() {
 
 // Legacy: startGenPipeline calls gerarImagem only if refined or brainstorm has content
 function startGenPipeline() {
+  // Novo fluxo: Refinador #2 já rodou → vai direto para gerarImagem()
+  if (window._refinedBlueprint) {
+    const base = window._refinedBase1 || window._refinedPrompt || '';
+    if (!base) { toast('Refine sua ideia com a IA primeiro','err'); return; }
+    if (!window._refinedPrompt) window._refinedPrompt = base;
+    gerarImagem();
+    return;
+  }
+
+  // Fluxo legado (sem blueprint do Refinador #2)
   const state = _bsGet('image');
   const hasPrompt = (window._refinedPrompt||'').trim() || state.messages.length > 0;
   if (!hasPrompt) { toast('Converse com a IA primeiro para refinar sua ideia','err'); return; }
   if (!window._refinedPrompt && state.refined) window._refinedPrompt = state.refined;
-  // If no refined yet but has messages, use last user message as fallback
   if (!window._refinedPrompt && state.messages.length) {
     const lastUser = [...state.messages].reverse().find(m=>m.role==='user');
     if (lastUser) { window._refinedPrompt = lastUser.content; const h=document.getElementById('gen-in');if(h)h.value=lastUser.content; }
