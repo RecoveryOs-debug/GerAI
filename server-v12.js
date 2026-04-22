@@ -1043,7 +1043,7 @@ function callHaiku({ system, messages, maxTokens = 900 }) {
 function callOpenAIImage({ prompt, size = '1024x1024', quality = 'medium', model = 'gpt-image-2' }) {
   return new Promise((resolve, reject) => {
     if (!OPENAI_KEY) return reject(new Error('OPENAI_API_KEY não configurada no servidor.'));
-    const body = JSON.stringify({ model, prompt, n: 1, size, quality, output_format: 'b64_json' });
+    const body = JSON.stringify({ model, prompt, n: 1, size, quality, output_format: 'png' });
     const opts = {
       hostname: 'api.openai.com', path: '/v1/images/generations', method: 'POST',
       headers: {
