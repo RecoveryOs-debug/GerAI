@@ -4472,6 +4472,114 @@ OUTPUT — return ONLY this JSON, no text before or after:
   }
 });
 
+// ── Rota: Refinar unificado (novo fluxo) ─────────────────────────────────────
+// Combina extração de conteúdo + geração de blueprint em UMA chamada Haiku.
+// Input: messages (Strategist), format, subFormat, network, voiceName, brandProfile
+// Output: { blueprint, refinedPrompt }
+route('POST', '/api/user/brainstorm/refine-unified', async (req, res) => {
+  const payload = requireAuth(req, res); if (!payload) return;
+  const { messages, format, subFormat, network, voiceName, brandProfile } = await parseBody(req);
+  if (!messages || !Array.isArray(messages) || !messages.length)
+    return err(res, 'messages obrigatório');
+
+  const user = db.getUserById(payload.id);
+  try { db.consumeQuota(payload.id); } catch(e) { return err(res, e.message, 402); }
+
+  const brand = daBrand(user, brandProfile);
+
+  const subFmtDescriptions = {
+    BIG_STATEMENT: 'Single dominant phrase, centered, lots of white space, no subtitle',
+    QUESTION_HOOK: 'Large question + small complement, vertical accent bar',
+    CONTROVERSIAL_OPINION: 'Strong opinion statement highlighted, generates agree/disagree reaction',
+    QUICK_TIP: 'Pill label + short title + divider + body text, immediately actionable',
+    MINI_LIST: 'Hook title + 3 numbered items, 3-second read',
+    QUOTE_AUTHORITY: 'Quote marks + elegant text + divider + author name',
+    BEFORE_AFTER: 'Vertical split: left=before (muted), right=after (accent color)',
+    CTA_POST: 'Strong headline + body + prominent CTA button',
+    STAT_POST: 'Large number as hero + accent divider + explanation',
+    BRAND_STATEMENT: 'Clean sophisticated positioning, accent lines top/bottom, brand logo area',
+    LIST_CAROUSEL: 'Hook slide → 1 item per slide with numbered circles → CTA slide',
+    EDUCATIONAL_CAROUSEL: 'Hook block → progressive content blocks → conclusion block',
+    MISTAKE_CAROUSEL: 'Hook → mistakes (red markers) per slide → solution slide',
+    STEP_BY_STEP: 'Hook → numbered steps on timeline → result slide',
+    STORY_CAROUSEL: 'Emotional hook → development → climax (accent block) → conclusion',
+    CONTRAST_CAROUSEL: 'Two-column comparison: left=old/bad, right=new/good (accent)',
+    CHECKLIST_CAROUSEL: 'Hook → checklist items (filled=done, empty=todo) → CTA',
+    MYTH_BUSTING: 'Hook → alternating MYTH (red) / TRUTH (green) pairs',
+    TIPS_CAROUSEL: 'Hook → bullet tips per slide → CTA',
+    TRANSFORMATION: 'Before block (muted) → arrow/divider → After block (bright/accent)',
+    TWEET_CARD: 'Twitter/X card with avatar, handle, text content, engagement row',
+    TWEET_THREAD: 'Twitter/X thread: connected tweet cards, narrative sequence',
+  };
+
+  const fmtLabel = { post:'Post único', carousel:'Carrossel', tweet:'Tweet Card' }[format] || (format || 'post');
+  const subFmtLabel = subFormat ? (subFmtDescriptions[subFormat] || subFormat) : '';
+  const netLabel = { ig:'Instagram', li:'LinkedIn', yt:'YouTube', tt:'TikTok' }[network] || (network || 'Instagram');
+  const brandTone = voiceName || brand.tom || 'flexible';
+  const brandColors = `background=${brand.p2||'#0D0D0F'} text=${brand.p3||'#FFFFFF'} accent=${brand.p1||'#7C3AED'}`;
+
+  const conversationStr = messages
+    .slice(-16)
+    .map(m => `${m.role === 'user' ? 'Usuário' : 'Consultor'}: ${m.content}`)
+    .join('\n\n');
+
+  const system =
+`You are a content strategist and design blueprint generator. Two tasks in one response.
+
+TASK 1 — Extract from conversation:
+Identify the CORE MESSAGE (1-2 sentences), best headline (max 10 words), key content points, and emotion.
+
+TASK 2 — Generate blueprint JSON:
+Apply the format, sub-format, and brand to create a precise design blueprint.
+
+FORMAT: ${fmtLabel} | SUB-FORMAT: ${subFormat || 'default'} — ${subFmtLabel}
+TONE: ${brandTone} | NETWORK: ${netLabel} | BRAND: ${brand.profissao} / ${brand.nicho}
+COLORS: ${brandColors}
+
+SUB-FORMAT RULE (follow strictly):
+${subFmtLabel ? `${subFormat}: ${subFmtLabel}` : 'Default post: strong headline, clean layout'}
+- Carousel sub-formats → type="carousel", fill slides array with hook + content slides + CTA
+- Post sub-formats → type="post", slides=null
+- Tweet → type="post", concise Twitter-style headline
+
+FIELD RULES:
+- body_points: REQUIRED for MINI_LIST / QUICK_TIP / CTA_POST (exactly 3 items, ≤8 words each). null otherwise.
+- data_highlight: REQUIRED for STAT_POST (the hero number e.g. "3.4x" "87%" "R$12k"). null otherwise.
+- cta: REQUIRED for CTA_POST (max 4 words). null otherwise.
+- headline/subheadline/slides: SAME language as the conversation.
+
+OUTPUT — return ONLY this JSON, no text before or after:
+{"type":"post|carousel","headline":"...","subheadline":"...|null","body_points":["≤8w","≤8w","≤8w"]|null,"data_highlight":"stat"|null,"cta":"≤4w"|null,"slides":["hook","...","CTA"]|null,"visual":{"background":"solid|gradient|texture","style":"minimal|editorial|luxury|modern|bold|typographic","image_usage":"none|subtle|dominant"},"layout":{"alignment":"center|left|mixed","hierarchy":"headline-dominant|data-hero|list-flow|editorial","spacing":"airy|balanced|compact"},"colors":{"background":"${brand.p2||'#0D0D0F'}","text":"${brand.p3||'#FFFFFF'}","accent":"${brand.p1||'#7C3AED'}"},"typography":{"headline_style":"bold-uppercase|mixed-weight|serif-italic|display-black|editorial","body_style":"none|minimal|small-regular"},"elements":{"shapes":"none|lines|geometric|brackets","accents":"none|minimal|arrows|numbers|rule-left"},"tone":"bold|emotional|minimal|luxury|authoritative|warm"}`;
+
+  try {
+    const r = await callHaiku({
+      system,
+      messages: [{ role: 'user', content: `Conversation:\n\n${conversationStr}\n\nReturn the JSON blueprint:` }],
+      maxTokens: 900,
+    });
+    const tok = { in: r.inputTokens || 0, out: r.outputTokens || 0 };
+    let blueprint = null;
+    try {
+      const m = r.text.match(/\{[\s\S]*\}/);
+      if (m) blueprint = JSON.parse(m[0]);
+    } catch { /* blueprint stays null */ }
+    let refinedPrompt = '';
+    if (blueprint) {
+      const parts = [];
+      if (blueprint.headline) parts.push(`✦ ${blueprint.headline}`);
+      if (blueprint.subheadline) parts.push(blueprint.subheadline);
+      if (blueprint.visual?.style) parts.push(`Estilo: ${blueprint.visual.style} · Tom: ${blueprint.tone||''}`);
+      refinedPrompt = parts.join('\n');
+    } else {
+      refinedPrompt = r.text.trim();
+    }
+    const cost_usd = parseFloat(((tok.in / 1_000_000 * 0.80) + (tok.out / 1_000_000 * 4.00)).toFixed(6));
+    res.end(JSON.stringify({ ok: true, refinedPrompt, blueprint, tok, cost_usd, model: 'haiku-4-5' }));
+  } catch(e) {
+    return err(res, 'Erro ao refinar: ' + e.message);
+  }
+});
+
 // ── Rota: Export SVG → PNG/JPG ────────────────────────────────────────────────
 // Recebe o SVG, injeta as fontes em base64 e rasteriza via sharp.
 // fmt: 'png' (padrão) | 'jpg'   quality: 60–100 (padrão 90, só JPG)
