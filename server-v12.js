@@ -40,6 +40,16 @@ const PORT           = process.env.PORT || 3001;
 const HOST           = '0.0.0.0';
 const ANTHROPIC_KEY  = process.env.ANTHROPIC_API_KEY || '';
 const OPENAI_KEY     = process.env.OPENAI_API_KEY    || '';
+
+// ── Centralized Style System (injected into all image prompts) ────────────────
+const STYLE_SYSTEM_BLOCK = `Global visual standards: minimalist premium SaaS aesthetic. Background: near-black #0B0B0B or clean white. Accent: warm amber #FFC107. Typography: ultra-bold modern sans-serif 900 weight, clear size hierarchy. Layout: generous negative space, strong visual hierarchy, intentional whitespace. Elements: UI dashboard screens, data visualizations, device mockups, growth charts. Rendering: photorealistic 8K ultra-sharp, commercial studio lighting. Avoid: visual clutter, decorative excess, generic stock aesthetics, clichéd business imagery.`;
+
+const VISUAL_STYLE_GUIDES = {
+  'premium-dark':  'Near-black #0B0B0B background. Warm amber #FFC107 accent highlights. Premium editorial dark atmosphere. Subtle top-down gradient lighting from warm white source.',
+  'clean-minimal': 'Pure white #FFFFFF background. Ultra-minimal composition. Single strong focal element. Extreme negative space. Black #111 typography, amber #FFC107 accent only.',
+  'modern-saas':   'Deep navy-charcoal #0F1117 background. Electric indigo #6366F1 accent. Clean SaaS product UI focus. Subtle grid lines barely visible. Data-forward aesthetic.',
+  'aggressive-ads':'Near-black background. High-contrast: bold red #FF3B30 and amber #FFC107 accents. Maximum visual impact. Oversized bold text. Direct aggressive CTA placement.',
+};
 const DB_PATH        = process.env.DB_PATH || path.join(__dirname, 'autopostt.db');
 const LEGACY_JSON    = process.env.LEGACY_JSON || path.join(__dirname, 'gerai.db.json');
 // Em produção, defina ALLOWED_ORIGIN=https://seudominio.com no Railway
@@ -1040,10 +1050,10 @@ function callHaiku({ system, messages, maxTokens = 900 }) {
 // ── OpenAI Image Generation (GPT-image-2 / DALL-E) ───────────────────────────// Retorna { b64: string, tok: {in,out} }
 // size: '1024x1024' | '1024x1792' | '1792x1024'
 // quality: 'low' | 'medium' | 'high'
-function callOpenAIImage({ prompt, size = '1024x1024', quality = 'medium', model = 'gpt-image-2' }) {
+function callOpenAIImage({ prompt, size = '1024x1024', quality = 'medium', model = 'gpt-image-2', n = 1 }) {
   return new Promise((resolve, reject) => {
     if (!OPENAI_KEY) return reject(new Error('OPENAI_API_KEY não configurada no servidor.'));
-    const body = JSON.stringify({ model, prompt, n: 1, size, quality, output_format: 'png' });
+    const body = JSON.stringify({ model, prompt, n: Math.max(1, Math.min(n, 4)), size, quality, output_format: 'png' });
     const opts = {
       hostname: 'api.openai.com', path: '/v1/images/generations', method: 'POST',
       headers: {
@@ -1059,9 +1069,9 @@ function callOpenAIImage({ prompt, size = '1024x1024', quality = 'medium', model
         try {
           const json = JSON.parse(data);
           if (json.error) return reject(new Error('OpenAI: ' + (json.error.message || JSON.stringify(json.error))));
-          const b64 = json.data?.[0]?.b64_json;
-          if (!b64) return reject(new Error('Sem imagem na resposta OpenAI. Verifique o modelo e a chave.'));
-          resolve({ b64, tok: { in: 0, out: 0 } });
+          const images = (json.data || []).map(item => item.b64_json).filter(Boolean);
+          if (!images.length) return reject(new Error('Sem imagem na resposta OpenAI. Verifique o modelo e a chave.'));
+          resolve({ b64: images[0], images, tok: { in: 0, out: 0 } });
         } catch (e) { reject(new Error('Resposta inválida da OpenAI: ' + e.message)); }
       });
     });
@@ -4619,6 +4629,8 @@ Your prompt MUST specify:
 6. Visual element: realistic 3D product mockup (phone showing dashboard UI, laptop with analytics screen, or relevant product), high detail.
 7. Quality: photorealistic, 8K render, ultra-sharp, commercial photography quality.
 
+GLOBAL STYLE: ${STYLE_SYSTEM_BLOCK}
+
 Write ONLY the prompt. No explanations. No markdown. Just the prompt text.`;
 
   const r = await callHaiku({
@@ -4629,29 +4641,80 @@ Write ONLY the prompt. No explanations. No markdown. Just the prompt text.`;
   return r.text.trim();
 }
 
+// ── Prompt Polisher: GPT-5.2 elevates Haiku draft to premium quality ──────────
+async function polishPromptGPT5({ rawPrompt, format, style = 'premium-dark' }) {
+  const styleGuide = VISUAL_STYLE_GUIDES[style] || VISUAL_STYLE_GUIDES['premium-dark'];
+  const system = `You are a senior creative director at a world-class design agency. Your job is to take a marketing image prompt and elevate it to flawless professional quality.
+
+STRICT RULES:
+- Preserve the EXACT original concept, marketing message, product, and offer — do not invent new ideas
+- Improve: compositional precision, typographic specificity, lighting detail, layout coordinates
+- Replace every vague word ("nice", "beautiful", "modern", "stunning") with concrete visual specs
+- Specify HEX color codes for every color element
+- Quote every text string that appears in the image
+- State exact layout positions (left-third, top-center, bottom-right 20%, etc.)
+- Specify rendering quality last: photorealistic 8K, ultra-sharp, studio lighting
+
+MANDATORY VISUAL STYLE: ${styleGuide}
+GLOBAL STANDARDS: ${STYLE_SYSTEM_BLOCK}
+
+Output ONLY the refined prompt. Zero commentary. Zero markdown. Plain text only.`;
+
+  try {
+    const r = await callGPT5Messages({
+      system,
+      messages: [{ role: 'user', content: `Refine to premium level:\n\n${rawPrompt}` }],
+      maxTokens: 700,
+    });
+    return r.text.trim();
+  } catch (e) {
+    // Polisher failure is non-fatal — return raw prompt as fallback
+    console.error('[polishPromptGPT5] fallback to raw prompt:', e.message);
+    return rawPrompt;
+  }
+}
+
 // ── Rota: Generate V2 (GPT-image-2 full image) ────────────────────────────────
 route('POST', '/api/user/generate-v2', async (req, res) => {
   const payload = requireAuth(req, res); if (!payload) return;
-  const { messages, format = 'post', network = 'Instagram', brandProfile, slideIndex = null, totalSlides = null } = await parseBody(req);
+  const {
+    messages, format = 'post', network = 'Instagram',
+    brandProfile, slideIndex = null, totalSlides = null,
+    style = 'premium-dark', variations = 1,
+  } = await parseBody(req);
   if (!messages || !messages.length) return err(res, 'Sem mensagens para gerar imagem');
 
-  const uid = payload.sub;
-  const quota = await consumeQuota(uid, 2);
-  if (!quota.ok) return err(res, quota.error || 'Sem créditos', 402);
+  // Deduct credits: 2 base + 1 per extra variation
+  const credits = Math.max(2, 1 + Math.min(variations, 3));
+  try { for (let i = 0; i < credits; i++) db.consumeQuota(payload.id); }
+  catch(e) { return err(res, e.message, 402); }
 
-  const brand = brandProfile || null;
-  const netFull = network;
-
+  const brand   = brandProfile || null;
   const sizeMap = {
     post:'1024x1024', carrossel:'1024x1024', anuncio:'1024x1024',
     story:'1024x1536', thumb:'1536x1024', banner:'1536x1024',
   };
   const size = sizeMap[format] || '1024x1024';
+  const n    = slideIndex ? 1 : Math.min(Math.max(1, variations), 3);
 
   try {
-    const imgPrompt = await buildGPT2Prompt({ messages, format, network: netFull, brand, slideIndex, totalSlides });
-    const imgRes    = await callOpenAIImage({ prompt: imgPrompt, size, quality: 'high' });
-    res.end(JSON.stringify({ ok: true, image_b64: imgRes.b64, prompt_used: imgPrompt, model: 'gpt-image-2' }));
+    // Stage 1: Haiku builds initial visual prompt
+    const draftPrompt = await buildGPT2Prompt({ messages, format, network, brand, slideIndex, totalSlides });
+
+    // Stage 2: GPT-5.2 polishes to premium quality
+    const finalPrompt = await polishPromptGPT5({ rawPrompt: draftPrompt, format, style });
+
+    // Stage 3: GPT-image-2 generates n variations
+    const imgRes = await callOpenAIImage({ prompt: finalPrompt, size, quality: 'high', n });
+
+    res.end(JSON.stringify({
+      ok: true,
+      image_b64:      imgRes.b64,
+      images:         imgRes.images,
+      prompt_used:    draftPrompt,
+      polished_prompt: finalPrompt,
+      model: 'gpt-image-2',
+    }));
   } catch(e) {
     return err(res, 'Erro ao gerar imagem: ' + e.message);
   }
