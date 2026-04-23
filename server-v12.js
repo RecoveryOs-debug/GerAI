@@ -4757,9 +4757,15 @@ route('POST', '/api/user/generate-v2', async (req, res) => {
 
   const varCount = Math.min(4, Math.max(1, variations));
   const creditMap = { 1: 2, 2: 4, 3: 5, 4: 7 };
-  const credits = slideIndex ? 1 : (creditMap[varCount] || 2);
-  try { for (let i = 0; i < credits; i++) db.consumeQuota(payload.id); }
-  catch(e) { return err(res, e.message, 402); }
+  const carrosselCreditMap = { 3: 5, 4: 7, 5: 9, 6: 11, 7: 12 };
+  // For carrossel: deduct all credits on slide 1, subsequent slides are free
+  const credits = slideIndex
+    ? (slideIndex === 1 ? (carrosselCreditMap[totalSlides] || totalSlides) : 0)
+    : (creditMap[varCount] || 2);
+  if (credits > 0) {
+    try { for (let i = 0; i < credits; i++) db.consumeQuota(payload.id); }
+    catch(e) { return err(res, e.message, 402); }
+  }
 
   // Resolve format/network: use explicit value or extract from conversation
   const resolvedFmt = format || extractFmtFromConversation(messages);

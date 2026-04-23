@@ -6344,26 +6344,32 @@ body.image-agent-refining #image-agent-refine-overlay{
     <div class="pg" id="pg-generate">
       <div class="pg-hd"><div class="pg-title">Gerar conteúdo</div><div class="pg-sub">Converse com a IA e gere imagens profissionais com GPT-image-2.</div></div>
 
-      <!-- ══ Variation count selector ══ -->
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding:10px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:8px">
+      <!-- ══ Format buttons ══ -->
+      <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:10px">
+        <button class="fmt v2-fmt on" id="f-post"     onclick="selFmt('post')">Post único</button>
+        <button class="fmt v2-fmt"    id="f-carrossel" onclick="selFmt('carrossel')">Carrossel</button>
+        <button class="fmt v2-fmt"    id="f-story"    onclick="selFmt('story')">Story</button>
+        <button class="fmt v2-fmt"    id="f-anuncio"  onclick="selFmt('anuncio')">Anúncio</button>
+        <button class="fmt v2-fmt"    id="f-banner"   onclick="selFmt('banner')">Banner</button>
+      </div>
+
+      <!-- Variation count selector (hidden when carrossel) -->
+      <div id="v2-var-count-row" style="display:flex;align-items:center;gap:8px;margin-bottom:14px;padding:10px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:8px">
         <span style="font-size:9.5px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;margin-right:2px;flex-shrink:0">Variações</span>
         <button class="v2-var-count on" id="vc-1" onclick="selVarCount(1)"><span>1</span><span class="vc-cr">2 cr</span></button>
         <button class="v2-var-count"    id="vc-2" onclick="selVarCount(2)"><span>2</span><span class="vc-cr">4 cr</span></button>
         <button class="v2-var-count"    id="vc-3" onclick="selVarCount(3)"><span>3</span><span class="vc-cr">5 cr</span></button>
         <button class="v2-var-count"    id="vc-4" onclick="selVarCount(4)"><span>4</span><span class="vc-cr">7 cr</span></button>
-        <span style="flex:1"></span>
-        <span style="font-size:9px;color:var(--t3)">A IA descobre o formato na conversa</span>
       </div>
-      <!-- Slide count row (only for carrossel, hidden by default) -->
-      <div id="slide-count-row" style="display:none;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-        <span style="font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">Qtd. slides</span>
-        <div style="display:flex;gap:4px;flex-wrap:wrap">
-          <button class="sc-btn on" data-n="0" onclick="selSlides(this,0)">Auto</button>
-          <button class="sc-btn" data-n="3" onclick="selSlides(this,3)">3</button>
-          <button class="sc-btn" data-n="4" onclick="selSlides(this,4)">4</button>
-          <button class="sc-btn" data-n="5" onclick="selSlides(this,5)">5</button>
-          <button class="sc-btn" data-n="6" onclick="selSlides(this,6)">6</button>
-        </div>
+
+      <!-- Slide count row (only for carrossel) -->
+      <div id="slide-count-row" style="display:none;align-items:center;gap:8px;margin-bottom:14px;padding:10px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:8px">
+        <span style="font-size:9.5px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;flex-shrink:0">Slides</span>
+        <button class="sc-btn on" data-n="3" data-cr="5" onclick="selSlides(this,3)">3 <span style="font-size:9px;opacity:.6">5cr</span></button>
+        <button class="sc-btn"    data-n="4" data-cr="7" onclick="selSlides(this,4)">4 <span style="font-size:9px;opacity:.6">7cr</span></button>
+        <button class="sc-btn"    data-n="5" data-cr="9" onclick="selSlides(this,5)">5 <span style="font-size:9px;opacity:.6">9cr</span></button>
+        <button class="sc-btn"    data-n="6" data-cr="11" onclick="selSlides(this,6)">6 <span style="font-size:9px;opacity:.6">11cr</span></button>
+        <button class="sc-btn"    data-n="7" data-cr="12" onclick="selSlides(this,7)">7 <span style="font-size:9px;opacity:.6">12cr</span></button>
       </div>
 
       <div class="g-gen" style="grid-template-columns:1fr 1fr;gap:16px">
@@ -6413,9 +6419,7 @@ body.image-agent-refining #image-agent-refine-overlay{
             <div id="bs-blueprint-preview" style="display:none"><div id="bs-blueprint-headline"></div><div id="bs-blueprint-style"></div></div>
             <button id="bs-image-gerar-main-btn" style="display:none" onclick="startGenPipeline()"></button>
           </div>
-          <div id="bs-refine-unified-wrap" style="display:none">
-            <button id="bs-refine-unified-btn" onclick="bsRefineUnified()">✦ Refinar para o formato</button>
-          </div>
+          <div id="bs-refine-unified-wrap" style="display:none!important"></div>
           <div id="bs-image-strategist-hint" style="display:none"></div>
         </div>
 
@@ -7724,6 +7728,8 @@ function toggleAiBg() {
 const _panelFmtLabels = { post:'Post único', carrossel:'Carrossel', carousel:'Carrossel', story:'Story', anuncio:'Anúncio', thumb:'Thumbnail', banner:'Banner', tweet:'Tweet Card' };
 const _fmtBtnLabels   = { post:'Post único', carrossel:'Carrossel', story:'Story', anuncio:'Anúncio', thumb:'Thumbnail', banner:'Banner' };
 
+const _carrosselCreditMap = { 3: 5, 4: 7, 5: 9, 6: 11, 7: 12 };
+
 function selFmt(f) {
   _currentFmt = f;
   _panelFmt = f;
@@ -7735,21 +7741,46 @@ function selFmt(f) {
   document.querySelectorAll('.fmt').forEach(c => c.classList.remove('on'));
   const el = document.getElementById('f-' + f);
   if (el) { el.classList.add('on'); const svg = el.querySelector('svg'); if (svg) svg.style.color='var(--a)'; }
+
+  const isCarrossel = f === 'carrossel';
+  const vcRow = document.getElementById('v2-var-count-row');
+  const scRow = document.getElementById('slide-count-row');
+  if (vcRow) vcRow.style.display = isCarrossel ? 'none' : 'flex';
+  if (scRow) scRow.style.display = isCarrossel ? 'flex' : 'none';
+
+  if (isCarrossel) {
+    // Default to 3 slides if not already set
+    if (!_slideCount || _slideCount < 3) {
+      _slideCount = 3;
+      document.querySelectorAll('.sc-btn').forEach(function(b) { b.classList.remove('on'); });
+      var btn3 = document.querySelector('.sc-btn[data-n="3"]');
+      if (btn3) btn3.classList.add('on');
+    }
+    _updateV2Credits();
+  } else {
+    _slideCount = 0;
+    _updateV2Credits();
+  }
+
   var lbl = document.getElementById('btn-gerar-v2-label');
   if (lbl) { var _fn={post:'Post único',carrossel:'Carrossel',story:'Story',anuncio:'Anúncio',thumb:'Thumbnail',banner:'Banner'}; lbl.textContent='Gerar '+(_fn[f]||f); }
-  var sc = document.getElementById('slide-count-row');
-  if (sc) sc.style.display = (f === 'carrossel') ? 'flex' : 'none';
-  if (f !== 'carrossel') {
-    _slideCount = 0;
-    document.querySelectorAll('.sc-btn').forEach(function(b) { b.classList.remove('on'); });
-    var first = document.querySelector('.sc-btn[data-n="0"]');
-    if (first) first.classList.add('on');
-  }
+
   renderBsSubFmtGrid(f);
   var gerarBtn = document.getElementById('bs-image-gerar-main-btn');
   if (gerarBtn) gerarBtn.textContent = 'Gerar ' + (_fmtBtnLabels[f] || f);
   var gb = document.getElementById('bs-image-gerar-btn');
   if (gb) gb.style.display = 'none';
+}
+
+function _updateV2Credits() {
+  var credits;
+  if (_currentFmt === 'carrossel') {
+    credits = _carrosselCreditMap[_slideCount] || 5;
+  } else {
+    credits = _varCreditMap[_variationCount] || 2;
+  }
+  var lbl = document.getElementById('v2-credits-label');
+  if (lbl) lbl.textContent = credits + ' créditos';
 }
 
 // Slide count state
@@ -7759,6 +7790,7 @@ function selSlides(el, n) {
   _slideCount = n;
   document.querySelectorAll('.sc-btn').forEach(function(b) { b.classList.remove('on'); });
   el.classList.add('on');
+  _updateV2Credits();
 }
 async function sendFeedback(slug, rating, btnEl) {
   try {
@@ -8419,7 +8451,6 @@ async function sendBrainstorm(ctx) {
     const d = await r.json();
     state.messages.push({ role: 'assistant', content: d.reply });
     _bsRender(ctx);
-    if (ctx === 'image') _showUnifiedRefineBtn();
     if (me) { me.quota_used=(me.quota_used||0)+1; updateQuota(); }
   } catch(e) {
     dot.remove(); toast('Erro de conexão','err'); state.messages.pop(); _bsRender(ctx);
@@ -8869,9 +8900,7 @@ function selVarCount(n) {
   document.querySelectorAll('.v2-var-count').forEach(function(b){ b.classList.remove('on'); });
   const el = document.getElementById('vc-' + n);
   if (el) el.classList.add('on');
-  const credits = _varCreditMap[n] || 2;
-  const lbl = document.getElementById('v2-credits-label');
-  if (lbl) lbl.textContent = credits + ' créditos';
+  _updateV2Credits();
 }
 
 function handleBsImgUpload(input) {
@@ -8926,24 +8955,14 @@ function _v2SetStageSub(txt) {
   if (el) el.textContent = txt;
 }
 
-function _extractFmtFromMsgs(msgs) {
-  const text = msgs.map(function(m){ return String(m.content||''); }).join(' ').toLowerCase();
-  if (text.includes('carrossel') || text.includes('carousel')) return 'carrossel';
-  if (text.includes('story') || text.includes('stories')) return 'story';
-  if (/anún?cio|anuncio/.test(text)) return 'anuncio';
-  if (text.includes('thumbnail') || text.includes('miniatura')) return 'thumb';
-  if (text.includes('banner')) return 'banner';
-  return 'post';
-}
-
 async function gerarV2() {
   const state = _bsGet('image');
   if (!state.messages.length) { toast('Converse com a IA primeiro para criar sua imagem','err'); return; }
 
-  const fmt = _extractFmtFromMsgs(state.messages);
+  const fmt = _currentFmt || 'post';
   const net = null; // backend extracts from conversation
   const isCarrossel = fmt === 'carrossel';
-  const totalSlides = isCarrossel ? (_slideCount > 0 ? _slideCount : 4) : null;
+  const totalSlides = isCarrossel ? (_slideCount >= 3 ? _slideCount : 3) : null;
   const variations  = isCarrossel ? 1 : _variationCount;
 
   const brandProfile = BrandProfileModule.toGenerationPayload({
@@ -9031,7 +9050,7 @@ async function gerarV2() {
       if (loadingEl) loadingEl.style.display = 'none';
       setBar(100); setStage('Carrossel completo!', '');
       toast('Carrossel gerado! ' + totalSlides + ' slides prontos.', 'ok');
-      if (me) { me.quota_used = (me.quota_used||0) + totalSlides; updateQuota(); }
+      if (me) { me.quota_used = (me.quota_used||0) + (_carrosselCreditMap[totalSlides] || totalSlides); updateQuota(); }
     } else {
       const d = await callGenV2(null, null, variations);
       stageTimers.forEach(clearTimeout);
