@@ -6058,6 +6058,157 @@ body.image-agent-refining #image-agent-refine-overlay{
 }
 [data-theme="light"] .img-config-select option { background:#fff; color:#0A0A08; }
 [data-theme="light"] .ni.on { background: rgba(245,197,24,.1) !important; }
+
+/* ── GENERATE BUTTON — premium hierarchy ── */
+#btn-gerar-v2 {
+  width: 100% !important;
+  margin-top: 12px !important;
+  background: linear-gradient(135deg, #F5C518 0%, #E8A000 100%) !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 14px 20px !important;
+  cursor: pointer !important;
+  font-family: var(--f-body) !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  color: #0B0B0B !important;
+  letter-spacing: -.02em !important;
+  box-shadow: 0 4px 24px rgba(245,197,24,.35), 0 1px 0 rgba(255,255,255,.2) inset !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  transition: transform .2s, box-shadow .2s, filter .2s !important;
+}
+#btn-gerar-v2:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 8px 32px rgba(245,197,24,.45) !important;
+  filter: brightness(1.06) !important;
+}
+#btn-gerar-v2:active { transform: translateY(0) !important; }
+#btn-gerar-v2 svg { stroke: #0B0B0B !important; }
+#v2-credits-label {
+  margin-left: auto !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  color: rgba(0,0,0,.55) !important;
+  background: rgba(0,0,0,.12) !important;
+  border-radius: 20px !important;
+  padding: 3px 9px !important;
+}
+
+/* ── VARIATION CARDS — zoom on hover ── */
+.v2-variation {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+  border: 2px solid transparent !important;
+  transition: transform .22s, border-color .22s, box-shadow .22s !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,.4) !important;
+}
+.v2-variation:hover {
+  transform: scale(1.025) !important;
+  box-shadow: 0 8px 28px rgba(0,0,0,.55) !important;
+}
+.v2-variation.sel {
+  border-color: var(--amber) !important;
+  box-shadow: 0 0 0 1px var(--amber), 0 6px 24px rgba(245,197,24,.2) !important;
+}
+.v2-variation img {
+  width: 100% !important;
+  display: block !important;
+  aspect-ratio: 1 !important;
+  object-fit: cover !important;
+  transition: transform .35s !important;
+}
+.v2-variation:hover img { transform: scale(1.04) !important; }
+.v2-variation-overlay {
+  position: absolute !important;
+  inset: 0 !important;
+  background: linear-gradient(to top, rgba(0,0,0,.75) 0%, transparent 55%) !important;
+  opacity: 0 !important;
+  transition: opacity .22s !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 10px !important;
+}
+.v2-variation:hover .v2-variation-overlay { opacity: 1 !important; }
+.v2-var-btn {
+  padding: 5px 12px !important;
+  background: rgba(255,255,255,.12) !important;
+  border: 1px solid rgba(255,255,255,.25) !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  font-family: var(--f-body) !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  color: #fff !important;
+  backdrop-filter: blur(8px) !important;
+  transition: background .18s !important;
+}
+.v2-var-btn:hover { background: rgba(255,255,255,.25) !important; }
+.v2-var-btn.primary {
+  background: var(--amber) !important;
+  border-color: var(--amber) !important;
+  color: #0B0B0B !important;
+}
+.v2-var-btn.primary:hover { background: var(--amber-h) !important; }
+
+/* ── LOADING STATE — refined ── */
+#gen-v2-loading {
+  background: rgba(11,11,15,.7) !important;
+  border: 1px solid rgba(255,255,255,.07) !important;
+  border-radius: 16px !important;
+  backdrop-filter: blur(12px) !important;
+  min-height: 320px !important;
+}
+.gen-v2-step { letter-spacing: .04em !important; }
+.gen-v2-step.active { color: var(--amber) !important; }
+.gen-v2-step.active .gen-v2-step-dot {
+  box-shadow: 0 0 8px var(--amber), 0 0 16px rgba(245,197,24,.3) !important;
+}
+#gen-v2-stage { font-size: 13px !important; font-weight: 700 !important; }
+#gen-v2-stage-sub { font-size: 11px !important; color: var(--tx-2) !important; }
+#gen-v2-bar {
+  background: linear-gradient(90deg, #F5C518, #FFD740) !important;
+  box-shadow: 0 0 8px rgba(245,197,24,.4) !important;
+  transition: width 1s cubic-bezier(0.4,0,0.2,1) !important;
+}
+
+/* ── EMPTY STATE — cleaner ── */
+#gen-v2-empty {
+  aspect-ratio: 1 !important;
+  background: rgba(255,255,255,.015) !important;
+  border: 1.5px dashed rgba(255,255,255,.1) !important;
+  border-radius: 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 14px !important;
+  padding: 32px !important;
+  text-align: center !important;
+  transition: border-color .2s, background .2s !important;
+}
+#gen-v2-empty:hover {
+  border-color: rgba(245,197,24,.2) !important;
+  background: rgba(245,197,24,.015) !important;
+}
+
+/* ── RESULT ACTIONS ── */
+.v2-result-actions {
+  display: flex !important;
+  gap: 8px !important;
+  margin-top: 10px !important;
+}
+.v2-result-actions .btn {
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  transition: transform .18s, box-shadow .18s !important;
+}
+.v2-result-actions .btn:hover { transform: translateY(-1px) !important; }
 </style>
 
 </head>
@@ -8682,7 +8833,7 @@ async function sendBrainstorm(ctx) {
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
       body: JSON.stringify({
-        messages: state.messages,
+        messages: state.messages.slice(-10),  // client-side trim — server also compresses
         context: ctx,
         brandProfile,
         format:  _currentFmt || null,
@@ -9249,23 +9400,27 @@ async function gerarV2() {
   _v2SetPipelineStep(1);
   setBar(5); setStage('Estruturando prompt visual...', 'Haiku analisando conversa');
 
-  // Animate loading stages while API call runs
+  // Animate loading stages (timings tuned for optimized token budgets)
   const stageTimers = [];
   stageTimers.push(setTimeout(function() {
-    _v2SetPipelineStep(2); setBar(32);
-    setStage('Refinando para nível premium...', 'GPT-5.2 polishing');
-  }, 3500));
+    _v2SetPipelineStep(2); setBar(35);
+    setStage('Refinando prompt para nível premium...', 'GPT-5.2 polishing');
+  }, 2200));
   stageTimers.push(setTimeout(function() {
-    _v2SetPipelineStep(3); setBar(62);
-    setStage('Gerando variações com IA...', 'GPT-image-2 renderizando');
-  }, 8000));
+    setBar(55);
+    setStage('Refinando prompt para nível premium...', 'Aplicando estilo visual');
+  }, 3800));
+  stageTimers.push(setTimeout(function() {
+    _v2SetPipelineStep(3); setBar(68);
+    setStage('Gerando com GPT-image-2...', 'Renderizando variações');
+  }, 5500));
 
   async function callGenV2(slideIndex, total, n) {
     const r = await fetch(API + '/api/user/generate-v2', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({
-        messages: state.messages, format: fmt, network: net, brandProfile,
+        messages: state.messages.slice(-10), format: fmt, network: net, brandProfile,
         slideIndex, totalSlides: total,
         style: _selectedStyle, variations: n || 1,
         referenceImages: _uploadedRefImages,
