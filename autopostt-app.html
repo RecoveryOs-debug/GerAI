@@ -2582,6 +2582,17 @@ tr:hover .td-actions { opacity: 1; }
 .v2-variations-grid.single{grid-template-columns:1fr}
 .v2-result-actions{display:flex;gap:6px;flex-wrap:wrap}
 .img-preview-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;color:var(--t3);font-size:12px;min-height:200px}
+.v2-var-count{padding:5px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:6px;cursor:pointer;font-family:var(--f);font-size:11px;font-weight:700;color:var(--t2);transition:.12s;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:1px}
+.v2-var-count.on{background:rgba(255,193,7,.15);border-color:#FFC107;color:#FFC107}
+.v2-var-count:hover{background:rgba(255,255,255,.08);color:var(--tx)}
+.v2-var-count .vc-cr{font-size:9px;font-weight:500;opacity:.65}
+.bs-ref-strip{display:flex;flex-wrap:wrap;gap:5px;padding:4px 8px;min-height:0}
+.bs-ref-strip:empty{display:none}
+.bs-ref-thumb{position:relative;width:42px;height:42px;border-radius:5px;overflow:hidden;border:1px solid rgba(255,193,7,.35);flex-shrink:0}
+.bs-ref-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.bs-ref-thumb .rm{position:absolute;top:1px;right:1px;width:14px;height:14px;background:rgba(0,0,0,.75);border:none;border-radius:50%;cursor:pointer;font-size:8px;color:#fff;display:flex;align-items:center;justify-content:center;line-height:1;padding:0}
+.bs-img-btn{width:28px;height:28px;border-radius:6px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.12s;color:var(--t2)}
+.bs-img-btn:hover{background:rgba(255,193,7,.15);border-color:#FFC107;color:#FFC107}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
 .out-res{display:none}
@@ -6333,21 +6344,17 @@ body.image-agent-refining #image-agent-refine-overlay{
     <div class="pg" id="pg-generate">
       <div class="pg-hd"><div class="pg-title">Gerar conteúdo</div><div class="pg-sub">Converse com a IA e gere imagens profissionais com GPT-image-2.</div></div>
 
-      <!-- ══ Top bar: Format + Network ══ -->
-      <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:14px">
-        <button class="fmt v2-fmt on" id="f-post" onclick="selFmt('post')">Post</button>
-        <button class="fmt v2-fmt" id="f-carrossel" onclick="selFmt('carrossel')">Carrossel</button>
-        <button class="fmt v2-fmt" id="f-story" onclick="selFmt('story')">Story</button>
-        <button class="fmt v2-fmt" id="f-anuncio" onclick="selFmt('anuncio')">Anúncio</button>
-        <button class="fmt v2-fmt" id="f-thumb" onclick="selFmt('thumb')">Thumbnail</button>
-        <button class="fmt v2-fmt" id="f-banner" onclick="selFmt('banner')">Banner</button>
-        <div style="width:1px;height:18px;background:rgba(255,255,255,.1);margin:0 2px;flex-shrink:0"></div>
-        <button class="v2-net on" id="n-ig" onclick="selNet('ig')" title="Instagram"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg>IG</button>
-        <button class="v2-net" id="n-li" onclick="selNet('li')" title="LinkedIn"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>LI</button>
-        <button class="v2-net" id="n-yt" onclick="selNet('yt')" title="YouTube"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>YT</button>
-        <button class="v2-net" id="n-tt" onclick="selNet('tt')" title="TikTok"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>TT</button>
+      <!-- ══ Variation count selector ══ -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding:10px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:8px">
+        <span style="font-size:9.5px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;margin-right:2px;flex-shrink:0">Variações</span>
+        <button class="v2-var-count on" id="vc-1" onclick="selVarCount(1)"><span>1</span><span class="vc-cr">2 cr</span></button>
+        <button class="v2-var-count"    id="vc-2" onclick="selVarCount(2)"><span>2</span><span class="vc-cr">4 cr</span></button>
+        <button class="v2-var-count"    id="vc-3" onclick="selVarCount(3)"><span>3</span><span class="vc-cr">5 cr</span></button>
+        <button class="v2-var-count"    id="vc-4" onclick="selVarCount(4)"><span>4</span><span class="vc-cr">7 cr</span></button>
+        <span style="flex:1"></span>
+        <span style="font-size:9px;color:var(--t3)">A IA descobre o formato na conversa</span>
       </div>
-      <!-- Slide count row (only for carrossel) -->
+      <!-- Slide count row (only for carrossel, hidden by default) -->
       <div id="slide-count-row" style="display:none;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
         <span style="font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">Qtd. slides</span>
         <div style="display:flex;gap:4px;flex-wrap:wrap">
@@ -6357,17 +6364,6 @@ body.image-agent-refining #image-agent-refine-overlay{
           <button class="sc-btn" data-n="5" onclick="selSlides(this,5)">5</button>
           <button class="sc-btn" data-n="6" onclick="selSlides(this,6)">6</button>
         </div>
-      </div>
-
-      <!-- Style selector row -->
-      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:16px;padding:10px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:8px">
-        <span style="font-size:9.5px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;margin-right:2px">Tom visual</span>
-        <button class="v2-style on" id="vs-premium-dark"   onclick="selStyle('premium-dark')">✦ Premium Dark</button>
-        <button class="v2-style"    id="vs-clean-minimal"  onclick="selStyle('clean-minimal')">Clean Minimal</button>
-        <button class="v2-style"    id="vs-modern-saas"    onclick="selStyle('modern-saas')">Modern SaaS</button>
-        <button class="v2-style"    id="vs-aggressive-ads" onclick="selStyle('aggressive-ads')">Agressivo</button>
-        <div style="width:1px;height:14px;background:rgba(255,255,255,.08);margin:0 4px;flex-shrink:0"></div>
-        <span style="font-size:9px;color:var(--t3)">3 variações</span>
       </div>
 
       <div class="g-gen" style="grid-template-columns:1fr 1fr;gap:16px">
@@ -6389,20 +6385,25 @@ body.image-agent-refining #image-agent-refine-overlay{
                 <div class="bs-placeholder-text">Descreva sua ideia. A IA vai te ajudar a desenvolvê-la até ficar irresistível.</div>
               </div>
             </div>
+            <div class="bs-ref-strip" id="bs-ref-strip"></div>
             <div class="bs-input-row">
               <textarea id="bs-image-input" rows="2" placeholder="O que você quer criar?" onkeydown="bsKeydown(event,'image')"></textarea>
+              <button class="bs-img-btn" onclick="document.getElementById('bs-ref-input').click()" title="Enviar imagem de referência">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              </button>
+              <input type="file" id="bs-ref-input" accept="image/*" multiple style="display:none" onchange="handleBsImgUpload(this)">
               <button class="bs-send-btn" id="bs-image-send" onclick="sendBrainstorm('image')" title="Enviar">
                 <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
               </button>
             </div>
             <div class="bs-footer">
-              <span class="bs-cost-hint">Enter para enviar · Shift+Enter nova linha</span>
+              <span class="bs-cost-hint">Enter para enviar · Shift+Enter nova linha · 📎 imagem de referência</span>
             </div>
           </div>
           <button id="btn-gerar-v2" onclick="gerarV2()" style="width:100%;margin-top:10px;background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:13px 16px;cursor:pointer;font-family:var(--f);font-size:14px;font-weight:800;color:#fff;letter-spacing:-.02em;box-shadow:0 4px 20px rgba(243,107,42,.32);display:flex;align-items:center;justify-content:center;gap:8px;transition:.15s">
             <svg style="width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <span id="btn-gerar-v2-label">Gerar Post único</span>
-            <span style="margin-left:auto;font-size:10px;font-weight:500;opacity:.75;background:rgba(0,0,0,.2);border-radius:10px;padding:2px 7px">2 créditos</span>
+            <span id="btn-gerar-v2-label">✦ Gerar Imagem</span>
+            <span id="v2-credits-label" style="margin-left:auto;font-size:10px;font-weight:500;opacity:.75;background:rgba(0,0,0,.2);border-radius:10px;padding:2px 7px">2 créditos</span>
           </button>
           <!-- compat hidden elements -->
           <textarea id="gen-in" style="display:none"></textarea>
@@ -8408,8 +8409,9 @@ async function sendBrainstorm(ctx) {
         messages: state.messages,
         context: ctx,
         brandProfile,
-        format:  _currentFmt || 'post',
-        network: _currentNet || 'ig',
+        format:  _currentFmt || null,
+        network: _currentNet || null,
+        referenceImages: ctx === 'image' ? _uploadedRefImages : [],
       }),
     });
     dot.remove();
@@ -8850,6 +8852,9 @@ let _currentImgB64 = null;
 let _currentImagesB64 = [];
 let _selectedVariationIdx = 0;
 let _selectedStyle = 'premium-dark';
+let _variationCount = 1;
+let _uploadedRefImages = []; // { b64, type, name }
+const _varCreditMap = { 1: 2, 2: 4, 3: 5, 4: 7 };
 const _netMap2 = { ig:'Instagram', li:'LinkedIn', yt:'YouTube', tt:'TikTok', fb:'Facebook' };
 
 function selStyle(s) {
@@ -8857,6 +8862,53 @@ function selStyle(s) {
   document.querySelectorAll('.v2-style').forEach(function(b){ b.classList.remove('on'); });
   const el = document.getElementById('vs-' + s);
   if (el) el.classList.add('on');
+}
+
+function selVarCount(n) {
+  _variationCount = n;
+  document.querySelectorAll('.v2-var-count').forEach(function(b){ b.classList.remove('on'); });
+  const el = document.getElementById('vc-' + n);
+  if (el) el.classList.add('on');
+  const credits = _varCreditMap[n] || 2;
+  const lbl = document.getElementById('v2-credits-label');
+  if (lbl) lbl.textContent = credits + ' créditos';
+}
+
+function handleBsImgUpload(input) {
+  const files = Array.from(input.files || []);
+  if (!files.length) return;
+  const strip = document.getElementById('bs-ref-strip');
+  files.slice(0, 4 - _uploadedRefImages.length).forEach(function(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const b64 = e.target.result.split(',')[1];
+      const idx = _uploadedRefImages.length;
+      _uploadedRefImages.push({ b64, type: file.type, name: file.name });
+      if (strip) {
+        const thumb = document.createElement('div');
+        thumb.className = 'bs-ref-thumb';
+        thumb.id = 'ref-thumb-' + idx;
+        thumb.innerHTML = '<img src="' + e.target.result + '" alt="ref"><button class="rm" onclick="removeRefImage(' + idx + ')" title="Remover">×</button>';
+        strip.appendChild(thumb);
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function removeRefImage(idx) {
+  _uploadedRefImages.splice(idx, 1);
+  const strip = document.getElementById('bs-ref-strip');
+  if (strip) strip.innerHTML = '';
+  // Re-render all remaining thumbs
+  _uploadedRefImages.forEach(function(img, i) {
+    const thumb = document.createElement('div');
+    thumb.className = 'bs-ref-thumb';
+    thumb.id = 'ref-thumb-' + i;
+    thumb.innerHTML = '<img src="data:' + img.type + ';base64,' + img.b64 + '" alt="ref"><button class="rm" onclick="removeRefImage(' + i + ')" title="Remover">×</button>';
+    if (strip) strip.appendChild(thumb);
+  });
 }
 
 function _v2SetPipelineStep(step) {
@@ -8874,15 +8926,25 @@ function _v2SetStageSub(txt) {
   if (el) el.textContent = txt;
 }
 
+function _extractFmtFromMsgs(msgs) {
+  const text = msgs.map(function(m){ return String(m.content||''); }).join(' ').toLowerCase();
+  if (text.includes('carrossel') || text.includes('carousel')) return 'carrossel';
+  if (text.includes('story') || text.includes('stories')) return 'story';
+  if (/anún?cio|anuncio/.test(text)) return 'anuncio';
+  if (text.includes('thumbnail') || text.includes('miniatura')) return 'thumb';
+  if (text.includes('banner')) return 'banner';
+  return 'post';
+}
+
 async function gerarV2() {
   const state = _bsGet('image');
   if (!state.messages.length) { toast('Converse com a IA primeiro para criar sua imagem','err'); return; }
 
-  const fmt = _currentFmt || 'post';
-  const net = _netMap2[_currentNet] || 'Instagram';
+  const fmt = _extractFmtFromMsgs(state.messages);
+  const net = null; // backend extracts from conversation
   const isCarrossel = fmt === 'carrossel';
   const totalSlides = isCarrossel ? (_slideCount > 0 ? _slideCount : 4) : null;
-  const variations  = isCarrossel ? 1 : 3;
+  const variations  = isCarrossel ? 1 : _variationCount;
 
   const brandProfile = BrandProfileModule.toGenerationPayload({
     voiceId: (window._selectedVoice||{}).id || '',
@@ -8933,6 +8995,7 @@ async function gerarV2() {
         messages: state.messages, format: fmt, network: net, brandProfile,
         slideIndex, totalSlides: total,
         style: _selectedStyle, variations: n || 1,
+        referenceImages: _uploadedRefImages,
       })
     });
     if (!r.ok) { const d = await r.json().catch(()=>({})); throw new Error(d.error || 'Erro ' + r.status); }
@@ -9009,7 +9072,7 @@ async function gerarV2() {
 
       showV2('gen-v2-result');
       toast(_currentImagesB64.length > 1 ? _currentImagesB64.length + ' variações geradas!' : 'Imagem gerada!', 'ok');
-      const credits = 1 + Math.min(variations, 3);
+      const credits = _varCreditMap[_variationCount] || 2;
       if (me) { me.quota_used = (me.quota_used||0) + credits; updateQuota(); }
     }
   } catch(e) {

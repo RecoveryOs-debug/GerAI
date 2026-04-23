@@ -979,7 +979,7 @@ function callGPT5Messages({ system, messages, maxTokens = 800 }) {
   return new Promise((resolve, reject) => {
     const oaiMsgs = [
       { role: 'system', content: system },
-      ...messages.map(m => ({ role: m.role, content: String(m.content) })),
+      ...messages.map(m => ({ role: m.role, content: Array.isArray(m.content) ? m.content : String(m.content) })),
     ];
     const body = JSON.stringify({ model: 'gpt-5.2', messages: oaiMsgs, max_completion_tokens: maxTokens });
     const opts = {
@@ -4239,7 +4239,7 @@ route('POST', '/api/user/design-agent', async (req, res) => {
 // Cada mensagem consome 1 crédito. Suporta até 14 mensagens de histórico.
 route('POST', '/api/user/brainstorm', async (req, res) => {
   const payload = requireAuth(req, res); if (!payload) return;
-  const { messages, context, brandProfile, format, network } = await parseBody(req);
+  const { messages, context, brandProfile, format, network, referenceImages } = await parseBody(req);
   if (!messages || !Array.isArray(messages) || messages.length === 0)
     return err(res, 'messages obrigatório');
 
@@ -4290,16 +4290,40 @@ Exemplo: ângulo "meta impossível que queima vendedor"
 → "A meta impossível que queima quem vende"
 A headline mostra o post antes de existir.
 
+## Descoberta de formato e plataforma
+
+Quando o ângulo estiver definido, pergunte de forma natural — UMA pergunta: qual o formato desejado (Post, Carrossel, Story, Anúncio, Thumbnail) e para qual plataforma (Instagram, LinkedIn, YouTube, TikTok). Nunca liste como menu técnico, integre na conversa.
+Exemplo: "Já temos um ângulo forte. Vai ser um post ou carrossel? E para qual rede?"
+
+Se o usuário enviar imagens de referência, analise o estilo visual e confirme que entendeu: cores, tipografia, layout — e use isso como guia para a geração.
+
 ## Quando fechar
 
-Coloca ✅ quando o ângulo estiver claro + tiver elemento concreto (dado, contraste, transformação).
-Usa 🔄 quando ainda falta clareza.
-Quando ✅: "Fechado — clica em ✦ Refinar Prompt para gerar."`;
+Coloca ✅ quando o ângulo estiver claro + formato/rede definidos + elemento concreto (dado, contraste, transformação).
+Usa 🔄 quando ainda falta clareza ou formato/rede não definidos.
+Quando ✅: "Fechado — clica em ✦ Gerar Imagem para criar."`;
+
+  // Build messages array — inject reference images as first vision message if provided
+  let msgsToSend = messages.slice(-14).map(m => ({
+    role: m.role,
+    content: Array.isArray(m.content) ? m.content : String(m.content),
+  }));
+
+  if (Array.isArray(referenceImages) && referenceImages.length > 0) {
+    const visionContent = [
+      { type: 'text', text: 'O usuário enviou estas imagens de referência de estilo. Analise e confirme o estilo visual (cores, tipografia, layout) para guiar a geração:' },
+      ...referenceImages.slice(0, 4).map(img => ({
+        type: 'image_url',
+        image_url: { url: `data:${img.type || 'image/jpeg'};base64,${img.b64}` },
+      })),
+    ];
+    msgsToSend = [{ role: 'user', content: visionContent }, ...msgsToSend];
+  }
 
   try {
     const r = await callGPT5Messages({
       system,
-      messages: messages.slice(-14).map(m => ({ role: m.role, content: String(m.content) })),
+      messages: msgsToSend,
       maxTokens: 600,
     });
     const tok = { in: r.inputTokens || 0, out: r.outputTokens || 0 };
@@ -4590,85 +4614,132 @@ OUTPUT — return ONLY this JSON, no text before or after:
   }
 });
 
-// ── buildGPT2Prompt: Haiku → rich English prose prompt for GPT-image-2 ────────
-async function buildGPT2Prompt({ messages, format, network, brand, slideIndex = null, totalSlides = null }) {
+// ── Extract format/network from conversation text ────────────────────────────
+function extractFmtFromConversation(messages) {
+  const text = messages.map(m => (typeof m.content === 'string' ? m.content : '')).join(' ').toLowerCase();
+  if (text.includes('carrossel') || text.includes('carousel')) return 'carrossel';
+  if (text.includes('story') || text.includes('stories')) return 'story';
+  if (/anún?cio|anuncio/.test(text)) return 'anuncio';
+  if (text.includes('thumbnail') || text.includes('miniatura')) return 'thumb';
+  if (text.includes('banner')) return 'banner';
+  return 'post';
+}
+
+function extractNetFromConversation(messages) {
+  const text = messages.map(m => (typeof m.content === 'string' ? m.content : '')).join(' ').toLowerCase();
+  if (text.includes('linkedin')) return 'LinkedIn';
+  if (text.includes('youtube') || text.includes(' yt ')) return 'YouTube';
+  if (text.includes('tiktok') || text.includes('tik tok')) return 'TikTok';
+  if (text.includes('facebook') || text.includes(' fb ')) return 'Facebook';
+  return 'Instagram';
+}
+
+// ── buildGPT2Prompt: Haiku → rich Portuguese prose prompt for GPT-image-2 ─────
+async function buildGPT2Prompt({ messages, format, network, brand, slideIndex = null, totalSlides = null, referenceImages = [] }) {
   const conversationStr = messages.slice(-12).map(m =>
-    `${m.role === 'user' ? 'User' : 'Strategist'}: ${m.content}`
+    `${m.role === 'user' ? 'Usuário' : 'Estrategista'}: ${typeof m.content === 'string' ? m.content : '[imagem]'}`
   ).join('\n\n');
 
+  // Extract format/network from conversation if not explicitly provided
+  const fmt = format || extractFmtFromConversation(messages);
+  const net = network || extractNetFromConversation(messages);
+
   const fmtGuide = {
-    post:      'Square 1:1. Large bold headline + body text left half, high-quality product/device mockup right half.',
-    carrossel: 'Square 1:1 carousel slide. Slide number top-left. ONE bold message per slide.',
-    story:     'Vertical 9:16. Full-bleed dramatic background. Bold oversized headline centered.',
-    anuncio:   'Square 1:1 ad. Logo top-left. Bold headline + 2-3 benefit lines + CTA button bottom.',
-    thumb:     'Landscape 16:9 thumbnail. Maximum contrast. Huge bold text on left third.',
-    banner:    'Wide landscape 16:9. Horizontal layout. Product on right, text on left.',
+    post:      'Quadrado 1:1. Headline grande e bold na metade esquerda, mockup de dispositivo fotorealista na metade direita.',
+    carrossel: 'Quadrado 1:1 slide de carrossel. Número do slide no canto superior esquerdo. UMA mensagem bold por slide.',
+    story:     'Vertical 9:16. Background dramático full-bleed. Headline oversized centralizado em negrito.',
+    anuncio:   'Quadrado 1:1 anúncio. Logo no canto superior esquerdo. Headline bold + 2-3 benefícios + botão CTA embaixo.',
+    thumb:     'Landscape 16:9 thumbnail. Contraste máximo. Texto bold enorme no terço esquerdo.',
+    banner:    'Landscape 16:9 horizontal. Produto à direita, texto à esquerda.',
   };
 
   let slideCtx = '';
   if (slideIndex && totalSlides) {
-    const roles = { 1: 'hook/capa — grab attention', [totalSlides]: 'CTA — clear call to action' };
-    slideCtx = `\nThis is slide ${slideIndex} of ${totalSlides}. Role: ${roles[slideIndex] || 'content — one key insight or benefit'}.`;
+    const roles = { 1: 'capa/hook — capturar atenção imediata', [totalSlides]: 'CTA — chamada para ação clara' };
+    slideCtx = `\nEste é o slide ${slideIndex} de ${totalSlides}. Papel: ${roles[slideIndex] || 'conteúdo — um insight ou benefício chave'}.`;
   }
 
-  const brandStr = brand ? `Brand: ${brand.companyName || ''}, primary color ${brand.primaryColor || '#F36B2A'}, accent ${brand.accentColor || '#ffffff'}.` : '';
+  const brandStr = brand ? `Marca: ${brand.companyName || 'AutoPostt'}, cor primária ${brand.primaryColor || '#FFC107'}, accent ${brand.accentColor || '#ffffff'}.` : '';
+  const refCtx = referenceImages.length > 0 ? `\nO usuário enviou ${referenceImages.length} imagem(ns) de referência de estilo — crie um prompt que produza resultado visualmente similar em qualidade, composição e sofisticação.` : '';
 
-  const system = `You are a world-class art director creating prompts for GPT-image-2 image generation.
-Convert the marketing conversation below into a single rich English prose prompt (max 450 tokens) that produces a STUNNING, professional marketing image.
+  const system = `Você é um diretor de arte de classe mundial criando prompts para o gerador de imagens GPT-image-2.
+Converta a conversa de marketing abaixo em um único prompt em prosa (máx 450 tokens) que produza uma imagem de marketing INCRÍVEL e profissional.
 
-Format guidance: ${fmtGuide[format] || fmtGuide.post}
+⚠️ REGRA CRÍTICA DE IDIOMA: TODO TEXTO VISÍVEL NA IMAGEM DEVE ESTAR EM PORTUGUÊS BRASILEIRO. Nunca use palavras em inglês em headlines, corpo, CTAs ou labels de UI. Headlines, subtítulos, CTAs e qualquer texto sobreposto OBRIGATORIAMENTE em PT-BR.
+
+Você está criando imagens para a AutoPostt — plataforma SaaS brasileira de criação de conteúdo para redes sociais.
+Identidade visual AutoPostt: fundo escuro #0B0B0B, accent âmbar/dourado #FFC107, mockups de dispositivos mostrando dashboard real com:
+- Sidebar escura com ícones de navegação e destaque âmbar
+- Cards de métricas (Alcance, Engajamento, Posts Publicados) com números em PT-BR (ex: "12,4K alcance")
+- Gráficos de crescimento com linhas de tendência âmbar
+- Tipografia SaaS moderna e limpa
+
+Formato: ${fmtGuide[fmt] || fmtGuide.post}
 ${slideCtx}
 ${brandStr}
+${refCtx}
+Rede/Plataforma: ${net}
 
-Your prompt MUST specify:
-1. EXACT TEXT on image: main headline (max 6 words, ALL CAPS), subheadline (max 10 words), optional body copy. Wrap each text in quotes.
-2. Typography: font weight (Black/ExtraBold), size hierarchy, HEX color codes for each text element.
-3. Layout precision: exact positioning (left third, centered, top-left quadrant, etc.).
-4. Background & atmosphere: near-black or very dark background (#0a0a0a to #1a1a1a), dramatic professional lighting.
-5. Accent color: specify EXACTLY where the brand accent color appears (underline, icon, CTA button, divider line, etc.).
-6. Visual element: realistic 3D product mockup (phone showing dashboard UI, laptop with analytics screen, or relevant product), high detail.
-7. Quality: photorealistic, 8K render, ultra-sharp, commercial photography quality.
+Seu prompt DEVE especificar:
+1. TEXTO EXATO na imagem: headline principal (máx 6 palavras, CAIXA ALTA, PORTUGUÊS), subheadline (máx 10 palavras, PORTUGUÊS), copy opcional PORTUGUÊS. Envolva cada texto em aspas.
+2. Tipografia: peso da fonte (Black/ExtraBold), hierarquia de tamanho, códigos HEX para cada elemento de texto.
+3. Posicionamento preciso: coordenadas exatas (terço esquerdo, centralizado, quadrante superior esquerdo, etc.).
+4. Background e atmosfera: fundo próximo ao preto ou muito escuro (#0a0a0a a #1a1a1a), iluminação profissional dramática.
+5. Cor accent: especifique EXATAMENTE onde o accent âmbar #FFC107 aparece (sublinhado, ícone, botão CTA, linha divisória, etc.).
+6. Elemento visual: mockup 3D fotorealista de dispositivo (celular exibindo dashboard AutoPostt, laptop com tela de analytics), alto detalhe.
+7. Qualidade: fotorealista, 8K render, ultra-sharp, qualidade de fotografia comercial de estúdio.
 
-GLOBAL STYLE: ${STYLE_SYSTEM_BLOCK}
+ESTILO GLOBAL: ${STYLE_SYSTEM_BLOCK}
 
-Write ONLY the prompt. No explanations. No markdown. Just the prompt text.`;
+Escreva APENAS o prompt. Sem explicações. Sem markdown. Apenas texto do prompt.`;
 
   const r = await callHaiku({
     system,
-    messages: [{ role: 'user', content: `Conversation:\n${conversationStr}\n\nNetwork: ${network || 'Instagram'}. Generate the image prompt now.` }],
-    maxTokens: 480,
+    messages: [{ role: 'user', content: `Conversa:\n${conversationStr}\n\nPlataforma: ${net}. Gere o prompt de imagem agora.` }],
+    maxTokens: 500,
   });
   return r.text.trim();
 }
 
 // ── Prompt Polisher: GPT-5.2 elevates Haiku draft to premium quality ──────────
-async function polishPromptGPT5({ rawPrompt, format, style = 'premium-dark' }) {
+async function polishPromptGPT5({ rawPrompt, format, style = 'premium-dark', referenceImages = [] }) {
   const styleGuide = VISUAL_STYLE_GUIDES[style] || VISUAL_STYLE_GUIDES['premium-dark'];
-  const system = `You are a senior creative director at a world-class design agency. Your job is to take a marketing image prompt and elevate it to flawless professional quality.
+  const system = `Você é um diretor criativo sênior de uma agência de design de classe mundial. Seu trabalho é pegar um prompt de imagem de marketing e elevar ao nível profissional impecável.
 
-STRICT RULES:
-- Preserve the EXACT original concept, marketing message, product, and offer — do not invent new ideas
-- Improve: compositional precision, typographic specificity, lighting detail, layout coordinates
-- Replace every vague word ("nice", "beautiful", "modern", "stunning") with concrete visual specs
-- Specify HEX color codes for every color element
-- Quote every text string that appears in the image
-- State exact layout positions (left-third, top-center, bottom-right 20%, etc.)
-- Specify rendering quality last: photorealistic 8K, ultra-sharp, studio lighting
+REGRAS RIGOROSAS:
+- Preserve o CONCEITO ORIGINAL exato, mensagem de marketing, produto e oferta — não invente novas ideias
+- Melhore: precisão composicional, especificidade tipográfica, detalhes de iluminação, coordenadas de layout
+- Substitua cada palavra vaga ("bonito", "moderno", "impressionante") por especificações visuais concretas
+- Especifique códigos HEX para cada elemento de cor
+- Coloque entre aspas cada string de texto que aparece na imagem
+- Declare posições de layout exatas (terço esquerdo, centro superior, 20% inferior direito, etc.)
+- Especifique qualidade de renderização por último: fotorealista 8K, ultra-sharp, iluminação de estúdio
 
-MANDATORY VISUAL STYLE: ${styleGuide}
-GLOBAL STANDARDS: ${STYLE_SYSTEM_BLOCK}
+⚠️ CRÍTICO — IDIOMA: TODO TEXTO VISÍVEL NA IMAGEM DEVE ESTAR EM PORTUGUÊS BRASILEIRO. Se encontrar palavras em inglês em headlines, CTAs, copy ou labels de UI, traduza para o português. NUNCA gere texto em inglês.
 
-Output ONLY the refined prompt. Zero commentary. Zero markdown. Plain text only.`;
+ESTILO VISUAL OBRIGATÓRIO: ${styleGuide}
+PADRÕES GLOBAIS: ${STYLE_SYSTEM_BLOCK}
+
+Saída APENAS o prompt refinado. Zero comentários. Zero markdown. Somente texto puro.`;
 
   try {
-    const r = await callGPT5Messages({
-      system,
-      messages: [{ role: 'user', content: `Refine to premium level:\n\n${rawPrompt}` }],
-      maxTokens: 700,
-    });
+    // Build messages — include reference images if provided so polisher can visually match the style
+    let msgs;
+    if (referenceImages.length > 0) {
+      const visionContent = [
+        { type: 'text', text: `Eleve este prompt ao nível premium. Combine visualmente o estilo das imagens de referência abaixo:\n\n${rawPrompt}` },
+        ...referenceImages.slice(0, 3).map(img => ({
+          type: 'image_url',
+          image_url: { url: `data:${img.type || 'image/jpeg'};base64,${img.b64}` },
+        })),
+      ];
+      msgs = [{ role: 'user', content: visionContent }];
+    } else {
+      msgs = [{ role: 'user', content: `Eleve ao nível premium:\n\n${rawPrompt}` }];
+    }
+    const r = await callGPT5Messages({ system, messages: msgs, maxTokens: 750 });
     return r.text.trim();
   } catch (e) {
-    // Polisher failure is non-fatal — return raw prompt as fallback
     console.error('[polishPromptGPT5] fallback to raw prompt:', e.message);
     return rawPrompt;
   }
@@ -4678,31 +4749,39 @@ Output ONLY the refined prompt. Zero commentary. Zero markdown. Plain text only.
 route('POST', '/api/user/generate-v2', async (req, res) => {
   const payload = requireAuth(req, res); if (!payload) return;
   const {
-    messages, format = 'post', network = 'Instagram',
+    messages, format, network,
     brandProfile, slideIndex = null, totalSlides = null,
-    style = 'premium-dark', variations = 1,
+    style = 'premium-dark', variations = 1, referenceImages = [],
   } = await parseBody(req);
   if (!messages || !messages.length) return err(res, 'Sem mensagens para gerar imagem');
 
-  // Deduct credits: 2 base + 1 per extra variation
-  const credits = Math.max(2, 1 + Math.min(variations, 3));
+  const varCount = Math.min(4, Math.max(1, variations));
+  const creditMap = { 1: 2, 2: 4, 3: 5, 4: 7 };
+  const credits = slideIndex ? 1 : (creditMap[varCount] || 2);
   try { for (let i = 0; i < credits; i++) db.consumeQuota(payload.id); }
   catch(e) { return err(res, e.message, 402); }
+
+  // Resolve format/network: use explicit value or extract from conversation
+  const resolvedFmt = format || extractFmtFromConversation(messages);
+  const resolvedNet = network || extractNetFromConversation(messages);
 
   const brand   = brandProfile || null;
   const sizeMap = {
     post:'1024x1024', carrossel:'1024x1024', anuncio:'1024x1024',
     story:'1024x1536', thumb:'1536x1024', banner:'1536x1024',
   };
-  const size = sizeMap[format] || '1024x1024';
-  const n    = slideIndex ? 1 : Math.min(Math.max(1, variations), 3);
+  const size = sizeMap[resolvedFmt] || '1024x1024';
+  const n    = slideIndex ? 1 : varCount;
 
   try {
-    // Stage 1: Haiku builds initial visual prompt
-    const draftPrompt = await buildGPT2Prompt({ messages, format, network, brand, slideIndex, totalSlides });
+    // Stage 1: Haiku builds initial visual prompt (with Portuguese enforcement)
+    const draftPrompt = await buildGPT2Prompt({
+      messages, format: resolvedFmt, network: resolvedNet,
+      brand, slideIndex, totalSlides, referenceImages,
+    });
 
-    // Stage 2: GPT-5.2 polishes to premium quality
-    const finalPrompt = await polishPromptGPT5({ rawPrompt: draftPrompt, format, style });
+    // Stage 2: GPT-5.2 polishes to premium quality (with reference images if provided)
+    const finalPrompt = await polishPromptGPT5({ rawPrompt: draftPrompt, format: resolvedFmt, style, referenceImages });
 
     // Stage 3: GPT-image-2 generates n variations
     const imgRes = await callOpenAIImage({ prompt: finalPrompt, size, quality: 'high', n });
