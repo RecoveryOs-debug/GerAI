@@ -41,6 +41,27 @@ const HOST           = '0.0.0.0';
 const ANTHROPIC_KEY  = process.env.ANTHROPIC_API_KEY || '';
 const OPENAI_KEY     = process.env.OPENAI_API_KEY    || '';
 
+// ── API Pricing constants ($ per million tokens / $ per image) ───────────────
+const PRICING = {
+  'haiku':     { in: 0.80,  out: 4.00  },  // claude-haiku-4-5-20251001
+  'gpt-5.2':   { in: 1.75,  out: 14.00 },  // gpt-5.2 chat completions
+  'sonnet':    { in: 3.00,  out: 15.00 },  // claude-sonnet-4-6
+};
+// $ per image — gpt-image-2 by size × quality
+const IMG_PRICING = {
+  '1024x1024': { low: 0.011, medium: 0.020, high: 0.040 },
+  '1024x1536': { low: 0.016, medium: 0.028, high: 0.056 },
+  '1536x1024': { low: 0.016, medium: 0.028, high: 0.056 },
+};
+function calcTokenCost(model, inp, out) {
+  const p = PRICING[model] || PRICING['haiku'];
+  return parseFloat(((inp / 1e6 * p.in) + (out / 1e6 * p.out)).toFixed(8));
+}
+function calcImageCost(size, quality, n) {
+  const sp = IMG_PRICING[size] || IMG_PRICING['1024x1024'];
+  return parseFloat(((sp[quality] || sp.medium) * Math.max(1, n || 1)).toFixed(8));
+}
+
 // ── Centralized Style System (injected into all image prompts) ────────────────
 const STYLE_SYSTEM_BLOCK = `Global visual standards: minimalist premium SaaS aesthetic. Background: near-black #0B0B0B or clean white. Accent: warm amber #FFC107. Typography: ultra-bold modern sans-serif 900 weight, clear size hierarchy. Layout: generous negative space, strong visual hierarchy, intentional whitespace. Elements: UI dashboard screens, data visualizations, device mockups, growth charts. Rendering: photorealistic 8K ultra-sharp, commercial studio lighting. Avoid: visual clutter, decorative excess, generic stock aesthetics, clichéd business imagery.`;
 
@@ -142,6 +163,10 @@ class Database {
     `);
     this.db.exec(`CREATE INDEX IF NOT EXISTS idx_gen_user ON generations(user_id)`);
     this.db.exec(`CREATE INDEX IF NOT EXISTS idx_gen_created ON generations(created_at DESC)`);
+    // Safe schema migrations for cost tracking columns
+    try { this.db.prepare(`ALTER TABLE generations ADD COLUMN api_provider TEXT DEFAULT 'anthropic'`).run(); } catch(_) {}
+    try { this.db.prepare(`ALTER TABLE generations ADD COLUMN image_cost REAL DEFAULT 0`).run(); } catch(_) {}
+    try { this.db.prepare(`ALTER TABLE generations ADD COLUMN model TEXT DEFAULT ''`).run(); } catch(_) {}
 
     // Plans
     this.db.exec(`
@@ -436,20 +461,29 @@ class Database {
 
   // ── GENERATIONS ──
   addGeneration(gen) {
-    const inp = gen.input_tokens || 0;
-    const out = gen.output_tokens || 0;
-    const cost_usd = parseFloat(((inp / 1_000_000 * 3) + (out / 1_000_000 * 15)).toFixed(6));
+    const inp  = gen.input_tokens  || 0;
+    const out  = gen.output_tokens || 0;
+    // Use pre-calculated cost if provided, else estimate from model
+    const cost_usd = (gen.cost_usd != null)
+      ? parseFloat(Number(gen.cost_usd).toFixed(8))
+      : calcTokenCost(gen.model || 'haiku', inp, out);
+    const image_cost    = parseFloat(Number(gen.image_cost || 0).toFixed(8));
+    const api_provider  = gen.api_provider || 'anthropic';
+    const model         = gen.model || '';
     const id = this._id();
     this.db.prepare(`
       INSERT INTO generations
-      (id,user_id,feature,format,network,concept_name,prompt,svg_data,input_tokens,output_tokens,total_tokens,cost_usd,credits_used)
-      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+      (id,user_id,feature,format,network,concept_name,prompt,svg_data,
+       input_tokens,output_tokens,total_tokens,cost_usd,credits_used,
+       api_provider,image_cost,model)
+      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     `).run(
       id, gen.user_id, gen.feature || '', gen.format || '', gen.network || '',
       gen.concept_name || '', (gen.prompt || '').slice(0, 500),
-      gen.svg_data || '', inp, out, inp + out, cost_usd, gen.credits_used || 1
+      gen.svg_data || '', inp, out, inp + out, cost_usd, gen.credits_used || 1,
+      api_provider, image_cost, model
     );
-    return { id, ...gen, cost_usd, total_tokens: inp + out };
+    return { id, ...gen, cost_usd, image_cost, total_tokens: inp + out };
   }
 
   getGenerations({ user_id, limit = 50 } = {}) {
@@ -783,12 +817,23 @@ class Database {
       return { user_id:uid, name:u?.name||'Desconhecido', email:u?.email||'',
                cost_usd: parseFloat(d.cost_usd.toFixed(6)), count: d.count };
     });
+    const anthropicCostUsd = gens
+      .filter(g => !g.api_provider || g.api_provider === 'anthropic')
+      .reduce((s, g) => s + (g.cost_usd || 0), 0);
+    const openaiCostUsd = gens
+      .filter(g => g.api_provider === 'openai')
+      .reduce((s, g) => s + (g.cost_usd || 0), 0);
+    const imageCostUsd = gens.reduce((s, g) => s + (g.image_cost || 0), 0);
+
     return {
       total_users: users.length,
       active_users: users.filter(u => u.status === 'active').length,
       total_generations: gens.length,
       plan_breakdown: breakdown,
       mrr, total_cost_usd: parseFloat(totalCostUsd.toFixed(6)),
+      anthropic_cost_usd: parseFloat(anthropicCostUsd.toFixed(6)),
+      openai_cost_usd:    parseFloat(openaiCostUsd.toFixed(6)),
+      image_cost_usd:     parseFloat(imageCostUsd.toFixed(6)),
       total_tokens: totalTokens, by_feature: byFeature, by_month: byMonth,
       top_users_by_cost: topUsers
     };
@@ -1071,7 +1116,8 @@ function callOpenAIImage({ prompt, size = '1024x1024', quality = 'medium', model
           if (json.error) return reject(new Error('OpenAI: ' + (json.error.message || JSON.stringify(json.error))));
           const images = (json.data || []).map(item => item.b64_json).filter(Boolean);
           if (!images.length) return reject(new Error('Sem imagem na resposta OpenAI. Verifique o modelo e a chave.'));
-          resolve({ b64: images[0], images, tok: { in: 0, out: 0 } });
+          const image_cost = calcImageCost(size, quality, images.length);
+          resolve({ b64: images[0], images, tok: { in: 0, out: 0 }, image_cost });
         } catch (e) { reject(new Error('Resposta inválida da OpenAI: ' + e.message)); }
       });
     });
@@ -2317,7 +2363,7 @@ route('POST', '/api/user/generate-content-stream', async (req, res) => {
     send('done', { agent: agent, rede: rede, tipo: tipo });
     res.end();
 
-    db.addGeneration({ user_id: payload.id, feature: agent, format: tipo || agent, network: rede || 'instagram', concept_name: agent, prompt: input.slice(0, 200), credits_used: 1, input_tokens: streamInputTokens, output_tokens: streamOutputTokens });
+    db.addGeneration({ user_id: payload.id, feature: agent, format: tipo || agent, network: rede || 'instagram', concept_name: agent, prompt: input.slice(0, 200), credits_used: 1, input_tokens: streamInputTokens, output_tokens: streamOutputTokens, model: 'gpt-5.2', api_provider: 'openai', cost_usd: calcTokenCost('gpt-5.2', streamInputTokens, streamOutputTokens) });
     const newCount = db.upsertMemory(payload.id, { summary: memory.summary, preferences: memory.preferences, positive: memory.positive, negative: memory.negative, incrementGen: true });
     if (newCount % 5 === 0) {
       const recentGens = db.getRecentGenerations(payload.id, 15);
@@ -2336,7 +2382,7 @@ route('POST', '/api/user/generate-content', async (req, res) => {
   const memory = db.getMemory(payload.id);
   try {
     const { content: responseText, inputTokens: agentIn, outputTokens: agentOut } = await runAgentPipeline({ agent, input, user, memory, tomOverride: tom, mediaFiles });
-    db.addGeneration({ user_id: payload.id, feature: agent, format: tipo || agent, network: rede || 'instagram', concept_name: agent, prompt: input.slice(0, 200), credits_used: 1, input_tokens: agentIn || 0, output_tokens: agentOut || 0 });
+    db.addGeneration({ user_id: payload.id, feature: agent, format: tipo || agent, network: rede || 'instagram', concept_name: agent, prompt: input.slice(0, 200), credits_used: 1, input_tokens: agentIn || 0, output_tokens: agentOut || 0, model: 'gpt-5.2', api_provider: 'openai', cost_usd: calcTokenCost('gpt-5.2', agentIn || 0, agentOut || 0) });
     const newCount = db.upsertMemory(payload.id, { summary: memory.summary, preferences: memory.preferences, positive: memory.positive, negative: memory.negative, incrementGen: true });
     if (newCount % 5 === 0) {
       const recentGens = db.getRecentGenerations(payload.id, 15);
@@ -4327,8 +4373,21 @@ Quando ✅: "Fechado — clica em ✦ Gerar Imagem para criar."`;
       maxTokens: 600,
     });
     const tok = { in: r.inputTokens || 0, out: r.outputTokens || 0 };
-    // GPT-5.2 pricing: $1.75 input / $14 output per MTok
-    const cost_usd = parseFloat(((tok.in / 1_000_000 * 1.75) + (tok.out / 1_000_000 * 14)).toFixed(6));
+    const cost_usd = calcTokenCost('gpt-5.2', tok.in, tok.out);
+    db.addGeneration({
+      user_id:      payload.id,
+      feature:      'brainstorm',
+      format:       context || 'image',
+      network:      network || '',
+      concept_name: 'Strategist',
+      prompt:       (messages[messages.length - 1]?.content || '').slice(0, 200),
+      credits_used: 1,
+      input_tokens:  tok.in,
+      output_tokens: tok.out,
+      cost_usd,
+      model:        'gpt-5.2',
+      api_provider: 'openai',
+    });
     res.end(JSON.stringify({ ok: true, reply: r.text, tok, cost_usd, model: 'gpt-5.2' }));
   } catch(e) {
     return err(res, 'Erro na conversa: ' + e.message);
@@ -4698,7 +4757,7 @@ Escreva APENAS o prompt. Sem explicações. Sem markdown. Apenas texto do prompt
     messages: [{ role: 'user', content: `Conversa:\n${conversationStr}\n\nPlataforma: ${net}. Gere o prompt de imagem agora.` }],
     maxTokens: 500,
   });
-  return r.text.trim();
+  return { prompt: r.text.trim(), inputTokens: r.inputTokens || 0, outputTokens: r.outputTokens || 0 };
 }
 
 // ── Prompt Polisher: GPT-5.2 elevates Haiku draft to premium quality ──────────
@@ -4738,10 +4797,10 @@ Saída APENAS o prompt refinado. Zero comentários. Zero markdown. Somente texto
       msgs = [{ role: 'user', content: `Eleve ao nível premium:\n\n${rawPrompt}` }];
     }
     const r = await callGPT5Messages({ system, messages: msgs, maxTokens: 750 });
-    return r.text.trim();
+    return { prompt: r.text.trim(), inputTokens: r.inputTokens || 0, outputTokens: r.outputTokens || 0 };
   } catch (e) {
     console.error('[polishPromptGPT5] fallback to raw prompt:', e.message);
-    return rawPrompt;
+    return { prompt: rawPrompt, inputTokens: 0, outputTokens: 0 };
   }
 }
 
@@ -4781,24 +4840,47 @@ route('POST', '/api/user/generate-v2', async (req, res) => {
 
   try {
     // Stage 1: Haiku builds initial visual prompt (with Portuguese enforcement)
-    const draftPrompt = await buildGPT2Prompt({
+    const draftRes = await buildGPT2Prompt({
       messages, format: resolvedFmt, network: resolvedNet,
       brand, slideIndex, totalSlides, referenceImages,
     });
 
     // Stage 2: GPT-5.2 polishes to premium quality (with reference images if provided)
-    const finalPrompt = await polishPromptGPT5({ rawPrompt: draftPrompt, format: resolvedFmt, style, referenceImages });
+    const polishRes = await polishPromptGPT5({ rawPrompt: draftRes.prompt, format: resolvedFmt, style, referenceImages });
 
     // Stage 3: GPT-image-2 generates n variations
-    const imgRes = await callOpenAIImage({ prompt: finalPrompt, size, quality: 'high', n });
+    const imgRes = await callOpenAIImage({ prompt: polishRes.prompt, size, quality: 'high', n });
+
+    // ── Cost accounting ───────────────────────────────────────────────────────
+    const haikuCost  = calcTokenCost('haiku',   draftRes.inputTokens,  draftRes.outputTokens);
+    const gpt52Cost  = calcTokenCost('gpt-5.2', polishRes.inputTokens, polishRes.outputTokens);
+    const imgCost    = imgRes.image_cost || 0;
+    const totalCost  = haikuCost + gpt52Cost + imgCost;
+
+    db.addGeneration({
+      user_id:      payload.id,
+      feature:      'generate-v2',
+      format:       resolvedFmt,
+      network:      resolvedNet,
+      concept_name: polishRes.prompt.slice(0, 60),
+      prompt:       polishRes.prompt.slice(0, 500),
+      credits_used: credits,
+      input_tokens:  (draftRes.inputTokens || 0) + (polishRes.inputTokens || 0),
+      output_tokens: (draftRes.outputTokens || 0) + (polishRes.outputTokens || 0),
+      cost_usd:     totalCost,
+      image_cost:   imgCost,
+      model:        'gpt-image-2',
+      api_provider: 'openai',
+    });
 
     res.end(JSON.stringify({
       ok: true,
-      image_b64:      imgRes.b64,
-      images:         imgRes.images,
-      prompt_used:    draftPrompt,
-      polished_prompt: finalPrompt,
+      image_b64:       imgRes.b64,
+      images:          imgRes.images,
+      prompt_used:     draftRes.prompt,
+      polished_prompt: polishRes.prompt,
       model: 'gpt-image-2',
+      cost: { haiku: haikuCost, gpt52: gpt52Cost, image: imgCost, total: totalCost },
     }));
   } catch(e) {
     return err(res, 'Erro ao gerar imagem: ' + e.message);

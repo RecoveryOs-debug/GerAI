@@ -811,10 +811,13 @@ html, body{
             <div class="card-body" id="system-info">
               <div class="stat-row"><span class="stat-lbl">Versão do servidor</span><span class="stat-val">v13.0.0</span></div>
               <div class="stat-row"><span class="stat-lbl">Banco de dados</span><span class="stat-val badge bdg-ok">SQLite</span></div>
-              <div class="stat-row"><span class="stat-lbl">Motor de IA</span><span class="stat-val">claude-sonnet-4-6</span></div>
-              <div class="stat-row"><span class="stat-lbl">Taxa USD/BRL</span><span class="stat-val">5.20×</span></div>
-              <div class="stat-row"><span class="stat-lbl">Custo input/M tokens</span><span class="stat-val mono">$3.00</span></div>
-              <div class="stat-row"><span class="stat-lbl">Custo output/M tokens</span><span class="stat-val mono">$15.00</span></div>
+              <div class="stat-row"><span class="stat-lbl">Motor de IA</span><span class="stat-val">GPT-5.2 + Haiku + GPT-image-2</span></div>
+              <div class="stat-row"><span class="stat-lbl">Taxa USD/BRL</span><span class="stat-val" id="cfg-usd-brl">—</span></div>
+              <div class="stat-row"><span class="stat-lbl">Haiku input/MTok</span><span class="stat-val mono">$0.80</span></div>
+              <div class="stat-row"><span class="stat-lbl">Haiku output/MTok</span><span class="stat-val mono">$4.00</span></div>
+              <div class="stat-row"><span class="stat-lbl">GPT-5.2 input/MTok</span><span class="stat-val mono">$1.75</span></div>
+              <div class="stat-row"><span class="stat-lbl">GPT-5.2 output/MTok</span><span class="stat-val mono">$14.00</span></div>
+              <div class="stat-row"><span class="stat-lbl">GPT-image-2 (1024² high)</span><span class="stat-val mono">$0.040/img</span></div>
             </div>
           </div>
         </div>
@@ -961,6 +964,8 @@ function _renderFxBadge() {
     '<span style="font-size:14px;font-weight:700;font-family:monospace;color:var(--tx0)">R$ ' + USD_BRL.toFixed(4) + '</span>' +
     '<span style="font-size:10px;color:' + clr + ';font-weight:600;margin-left:4px">' + arrow + ' ' + Math.abs(pct).toFixed(2) + '%</span>' +
     '<span style="font-size:9px;color:var(--tx3);margin-left:5px">' + (_fxData.source||'') + '</span>';
+  const cfgEl = document.getElementById('cfg-usd-brl');
+  if (cfgEl) cfgEl.textContent = 'R$ ' + USD_BRL.toFixed(4) + ' (' + (_fxData.source||'estimativa') + ')';
 }
 let _allGens = [];
 let _currentGensFilter = '';
@@ -1192,7 +1197,10 @@ async function loadCosts() {
     await fetchExchangeRate().catch(()=>{});
     try { const d = await aApi('GET', '/api/admin/stats'); s = d.stats || {}; } catch { s = {}; }
 
-    const costUsd    = s.total_cost_usd || 0;
+    const costUsd       = s.total_cost_usd    || 0;
+    const anthropicCost = s.anthropic_cost_usd || 0;
+    const openaiCost    = s.openai_cost_usd    || 0;
+    const imageCost     = s.image_cost_usd     || 0;
     await fetchExchangeRate().catch(()=>{});
     const costBrl    = costUsd * USD_BRL;
     const totalTok   = s.total_tokens || 0;
@@ -1202,11 +1210,11 @@ async function loadCosts() {
     const topFeat    = Object.entries(byFeature).sort((a,b) => (b[1].cost_usd||0) - (a[1].cost_usd||0))[0];
 
     document.getElementById('kpi-costs').innerHTML =
-      kpi('Custo total USD', fmtUsd(costUsd), 'R$' + costBrl.toFixed(2), svgCost()) +
-      kpi('Custo total BRL', 'R\$' + costBrl.toFixed(2), 'R\$ ' + USD_BRL.toFixed(4) + ' · ' + (_fxData.source||'cotação'), svgMoney()) +
-      kpi('Total tokens', totalTok.toLocaleString('pt-BR'), 'input + output', svgPulse()) +
-      kpi('Custo médio/geração', fmtUsd(avgCostUsd), 'por chamada de IA', svgCost()) +
-      kpi('Feature mais cara', topFeat ? topFeat[0] : '—', topFeat ? fmtUsd(topFeat[1].cost_usd||0) : '—', svgMoney());
+      kpi('Custo total', fmtUsd(costUsd), 'R$' + costBrl.toFixed(2) + ' · ' + USD_BRL + '×', svgCost()) +
+      kpi('Anthropic (Haiku)', fmtUsd(anthropicCost), fmtBrlShort(anthropicCost) + ' — texto/agentes', svgPulse(), 'var(--blue)') +
+      kpi('OpenAI (GPT-5.2)', fmtUsd(openaiCost - imageCost), fmtBrlShort(openaiCost - imageCost) + ' — chat/brainstorm', svgPulse()) +
+      kpi('OpenAI (GPT-image-2)', fmtUsd(imageCost), fmtBrlShort(imageCost) + ' — imagens geradas', svgCost(), 'var(--or)') +
+      kpi('Custo médio/geração', fmtUsd(avgCostUsd), totalGens + ' gerações totais', svgMoney());
 
     // Chart feature costs
     const feats = Object.entries(byFeature).sort((a,b) => (b[1].cost_usd||0) - (a[1].cost_usd||0)).slice(0,8);
