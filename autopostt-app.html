@@ -5836,6 +5836,230 @@ body.image-agent-refining #image-agent-refine-overlay{
       .fb-btn.neg.on { background: rgba(255,68,68,.1); border-color: rgba(255,68,68,.2); color: #FF4444; }
 </style>
 
+<style id="saas-pro-patch">
+/* ══════════════════════════════════════════════════════
+   SAAS PRO PATCH — HubSpot/Linear quality redesign
+   Injected last so every rule wins via cascade.
+   ══════════════════════════════════════════════════════ */
+
+/* ── GLOBAL TRANSITIONS ── */
+.ni,.btn,.kpi,.card,.fmt,.v2-var-count,.sc-btn,.qa,.act-row,.hist-card { transition-duration:.2s!important; transition-timing-function:cubic-bezier(0.4,0,0.2,1)!important; }
+
+/* ── SIDEBAR — glass + amber left-line active state ── */
+.sb {
+  background: rgba(13,13,15,.92) !important;
+  backdrop-filter: blur(14px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(160%) !important;
+  border-right: 1px solid rgba(255,255,255,.065) !important;
+}
+
+/* Active nav item: subtle amber tint + left border only */
+.ni { position: relative !important; }
+.ni.on {
+  background: rgba(245,197,24,.06) !important;
+  color: var(--amber) !important;
+  font-weight: 600 !important;
+}
+.ni.on::after {
+  content: '' !important;
+  position: absolute !important;
+  left: 0 !important; top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 3px !important; height: 22px !important;
+  background: var(--amber) !important;
+  border-radius: 0 3px 3px 0 !important;
+  box-shadow: 0 0 8px rgba(245,197,24,.35) !important;
+}
+.ni:hover { background: rgba(255,255,255,.05) !important; }
+
+/* ── TOPBAR — glass ── */
+.tb {
+  background: rgba(17,17,22,.85) !important;
+  backdrop-filter: blur(12px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(150%) !important;
+  border-bottom: 1px solid rgba(255,255,255,.06) !important;
+}
+
+/* ── CARD / SURFACE — Liquid Glass ── */
+.card,
+.hist-card,
+.tip-card,
+.profile-card,
+.sett-nav {
+  background: rgba(255,255,255,.024) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255,255,255,.07) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,.25),0 0 0 0.5px rgba(255,255,255,.04) inset !important;
+}
+.card:hover { border-color: rgba(255,255,255,.12) !important; }
+
+/* ── KPI CARDS — executive hierarchy ── */
+#pg-dashboard .kpi {
+  background: rgba(255,255,255,.025) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255,255,255,.07) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3),0 0 0 0.5px rgba(255,255,255,.04) inset !important;
+  border-radius: 20px !important;
+  padding: 20px 20px 16px !important;
+  min-height: 150px !important;
+}
+#pg-dashboard .kpi:hover {
+  transform: translateY(-2px) !important;
+  border-color: rgba(255,255,255,.14) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,.35),0 0 0 0.5px rgba(255,255,255,.06) inset !important;
+}
+#pg-dashboard .kpi::before {
+  content: '' !important;
+  position: absolute !important;
+  left: 20px !important; right: 20px !important; top: 0 !important;
+  height: 1px !important;
+  background: linear-gradient(90deg,rgba(245,197,24,.38),transparent 65%) !important;
+  transform: none !important;
+}
+#pg-dashboard .kpi-lbl {
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  color: rgba(158,156,148,.8) !important;
+  text-transform: uppercase !important;
+  letter-spacing: .1em !important;
+  margin-bottom: 6px !important;
+  display: block !important;
+}
+#pg-dashboard .kpi-val {
+  font-size: 34px !important;
+  font-weight: 800 !important;
+  letter-spacing: -.04em !important;
+  line-height: 1 !important;
+  margin-bottom: 8px !important;
+}
+#pg-dashboard .kpi-icon {
+  position: absolute !important;
+  top: 16px !important; right: 16px !important;
+  width: 36px !important; height: 36px !important;
+  border-radius: 10px !important;
+  background: rgba(245,197,24,.07) !important;
+  border: 1px solid rgba(245,197,24,.12) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+#pg-dashboard .kpi-icon svg { stroke: var(--amber) !important; }
+
+/* ── SKELETON LOADER ── */
+@keyframes skel-shimmer {
+  0%   { background-position:-200% 0; }
+  100% { background-position:200% 0; }
+}
+.skel {
+  background: linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.10) 50%,rgba(255,255,255,.04) 75%) !important;
+  background-size: 200% 100% !important;
+  animation: skel-shimmer 1.4s ease infinite !important;
+  border-radius: 8px !important;
+  border: none !important;
+}
+
+/* ── DASHBOARD ACTIVITY ── */
+#pg-dashboard .g-dash > .card { border-radius: 20px !important; }
+#pg-dashboard .act-row {
+  border-bottom: 1px solid rgba(255,255,255,.05) !important;
+  border-radius: 10px !important;
+}
+#pg-dashboard .act-row:hover { background: rgba(255,255,255,.03) !important; }
+
+/* ── IMAGE CONFIG SELECTS ── */
+.img-config-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.img-config-select {
+  flex: 1;
+  min-width: 140px;
+  padding: 8px 28px 8px 12px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 8px;
+  color: var(--tx-0);
+  font-family: var(--f-body);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239E9C94' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  transition: border-color .2s, background .2s;
+}
+.img-config-select:focus,
+.img-config-select:hover { border-color: rgba(245,197,24,.35); background-color: rgba(245,197,24,.03); }
+.img-config-select option { background: #1E1E26; color: var(--tx-0); }
+.img-config-select.has-value { border-color: rgba(245,197,24,.28); color: var(--amber); }
+
+/* ── FORMAT BUTTONS refinement ── */
+.fmt.v2-fmt {
+  padding: 7px 14px !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  background: rgba(255,255,255,.02) !important;
+  color: var(--tx-1) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+}
+.fmt.v2-fmt:hover {
+  border-color: rgba(245,197,24,.3) !important;
+  background: rgba(245,197,24,.04) !important;
+  color: var(--tx-0) !important;
+}
+.fmt.v2-fmt.on {
+  background: rgba(245,197,24,.1) !important;
+  border-color: rgba(245,197,24,.38) !important;
+  color: var(--amber) !important;
+  box-shadow: 0 0 0 1px rgba(245,197,24,.07) inset !important;
+}
+
+/* ── BRAINSTORM WRAP ── */
+.bs-wrap {
+  border-radius: 14px !important;
+  border: 1px solid rgba(255,255,255,.07) !important;
+  background: rgba(255,255,255,.018) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+}
+.bs-wrap:focus-within {
+  border-color: rgba(245,197,24,.32) !important;
+  box-shadow: 0 0 0 3px rgba(245,197,24,.06) !important;
+}
+
+/* ── LIGHT MODE OVERRIDES ── */
+[data-theme="light"] .sb {
+  background: rgba(255,255,255,.92) !important;
+  border-right: 1px solid rgba(0,0,0,.08) !important;
+}
+[data-theme="light"] .tb {
+  background: rgba(255,255,255,.88) !important;
+  border-bottom: 1px solid rgba(0,0,0,.07) !important;
+}
+[data-theme="light"] #pg-dashboard .kpi {
+  background: rgba(255,255,255,.8) !important;
+  border: 1px solid rgba(0,0,0,.08) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,.07) !important;
+}
+[data-theme="light"] .img-config-select {
+  background-color: rgba(0,0,0,.03) !important;
+  border-color: rgba(0,0,0,.1) !important;
+  color: #0A0A08 !important;
+}
+[data-theme="light"] .img-config-select option { background:#fff; color:#0A0A08; }
+[data-theme="light"] .ni.on { background: rgba(245,197,24,.1) !important; }
+</style>
+
 </head>
 <body>
 
@@ -6351,6 +6575,26 @@ body.image-agent-refining #image-agent-refine-overlay{
         <button class="fmt v2-fmt"    id="f-story"    onclick="selFmt('story')">Story</button>
         <button class="fmt v2-fmt"    id="f-anuncio"  onclick="selFmt('anuncio')">Anúncio</button>
         <button class="fmt v2-fmt"    id="f-banner"   onclick="selFmt('banner')">Banner</button>
+      </div>
+
+      <!-- ══ Image config: post type + platform ══ -->
+      <div class="img-config-row" id="img-config-row">
+        <select class="img-config-select" id="sel-post-type" onchange="updateImageConfig('postType',this.value)">
+          <option value="">Tipo de post…</option>
+          <option value="single">Post único</option>
+          <option value="carousel">Carrossel</option>
+          <option value="story">Story</option>
+          <option value="ad">Anúncio</option>
+          <option value="banner">Banner</option>
+        </select>
+        <select class="img-config-select" id="sel-platform" onchange="updateImageConfig('platform',this.value)">
+          <option value="">Rede social…</option>
+          <option value="instagram">Instagram</option>
+          <option value="facebook">Facebook</option>
+          <option value="linkedin">LinkedIn</option>
+          <option value="tiktok">TikTok</option>
+          <option value="google">Google Ads</option>
+        </select>
       </div>
 
       <!-- Variation count selector (hidden when carrossel) -->
@@ -8888,6 +9132,16 @@ let _uploadedRefImages = []; // { b64, type, name }
 const _varCreditMap = { 1: 2, 2: 4, 3: 5, 4: 7 };
 const _netMap2 = { ig:'Instagram', li:'LinkedIn', yt:'YouTube', tt:'TikTok', fb:'Facebook' };
 
+// Image generation config state
+const _imageGenConfig = { postType: null, platform: null };
+
+function updateImageConfig(key, value) {
+  _imageGenConfig[key] = value || null;
+  const elId = key === 'postType' ? 'sel-post-type' : 'sel-platform';
+  const el = document.getElementById(elId);
+  if (el) { value ? el.classList.add('has-value') : el.classList.remove('has-value'); }
+}
+
 function selStyle(s) {
   _selectedStyle = s;
   document.querySelectorAll('.v2-style').forEach(function(b){ b.classList.remove('on'); });
@@ -9090,7 +9344,10 @@ async function gerarV2() {
       }
 
       showV2('gen-v2-result');
-      toast(_currentImagesB64.length > 1 ? _currentImagesB64.length + ' variações geradas!' : 'Imagem gerada!', 'ok');
+      const _cfgParts = [];
+      if (_imageGenConfig.postType) _cfgParts.push({single:'Post único',carousel:'Carrossel',story:'Story',ad:'Anúncio',banner:'Banner'}[_imageGenConfig.postType]||_imageGenConfig.postType);
+      if (_imageGenConfig.platform) _cfgParts.push({instagram:'Instagram',facebook:'Facebook',linkedin:'LinkedIn',tiktok:'TikTok',google:'Google Ads'}[_imageGenConfig.platform]||_imageGenConfig.platform);
+      toast((_currentImagesB64.length > 1 ? _currentImagesB64.length + ' variações geradas' : 'Imagem gerada') + (_cfgParts.length ? ' · ' + _cfgParts.join(' / ') : '') + '!', 'ok');
       const credits = _varCreditMap[_variationCount] || 2;
       if (me) { me.quota_used = (me.quota_used||0) + credits; updateQuota(); }
     }
