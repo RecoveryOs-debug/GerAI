@@ -919,7 +919,7 @@ tr:hover .td-actions { opacity: 1; }
 #pg-generate .bs-wrap {
   min-height: 260px;
 }
-#bs-image-msgs{min-height:92px;max-height:160px;}
+#bs-image-msgs{min-height:76px;max-height:128px;}
 #pg-generate .bs-msgs {
   min-height: 140px;
 }
@@ -6628,7 +6628,11 @@ body.image-agent-refining #image-agent-refine-overlay{
   color: rgba(255,255,255,.3);
   white-space: nowrap;
   transition: color .2s;
+  display:flex;
+  align-items:baseline;
+  gap:4px;
 }
+.ia-step-sub{font-size:10px;font-weight:600;color:rgba(255,255,255,.22);}
 .ia-step-line {
   flex: 1;
   height: 2px;
@@ -6653,6 +6657,7 @@ body.image-agent-refining #image-agent-refine-overlay{
 }
 .ia-step.active .ia-step-lbl { color: var(--t0,#fff); font-weight: 700; }
 
+@media (max-width: 1100px){ .ia-custom-list{grid-template-columns:repeat(2,minmax(0,1fr));} }
 /* Two-column layout */
 .ia-layout {
   display: grid;
@@ -6704,21 +6709,26 @@ body.image-agent-refining #image-agent-refine-overlay{
   color:var(--t0);
 }
 
-.ia-custom-list { display: flex; flex-direction: column; gap: 8px; }
+.ia-custom-list { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
 .ia-custom-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 12.5px;
-  color: var(--t1,rgba(255,255,255,.75));
-  padding: 8px 10px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-size: 11px;
+  color: var(--t2,rgba(255,255,255,.55));
+  padding: 10px 12px;
   background: rgba(255,255,255,.025);
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid rgba(255,255,255,.05);
+  text-transform:uppercase;
+  letter-spacing:.08em;
 }
 .ia-custom-val {
   font-size: 12px;
-  color: var(--t3,rgba(255,255,255,.35));
+  color: var(--t0,#fff);
+  text-transform:none;
+  letter-spacing:0;
+  font-weight:600;
 }
 
 .ia-nav {
@@ -7461,22 +7471,22 @@ body.image-agent-refining #image-agent-refine-overlay{
         <div class="ia-steps" id="ia-steps">
           <div class="ia-step" id="ia-step-1">
             <div class="ia-step-circle">1</div>
-            <div class="ia-step-lbl">Configuração</div>
+            <div class="ia-step-lbl">Configuração <span class="ia-step-sub">(formato do post)</span></div>
           </div>
           <div class="ia-step-line" id="ia-line-1"></div>
           <div class="ia-step" id="ia-step-2">
             <div class="ia-step-circle">2</div>
-            <div class="ia-step-lbl">Estratégia</div>
+            <div class="ia-step-lbl">Estratégia <span class="ia-step-sub">(conversar com o agente)</span></div>
           </div>
           <div class="ia-step-line" id="ia-line-2"></div>
           <div class="ia-step" id="ia-step-3">
             <div class="ia-step-circle">3</div>
-            <div class="ia-step-lbl">Refinamento</div>
+            <div class="ia-step-lbl">Refinamento <span class="ia-step-sub">(após clicar em gerar)</span></div>
           </div>
           <div class="ia-step-line" id="ia-line-3"></div>
           <div class="ia-step" id="ia-step-4">
             <div class="ia-step-circle">4</div>
-            <div class="ia-step-lbl">Geração</div>
+            <div class="ia-step-lbl">Geração <span class="ia-step-sub">(depois do refinamento)</span></div>
           </div>
         </div>
       </div>
@@ -10174,9 +10184,10 @@ function setIaModelChoice(value){
 
 function syncIaCustomizations(){
   var fmtLbl = {post:'Post único',carrossel:'Carrossel',story:'Story',anuncio:'Anúncio',banner:'Banner',thumb:'Thumbnail'}[_currentFmt||'post'] || 'Post único';
-  var typeLbl = {single:'Post único',carousel:'Carrossel',story:'Story',ad:'Anúncio',banner:'Banner',thumbnail:'Thumbnail'}[_imageGenConfig.postType] || fmtLbl;
+  var selectedType = _imageGenConfig.postType || _fmtToPostType[_currentFmt||'post'] || 'single';
+  var typeLbl = {single:'Post único',carousel:'Carrossel',story:'Story',ad:'Anúncio',banner:'Banner',thumbnail:'Thumbnail'}[selectedType] || fmtLbl;
   var platformLbl = {instagram:'Instagram',facebook:'Facebook',linkedin:'LinkedIn',tiktok:'TikTok',google:'Google Ads',youtube:'YouTube'}[_imageGenConfig.platform] || '—';
-  var formatSize = {single:'1080x1080',carousel:'1080x1080',story:'1080x1920',ad:'1080x1080',banner:'1584x396',thumbnail:'1280x720'}[_imageGenConfig.postType] || 'Padrão';
+  var formatSize = {single:'1080x1080',carousel:'1080x1080',story:'1080x1920',ad:'1080x1080',banner:'1584x396',thumbnail:'1280x720'}[selectedType] || 'Padrão';
   var f = document.getElementById('ia-cv-format'); if (f) f.textContent = formatSize;
   var p = document.getElementById('ia-cv-platform'); if (p) p.textContent = platformLbl;
   var v = document.getElementById('ia-cv-vars'); if (v) v.textContent = String(_variationCount || 1);
