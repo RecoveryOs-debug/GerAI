@@ -6211,6 +6211,617 @@ body.image-agent-refining #image-agent-refine-overlay{
 .v2-result-actions .btn:hover { transform: translateY(-1px) !important; }
 </style>
 
+<style id="dash-redesign">
+/* ═══════════════════════════════════════════
+   SIDEBAR — FILLED ORANGE ACTIVE + PLAN SECTION
+═══════════════════════════════════════════ */
+.ni.on {
+  background: #E8541A !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  border-radius: 10px !important;
+}
+.ni.on .ni-ico svg { color: #fff !important; }
+.ni.on::after { display: none !important; }
+.ni:not(.on):hover { background: rgba(255,255,255,.05) !important; }
+
+.sb-plan {
+  margin-top: auto;
+  padding: 14px 12px 12px;
+  border-top: 1px solid rgba(255,255,255,.06);
+}
+.sb-plan-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: rgba(255,255,255,.4);
+  margin-bottom: 6px;
+}
+.sb-plan-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 2px;
+}
+.sb-plan-credits {
+  font-size: 11.5px;
+  color: rgba(255,255,255,.55);
+  margin-bottom: 8px;
+}
+.sb-plan-bar-track {
+  height: 4px;
+  background: rgba(255,255,255,.1);
+  border-radius: 999px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.sb-plan-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg,#E8541A,#f07a40);
+  border-radius: 999px;
+  transition: width .6s;
+}
+.sb-plan-btn {
+  width: 100%;
+  padding: 8px 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #E8541A;
+  background: rgba(232,84,26,.1);
+  border: 1px solid rgba(232,84,26,.3);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: var(--f,inherit);
+  transition: background .15s;
+}
+.sb-plan-btn:hover { background: rgba(232,84,26,.18) !important; }
+.sb-user-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 12px 12px;
+  border-top: 1px solid rgba(255,255,255,.06);
+}
+.sb-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg,#E8541A,#f07a40);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+.sb-user-name { font-size: 12.5px; font-weight: 700; color: var(--t0,#fff); }
+.sb-user-plan { font-size: 10.5px; color: var(--t3,rgba(255,255,255,.35)); }
+
+/* ═══════════════════════════════════════════
+   DASHBOARD REDESIGN
+═══════════════════════════════════════════ */
+.dash-hdr {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+.dash-hdr-left {}
+.dash-hdr-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--t0,#fff);
+  letter-spacing: -.04em;
+  line-height: 1.15;
+}
+.dash-hdr-sub {
+  font-size: 13px;
+  color: var(--t3,rgba(255,255,255,.4));
+  margin-top: 3px;
+}
+.dash-hdr-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.dash-date-range {
+  font-size: 12px;
+  color: var(--t2,rgba(255,255,255,.55));
+  padding: 6px 12px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.dash-export-btn {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--t0,#fff);
+  padding: 7px 14px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: var(--f,inherit);
+  transition: background .15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dash-export-btn:hover { background: rgba(255,255,255,.1) !important; }
+
+.dash-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.dash-kpi {
+  background: var(--ink-2,#111);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 14px;
+  padding: 18px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.dash-kpi-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.dash-kpi-lbl {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--t2,rgba(255,255,255,.55));
+}
+.dash-kpi-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.dash-kpi-icon.orange { background: rgba(232,84,26,.15); }
+.dash-kpi-icon.orange svg { color: #E8541A; }
+.dash-kpi-icon.purple { background: rgba(139,92,246,.15); }
+.dash-kpi-icon.purple svg { color: #8B5CF6; }
+.dash-kpi-icon.green  { background: rgba(34,197,94,.15); }
+.dash-kpi-icon.green  svg { color: #22C55E; }
+.dash-kpi-icon.blue   { background: rgba(59,130,246,.15); }
+.dash-kpi-icon.blue   svg { color: #3B82F6; }
+.dash-kpi-val {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -.05em;
+  color: var(--t0,#fff);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.dash-kpi-delta {
+  font-size: 11px;
+  color: var(--t3,rgba(255,255,255,.35));
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.dash-kpi-delta.pos { color: #22C55E; }
+.dash-kpi-delta.neg { color: #EF4444; }
+
+.dash-charts-row {
+  display: grid;
+  grid-template-columns: 1fr minmax(220px,.45fr);
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.dash-card {
+  background: var(--ink-2,#111);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 14px;
+  padding: 18px 18px 14px;
+}
+.dash-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--t0,#fff);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.dash-card-sub { font-size: 11px; color: var(--t3,rgba(255,255,255,.35)); font-weight: 400; }
+.dash-line-svg { width: 100%; height: 120px; }
+.dash-donut-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.dash-donut-svg { width: 120px; height: 120px; }
+.dash-donut-legend { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+.dash-donut-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--t2,rgba(255,255,255,.55));
+}
+.dash-donut-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+.dash-bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+}
+.dash-bar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.dash-bar-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: var(--t2,rgba(255,255,255,.55));
+  margin-bottom: 2px;
+}
+.dash-bar-track {
+  height: 5px;
+  background: rgba(255,255,255,.07);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.dash-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: #E8541A;
+}
+.dash-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+  font-size: 12px;
+  color: var(--t1,rgba(255,255,255,.75));
+}
+.dash-list-item:last-child { border-bottom: none; }
+.dash-list-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(232,84,26,.12);
+  color: #E8541A;
+}
+.dash-insight {
+  padding: 10px 12px;
+  background: rgba(255,255,255,.025);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 10px;
+  font-size: 12px;
+  color: var(--t2,rgba(255,255,255,.55));
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+.dash-insight-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #E8541A;
+  display: inline-block;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+@media(max-width:1180px){
+  .dash-kpi-row { grid-template-columns: repeat(2,1fr) !important; }
+  .dash-charts-row,.dash-bottom-row { grid-template-columns: 1fr !important; }
+}
+
+/* ═══════════════════════════════════════════
+   IMAGE AGENT — 5-STEP WIZARD
+═══════════════════════════════════════════ */
+.ia-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.ia-hdr-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ia-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--t0,#fff);
+  letter-spacing: -.03em;
+}
+.ia-beta {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #E8541A;
+  background: rgba(232,84,26,.12);
+  border: 1px solid rgba(232,84,26,.25);
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+.ia-credits-pill {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--t2,rgba(255,255,255,.55));
+  padding: 5px 11px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.ia-hist-btn {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--t1,rgba(255,255,255,.75));
+  padding: 6px 13px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: var(--f,inherit);
+  transition: background .15s;
+}
+.ia-hist-btn:hover { background: rgba(255,255,255,.08) !important; }
+
+/* Steps */
+.ia-steps-wrap {
+  background: var(--ink-2,#111);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow-x: auto;
+}
+.ia-steps {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 0;
+}
+.ia-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+.ia-step-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: rgba(255,255,255,.3);
+  flex-shrink: 0;
+  background: transparent;
+  transition: all .2s;
+}
+.ia-step-lbl {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: rgba(255,255,255,.3);
+  white-space: nowrap;
+  transition: color .2s;
+}
+.ia-step-line {
+  flex: 1;
+  height: 2px;
+  background: rgba(255,255,255,.08);
+  margin: 0 6px;
+  border-radius: 999px;
+  transition: background .3s;
+  min-width: 16px;
+}
+.ia-step.done .ia-step-circle {
+  background: rgba(232,84,26,.2);
+  border-color: #E8541A;
+  color: #E8541A;
+}
+.ia-step.done .ia-step-lbl { color: rgba(255,255,255,.6); }
+.ia-step.done + .ia-step-line { background: #E8541A; }
+.ia-step.active .ia-step-circle {
+  background: #E8541A;
+  border-color: #E8541A;
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(232,84,26,.2);
+}
+.ia-step.active .ia-step-lbl { color: var(--t0,#fff); font-weight: 700; }
+
+/* Two-column layout */
+.ia-layout {
+  display: grid;
+  grid-template-columns: 1fr minmax(0,.9fr);
+  gap: 14px;
+  align-items: start;
+}
+.ia-left { display: flex; flex-direction: column; gap: 10px; }
+.ia-right { display: flex; flex-direction: column; gap: 10px; }
+
+.ia-panel {
+  background: var(--ink-2,#111);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 14px;
+  padding: 16px;
+}
+.ia-panel-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--t2,rgba(255,255,255,.55));
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-bottom: 12px;
+}
+
+.ia-custom-list { display: flex; flex-direction: column; gap: 8px; }
+.ia-custom-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: var(--t1,rgba(255,255,255,.75));
+  padding: 8px 10px;
+  background: rgba(255,255,255,.025);
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.05);
+}
+.ia-custom-val {
+  font-size: 12px;
+  color: var(--t3,rgba(255,255,255,.35));
+}
+
+.ia-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+.ia-back-btn {
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--t1,rgba(255,255,255,.75));
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: var(--f,inherit);
+  transition: background .15s;
+}
+.ia-back-btn:hover { background: rgba(255,255,255,.09) !important; }
+.ia-gen-btn {
+  flex: 1;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg,#E8541A 0%,#c94410 100%);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: var(--f,inherit);
+  letter-spacing: -.02em;
+  box-shadow: 0 4px 18px rgba(232,84,26,.3);
+  transition: opacity .15s, transform .15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.ia-gen-btn:hover { opacity: .9; transform: translateY(-1px); }
+
+.ia-preview-card {
+  background: var(--ink-2,#111);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 14px;
+  padding: 16px;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ia-preview-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--t2,rgba(255,255,255,.55));
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+.ia-preview-area {
+  flex: 1;
+  min-height: 200px;
+  display: flex;
+  align-items: stretch;
+  flex-direction: column;
+}
+.ia-action-row {
+  display: flex;
+  gap: 8px;
+}
+.ia-action-btn {
+  flex: 1;
+  padding: 8px 0;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 9px;
+  cursor: pointer;
+  font-family: var(--f,inherit);
+  transition: background .15s;
+  border: 1px solid rgba(255,255,255,.08);
+  color: var(--t0,#fff);
+  background: rgba(255,255,255,.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.ia-action-btn:hover { background: rgba(255,255,255,.09) !important; }
+.ia-action-btn.primary {
+  background: rgba(232,84,26,.12);
+  border-color: rgba(232,84,26,.25);
+  color: #E8541A;
+}
+.ia-action-btn.primary:hover { background: rgba(232,84,26,.2) !important; }
+
+.ia-tips-card {
+  background: rgba(232,84,26,.04);
+  border: 1px solid rgba(232,84,26,.14);
+  border-radius: 12px;
+  padding: 14px 15px;
+}
+.ia-tips-title {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: #E8541A;
+  margin-bottom: 8px;
+}
+.ia-tip-item {
+  font-size: 11.5px;
+  color: var(--t2,rgba(255,255,255,.55));
+  line-height: 1.5;
+  margin-bottom: 5px;
+  padding-left: 12px;
+  position: relative;
+}
+.ia-tip-item::before {
+  content: '·';
+  position: absolute;
+  left: 2px;
+  color: #E8541A;
+  font-weight: 800;
+}
+
+@media(max-width:1100px){
+  .ia-layout { grid-template-columns: 1fr !important; }
+}
+</style>
+
 </head>
 <body>
 
@@ -6590,55 +7201,44 @@ body.image-agent-refining #image-agent-refine-overlay{
       </div>
     </div>
     <div class="sb-sect">
-      <div class="sb-lbl">Principal</div>
       <div class="ni on" onclick="nav('dashboard',this)">
         <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span>
         Dashboard
       </div>
-
-      <div class="ni" onclick="nav('history',this)">
-        <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
-        Histórico
-      </div>
-      <div class="ni" onclick="nav('saved-designs',this)" id="ni-saved-designs">
-        <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>
-        Designs Salvos
-      </div>
-    </div>
-    <div class="sb-sect" style="margin-top:4px">
-      <div class="sb-lbl">Agentes de Conteúdo</div>
       <div class="ni" onclick="nav('generate',this)">
         <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
         Agente de Imagem
       </div>
       <div class="ni" onclick="nav('agent-legenda',this)">
         <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
-        Legenda
+        Gerar Conteúdo
       </div>
-      <div class="ni" onclick="nav('agent-roteiro-yt',this)">
-        <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg></span>
-        Roteiro YouTube
+      <div class="ni" onclick="nav('saved-designs',this)" id="ni-saved-designs">
+        <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+        Templates
       </div>
-      <div class="ni" onclick="nav('agent-roteiro-reels',this)">
-        <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg></span>
-        Roteiro Reels
+      <div class="ni" onclick="navComingSoon('Calendário')">
+        <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+        Calendário
       </div>
-      <div class="ni" onclick="nav('agent-story',this)">
-        <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg></span>
-        Ideias Story
+      <div class="ni" onclick="navComingSoon('Mídia')">
+        <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
+        Mídia
       </div>
-      <div class="ni" onclick="nav('agent-linkedin',this)">
-        <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></span>
-        Post LinkedIn
+      <div class="ni" onclick="navComingSoon('Análises')">
+        <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+        Análises
       </div>
-      <div class="ni" onclick="nav('agent-tiktok',this)">
-        <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg></span>
-        Roteiro TikTok
+      <div class="ni" onclick="navComingSoon('Equipe')">
+        <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+        Equipe
       </div>
-
     </div>
-    <div class="sb-sect" style="margin-top:4px">
-      <div class="sb-lbl">Conta</div>
+    <div class="sb-sect" style="margin-top:4px;border-top:1px solid rgba(255,255,255,.06);padding-top:8px">
+      <div class="ni" onclick="nav('history',this)">
+        <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+        Histórico
+      </div>
       <div class="ni" onclick="nav('profile',this)">
         <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></span>
         Perfil de Marca
@@ -6649,15 +7249,23 @@ body.image-agent-refining #image-agent-refine-overlay{
       </div>
     </div>
 
-    <div class="sb-bot">
-      <div class="sb-user" onclick="navP('settings')">
-        <div class="sb-av" id="sb-av">—</div>
-        <div><div class="sb-uname" id="sb-uname">—</div><div class="sb-uplan" id="sb-uplan">—</div></div>
+    <!-- Plan section -->
+    <div class="sb-plan">
+      <div class="sb-plan-label">Seu Plano</div>
+      <div class="sb-plan-name" id="sb-plan-name">Profissional</div>
+      <div class="sb-plan-credits"><span id="sb-plan-credits">—</span> créditos</div>
+      <div class="sb-plan-bar-track">
+        <div class="sb-plan-bar-fill" id="sb-plan-bar" style="width:50%"></div>
       </div>
-      <button class="btn btn-g btn-full btn-sm" style="margin-top:6px" onclick="doLogout()">
-        <svg class="ico" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Sair
-      </button>
+      <button class="sb-plan-btn" onclick="navP('settings')">Gerenciar plano</button>
+    </div>
+    <!-- User row -->
+    <div class="sb-user-row" onclick="navP('settings')" style="cursor:pointer">
+      <div class="sb-avatar" id="sb-av">P</div>
+      <div>
+        <div class="sb-user-name" id="sb-uname">—</div>
+        <div class="sb-user-plan" id="sb-uplan">—</div>
+      </div>
     </div>
   </nav>
 
@@ -6678,134 +7286,292 @@ body.image-agent-refining #image-agent-refine-overlay{
 
     <!-- dashboard -->
     <div class="pg on" id="pg-dashboard">
-      <div class="pg-hd"><div class="pg-title">Bom dia, Pedro</div></div>
-      <div class="kpi-row"><div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:16px 0;color:var(--t3)"><div style="width:14px;height:14px;border:2px solid var(--b2);border-top-color:var(--a);border-radius:50%;animation:spin .7s linear infinite"></div> Carregando...</div></div>
-      <div class="g-dash">
-        <div class="card p-20">
-          <div class="t-sm fw-7" style="margin-bottom:14px">Atividade recente</div>
-          <div class="act-row"><div class="act-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg></div><div class="act-body"><div class="act-name">Post — Processo vs Vendedor</div><div class="act-meta"><span class="badge bdg-a">Instagram</span></div></div><div class="act-time">2h</div></div>
-          <div class="act-row"><div class="act-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><div class="act-body"><div class="act-name">Carrossel — 5 erros de gestão</div><div class="act-meta"><span class="badge bdg-b">LinkedIn</span></div></div><div class="act-time">1d</div></div>
-          <div class="act-row"><div class="act-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><div class="act-body"><div class="act-name">Anúncio — Mentoria Premium</div><div class="act-meta"><span class="badge bdg-g">Meta Ads</span></div></div><div class="act-time">3d</div></div>
-          <div class="act-row"><div class="act-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg></div><div class="act-body"><div class="act-name">Thumbnail — Fechar em 1 call</div><div class="act-meta"><span class="badge bdg-n">YouTube</span></div></div><div class="act-time">5d</div></div>
+      <!-- Header -->
+      <div class="dash-hdr">
+        <div class="dash-hdr-left">
+          <div class="dash-hdr-title" id="dash-greeting">Visão Geral</div>
+          <div class="dash-hdr-sub">Painel de desempenho do conteúdo</div>
         </div>
-        <div>
-          <div class="card p-20" style="margin-bottom:10px">
-            <div class="t-sm fw-7" style="margin-bottom:12px">Ações rápidas</div>
-            <div class="qa-grid">
-              <div class="qa" onclick="navP('generate');selFmt('post')"><div class="qa-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg></div><div class="qa-lbl">Novo post</div></div>
-              <div class="qa" onclick="navP('generate');selFmt('carrossel')"><div class="qa-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><div class="qa-lbl">Carrossel</div></div>
-              <div class="qa" onclick="navP('generate');selFmt('anuncio')"><div class="qa-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><div class="qa-lbl">Anúncio</div></div>
-              <div class="qa" onclick="navP('generate')"><div class="qa-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg></div><div class="qa-lbl">Por voz</div></div>
-              <div class="qa" onclick="navP('history')"><div class="qa-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg></div><div class="qa-lbl">Reusar</div></div>
-              <div class="qa" onclick="navP('profile')"><div class="qa-ico"><svg class="ico ico-sm" style="color:var(--t2)" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4"/></svg></div><div class="qa-lbl">Editar marca</div></div>
+        <div class="dash-hdr-actions">
+          <div class="dash-date-range" id="dash-date-range">Últimos 30 dias ▾</div>
+          <button class="dash-export-btn" onclick="navP('history')">
+            <svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Exportar
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="dash-kpi-row" id="dash-kpi-row">
+        <div class="dash-kpi">
+          <div class="dash-kpi-top">
+            <span class="dash-kpi-lbl">Total gerado</span>
+            <div class="dash-kpi-icon orange"><svg style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+          </div>
+          <div class="dash-kpi-val" id="kpi-total">—</div>
+          <div class="dash-kpi-delta" id="kpi-total-delta">Carregando...</div>
+        </div>
+        <div class="dash-kpi">
+          <div class="dash-kpi-top">
+            <span class="dash-kpi-lbl">Últimos 7 dias</span>
+            <div class="dash-kpi-icon purple"><svg style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+          </div>
+          <div class="dash-kpi-val" id="kpi-week">—</div>
+          <div class="dash-kpi-delta" id="kpi-week-delta">Carregando...</div>
+        </div>
+        <div class="dash-kpi">
+          <div class="dash-kpi-top">
+            <span class="dash-kpi-lbl">Agendados</span>
+            <div class="dash-kpi-icon green"><svg style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          </div>
+          <div class="dash-kpi-val" id="kpi-sched">—</div>
+          <div class="dash-kpi-delta" id="kpi-sched-delta">Carregando...</div>
+        </div>
+        <div class="dash-kpi">
+          <div class="dash-kpi-top">
+            <span class="dash-kpi-lbl">Última geração</span>
+            <div class="dash-kpi-icon blue"><svg style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          </div>
+          <div class="dash-kpi-val" id="kpi-last" style="font-size:20px;padding-top:6px">—</div>
+          <div class="dash-kpi-delta" id="kpi-last-delta">Carregando...</div>
+        </div>
+      </div>
+
+      <!-- Charts row -->
+      <div class="dash-charts-row">
+        <div class="dash-card">
+          <div class="dash-card-title">
+            Gerações ao longo do tempo
+            <span class="dash-card-sub">últimos 7 dias</span>
+          </div>
+          <svg class="dash-line-svg" id="dash-line-svg" viewBox="0 0 600 100" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#E8541A" stop-opacity=".35"/>
+                <stop offset="100%" stop-color="#E8541A" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path id="dash-area-fill" fill="url(#lineGrad)" d=""/>
+            <path id="dash-line-path" fill="none" stroke="#E8541A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d=""/>
+          </svg>
+          <div id="dash-line-labels" style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:6px"></div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-title">Formatos</div>
+          <div class="dash-donut-wrap">
+            <svg class="dash-donut-svg" id="dash-donut-svg" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="44" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="16"/>
+              <circle id="donut-arc-1" cx="60" cy="60" r="44" fill="none" stroke="#E8541A" stroke-width="16" stroke-dasharray="0 276" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+              <circle id="donut-arc-2" cx="60" cy="60" r="44" fill="none" stroke="#8B5CF6" stroke-width="16" stroke-dasharray="0 276" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+              <circle id="donut-arc-3" cx="60" cy="60" r="44" fill="none" stroke="#22C55E" stroke-width="16" stroke-dasharray="0 276" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+            </svg>
+            <div class="dash-donut-legend" id="dash-donut-legend">
+              <div class="dash-donut-item"><div class="dash-donut-dot" style="background:#E8541A"></div>Post único</div>
+              <div class="dash-donut-item"><div class="dash-donut-dot" style="background:#8B5CF6"></div>Carrossel</div>
+              <div class="dash-donut-item"><div class="dash-donut-dot" style="background:#22C55E"></div>Outros</div>
             </div>
           </div>
-          <div class="tip-card" id="tip-card">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
-              <div class="tip-lbl">Dica do dia</div>
-              <button class="btn btn-g btn-sm" style="padding:3px 8px;font-size:10px" onclick="loadDailyTip(true)" title="Nova dica">
-                <svg class="ico ico-sm" style="width:11px;height:11px" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
-              </button>
+        </div>
+      </div>
+
+      <!-- Bottom 3-col -->
+      <div class="dash-bottom-row">
+        <!-- Bar chart: top networks -->
+        <div class="dash-card">
+          <div class="dash-card-title">Redes sociais</div>
+          <div id="dash-bars">
+            <div class="dash-bar-item">
+              <div class="dash-bar-label"><span>Instagram</span><span>—</span></div>
+              <div class="dash-bar-track"><div class="dash-bar-fill" style="width:0%;background:#E8541A"></div></div>
             </div>
-            <div class="tip-txt" id="tip-txt">
-              <span style="color:var(--t3)">Carregando dica...</span>
+            <div class="dash-bar-item">
+              <div class="dash-bar-label"><span>LinkedIn</span><span>—</span></div>
+              <div class="dash-bar-track"><div class="dash-bar-fill" style="width:0%;background:#8B5CF6"></div></div>
+            </div>
+            <div class="dash-bar-item">
+              <div class="dash-bar-label"><span>YouTube</span><span>—</span></div>
+              <div class="dash-bar-track"><div class="dash-bar-fill" style="width:0%;background:#22C55E"></div></div>
+            </div>
+            <div class="dash-bar-item">
+              <div class="dash-bar-label"><span>TikTok</span><span>—</span></div>
+              <div class="dash-bar-track"><div class="dash-bar-fill" style="width:0%;background:#3B82F6"></div></div>
             </div>
           </div>
+        </div>
+        <!-- Content list -->
+        <div class="dash-card">
+          <div class="dash-card-title">Conteúdo recente</div>
+          <div id="dash-content-list">
+            <div class="dash-list-item" style="color:var(--t3)">Carregando...</div>
+          </div>
+        </div>
+        <!-- Insights / tip -->
+        <div class="dash-card">
+          <div class="dash-card-title">Insights</div>
+          <div class="dash-insight"><span class="dash-insight-dot"></span>Acesse o histórico para reutilizar seus melhores conteúdos.</div>
+          <div class="dash-insight"><span class="dash-insight-dot"></span>Poste com consistência: 3x por semana é o mínimo para crescer.</div>
+          <div class="dash-insight" id="dash-tip-insight" style="cursor:pointer" onclick="loadDailyTip(true)"><span class="dash-insight-dot"></span><span id="tip-txt">Carregando dica...</span></div>
+        </div>
+      </div>
+
+      <!-- Hidden compat elements -->
+      <div style="display:none">
+        <div class="kpi-row"></div>
+        <div class="g-dash">
+          <div class="card p-20"></div>
+          <div><div class="card p-20"><div class="qa-grid"></div></div><div class="tip-card" id="tip-card-compat"></div></div>
         </div>
       </div>
     </div>
 
     <!-- generate -->
     <div class="pg" id="pg-generate">
-      <div class="pg-hd"><div class="pg-title">Gerar conteúdo</div><div class="pg-sub">Converse com a IA e gere imagens profissionais com GPT-image-2.</div></div>
-
-      <!-- ══ Format buttons ══ -->
-      <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:10px">
-        <button class="fmt v2-fmt on" id="f-post"     onclick="selFmt('post')">Post único</button>
-        <button class="fmt v2-fmt"    id="f-carrossel" onclick="selFmt('carrossel')">Carrossel</button>
-        <button class="fmt v2-fmt"    id="f-story"    onclick="selFmt('story')">Story</button>
-        <button class="fmt v2-fmt"    id="f-anuncio"  onclick="selFmt('anuncio')">Anúncio</button>
-        <button class="fmt v2-fmt"    id="f-banner"   onclick="selFmt('banner')">Banner</button>
+      <!-- Image Agent Header -->
+      <div class="ia-hdr">
+        <div class="ia-hdr-left">
+          <div class="ia-title">Agente de Imagem</div>
+          <span class="ia-beta">BETA</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="ia-credits-pill">
+            <svg style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span id="ia-credits-display">— créditos</span>
+          </div>
+          <button class="ia-hist-btn" onclick="navP('history')">Histórico</button>
+        </div>
       </div>
 
-      <!-- ══ Image config: post type + platform ══ -->
-      <div class="img-config-row" id="img-config-row">
-        <select class="img-config-select" id="sel-post-type" onchange="updateImageConfig('postType',this.value)">
-          <option value="">Tipo de post…</option>
-          <option value="single">Post único</option>
-          <option value="carousel">Carrossel</option>
-          <option value="story">Story</option>
-          <option value="ad">Anúncio</option>
-          <option value="banner">Banner</option>
-        </select>
-        <select class="img-config-select" id="sel-platform" onchange="updateImageConfig('platform',this.value)">
-          <option value="">Rede social…</option>
-          <option value="instagram">Instagram</option>
-          <option value="facebook">Facebook</option>
-          <option value="linkedin">LinkedIn</option>
-          <option value="tiktok">TikTok</option>
-          <option value="google">Google Ads</option>
-        </select>
+      <!-- 5-Step Wizard -->
+      <div class="ia-steps-wrap">
+        <div class="ia-steps" id="ia-steps">
+          <div class="ia-step done" id="ia-step-1">
+            <div class="ia-step-circle">1</div>
+            <div class="ia-step-lbl">Estratégia</div>
+          </div>
+          <div class="ia-step-line" id="ia-line-1"></div>
+          <div class="ia-step done" id="ia-step-2">
+            <div class="ia-step-circle">2</div>
+            <div class="ia-step-lbl">Refinamento</div>
+          </div>
+          <div class="ia-step-line" id="ia-line-2"></div>
+          <div class="ia-step done" id="ia-step-3">
+            <div class="ia-step-circle">3</div>
+            <div class="ia-step-lbl">Personalização</div>
+          </div>
+          <div class="ia-step-line" id="ia-line-3"></div>
+          <div class="ia-step active" id="ia-step-4">
+            <div class="ia-step-circle">4</div>
+            <div class="ia-step-lbl">Prompt final</div>
+          </div>
+          <div class="ia-step-line" id="ia-line-4"></div>
+          <div class="ia-step" id="ia-step-5">
+            <div class="ia-step-circle">5</div>
+            <div class="ia-step-lbl">Geração</div>
+          </div>
+        </div>
       </div>
 
-      <!-- Variation count selector (hidden when carrossel) -->
-      <div id="v2-var-count-row" style="display:flex;align-items:center;gap:8px;margin-bottom:14px;padding:10px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:8px">
-        <span style="font-size:9.5px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;margin-right:2px;flex-shrink:0">Variações</span>
-        <button class="v2-var-count on" id="vc-1" onclick="selVarCount(1)"><span>1</span><span class="vc-cr">2 cr</span></button>
-        <button class="v2-var-count"    id="vc-2" onclick="selVarCount(2)"><span>2</span><span class="vc-cr">4 cr</span></button>
-        <button class="v2-var-count"    id="vc-3" onclick="selVarCount(3)"><span>3</span><span class="vc-cr">5 cr</span></button>
-        <button class="v2-var-count"    id="vc-4" onclick="selVarCount(4)"><span>4</span><span class="vc-cr">7 cr</span></button>
-      </div>
-
-      <!-- Slide count row (only for carrossel) -->
-      <div id="slide-count-row" style="display:none;align-items:center;gap:8px;margin-bottom:14px;padding:10px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:8px">
-        <span style="font-size:9.5px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;flex-shrink:0">Slides</span>
-        <button class="sc-btn on" data-n="3" data-cr="5" onclick="selSlides(this,3)">3 <span style="font-size:9px;opacity:.6">5cr</span></button>
-        <button class="sc-btn"    data-n="4" data-cr="7" onclick="selSlides(this,4)">4 <span style="font-size:9px;opacity:.6">7cr</span></button>
-        <button class="sc-btn"    data-n="5" data-cr="9" onclick="selSlides(this,5)">5 <span style="font-size:9px;opacity:.6">9cr</span></button>
-        <button class="sc-btn"    data-n="6" data-cr="11" onclick="selSlides(this,6)">6 <span style="font-size:9px;opacity:.6">11cr</span></button>
-        <button class="sc-btn"    data-n="7" data-cr="12" onclick="selSlides(this,7)">7 <span style="font-size:9px;opacity:.6">12cr</span></button>
-      </div>
-
-      <div class="g-gen" style="grid-template-columns:1fr 1fr;gap:16px">
-
-        <!-- ══ COL LEFT: Creative Strategist ══ -->
-        <div>
-          <div class="sec-lbl" style="margin-bottom:8px">Creative Strategist <span style="font-size:10px;color:var(--t3);font-weight:400;text-transform:none;letter-spacing:0">— 1 crédito por mensagem</span></div>
-          <div class="bs-wrap" id="bs-image-wrap">
-            <div class="bs-header">
-              <span class="bs-header-label">
-                <svg style="width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-                Creative Strategist
-              </span>
-              <span class="bs-header-cost">1 crédito por mensagem</span>
+      <!-- Two-column layout -->
+      <div class="ia-layout">
+        <!-- LEFT: controls -->
+        <div class="ia-left">
+          <!-- Format + config panel -->
+          <div class="ia-panel">
+            <div class="ia-panel-title">Configuração</div>
+            <!-- Format buttons -->
+            <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:10px">
+              <button class="fmt v2-fmt on" id="f-post"     onclick="selFmt('post')">Post único</button>
+              <button class="fmt v2-fmt"    id="f-carrossel" onclick="selFmt('carrossel')">Carrossel</button>
+              <button class="fmt v2-fmt"    id="f-story"    onclick="selFmt('story')">Story</button>
+              <button class="fmt v2-fmt"    id="f-anuncio"  onclick="selFmt('anuncio')">Anúncio</button>
+              <button class="fmt v2-fmt"    id="f-banner"   onclick="selFmt('banner')">Banner</button>
             </div>
-            <div class="bs-msgs" id="bs-image-msgs">
-              <div class="bs-placeholder">
-                <div class="bs-placeholder-icon">✦</div>
-                <div class="bs-placeholder-text">Descreva sua ideia. A IA vai te ajudar a desenvolvê-la até ficar irresistível.</div>
-              </div>
+            <!-- Image config -->
+            <div class="img-config-row" id="img-config-row">
+              <select class="img-config-select" id="sel-post-type" onchange="updateImageConfig('postType',this.value)">
+                <option value="">Tipo de post…</option>
+                <option value="single">Post único</option>
+                <option value="carousel">Carrossel</option>
+                <option value="story">Story</option>
+                <option value="ad">Anúncio</option>
+                <option value="banner">Banner</option>
+              </select>
+              <select class="img-config-select" id="sel-platform" onchange="updateImageConfig('platform',this.value)">
+                <option value="">Rede social…</option>
+                <option value="instagram">Instagram</option>
+                <option value="facebook">Facebook</option>
+                <option value="linkedin">LinkedIn</option>
+                <option value="tiktok">TikTok</option>
+                <option value="google">Google Ads</option>
+              </select>
             </div>
-            <div class="bs-ref-strip" id="bs-ref-strip"></div>
-            <div class="bs-input-row">
-              <textarea id="bs-image-input" rows="2" placeholder="O que você quer criar?" onkeydown="bsKeydown(event,'image')"></textarea>
-              <button class="bs-img-btn" onclick="document.getElementById('bs-ref-input').click()" title="Enviar imagem de referência">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-              </button>
-              <input type="file" id="bs-ref-input" accept="image/*" multiple style="display:none" onchange="handleBsImgUpload(this)">
-              <button class="bs-send-btn" id="bs-image-send" onclick="sendBrainstorm('image')" title="Enviar">
-                <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-              </button>
+            <!-- Variation count -->
+            <div id="v2-var-count-row" style="display:flex;align-items:center;gap:8px;margin-bottom:0;padding:8px 0 0;border:none">
+              <span style="font-size:9.5px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;flex-shrink:0">Variações</span>
+              <button class="v2-var-count on" id="vc-1" onclick="selVarCount(1)"><span>1</span><span class="vc-cr">2 cr</span></button>
+              <button class="v2-var-count"    id="vc-2" onclick="selVarCount(2)"><span>2</span><span class="vc-cr">4 cr</span></button>
+              <button class="v2-var-count"    id="vc-3" onclick="selVarCount(3)"><span>3</span><span class="vc-cr">5 cr</span></button>
+              <button class="v2-var-count"    id="vc-4" onclick="selVarCount(4)"><span>4</span><span class="vc-cr">7 cr</span></button>
             </div>
-            <div class="bs-footer">
-              <span class="bs-cost-hint">Enter para enviar · Shift+Enter nova linha · 📎 imagem de referência</span>
+            <!-- Slide count (carrossel) -->
+            <div id="slide-count-row" style="display:none;align-items:center;gap:8px;padding:8px 0 0">
+              <span style="font-size:9.5px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;flex-shrink:0">Slides</span>
+              <button class="sc-btn on" data-n="3" data-cr="5" onclick="selSlides(this,3)">3 <span style="font-size:9px;opacity:.6">5cr</span></button>
+              <button class="sc-btn"    data-n="4" data-cr="7" onclick="selSlides(this,4)">4 <span style="font-size:9px;opacity:.6">7cr</span></button>
+              <button class="sc-btn"    data-n="5" data-cr="9" onclick="selSlides(this,5)">5 <span style="font-size:9px;opacity:.6">9cr</span></button>
+              <button class="sc-btn"    data-n="6" data-cr="11" onclick="selSlides(this,6)">6 <span style="font-size:9px;opacity:.6">11cr</span></button>
+              <button class="sc-btn"    data-n="7" data-cr="12" onclick="selSlides(this,7)">7 <span style="font-size:9px;opacity:.6">12cr</span></button>
             </div>
           </div>
-          <button id="btn-gerar-v2" onclick="gerarV2()" style="width:100%;margin-top:10px;background:linear-gradient(135deg,var(--a) 0%,#c94410 100%);border:none;border-radius:var(--r2);padding:13px 16px;cursor:pointer;font-family:var(--f);font-size:14px;font-weight:800;color:#fff;letter-spacing:-.02em;box-shadow:0 4px 20px rgba(243,107,42,.32);display:flex;align-items:center;justify-content:center;gap:8px;transition:.15s">
-            <svg style="width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <span id="btn-gerar-v2-label">✦ Gerar Imagem</span>
-            <span id="v2-credits-label" style="margin-left:auto;font-size:10px;font-weight:500;opacity:.75;background:rgba(0,0,0,.2);border-radius:10px;padding:2px 7px">2 créditos</span>
-          </button>
+
+          <!-- Strategist chat panel -->
+          <div class="ia-panel" style="padding:0;overflow:hidden">
+            <div class="ia-panel-title" style="padding:14px 16px 0">Creative Strategist</div>
+            <div class="bs-wrap" id="bs-image-wrap" style="border:none;background:transparent">
+              <div class="bs-msgs" id="bs-image-msgs">
+                <div class="bs-placeholder">
+                  <div class="bs-placeholder-icon">✦</div>
+                  <div class="bs-placeholder-text">Descreva sua ideia. A IA vai te ajudar a desenvolvê-la até ficar irresistível.</div>
+                </div>
+              </div>
+              <div class="bs-ref-strip" id="bs-ref-strip"></div>
+              <div class="bs-input-row">
+                <textarea id="bs-image-input" rows="2" placeholder="O que você quer criar?" onkeydown="bsKeydown(event,'image')"></textarea>
+                <button class="bs-img-btn" onclick="document.getElementById('bs-ref-input').click()" title="Enviar imagem de referência">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                </button>
+                <input type="file" id="bs-ref-input" accept="image/*" multiple style="display:none" onchange="handleBsImgUpload(this)">
+                <button class="bs-send-btn" id="bs-image-send" onclick="sendBrainstorm('image')" title="Enviar">
+                  <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                </button>
+              </div>
+              <div class="bs-footer">
+                <span class="bs-cost-hint">Enter para enviar · Shift+Enter nova linha · 📎 imagem de referência</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customizations list -->
+          <div class="ia-panel" id="ia-custom-panel">
+            <div class="ia-panel-title">Personalizações</div>
+            <div class="ia-custom-list" id="ia-custom-list">
+              <div class="ia-custom-item"><span>Formato</span><span class="ia-custom-val" id="ia-cv-format">Post único</span></div>
+              <div class="ia-custom-item"><span>Rede social</span><span class="ia-custom-val" id="ia-cv-platform">—</span></div>
+              <div class="ia-custom-item"><span>Variações</span><span class="ia-custom-val" id="ia-cv-vars">1</span></div>
+              <div class="ia-custom-item"><span>Tipo de post</span><span class="ia-custom-val" id="ia-cv-type">—</span></div>
+            </div>
+          </div>
+
+          <!-- Nav buttons -->
+          <div class="ia-nav">
+            <button class="ia-back-btn" onclick="iaBack()">← Voltar</button>
+            <button class="ia-gen-btn" id="btn-gerar-v2" onclick="gerarV2()">
+              <svg style="width:15px;height:15px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span id="btn-gerar-v2-label">✦ Gerar Imagem</span>
+              <span id="v2-credits-label" style="margin-left:auto;font-size:10px;font-weight:500;opacity:.75;background:rgba(0,0,0,.2);border-radius:10px;padding:2px 7px">2 créditos</span>
+            </button>
+          </div>
+
           <!-- compat hidden elements -->
           <textarea id="gen-in" style="display:none"></textarea>
           <div id="refined-prompt-wrap" style="display:none"><div id="refined-prompt-box"></div></div>
@@ -6818,60 +7584,73 @@ body.image-agent-refining #image-agent-refine-overlay{
           <div id="bs-image-strategist-hint" style="display:none"></div>
         </div>
 
-        <!-- ══ COL RIGHT: Output ══ -->
-        <div>
-          <!-- Empty state -->
-          <div id="gen-v2-empty" style="aspect-ratio:1;background:var(--ink-2,#111);border:1.5px dashed rgba(255,255,255,.1);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center;box-sizing:border-box">
-            <svg style="width:32px;height:32px;fill:none;stroke:rgba(255,255,255,.2);stroke-width:1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <div style="font-size:12px;color:var(--t3);line-height:1.5">Converse com a IA e clique em<br><strong style="color:var(--tx)">Gerar</strong> para criar sua imagem</div>
-          </div>
-          <!-- Loading state -->
-          <div id="gen-v2-loading" style="display:none;background:var(--ink-2,#111);border:1px solid rgba(255,255,255,.07);border-radius:12px;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px 24px;box-sizing:border-box;min-height:300px">
-            <!-- 3-stage pipeline indicator -->
-            <div class="gen-v2-pipeline">
-              <div class="gen-v2-step active" id="v2-step-1"><div class="gen-v2-step-dot"></div>Estratégia</div>
-              <div class="gen-v2-step-line"></div>
-              <div class="gen-v2-step" id="v2-step-2"><div class="gen-v2-step-dot"></div>Polishing</div>
-              <div class="gen-v2-step-line"></div>
-              <div class="gen-v2-step" id="v2-step-3"><div class="gen-v2-step-dot"></div>Geração</div>
-            </div>
-            <div style="width:100%;background:rgba(255,255,255,.07);border-radius:4px;height:3px;overflow:hidden">
-              <div id="gen-v2-bar" style="height:100%;background:#FFC107;border-radius:4px;width:0%;transition:width .9s ease"></div>
-            </div>
-            <div style="width:24px;height:24px;border:2.5px solid rgba(255,255,255,.12);border-top-color:#FFC107;border-radius:50%;animation:spin .7s linear infinite"></div>
-            <div id="gen-v2-stage" style="font-size:12px;font-weight:700;color:var(--tx);text-align:center">Estruturando prompt visual...</div>
-            <div id="gen-v2-stage-sub" style="font-size:10px;color:var(--t3);text-align:center">Haiku analisando conversa</div>
-          </div>
-          <!-- Result state: variations grid -->
-          <div id="gen-v2-result" style="display:none">
-            <div id="gen-v2-variations" class="v2-variations-grid"></div>
-            <div class="v2-result-actions" style="margin-top:8px">
-              <button class="btn btn-p btn-sm" style="flex:1" onclick="downloadImgV2()">
-                <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Baixar selecionada
-              </button>
-              <button class="btn btn-s btn-sm" onclick="gerarV2()" title="Regerar 3 variações">
-                <svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
-                Regerar
-              </button>
-            </div>
-            <details style="margin-top:8px">
-              <summary style="font-size:10px;color:var(--t3);cursor:pointer;user-select:none">Ver prompts usados</summary>
-              <div style="margin-top:6px;display:flex;flex-direction:column;gap:6px">
-                <div style="font-size:9px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.06em">Haiku Draft</div>
-                <div id="gen-v2-prompt-used" style="padding:8px;background:var(--ink-2,#111);border-radius:8px;font-size:10px;color:var(--t3);line-height:1.5;word-break:break-word"></div>
-                <div style="font-size:9px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.06em">GPT-5.2 Polished</div>
-                <div id="gen-v2-polished-prompt" style="padding:8px;background:rgba(255,193,7,.05);border:1px solid rgba(255,193,7,.15);border-radius:8px;font-size:10px;color:var(--t3);line-height:1.5;word-break:break-word"></div>
+        <!-- RIGHT: Preview + tips -->
+        <div class="ia-right">
+          <!-- Preview card -->
+          <div class="ia-preview-card">
+            <div class="ia-preview-title">Pré-visualização</div>
+            <div class="ia-preview-area">
+              <!-- Empty state -->
+              <div id="gen-v2-empty" style="flex:1;background:rgba(255,255,255,.02);border:1.5px dashed rgba(255,255,255,.1);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center">
+                <svg style="width:32px;height:32px;fill:none;stroke:rgba(255,255,255,.2);stroke-width:1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <div style="font-size:12px;color:var(--t3);line-height:1.5">Converse com a IA e clique em<br><strong style="color:var(--tx)">Gerar</strong> para criar sua imagem</div>
               </div>
-            </details>
+              <!-- Loading state -->
+              <div id="gen-v2-loading" style="display:none;flex:1;background:rgba(255,255,255,.02);border-radius:10px;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px 24px;min-height:200px">
+                <div class="gen-v2-pipeline">
+                  <div class="gen-v2-step active" id="v2-step-1"><div class="gen-v2-step-dot"></div>Estratégia</div>
+                  <div class="gen-v2-step-line"></div>
+                  <div class="gen-v2-step" id="v2-step-2"><div class="gen-v2-step-dot"></div>Polishing</div>
+                  <div class="gen-v2-step-line"></div>
+                  <div class="gen-v2-step" id="v2-step-3"><div class="gen-v2-step-dot"></div>Geração</div>
+                </div>
+                <div style="width:100%;background:rgba(255,255,255,.07);border-radius:4px;height:3px;overflow:hidden">
+                  <div id="gen-v2-bar" style="height:100%;background:#E8541A;border-radius:4px;width:0%;transition:width .9s ease"></div>
+                </div>
+                <div style="width:24px;height:24px;border:2.5px solid rgba(255,255,255,.12);border-top-color:#E8541A;border-radius:50%;animation:spin .7s linear infinite"></div>
+                <div id="gen-v2-stage" style="font-size:12px;font-weight:700;color:var(--tx);text-align:center">Estruturando prompt visual...</div>
+                <div id="gen-v2-stage-sub" style="font-size:10px;color:var(--t3);text-align:center">Haiku analisando conversa</div>
+              </div>
+              <!-- Result state -->
+              <div id="gen-v2-result" style="display:none;flex:1;flex-direction:column">
+                <div id="gen-v2-variations" class="v2-variations-grid"></div>
+                <div class="ia-action-row" style="margin-top:10px">
+                  <button class="ia-action-btn primary" onclick="downloadImgV2()">
+                    <svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Baixar
+                  </button>
+                  <button class="ia-action-btn" onclick="gerarV2()">
+                    <svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
+                    Regerar
+                  </button>
+                </div>
+                <details style="margin-top:8px">
+                  <summary style="font-size:10px;color:var(--t3);cursor:pointer;user-select:none">Ver prompts usados</summary>
+                  <div style="margin-top:6px;display:flex;flex-direction:column;gap:6px">
+                    <div style="font-size:9px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.06em">Haiku Draft</div>
+                    <div id="gen-v2-prompt-used" style="padding:8px;background:rgba(255,255,255,.03);border-radius:8px;font-size:10px;color:var(--t3);line-height:1.5;word-break:break-word"></div>
+                    <div style="font-size:9px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.06em">GPT-5.2 Polished</div>
+                    <div id="gen-v2-polished-prompt" style="padding:8px;background:rgba(232,84,26,.05);border:1px solid rgba(232,84,26,.15);border-radius:8px;font-size:10px;color:var(--t3);line-height:1.5;word-break:break-word"></div>
+                  </div>
+                </details>
+              </div>
+              <!-- Carousel result -->
+              <div id="gen-v2-carousel" style="display:none;flex:1;flex-direction:column">
+                <div id="gen-v2-carousel-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+                <button class="ia-action-btn" onclick="gerarV2()" style="margin-top:10px;width:100%;justify-content:center">
+                  <svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
+                  Regerar carrossel
+                </button>
+              </div>
+            </div>
           </div>
-          <!-- Carousel result -->
-          <div id="gen-v2-carousel" style="display:none">
-            <div id="gen-v2-carousel-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
-            <button class="btn btn-s btn-sm" onclick="gerarV2()" style="width:100%;margin-top:10px">
-              <svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
-              Regerar carrossel
-            </button>
+
+          <!-- Tips card -->
+          <div class="ia-tips-card">
+            <div class="ia-tips-title">Dicas pro</div>
+            <div class="ia-tip-item">Descreva o cenário, iluminação e estilo na conversa para prompts mais ricos.</div>
+            <div class="ia-tip-item">Use "fundo neutro" ou "fundo branco" para posts de produto.</div>
+            <div class="ia-tip-item">Mencione a paleta de cores da sua marca para consistência visual.</div>
           </div>
 
           <!-- Legacy hidden output elements (JS compat) -->
@@ -6891,7 +7670,6 @@ body.image-agent-refining #image-agent-refine-overlay{
         </div>
       </div>
 
-    <!-- ← remove legacy g-gen col-left wrapper; history starts below -->
     <!-- dummy gen-col-left for compat -->
     <div style="display:none">
       <div class="gen-col-left">
@@ -7922,12 +8700,24 @@ function updateQuota() {
   const used = me.quota_used || 0;
   const limit = me.quota_limit || 0;
   const pct = limit ? Math.round(used / limit * 100) : 0;
+  const remaining = limit - used;
   const usedEl = document.getElementById('quota-used');
   const limitEl = document.getElementById('quota-limit');
   const dot = document.getElementById('quota-dot');
   if (usedEl) usedEl.textContent = used;
   if (limitEl) limitEl.textContent = limit;
   if (dot) dot.style.background = pct > 80 ? 'var(--err)' : pct > 60 ? 'var(--warn)' : 'var(--ok)';
+  // Sidebar plan section
+  const planName = me.plan_name || (me.plan_id === 'pro' ? 'Profissional' : me.plan_id === 'basic' ? 'Básico' : 'Free');
+  const sbPlanName = document.getElementById('sb-plan-name');
+  const sbPlanCr = document.getElementById('sb-plan-credits');
+  const sbPlanBar = document.getElementById('sb-plan-bar');
+  if (sbPlanName) sbPlanName.textContent = planName;
+  if (sbPlanCr) sbPlanCr.textContent = remaining.toLocaleString('pt-BR');
+  if (sbPlanBar) sbPlanBar.style.width = Math.min(100, 100 - pct) + '%';
+  // Image agent credits
+  const iaCr = document.getElementById('ia-credits-display');
+  if (iaCr) iaCr.textContent = remaining.toLocaleString('pt-BR') + ' créditos';
 }
 
 // ─────────────────────────────────────────────────
@@ -8083,6 +8873,12 @@ function nav(p, el) {
   if (p === 'profile')        loadProfile();
   if (p === 'settings')       loadSettings();
 }
+
+function navComingSoon(name) {
+  if (typeof toast === 'function') toast(name + ' estará disponível em breve.', 'info');
+}
+
+function iaBack() { navP('dashboard'); }
 
 function navP(p) {
   nav(p);
@@ -10665,6 +11461,111 @@ async function loadDashboard() {
           <div class="qa" onclick="nav('calendar', document.querySelector('.ni[onclick*=calendar]'))"><div class="qa-ico"><svg class="ico ico-sm" style="color:var(--a)" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="qa-lbl">Calendário</div></div>
         </div>
       `;
+    }
+
+    // ── New dashboard KPIs ──
+    const greet = document.getElementById('dash-greeting');
+    if (greet) {
+      const h = new Date().getHours();
+      const name = me.name ? me.name.split(' ')[0] : '';
+      const prefix = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
+      greet.textContent = name ? prefix + ', ' + name : 'Visão Geral';
+    }
+
+    const setKpi = (id, val, deltaId, delta) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val;
+      const del = document.getElementById(deltaId);
+      if (del) del.textContent = delta;
+    };
+    setKpi('kpi-total', me.quota_used || 0, 'kpi-total-delta', remaining + ' créditos disponíveis');
+    setKpi('kpi-week', recent7, 'kpi-week-delta', recent7 > 0 ? 'Ritmo ativo esta semana' : 'Sem gerações nos últimos 7 dias');
+    setKpi('kpi-sched', scheduledCount, 'kpi-sched-delta', scheduledLabel);
+    setKpi('kpi-last', gens.length > 0 ? timeAgo(gens[0].created_at) : '—', 'kpi-last-delta', gens[0] ? esc(gens[0].format || '') + ' · ' + esc(gens[0].network || '') : 'Histórico vazio');
+
+    // Line chart (last 7 days)
+    (function() {
+      const days = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - i);
+        days.push({ label: d.toLocaleDateString('pt-BR',{weekday:'short'}), date: d });
+      }
+      const counts = days.map(d => {
+        const dayStart = new Date(d.date.getFullYear(), d.date.getMonth(), d.date.getDate());
+        const dayEnd = new Date(dayStart.getTime() + 86400000);
+        return gens.filter(g => { const t = new Date(g.created_at); return t >= dayStart && t < dayEnd; }).length;
+      });
+      const maxC = Math.max(...counts, 1);
+      const W = 600, H = 90, pad = 8;
+      const xs = counts.map((_, i) => pad + i * ((W - pad*2) / 6));
+      const ys = counts.map(c => H - pad - (c / maxC) * (H - pad*2));
+      const linePts = xs.map((x, i) => (i === 0 ? 'M' : 'L') + x + ' ' + ys[i]).join(' ');
+      const areaPts = linePts + ' L' + xs[xs.length-1] + ' ' + H + ' L' + xs[0] + ' ' + H + ' Z';
+      const lp = document.getElementById('dash-line-path');
+      const af = document.getElementById('dash-area-fill');
+      if (lp) lp.setAttribute('d', linePts);
+      if (af) af.setAttribute('d', areaPts);
+      const lblEl = document.getElementById('dash-line-labels');
+      if (lblEl) lblEl.innerHTML = days.map(d => '<span>' + d.label + '</span>').join('');
+    })();
+
+    // Donut chart (formats)
+    (function() {
+      const fmtCounts = {};
+      gens.forEach(g => { const f = g.format || 'outro'; fmtCounts[f] = (fmtCounts[f] || 0) + 1; });
+      const top = Object.entries(fmtCounts).sort((a,b) => b[1]-a[1]).slice(0,3);
+      const total = gens.length || 1;
+      const CIRC = Math.PI * 2 * 44;
+      const colors = ['#E8541A','#8B5CF6','#22C55E'];
+      let offset = 0;
+      ['donut-arc-1','donut-arc-2','donut-arc-3'].forEach((id, i) => {
+        const el = document.getElementById(id);
+        const count = top[i] ? top[i][1] : 0;
+        const frac = count / total;
+        const dash = frac * CIRC;
+        if (el) {
+          el.setAttribute('stroke-dasharray', dash.toFixed(1) + ' ' + (CIRC - dash).toFixed(1));
+          el.setAttribute('stroke-dashoffset', -offset);
+          el.setAttribute('transform', 'rotate(-90 60 60)');
+        }
+        offset += frac * CIRC;
+      });
+      const legendEl = document.getElementById('dash-donut-legend');
+      if (legendEl && top.length) {
+        legendEl.innerHTML = top.map((t,i) => `<div class="dash-donut-item"><div class="dash-donut-dot" style="background:${colors[i]}"></div>${esc(t[0])} (${t[1]})</div>`).join('');
+      }
+    })();
+
+    // Network bars
+    (function() {
+      const netCounts = {};
+      gens.forEach(g => { const n = g.network || 'outro'; netCounts[n] = (netCounts[n] || 0) + 1; });
+      const sorted = Object.entries(netCounts).sort((a,b) => b[1]-a[1]).slice(0,4);
+      const maxN = sorted[0] ? sorted[0][1] : 1;
+      const colors = ['#E8541A','#8B5CF6','#22C55E','#3B82F6'];
+      const barsEl = document.getElementById('dash-bars');
+      if (barsEl && sorted.length) {
+        barsEl.innerHTML = sorted.map((s,i) => `
+          <div class="dash-bar-item">
+            <div class="dash-bar-label"><span>${esc(s[0])}</span><span>${s[1]}</span></div>
+            <div class="dash-bar-track"><div class="dash-bar-fill" style="width:${Math.round(s[1]/maxN*100)}%;background:${colors[i]}"></div></div>
+          </div>`).join('');
+      }
+    })();
+
+    // Content list
+    const listEl = document.getElementById('dash-content-list');
+    if (listEl) {
+      if (gens.length) {
+        listEl.innerHTML = gens.slice(0,5).map(g => `
+          <div class="dash-list-item">
+            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%">${esc(g.concept_name || g.format)}</span>
+            <span class="dash-list-badge">${esc(g.format)}</span>
+          </div>`).join('');
+      } else {
+        listEl.innerHTML = '<div class="dash-list-item" style="color:var(--t3)">Nenhuma geração ainda</div>';
+      }
     }
 
     loadDailyTip();
