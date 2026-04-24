@@ -917,8 +917,9 @@ tr:hover .td-actions { opacity: 1; }
 
 /* Brainstorm chat — taller in mid col */
 #pg-generate .bs-wrap {
-  min-height: 320px;
+  min-height: 260px;
 }
+#bs-image-msgs{min-height:100px;max-height:180px;}
 #pg-generate .bs-msgs {
   min-height: 200px;
 }
@@ -6216,7 +6217,7 @@ body.image-agent-refining #image-agent-refine-overlay{
    SIDEBAR — FILLED ORANGE ACTIVE + PLAN SECTION
 ═══════════════════════════════════════════ */
 .ni.on {
-  background: #E8541A !important;
+  background: var(--a) !important;
   color: #fff !important;
   font-weight: 600 !important;
   border-radius: 10px !important;
@@ -6258,7 +6259,7 @@ body.image-agent-refining #image-agent-refine-overlay{
 }
 .sb-plan-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg,#E8541A,#f07a40);
+  background: linear-gradient(90deg,var(--a),var(--ah));
   border-radius: 999px;
   transition: width .6s;
 }
@@ -6267,7 +6268,7 @@ body.image-agent-refining #image-agent-refine-overlay{
   padding: 8px 0;
   font-size: 12px;
   font-weight: 700;
-  color: #E8541A;
+  color: var(--a);
   background: rgba(232,84,26,.1);
   border: 1px solid rgba(232,84,26,.3);
   border-radius: 8px;
@@ -6287,7 +6288,7 @@ body.image-agent-refining #image-agent-refine-overlay{
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg,#E8541A,#f07a40);
+  background: linear-gradient(135deg,var(--a),var(--ah));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -6390,7 +6391,7 @@ body.image-agent-refining #image-agent-refine-overlay{
   flex-shrink: 0;
 }
 .dash-kpi-icon.orange { background: rgba(232,84,26,.15); }
-.dash-kpi-icon.orange svg { color: #E8541A; }
+.dash-kpi-icon.orange svg { color: var(--a); }
 .dash-kpi-icon.purple { background: rgba(139,92,246,.15); }
 .dash-kpi-icon.purple svg { color: #8B5CF6; }
 .dash-kpi-icon.green  { background: rgba(34,197,94,.15); }
@@ -6478,7 +6479,7 @@ body.image-agent-refining #image-agent-refine-overlay{
 .dash-bar-fill {
   height: 100%;
   border-radius: 999px;
-  background: #E8541A;
+  background: var(--a);
 }
 .dash-list-item {
   display: flex;
@@ -6496,7 +6497,7 @@ body.image-agent-refining #image-agent-refine-overlay{
   padding: 2px 8px;
   border-radius: 999px;
   background: rgba(232,84,26,.12);
-  color: #E8541A;
+  color: var(--a);
 }
 .dash-insight {
   padding: 10px 12px;
@@ -6511,7 +6512,7 @@ body.image-agent-refining #image-agent-refine-overlay{
 .dash-insight-dot {
   width: 6px; height: 6px;
   border-radius: 50%;
-  background: #E8541A;
+  background: var(--a);
   display: inline-block;
   margin-right: 6px;
   flex-shrink: 0;
@@ -6549,7 +6550,7 @@ body.image-agent-refining #image-agent-refine-overlay{
   font-weight: 800;
   letter-spacing: .12em;
   text-transform: uppercase;
-  color: #E8541A;
+  color: var(--a);
   background: rgba(232,84,26,.12);
   border: 1px solid rgba(232,84,26,.25);
   border-radius: 4px;
@@ -6638,15 +6639,15 @@ body.image-agent-refining #image-agent-refine-overlay{
   min-width: 16px;
 }
 .ia-step.done .ia-step-circle {
-  background: rgba(232,84,26,.2);
-  border-color: #E8541A;
-  color: #E8541A;
+  background: rgba(245,197,24,.2);
+  border-color: var(--a);
+  color: var(--a);
 }
 .ia-step.done .ia-step-lbl { color: rgba(255,255,255,.6); }
-.ia-step.done + .ia-step-line { background: #E8541A; }
+.ia-step.done + .ia-step-line { background: var(--a); }
 .ia-step.active .ia-step-circle {
-  background: #E8541A;
-  border-color: #E8541A;
+  background: var(--a);
+  border-color: var(--a);
   color: #fff;
   box-shadow: 0 0 0 4px rgba(232,84,26,.2);
 }
@@ -6719,7 +6720,7 @@ body.image-agent-refining #image-agent-refine-overlay{
   font-size: 13px;
   font-weight: 800;
   color: #fff;
-  background: linear-gradient(135deg,#E8541A 0%,#c94410 100%);
+  background: linear-gradient(135deg,var(--a) 0%,var(--amber-l) 100%);
   border: none;
   border-radius: 10px;
   cursor: pointer;
@@ -6783,7 +6784,7 @@ body.image-agent-refining #image-agent-refine-overlay{
 .ia-action-btn.primary {
   background: rgba(232,84,26,.12);
   border-color: rgba(232,84,26,.25);
-  color: #E8541A;
+  color: var(--a);
 }
 .ia-action-btn.primary:hover { background: rgba(232,84,26,.2) !important; }
 
@@ -6798,7 +6799,7 @@ body.image-agent-refining #image-agent-refine-overlay{
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: .12em;
-  color: #E8541A;
+  color: var(--a);
   margin-bottom: 8px;
 }
 .ia-tip-item {
@@ -6813,7 +6814,7 @@ body.image-agent-refining #image-agent-refine-overlay{
   content: '·';
   position: absolute;
   left: 2px;
-  color: #E8541A;
+  color: var(--a);
   font-weight: 800;
 }
 
@@ -7215,29 +7216,17 @@ body.image-agent-refining #image-agent-refine-overlay{
       </div>
       <div class="ni" onclick="nav('saved-designs',this)" id="ni-saved-designs">
         <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
-        Templates
-      </div>
-      <div class="ni" onclick="navComingSoon('Calendário')">
-        <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
-        Calendário
-      </div>
-      <div class="ni" onclick="navComingSoon('Mídia')">
-        <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
-        Mídia
-      </div>
-      <div class="ni" onclick="navComingSoon('Análises')">
-        <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
-        Análises
-      </div>
-      <div class="ni" onclick="navComingSoon('Equipe')">
-        <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
-        Equipe
+        Designs Salvos
       </div>
     </div>
     <div class="sb-sect" style="margin-top:4px;border-top:1px solid rgba(255,255,255,.06);padding-top:8px">
       <div class="ni" onclick="nav('history',this)">
         <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
         Histórico
+      </div>
+      <div class="ni" onclick="navComingSoon('Calendário')">
+        <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+        Calendário
       </div>
       <div class="ni" onclick="nav('profile',this)">
         <span class="ni-ico"><svg class="ico ico-sm" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></span>
@@ -7347,12 +7336,12 @@ body.image-agent-refining #image-agent-refine-overlay{
           <svg class="dash-line-svg" id="dash-line-svg" viewBox="0 0 600 100" preserveAspectRatio="none">
             <defs>
               <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#E8541A" stop-opacity=".35"/>
-                <stop offset="100%" stop-color="#E8541A" stop-opacity="0"/>
+                <stop offset="0%" stop-color="var(--a)" stop-opacity=".35"/>
+                <stop offset="100%" stop-color="var(--a)" stop-opacity="0"/>
               </linearGradient>
             </defs>
             <path id="dash-area-fill" fill="url(#lineGrad)" d=""/>
-            <path id="dash-line-path" fill="none" stroke="#E8541A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d=""/>
+            <path id="dash-line-path" fill="none" stroke="var(--a)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d=""/>
           </svg>
           <div id="dash-line-labels" style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:6px"></div>
         </div>
@@ -7361,12 +7350,12 @@ body.image-agent-refining #image-agent-refine-overlay{
           <div class="dash-donut-wrap">
             <svg class="dash-donut-svg" id="dash-donut-svg" viewBox="0 0 120 120">
               <circle cx="60" cy="60" r="44" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="16"/>
-              <circle id="donut-arc-1" cx="60" cy="60" r="44" fill="none" stroke="#E8541A" stroke-width="16" stroke-dasharray="0 276" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+              <circle id="donut-arc-1" cx="60" cy="60" r="44" fill="none" stroke="var(--a)" stroke-width="16" stroke-dasharray="0 276" stroke-linecap="round" transform="rotate(-90 60 60)"/>
               <circle id="donut-arc-2" cx="60" cy="60" r="44" fill="none" stroke="#8B5CF6" stroke-width="16" stroke-dasharray="0 276" stroke-linecap="round" transform="rotate(-90 60 60)"/>
               <circle id="donut-arc-3" cx="60" cy="60" r="44" fill="none" stroke="#22C55E" stroke-width="16" stroke-dasharray="0 276" stroke-linecap="round" transform="rotate(-90 60 60)"/>
             </svg>
             <div class="dash-donut-legend" id="dash-donut-legend">
-              <div class="dash-donut-item"><div class="dash-donut-dot" style="background:#E8541A"></div>Post único</div>
+              <div class="dash-donut-item"><div class="dash-donut-dot" style="background:var(--a)"></div>Post único</div>
               <div class="dash-donut-item"><div class="dash-donut-dot" style="background:#8B5CF6"></div>Carrossel</div>
               <div class="dash-donut-item"><div class="dash-donut-dot" style="background:#22C55E"></div>Outros</div>
             </div>
@@ -7382,7 +7371,7 @@ body.image-agent-refining #image-agent-refine-overlay{
           <div id="dash-bars">
             <div class="dash-bar-item">
               <div class="dash-bar-label"><span>Instagram</span><span>—</span></div>
-              <div class="dash-bar-track"><div class="dash-bar-fill" style="width:0%;background:#E8541A"></div></div>
+              <div class="dash-bar-track"><div class="dash-bar-fill" style="width:0%;background:var(--a)"></div></div>
             </div>
             <div class="dash-bar-item">
               <div class="dash-bar-label"><span>LinkedIn</span><span>—</span></div>
@@ -7444,28 +7433,23 @@ body.image-agent-refining #image-agent-refine-overlay{
       <!-- 5-Step Wizard -->
       <div class="ia-steps-wrap">
         <div class="ia-steps" id="ia-steps">
-          <div class="ia-step done" id="ia-step-1">
+          <div class="ia-step" id="ia-step-1">
             <div class="ia-step-circle">1</div>
-            <div class="ia-step-lbl">Estratégia</div>
+            <div class="ia-step-lbl">Configuração</div>
           </div>
           <div class="ia-step-line" id="ia-line-1"></div>
-          <div class="ia-step done" id="ia-step-2">
+          <div class="ia-step" id="ia-step-2">
             <div class="ia-step-circle">2</div>
-            <div class="ia-step-lbl">Refinamento</div>
+            <div class="ia-step-lbl">Estratégia</div>
           </div>
           <div class="ia-step-line" id="ia-line-2"></div>
-          <div class="ia-step done" id="ia-step-3">
+          <div class="ia-step" id="ia-step-3">
             <div class="ia-step-circle">3</div>
-            <div class="ia-step-lbl">Personalização</div>
+            <div class="ia-step-lbl">Refinamento</div>
           </div>
           <div class="ia-step-line" id="ia-line-3"></div>
-          <div class="ia-step active" id="ia-step-4">
+          <div class="ia-step" id="ia-step-4">
             <div class="ia-step-circle">4</div>
-            <div class="ia-step-lbl">Prompt final</div>
-          </div>
-          <div class="ia-step-line" id="ia-line-4"></div>
-          <div class="ia-step" id="ia-step-5">
-            <div class="ia-step-circle">5</div>
             <div class="ia-step-lbl">Geração</div>
           </div>
         </div>
@@ -7485,6 +7469,7 @@ body.image-agent-refining #image-agent-refine-overlay{
               <button class="fmt v2-fmt"    id="f-story"    onclick="selFmt('story')">Story</button>
               <button class="fmt v2-fmt"    id="f-anuncio"  onclick="selFmt('anuncio')">Anúncio</button>
               <button class="fmt v2-fmt"    id="f-banner"   onclick="selFmt('banner')">Banner</button>
+              <button class="fmt v2-fmt"    id="f-thumb"    onclick="selFmt('thumb')">Thumbnail</button>
             </div>
             <!-- Image config -->
             <div class="img-config-row" id="img-config-row">
@@ -7495,6 +7480,7 @@ body.image-agent-refining #image-agent-refine-overlay{
                 <option value="story">Story</option>
                 <option value="ad">Anúncio</option>
                 <option value="banner">Banner</option>
+                <option value="thumbnail">Thumbnail</option>
               </select>
               <select class="img-config-select" id="sel-platform" onchange="updateImageConfig('platform',this.value)">
                 <option value="">Rede social…</option>
@@ -7526,8 +7512,8 @@ body.image-agent-refining #image-agent-refine-overlay{
 
           <!-- Strategist chat panel -->
           <div class="ia-panel" style="padding:0;overflow:hidden">
-            <div class="ia-panel-title" style="padding:14px 16px 0">Creative Strategist</div>
-            <div class="bs-wrap" id="bs-image-wrap" style="border:none;background:transparent">
+            <div class="ia-panel-title" style="padding:12px 16px 0">Creative Strategist</div>
+            <div class="bs-wrap" id="bs-image-wrap" style="border:none;background:transparent;margin-bottom:8px">
               <div class="bs-msgs" id="bs-image-msgs">
                 <div class="bs-placeholder">
                   <div class="bs-placeholder-icon">✦</div>
@@ -7555,7 +7541,7 @@ body.image-agent-refining #image-agent-refine-overlay{
           <div class="ia-panel" id="ia-custom-panel">
             <div class="ia-panel-title">Personalizações</div>
             <div class="ia-custom-list" id="ia-custom-list">
-              <div class="ia-custom-item"><span>Formato</span><span class="ia-custom-val" id="ia-cv-format">Post único</span></div>
+              <div class="ia-custom-item"><span>Formato</span><span class="ia-custom-val" id="ia-cv-format">Padrão</span></div>
               <div class="ia-custom-item"><span>Rede social</span><span class="ia-custom-val" id="ia-cv-platform">—</span></div>
               <div class="ia-custom-item"><span>Variações</span><span class="ia-custom-val" id="ia-cv-vars">1</span></div>
               <div class="ia-custom-item"><span>Tipo de post</span><span class="ia-custom-val" id="ia-cv-type">—</span></div>
@@ -7605,9 +7591,9 @@ body.image-agent-refining #image-agent-refine-overlay{
                   <div class="gen-v2-step" id="v2-step-3"><div class="gen-v2-step-dot"></div>Geração</div>
                 </div>
                 <div style="width:100%;background:rgba(255,255,255,.07);border-radius:4px;height:3px;overflow:hidden">
-                  <div id="gen-v2-bar" style="height:100%;background:#E8541A;border-radius:4px;width:0%;transition:width .9s ease"></div>
+                  <div id="gen-v2-bar" style="height:100%;background:var(--a);border-radius:4px;width:0%;transition:width .9s ease"></div>
                 </div>
-                <div style="width:24px;height:24px;border:2.5px solid rgba(255,255,255,.12);border-top-color:#E8541A;border-radius:50%;animation:spin .7s linear infinite"></div>
+                <div style="width:24px;height:24px;border:2.5px solid rgba(255,255,255,.12);border-top-color:var(--a);border-radius:50%;animation:spin .7s linear infinite"></div>
                 <div id="gen-v2-stage" style="font-size:12px;font-weight:700;color:var(--tx);text-align:center">Estruturando prompt visual...</div>
                 <div id="gen-v2-stage-sub" style="font-size:10px;color:var(--t3);text-align:center">Haiku analisando conversa</div>
               </div>
@@ -8216,6 +8202,9 @@ body.image-agent-refining #image-agent-refine-overlay{
           </div>
           <div class="bs-refined-wrap" id="bs-legenda-refined-wrap" style="display:none;margin-bottom:12px"><div class="bs-refined-header"><span class="bs-refined-label">✦ Prompt refinado</span><div class="bs-refined-actions"><button class="btn btn-g btn-sm" onclick="bsEditRefined('legenda')" style="font-size:10px">Editar</button><button class="btn btn-g btn-sm" onclick="bsReset('legenda')" style="font-size:10px">Resetar</button></div></div><div class="bs-refined-text" id="bs-legenda-refined-text"></div></div>
           <textarea id="ag-legenda-in" style="display:none"></textarea>
+          <div class="form-row" style="margin-top:12px"><label>Rede social</label>
+            <select id="ag-legenda-rede"><option value="instagram">Instagram</option><option value="facebook">Facebook</option><option value="linkedin">LinkedIn</option><option value="tiktok">TikTok</option><option value="youtube">YouTube</option></select>
+          </div>
           <div class="form-row" style="margin-top:12px"><label>Tom de voz <span style="color:var(--t3);font-weight:400;text-transform:none">(opcional)</span></label>
             <select id="ag-legenda-tom"><option value="">Usar perfil de marca</option>              <option>Autoridade</option>
               <option>Provocativo</option>
@@ -8232,7 +8221,7 @@ body.image-agent-refining #image-agent-refine-overlay{
             <input type="file" id="ag-legenda-media" accept="image/*,video/*" multiple style="display:none" onchange="handleAgentMedia('legenda',this.files)">
             <div id="ag-legenda-media-previews" class="agent-media-previews" style="min-height:0;margin-top:6px"></div>
           </div>
-          <button class="btn btn-p btn-full" style="margin-top:16px" onclick="runAgent('legenda','post','legenda')">
+          <button class="btn btn-p btn-full" style="margin-top:16px" onclick="runAgent('legenda','post',document.getElementById('ag-legenda-rede')?.value||'instagram')">
             <svg class="ico ico-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Gerar Legenda
           </button>
         </div>
@@ -8253,7 +8242,7 @@ body.image-agent-refining #image-agent-refine-overlay{
               <span style="font-size:10px;font-weight:700;color:var(--a);letter-spacing:.06em;text-transform:uppercase">Gerado</span>
               <div style="display:flex;gap:6px">
                 <button class="btn btn-g btn-sm" onclick="copyAgentResult('ag-legenda-content')">Copiar</button>
-                <button class="btn btn-g btn-sm" onclick="runAgent('legenda','post','legenda')">&#8635; Regerar</button>
+                <button class="btn btn-g btn-sm" onclick="runAgent('legenda','post',document.getElementById('ag-legenda-rede')?.value||'instagram')">&#8635; Regerar</button>
               </div>
             </div>
             <div class="agent-result-content" id="ag-legenda-content"></div>
@@ -8956,6 +8945,7 @@ function selFmt(f) {
   var lbl = document.getElementById('btn-gerar-v2-label');
   if (lbl) { var _fn={post:'Post único',carrossel:'Carrossel',story:'Story',anuncio:'Anúncio',thumb:'Thumbnail',banner:'Banner'}; lbl.textContent='Gerar '+(_fn[f]||f); }
 
+  syncIaCustomizations();
   renderBsSubFmtGrid(f);
   var gerarBtn = document.getElementById('bs-image-gerar-main-btn');
   if (gerarBtn) gerarBtn.textContent = 'Gerar ' + (_fmtBtnLabels[f] || f);
@@ -8982,6 +8972,7 @@ function selSlides(el, n) {
   document.querySelectorAll('.sc-btn').forEach(function(b) { b.classList.remove('on'); });
   el.classList.add('on');
   _updateV2Credits();
+  syncIaCustomizations();
 }
 async function sendFeedback(slug, rating, btnEl) {
   try {
@@ -9602,6 +9593,7 @@ function _bsRender(ctx) {
 }
 
 async function sendBrainstorm(ctx) {
+  if (ctx === 'image') setImageAgentStep(2);
   const inputEl = document.getElementById(`bs-${ctx}-input`);
   const sendEl  = document.getElementById(`bs-${ctx}-send`);
   if (!inputEl) return;
@@ -10083,10 +10075,35 @@ const _netMap2 = { ig:'Instagram', li:'LinkedIn', yt:'YouTube', tt:'TikTok', fb:
 const _imageGenConfig = { postType: null, platform: null };
 
 function updateImageConfig(key, value) {
+  if (key === 'postType' || key === 'platform') setImageAgentStep(1);
   _imageGenConfig[key] = value || null;
   const elId = key === 'postType' ? 'sel-post-type' : 'sel-platform';
   const el = document.getElementById(elId);
   if (el) { value ? el.classList.add('has-value') : el.classList.remove('has-value'); }
+  syncIaCustomizations();
+}
+
+
+function setImageAgentStep(step) {
+  for (var i = 1; i <= 4; i++) {
+    var el = document.getElementById('ia-step-' + i);
+    if (!el) continue;
+    el.classList.remove('done','active');
+    if (i < step) el.classList.add('done');
+    else if (i === step) el.classList.add('active');
+  }
+}
+function setIaModelChoice(value){ window._iaModelChoice = value || 'auto'; }
+
+function syncIaCustomizations(){
+  var fmtLbl = {post:'Post único',carrossel:'Carrossel',story:'Story',anuncio:'Anúncio',banner:'Banner',thumb:'Thumbnail'}[_currentFmt||'post'] || 'Post único';
+  var typeLbl = {single:'Post único',carousel:'Carrossel',story:'Story',ad:'Anúncio',banner:'Banner',thumbnail:'Thumbnail'}[_imageGenConfig.postType] || fmtLbl;
+  var platformLbl = {instagram:'Instagram',facebook:'Facebook',linkedin:'LinkedIn',tiktok:'TikTok',google:'Google Ads',youtube:'YouTube'}[_imageGenConfig.platform] || '—';
+  var formatSize = {single:'1080x1080',carousel:'1080x1080',story:'1080x1920',ad:'1080x1080',banner:'1584x396',thumbnail:'1280x720'}[_imageGenConfig.postType] || 'Padrão';
+  var f = document.getElementById('ia-cv-format'); if (f) f.textContent = formatSize;
+  var p = document.getElementById('ia-cv-platform'); if (p) p.textContent = platformLbl;
+  var v = document.getElementById('ia-cv-vars'); if (v) v.textContent = String(_variationCount || 1);
+  var t = document.getElementById('ia-cv-type'); if (t) t.textContent = typeLbl;
 }
 
 function selStyle(s) {
@@ -10157,6 +10174,7 @@ function _v2SetStageSub(txt) {
 }
 
 async function gerarV2() {
+  setImageAgentStep(3);
   const state = _bsGet('image');
   if (!state.messages.length) { toast('Converse com a IA primeiro para criar sua imagem','err'); return; }
 
@@ -10254,6 +10272,7 @@ async function gerarV2() {
       stageTimers.forEach(clearTimeout);
       if (loadingEl) loadingEl.style.display = 'none';
       setBar(100); setStage('Carrossel completo!', '');
+      setImageAgentStep(4);
       toast('Carrossel gerado! ' + totalSlides + ' slides prontos.', 'ok');
       if (me) { me.quota_used = (me.quota_used||0) + (_carrosselCreditMap[totalSlides] || totalSlides); updateQuota(); }
     } else {
@@ -10296,8 +10315,9 @@ async function gerarV2() {
 
       showV2('gen-v2-result');
       const _cfgParts = [];
-      if (_imageGenConfig.postType) _cfgParts.push({single:'Post único',carousel:'Carrossel',story:'Story',ad:'Anúncio',banner:'Banner'}[_imageGenConfig.postType]||_imageGenConfig.postType);
+      if (_imageGenConfig.postType) _cfgParts.push({single:'Post único',carousel:'Carrossel',story:'Story',ad:'Anúncio',banner:'Banner',thumbnail:'Thumbnail'}[_imageGenConfig.postType]||_imageGenConfig.postType);
       if (_imageGenConfig.platform) _cfgParts.push({instagram:'Instagram',facebook:'Facebook',linkedin:'LinkedIn',tiktok:'TikTok',google:'Google Ads'}[_imageGenConfig.platform]||_imageGenConfig.platform);
+      setImageAgentStep(4);
       toast((_currentImagesB64.length > 1 ? _currentImagesB64.length + ' variações geradas' : 'Imagem gerada') + (_cfgParts.length ? ' · ' + _cfgParts.join(' / ') : '') + '!', 'ok');
       const credits = _varCreditMap[_variationCount] || 2;
       if (me) { me.quota_used = (me.quota_used||0) + credits; updateQuota(); }
@@ -11517,7 +11537,7 @@ async function loadDashboard() {
       const top = Object.entries(fmtCounts).sort((a,b) => b[1]-a[1]).slice(0,3);
       const total = gens.length || 1;
       const CIRC = Math.PI * 2 * 44;
-      const colors = ['#E8541A','#8B5CF6','#22C55E'];
+      const colors = ['var(--a)','#8B5CF6','#22C55E'];
       let offset = 0;
       ['donut-arc-1','donut-arc-2','donut-arc-3'].forEach((id, i) => {
         const el = document.getElementById(id);
@@ -11543,7 +11563,7 @@ async function loadDashboard() {
       gens.forEach(g => { const n = g.network || 'outro'; netCounts[n] = (netCounts[n] || 0) + 1; });
       const sorted = Object.entries(netCounts).sort((a,b) => b[1]-a[1]).slice(0,4);
       const maxN = sorted[0] ? sorted[0][1] : 1;
-      const colors = ['#E8541A','#8B5CF6','#22C55E','#3B82F6'];
+      const colors = ['var(--a)','#8B5CF6','#22C55E','#3B82F6'];
       const barsEl = document.getElementById('dash-bars');
       if (barsEl && sorted.length) {
         barsEl.innerHTML = sorted.map((s,i) => `
@@ -13070,6 +13090,7 @@ function selectVoice(idx) {
 
 // Legacy stubs — mantidos para não quebrar chamadas existentes
 function renderModelGrid() {
+  setImageAgentStep(1);
   renderVoiceGrid();
   var grid = document.getElementById('modelo-grid');
   if (!grid) return;
@@ -13086,6 +13107,9 @@ function renderModelGrid() {
   _updateFormatBadge();
 
   var list = MODELS[_modelFmt];
+  var baseList = (list || []).slice(0,10);
+  list = baseList.slice();
+  if (list.length) list.unshift({n:'IA',name:'Escolha automática',ratio:'Auto',svg:list[0].svg,auto:true});
 
   // Fallback: try post_instagram
   if (!list || !list.length) {
@@ -13099,6 +13123,11 @@ function renderModelGrid() {
   }
 
   var html = '';
+  var modelSelect = document.getElementById('ia-model-choice');
+  if (modelSelect) {
+    modelSelect.innerHTML = '<option value="auto">IA escolhe o melhor modelo</option>' + baseList.map(function(m,idx){ return '<option value="'+idx+'">Modelo '+m.n+' — '+m.name+'</option>'; }).join('');
+  }
+
   for (var i = 0; i < list.length; i++) {
     var m = list[i];
     var ratio = m.ratio ? ' \xb7 ' + m.ratio : '';
@@ -13164,14 +13193,21 @@ function _updateFormatBadge() {
   };
   var label = fmtLabels[_modelFmt] || _modelFmt;
   badge.innerHTML = '<svg style="width:10px;height:10px;fill:none;stroke:var(--amber);stroke-width:2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> '
-    + label + ' <span style="font-weight:400;color:var(--t2)">\xe2\x80\x94 20 estilos</span>';
+    + label + ' <span style="font-weight:400;color:var(--t2)">\xe2\x80\x94 10 estilos</span>';
 }
 
 function _getModelDesc(n) { return _MODEL_DESCS[n] || ''; }
 
 function selectModel(idx) {
-  var list = MODELS[_modelFmt] || [];
-  _selectedModel        = list[idx];
+  var pool = (MODELS[_modelFmt] || []).slice(0,10);
+  var list = pool.slice();
+  if (list.length) list.unshift({n:'IA',name:'Escolha automática',ratio:'Auto',svg:list[0].svg,auto:true});
+  var chosen = list[idx];
+  if (chosen && chosen.auto) {
+    chosen = pool[Math.floor(Math.random()*pool.length)] || chosen;
+  }
+  _selectedModel        = chosen;
+  setImageAgentStep(3);
   window._selectedModel = _selectedModel;
 
   var cards = document.querySelectorAll('#modelo-grid > div');
@@ -14935,6 +14971,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   document.addEventListener('DOMContentLoaded', function(){
     sanitizeDuplicateVisuals();
+    setImageAgentStep(0);
+    syncIaCustomizations();
   });
 })();
 </script>
