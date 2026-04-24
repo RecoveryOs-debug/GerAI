@@ -7476,17 +7476,17 @@ body.image-agent-refining #image-agent-refine-overlay{
           <div class="ia-step-line" id="ia-line-1"></div>
           <div class="ia-step" id="ia-step-2">
             <div class="ia-step-circle">2</div>
-            <div class="ia-step-lbl">Estratégia <span class="ia-step-sub">(conversar com o agente)</span></div>
+            <div class="ia-step-lbl">Estratégia <span class="ia-step-sub">(Conversar com o agente)</span></div>
           </div>
           <div class="ia-step-line" id="ia-line-2"></div>
           <div class="ia-step" id="ia-step-3">
             <div class="ia-step-circle">3</div>
-            <div class="ia-step-lbl">Refinamento <span class="ia-step-sub">(após clicar em gerar)</span></div>
+            <div class="ia-step-lbl">Refinamento <span class="ia-step-sub">(Após clicar em gerar imagem)</span></div>
           </div>
           <div class="ia-step-line" id="ia-line-3"></div>
           <div class="ia-step" id="ia-step-4">
             <div class="ia-step-circle">4</div>
-            <div class="ia-step-lbl">Geração <span class="ia-step-sub">(depois do refinamento)</span></div>
+            <div class="ia-step-lbl">Geração <span class="ia-step-sub">(Depois que o agente refinou)</span></div>
           </div>
         </div>
       </div>
@@ -7504,7 +7504,6 @@ body.image-agent-refining #image-agent-refine-overlay{
               <button class="fmt v2-fmt"    id="f-carrossel" onclick="selFmt('carrossel')">Carrossel</button>
               <button class="fmt v2-fmt"    id="f-story"    onclick="selFmt('story')">Story</button>
               <button class="fmt v2-fmt"    id="f-anuncio"  onclick="selFmt('anuncio')">Anúncio</button>
-              <button class="fmt v2-fmt"    id="f-banner"   onclick="selFmt('banner')">Banner</button>
               <button class="fmt v2-fmt"    id="f-thumb"    onclick="selFmt('thumb')">Thumbnail</button>
             </div>
             <!-- Image config -->
@@ -7515,7 +7514,6 @@ body.image-agent-refining #image-agent-refine-overlay{
                 <option value="carousel">Carrossel</option>
                 <option value="story">Story</option>
                 <option value="ad">Anúncio</option>
-                <option value="banner">Banner</option>
                 <option value="thumbnail">Thumbnail</option>
               </select>
               <select class="img-config-select" id="sel-platform" onchange="updateImageConfig('platform',this.value)">
@@ -13179,7 +13177,6 @@ function selectVoice(idx) {
 
 // Legacy stubs — mantidos para não quebrar chamadas existentes
 function renderModelGrid() {
-  setImageAgentStep(1);
   renderVoiceGrid();
   var grid = document.getElementById('modelo-grid');
   if (!grid) return;
