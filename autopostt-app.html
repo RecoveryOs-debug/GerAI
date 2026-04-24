@@ -919,9 +919,9 @@ tr:hover .td-actions { opacity: 1; }
 #pg-generate .bs-wrap {
   min-height: 260px;
 }
-#bs-image-msgs{min-height:120px;max-height:220px;}
+#bs-image-msgs{min-height:92px;max-height:160px;}
 #pg-generate .bs-msgs {
-  min-height: 200px;
+  min-height: 140px;
 }
 
 /* Section labels in generate */
@@ -6677,6 +6677,32 @@ body.image-agent-refining #image-agent-refine-overlay{
   letter-spacing: .1em;
   margin-bottom: 12px;
 }
+.ia-model-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:6px;
+  max-height:170px;
+  overflow:auto;
+  margin:0 16px 10px;
+  padding-right:2px;
+}
+.ia-model-opt{
+  border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.02);
+  color:var(--t2);
+  border-radius:8px;
+  font-size:10px;
+  line-height:1.35;
+  padding:7px 8px;
+  cursor:pointer;
+  transition:.18s ease;
+}
+.ia-model-opt:hover{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.06)}
+.ia-model-opt.on{
+  border-color:var(--a);
+  background:rgba(232,84,26,.14);
+  color:var(--t0);
+}
 
 .ia-custom-list { display: flex; flex-direction: column; gap: 8px; }
 .ia-custom-item {
@@ -7513,13 +7539,14 @@ body.image-agent-refining #image-agent-refine-overlay{
           <!-- Strategist chat panel -->
           <div class="ia-panel" style="padding:0;overflow:hidden">
             <div class="ia-panel-title" style="padding:12px 16px 0">Creative Strategist</div>
-            <div class="form-row" style="padding:0 16px 10px;margin-top:4px">
+            <div class="form-row" style="padding:0 16px 8px;margin-top:4px">
               <label>Modelo de post</label>
               <select id="ia-model-choice" onchange="setIaModelChoice(this.value)">
                 <option value="auto">IA escolhe o melhor modelo</option>
               </select>
             </div>
-            <div class="bs-wrap" id="bs-image-wrap" style="border:none;background:transparent;margin-bottom:8px">
+            <div class="ia-model-grid" id="ia-model-grid"></div>
+            <div class="bs-wrap" id="bs-image-wrap" style="border:none;background:transparent;margin-bottom:4px">
               <div class="bs-msgs" id="bs-image-msgs">
                 <div class="bs-placeholder">
                   <div class="bs-placeholder-icon">✦</div>
@@ -8951,8 +8978,14 @@ function selFmt(f) {
   var lbl = document.getElementById('btn-gerar-v2-label');
   if (lbl) { var _fn={post:'Post único',carrossel:'Carrossel',story:'Story',anuncio:'Anúncio',thumb:'Thumbnail',banner:'Banner'}; lbl.textContent='Gerar '+(_fn[f]||f); }
 
+  var mappedType = _fmtToPostType[f] || null;
+  var postTypeSel = document.getElementById('sel-post-type');
+  if (postTypeSel && mappedType) postTypeSel.value = mappedType;
+  if (mappedType) updateImageConfig('postType', mappedType);
+
   syncIaCustomizations();
   renderBsSubFmtGrid(f);
+  refreshIaModelOptions();
   var gerarBtn = document.getElementById('bs-image-gerar-main-btn');
   if (gerarBtn) gerarBtn.textContent = 'Gerar ' + (_fmtBtnLabels[f] || f);
   var gb = document.getElementById('bs-image-gerar-btn');
@@ -10079,6 +10112,15 @@ const _netMap2 = { ig:'Instagram', li:'LinkedIn', yt:'YouTube', tt:'TikTok', fb:
 
 // Image generation config state
 const _imageGenConfig = { postType: null, platform: null };
+const _fmtToPostType = { post:'single', carrossel:'carousel', story:'story', anuncio:'ad', banner:'banner', thumb:'thumbnail' };
+const _postTypeModels = {
+  single: ['Modelo 1','Modelo 2','Modelo 3','Modelo 4','Modelo 5','Modelo 6','Modelo 7','Modelo 8','Modelo 9','Modelo 10'],
+  carousel: ['Modelo 1','Modelo 2','Modelo 3','Modelo 4','Modelo 5','Modelo 6','Modelo 7','Modelo 8','Modelo 9','Modelo 10'],
+  story: ['Modelo 1','Modelo 2','Modelo 3','Modelo 4','Modelo 5','Modelo 6','Modelo 7','Modelo 8','Modelo 9','Modelo 10'],
+  ad: ['Modelo 1','Modelo 2','Modelo 3','Modelo 4','Modelo 5','Modelo 6','Modelo 7','Modelo 8','Modelo 9','Modelo 10'],
+  banner: ['Modelo 1','Modelo 2','Modelo 3','Modelo 4','Modelo 5','Modelo 6','Modelo 7','Modelo 8','Modelo 9','Modelo 10'],
+  thumbnail: ['Modelo 1','Modelo 2','Modelo 3','Modelo 4','Modelo 5','Modelo 6','Modelo 7','Modelo 8','Modelo 9','Modelo 10']
+};
 
 function updateImageConfig(key, value) {
   if (key === 'postType' || key === 'platform') setImageAgentStep(1);
@@ -10086,6 +10128,7 @@ function updateImageConfig(key, value) {
   const elId = key === 'postType' ? 'sel-post-type' : 'sel-platform';
   const el = document.getElementById(elId);
   if (el) { value ? el.classList.add('has-value') : el.classList.remove('has-value'); }
+  if (key === 'postType') refreshIaModelOptions();
   syncIaCustomizations();
 }
 
@@ -10095,11 +10138,39 @@ function setImageAgentStep(step) {
     var el = document.getElementById('ia-step-' + i);
     if (!el) continue;
     el.classList.remove('done','active');
+    if (step <= 0) continue;
     if (i < step) el.classList.add('done');
     else if (i === step) el.classList.add('active');
   }
 }
-function setIaModelChoice(value){ window._iaModelChoice = value || 'auto'; }
+function refreshIaModelOptions() {
+  const type = _imageGenConfig.postType || _fmtToPostType[_currentFmt] || 'single';
+  const list = _postTypeModels[type] || _postTypeModels.single;
+  const sel = document.getElementById('ia-model-choice');
+  const grid = document.getElementById('ia-model-grid');
+  if (sel) {
+    sel.innerHTML = '<option value="auto">IA escolhe o melhor modelo</option>' + list.map(function(n, idx) {
+      return '<option value="' + (idx + 1) + '">' + n + '</option>';
+    }).join('');
+  }
+  if (grid) {
+    let html = '<button class="ia-model-opt" data-model="auto" onclick="setIaModelChoice(\'auto\')">IA escolhe o melhor modelo</button>';
+    html += list.map(function(n, idx){
+      var v = String(idx + 1);
+      return '<button class="ia-model-opt" data-model="' + v + '" onclick="setIaModelChoice(\'' + v + '\')">' + n + '</button>';
+    }).join('');
+    grid.innerHTML = html;
+  }
+  setIaModelChoice(window._iaModelChoice || 'auto');
+}
+function setIaModelChoice(value){
+  window._iaModelChoice = value || 'auto';
+  var sel = document.getElementById('ia-model-choice');
+  if (sel && sel.value !== window._iaModelChoice) sel.value = window._iaModelChoice;
+  document.querySelectorAll('#ia-model-grid .ia-model-opt').forEach(function(el){
+    el.classList.toggle('on', el.dataset.model === window._iaModelChoice);
+  });
+}
 
 function syncIaCustomizations(){
   var fmtLbl = {post:'Post único',carrossel:'Carrossel',story:'Story',anuncio:'Anúncio',banner:'Banner',thumb:'Thumbnail'}[_currentFmt||'post'] || 'Post único';
@@ -10124,6 +10195,7 @@ function selVarCount(n) {
   document.querySelectorAll('.v2-var-count').forEach(function(b){ b.classList.remove('on'); });
   const el = document.getElementById('vc-' + n);
   if (el) el.classList.add('on');
+  syncIaCustomizations();
   _updateV2Credits();
 }
 
@@ -10180,7 +10252,7 @@ function _v2SetStageSub(txt) {
 }
 
 async function gerarV2() {
-  setImageAgentStep(4);
+  setImageAgentStep(3);
   const state = _bsGet('image');
   if (!state.messages.length) { toast('Converse com a IA primeiro para criar sua imagem','err'); return; }
 
@@ -10278,6 +10350,7 @@ async function gerarV2() {
       stageTimers.forEach(clearTimeout);
       if (loadingEl) loadingEl.style.display = 'none';
       setBar(100); setStage('Carrossel completo!', '');
+      setImageAgentStep(4);
       toast('Carrossel gerado! ' + totalSlides + ' slides prontos.', 'ok');
       if (me) { me.quota_used = (me.quota_used||0) + (_carrosselCreditMap[totalSlides] || totalSlides); updateQuota(); }
     } else {
@@ -10319,6 +10392,7 @@ async function gerarV2() {
       }
 
       showV2('gen-v2-result');
+      setImageAgentStep(4);
       const _cfgParts = [];
       if (_imageGenConfig.postType) _cfgParts.push({single:'Post único',carousel:'Carrossel',story:'Story',ad:'Anúncio',banner:'Banner',thumbnail:'Thumbnail'}[_imageGenConfig.postType]||_imageGenConfig.postType);
       if (_imageGenConfig.platform) _cfgParts.push({instagram:'Instagram',facebook:'Facebook',linkedin:'LinkedIn',tiktok:'TikTok',google:'Google Ads'}[_imageGenConfig.platform]||_imageGenConfig.platform);
@@ -14975,7 +15049,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   document.addEventListener('DOMContentLoaded', function(){
     sanitizeDuplicateVisuals();
-    setImageAgentStep(1);
+    setImageAgentStep(0);
+    refreshIaModelOptions();
     syncIaCustomizations();
   });
 })();
