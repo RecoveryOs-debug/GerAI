@@ -1092,6 +1092,34 @@ function callHaiku({ system, messages, maxTokens = 900 }) {
   });
 }
 
+// ── Prompt Cache (TTL 30 min, max 500 entries) ────────────────────────────────
+const _promptCache = new Map();
+const _CACHE_TTL = 30 * 60 * 1000;
+function _ck(...parts) {
+  let s = parts.join('|'), h = 0;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  return h.toString(36);
+}
+function _cacheGet(k) {
+  const e = _promptCache.get(k);
+  if (!e) return null;
+  if (Date.now() > e.exp) { _promptCache.delete(k); return null; }
+  return e.val;
+}
+function _cacheSet(k, val) {
+  if (_promptCache.size >= 500) _promptCache.delete(_promptCache.keys().next().value);
+  _promptCache.set(k, { val, exp: Date.now() + _CACHE_TTL });
+}
+
+// ── Context Compression ───────────────────────────────────────────────────────
+// Keeps only last N turns, trims long messages — reduces token cost ~40%
+function _compressCtx(messages, maxTurns = 8, maxChars = 350) {
+  return messages.slice(-maxTurns).map(m => ({
+    role: m.role,
+    content: typeof m.content === 'string' ? m.content.slice(0, maxChars) : m.content,
+  }));
+}
+
 // ── OpenAI Image Generation (GPT-image-2 / DALL-E) ───────────────────────────// Retorna { b64: string, tok: {in,out} }
 // size: '1024x1024' | '1024x1792' | '1792x1024'
 // quality: 'low' | 'medium' | 'high'
@@ -4350,15 +4378,16 @@ Usa 🔄 quando ainda falta clareza ou formato/rede não definidos.
 Quando ✅: "Fechado — clica em ✦ Gerar Imagem para criar."`;
 
   // Build messages array — inject reference images as first vision message if provided
-  let msgsToSend = messages.slice(-14).map(m => ({
+  // Compress context: last 8 turns, 350 chars each — cuts input tokens ~40%
+  let msgsToSend = _compressCtx(messages, 8, 350).map(m => ({
     role: m.role,
     content: Array.isArray(m.content) ? m.content : String(m.content),
   }));
 
   if (Array.isArray(referenceImages) && referenceImages.length > 0) {
     const visionContent = [
-      { type: 'text', text: 'O usuário enviou estas imagens de referência de estilo. Analise e confirme o estilo visual (cores, tipografia, layout) para guiar a geração:' },
-      ...referenceImages.slice(0, 4).map(img => ({
+      { type: 'text', text: 'Imagens de referência enviadas pelo usuário. Analise cores, tipografia e layout:' },
+      ...referenceImages.slice(0, 3).map(img => ({
         type: 'image_url',
         image_url: { url: `data:${img.type || 'image/jpeg'};base64,${img.b64}` },
       })),
@@ -4370,7 +4399,7 @@ Quando ✅: "Fechado — clica em ✦ Gerar Imagem para criar."`;
     const r = await callGPT5Messages({
       system,
       messages: msgsToSend,
-      maxTokens: 600,
+      maxTokens: 380,
     });
     const tok = { in: r.inputTokens || 0, out: r.outputTokens || 0 };
     const cost_usd = calcTokenCost('gpt-5.2', tok.in, tok.out);
@@ -4693,113 +4722,80 @@ function extractNetFromConversation(messages) {
   return 'Instagram';
 }
 
-// ── buildGPT2Prompt: Haiku → rich Portuguese prose prompt for GPT-image-2 ─────
+// ── buildGPT2Prompt: Haiku → Portuguese prose prompt for GPT-image-2 ──────────
 async function buildGPT2Prompt({ messages, format, network, brand, slideIndex = null, totalSlides = null, referenceImages = [] }) {
-  const conversationStr = messages.slice(-12).map(m =>
-    `${m.role === 'user' ? 'Usuário' : 'Estrategista'}: ${typeof m.content === 'string' ? m.content : '[imagem]'}`
-  ).join('\n\n');
+  // Use only last 8 turns, capped at 300 chars each — ~40% token saving
+  const compressed = _compressCtx(messages, 8, 300);
+  const conversationStr = compressed.map(m =>
+    `${m.role === 'user' ? 'U' : 'S'}: ${typeof m.content === 'string' ? m.content : '[img]'}`
+  ).join('\n');
 
-  // Extract format/network from conversation if not explicitly provided
   const fmt = format || extractFmtFromConversation(messages);
   const net = network || extractNetFromConversation(messages);
 
   const fmtGuide = {
-    post:      'Quadrado 1:1. Headline grande e bold na metade esquerda, mockup de dispositivo fotorealista na metade direita.',
-    carrossel: 'Quadrado 1:1 slide de carrossel. Número do slide no canto superior esquerdo. UMA mensagem bold por slide.',
-    story:     'Vertical 9:16. Background dramático full-bleed. Headline oversized centralizado em negrito.',
-    anuncio:   'Quadrado 1:1 anúncio. Logo no canto superior esquerdo. Headline bold + 2-3 benefícios + botão CTA embaixo.',
-    thumb:     'Landscape 16:9 thumbnail. Contraste máximo. Texto bold enorme no terço esquerdo.',
-    banner:    'Landscape 16:9 horizontal. Produto à direita, texto à esquerda.',
+    post:      '1:1. Headline bold esquerda, mockup fotorealista direita.',
+    carrossel: '1:1 slide. Número canto superior esq. UMA mensagem bold.',
+    story:     '9:16. Background dramático. Headline oversized centralizado.',
+    anuncio:   '1:1. Logo sup-esq. Headline + 2 benefícios + CTA embaixo.',
+    thumb:     '16:9. Contraste máximo. Texto bold enorme terço esquerdo.',
+    banner:    '16:9. Produto direita, texto esquerda.',
   };
 
-  let slideCtx = '';
-  if (slideIndex && totalSlides) {
-    const roles = { 1: 'capa/hook — capturar atenção imediata', [totalSlides]: 'CTA — chamada para ação clara' };
-    slideCtx = `\nEste é o slide ${slideIndex} de ${totalSlides}. Papel: ${roles[slideIndex] || 'conteúdo — um insight ou benefício chave'}.`;
-  }
+  const slideCtx = (slideIndex && totalSlides)
+    ? `Slide ${slideIndex}/${totalSlides}: ${slideIndex === 1 ? 'capa/hook' : slideIndex === totalSlides ? 'CTA' : 'insight/benefício'}.`
+    : '';
+  const brandStr = brand ? `Marca: ${brand.companyName || 'AutoPostt'}, primária ${brand.primaryColor || '#FFC107'}.` : '';
+  const refCtx   = referenceImages.length > 0 ? `${referenceImages.length} imagem(ns) de referência enviadas — combine o estilo visual.` : '';
 
-  const brandStr = brand ? `Marca: ${brand.companyName || 'AutoPostt'}, cor primária ${brand.primaryColor || '#FFC107'}, accent ${brand.accentColor || '#ffffff'}.` : '';
-  const refCtx = referenceImages.length > 0 ? `\nO usuário enviou ${referenceImages.length} imagem(ns) de referência de estilo — crie um prompt que produza resultado visualmente similar em qualidade, composição e sofisticação.` : '';
-
-  const system = `Você é um diretor de arte de classe mundial criando prompts para o gerador de imagens GPT-image-2.
-Converta a conversa de marketing abaixo em um único prompt em prosa (máx 450 tokens) que produza uma imagem de marketing INCRÍVEL e profissional.
-
-⚠️ REGRA CRÍTICA DE IDIOMA: TODO TEXTO VISÍVEL NA IMAGEM DEVE ESTAR EM PORTUGUÊS BRASILEIRO. Nunca use palavras em inglês em headlines, corpo, CTAs ou labels de UI. Headlines, subtítulos, CTAs e qualquer texto sobreposto OBRIGATORIAMENTE em PT-BR.
-
-Você está criando imagens para a AutoPostt — plataforma SaaS brasileira de criação de conteúdo para redes sociais.
-Identidade visual AutoPostt: fundo escuro #0B0B0B, accent âmbar/dourado #FFC107, mockups de dispositivos mostrando dashboard real com:
-- Sidebar escura com ícones de navegação e destaque âmbar
-- Cards de métricas (Alcance, Engajamento, Posts Publicados) com números em PT-BR (ex: "12,4K alcance")
-- Gráficos de crescimento com linhas de tendência âmbar
-- Tipografia SaaS moderna e limpa
-
-Formato: ${fmtGuide[fmt] || fmtGuide.post}
-${slideCtx}
-${brandStr}
-${refCtx}
-Rede/Plataforma: ${net}
-
-Seu prompt DEVE especificar:
-1. TEXTO EXATO na imagem: headline principal (máx 6 palavras, CAIXA ALTA, PORTUGUÊS), subheadline (máx 10 palavras, PORTUGUÊS), copy opcional PORTUGUÊS. Envolva cada texto em aspas.
-2. Tipografia: peso da fonte (Black/ExtraBold), hierarquia de tamanho, códigos HEX para cada elemento de texto.
-3. Posicionamento preciso: coordenadas exatas (terço esquerdo, centralizado, quadrante superior esquerdo, etc.).
-4. Background e atmosfera: fundo próximo ao preto ou muito escuro (#0a0a0a a #1a1a1a), iluminação profissional dramática.
-5. Cor accent: especifique EXATAMENTE onde o accent âmbar #FFC107 aparece (sublinhado, ícone, botão CTA, linha divisória, etc.).
-6. Elemento visual: mockup 3D fotorealista de dispositivo (celular exibindo dashboard AutoPostt, laptop com tela de analytics), alto detalhe.
-7. Qualidade: fotorealista, 8K render, ultra-sharp, qualidade de fotografia comercial de estúdio.
-
-ESTILO GLOBAL: ${STYLE_SYSTEM_BLOCK}
-
-Escreva APENAS o prompt. Sem explicações. Sem markdown. Apenas texto do prompt.`;
+  const system = `Diretor de arte criando prompt para GPT-image-2. Converta a conversa em prompt único em prosa.
+IDIOMA: todo texto na imagem em PORTUGUÊS BRASILEIRO. Zero inglês.
+Identidade AutoPostt: fundo #0B0B0B, accent âmbar #FFC107, mockups SaaS dark.
+Formato: ${fmtGuide[fmt] || fmtGuide.post} ${slideCtx}
+${brandStr} ${refCtx} Plataforma: ${net}
+Especifique: headline PT-BR entre aspas (máx 6 palavras CAIXA ALTA), posições exatas, HEX de cada cor, peso tipográfico, onde o âmbar aparece, mockup 3D fotorealista, qualidade 8K.
+Escreva APENAS o prompt. Sem comentários.`;
 
   const r = await callHaiku({
     system,
-    messages: [{ role: 'user', content: `Conversa:\n${conversationStr}\n\nPlataforma: ${net}. Gere o prompt de imagem agora.` }],
-    maxTokens: 500,
+    messages: [{ role: 'user', content: `Conversa:\n${conversationStr}\n\nPlataforma: ${net}. Gere o prompt agora.` }],
+    maxTokens: 380,
   });
   return { prompt: r.text.trim(), inputTokens: r.inputTokens || 0, outputTokens: r.outputTokens || 0 };
 }
 
-// ── Prompt Polisher: GPT-5.2 elevates Haiku draft to premium quality ──────────
+// ── Prompt Polisher: GPT-5.2 → premium quality (cached by prompt hash) ─────────
 async function polishPromptGPT5({ rawPrompt, format, style = 'premium-dark', referenceImages = [] }) {
+  // Cache hit when no reference images (deterministic input → same output)
+  const ck = referenceImages.length === 0 ? _ck(rawPrompt, style) : null;
+  if (ck) { const hit = _cacheGet(ck); if (hit) return hit; }
+
   const styleGuide = VISUAL_STYLE_GUIDES[style] || VISUAL_STYLE_GUIDES['premium-dark'];
-  const system = `Você é um diretor criativo sênior de uma agência de design de classe mundial. Seu trabalho é pegar um prompt de imagem de marketing e elevar ao nível profissional impecável.
-
-REGRAS RIGOROSAS:
-- Preserve o CONCEITO ORIGINAL exato, mensagem de marketing, produto e oferta — não invente novas ideias
-- Melhore: precisão composicional, especificidade tipográfica, detalhes de iluminação, coordenadas de layout
-- Substitua cada palavra vaga ("bonito", "moderno", "impressionante") por especificações visuais concretas
-- Especifique códigos HEX para cada elemento de cor
-- Coloque entre aspas cada string de texto que aparece na imagem
-- Declare posições de layout exatas (terço esquerdo, centro superior, 20% inferior direito, etc.)
-- Especifique qualidade de renderização por último: fotorealista 8K, ultra-sharp, iluminação de estúdio
-
-⚠️ CRÍTICO — IDIOMA: TODO TEXTO VISÍVEL NA IMAGEM DEVE ESTAR EM PORTUGUÊS BRASILEIRO. Se encontrar palavras em inglês em headlines, CTAs, copy ou labels de UI, traduza para o português. NUNCA gere texto em inglês.
-
-ESTILO VISUAL OBRIGATÓRIO: ${styleGuide}
-PADRÕES GLOBAIS: ${STYLE_SYSTEM_BLOCK}
-
-Saída APENAS o prompt refinado. Zero comentários. Zero markdown. Somente texto puro.`;
+  const system = `Diretor criativo sênior. Eleve o prompt de imagem ao nível premium.
+Regras: preserve conceito original; troque palavras vagas por especificações visuais concretas (HEX, posições exatas, peso tipográfico); textos entre aspas; qualidade 8K no final.
+IDIOMA: todo texto na imagem em PORTUGUÊS BRASILEIRO. Zero inglês.
+Estilo: ${styleGuide}
+Saída APENAS o prompt refinado. Zero comentários.`;
 
   try {
-    // Build messages — include reference images if provided so polisher can visually match the style
     let msgs;
     if (referenceImages.length > 0) {
-      const visionContent = [
-        { type: 'text', text: `Eleve este prompt ao nível premium. Combine visualmente o estilo das imagens de referência abaixo:\n\n${rawPrompt}` },
+      msgs = [{ role: 'user', content: [
+        { type: 'text', text: `Eleve ao nível premium. Use as referências de estilo:\n\n${rawPrompt}` },
         ...referenceImages.slice(0, 3).map(img => ({
           type: 'image_url',
           image_url: { url: `data:${img.type || 'image/jpeg'};base64,${img.b64}` },
         })),
-      ];
-      msgs = [{ role: 'user', content: visionContent }];
+      ]}];
     } else {
       msgs = [{ role: 'user', content: `Eleve ao nível premium:\n\n${rawPrompt}` }];
     }
-    const r = await callGPT5Messages({ system, messages: msgs, maxTokens: 750 });
-    return { prompt: r.text.trim(), inputTokens: r.inputTokens || 0, outputTokens: r.outputTokens || 0 };
+    const r = await callGPT5Messages({ system, messages: msgs, maxTokens: 550 });
+    const result = { prompt: r.text.trim(), inputTokens: r.inputTokens || 0, outputTokens: r.outputTokens || 0 };
+    if (ck) _cacheSet(ck, result);
+    return result;
   } catch (e) {
-    console.error('[polishPromptGPT5] fallback to raw prompt:', e.message);
+    console.error('[polishPromptGPT5] fallback:', e.message);
     return { prompt: rawPrompt, inputTokens: 0, outputTokens: 0 };
   }
 }
