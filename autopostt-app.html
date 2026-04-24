@@ -6019,10 +6019,10 @@ body.image-agent-refining #image-agent-refine-overlay{
   color: var(--tx-0) !important;
 }
 .fmt.v2-fmt.on {
-  background: rgba(245,197,24,.1) !important;
-  border-color: rgba(245,197,24,.38) !important;
-  color: var(--amber) !important;
-  box-shadow: 0 0 0 1px rgba(245,197,24,.07) inset !important;
+  background: linear-gradient(180deg, rgba(245,197,24,.22), rgba(120,70,8,.24)) !important;
+  border-color: rgba(245,197,24,.75) !important;
+  color: #F7E8BF !important;
+  box-shadow: 0 0 0 1px rgba(245,197,24,.18) inset, 0 8px 24px rgba(245,197,24,.16) !important;
 }
 
 /* ── BRAINSTORM WRAP ── */
@@ -6669,10 +6669,15 @@ body.image-agent-refining #image-agent-refine-overlay{
 .ia-right { display: flex; flex-direction: column; gap: 10px; }
 
 .ia-panel {
-  background: var(--ink-2,#111);
-  border: 1px solid rgba(255,255,255,.07);
-  border-radius: 14px;
+  background:
+    radial-gradient(120% 140% at 50% -20%, rgba(245,197,24,.10) 0%, rgba(245,197,24,0) 55%),
+    linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015));
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 18px;
   padding: 16px;
+  backdrop-filter: blur(14px) saturate(120%);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 18px 38px rgba(0,0,0,.30);
 }
 .ia-panel-title {
   font-size: 12px;
@@ -6772,14 +6777,19 @@ body.image-agent-refining #image-agent-refine-overlay{
 .ia-gen-btn:hover { opacity: .9; transform: translateY(-1px); }
 
 .ia-preview-card {
-  background: var(--ink-2,#111);
-  border: 1px solid rgba(255,255,255,.07);
-  border-radius: 14px;
+  background:
+    radial-gradient(120% 140% at 50% -20%, rgba(245,197,24,.08) 0%, rgba(245,197,24,0) 60%),
+    linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.012));
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 18px;
   padding: 16px;
   min-height: 260px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  backdrop-filter: blur(14px) saturate(120%);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 20px 38px rgba(0,0,0,.28);
 }
 .ia-preview-title {
   font-size: 12px;
@@ -7476,17 +7486,17 @@ body.image-agent-refining #image-agent-refine-overlay{
           <div class="ia-step-line" id="ia-line-1"></div>
           <div class="ia-step" id="ia-step-2">
             <div class="ia-step-circle">2</div>
-            <div class="ia-step-lbl">Estratégia <span class="ia-step-sub">(conversar com o agente)</span></div>
+            <div class="ia-step-lbl">Estratégia <span class="ia-step-sub">(Conversar com o agente)</span></div>
           </div>
           <div class="ia-step-line" id="ia-line-2"></div>
           <div class="ia-step" id="ia-step-3">
             <div class="ia-step-circle">3</div>
-            <div class="ia-step-lbl">Refinamento <span class="ia-step-sub">(após clicar em gerar)</span></div>
+            <div class="ia-step-lbl">Refinamento <span class="ia-step-sub">(Após clicar em gerar imagem)</span></div>
           </div>
           <div class="ia-step-line" id="ia-line-3"></div>
           <div class="ia-step" id="ia-step-4">
             <div class="ia-step-circle">4</div>
-            <div class="ia-step-lbl">Geração <span class="ia-step-sub">(depois do refinamento)</span></div>
+            <div class="ia-step-lbl">Geração <span class="ia-step-sub">(Depois que o agente refinou)</span></div>
           </div>
         </div>
       </div>
@@ -7504,7 +7514,6 @@ body.image-agent-refining #image-agent-refine-overlay{
               <button class="fmt v2-fmt"    id="f-carrossel" onclick="selFmt('carrossel')">Carrossel</button>
               <button class="fmt v2-fmt"    id="f-story"    onclick="selFmt('story')">Story</button>
               <button class="fmt v2-fmt"    id="f-anuncio"  onclick="selFmt('anuncio')">Anúncio</button>
-              <button class="fmt v2-fmt"    id="f-banner"   onclick="selFmt('banner')">Banner</button>
               <button class="fmt v2-fmt"    id="f-thumb"    onclick="selFmt('thumb')">Thumbnail</button>
             </div>
             <!-- Image config -->
@@ -7515,7 +7524,6 @@ body.image-agent-refining #image-agent-refine-overlay{
                 <option value="carousel">Carrossel</option>
                 <option value="story">Story</option>
                 <option value="ad">Anúncio</option>
-                <option value="banner">Banner</option>
                 <option value="thumbnail">Thumbnail</option>
               </select>
               <select class="img-config-select" id="sel-platform" onchange="updateImageConfig('platform',this.value)">
@@ -7548,14 +7556,7 @@ body.image-agent-refining #image-agent-refine-overlay{
 
           <!-- Strategist chat panel -->
           <div class="ia-panel" style="padding:0;overflow:hidden">
-            <div class="ia-panel-title" style="padding:12px 16px 0">Creative Strategist</div>
-            <div class="form-row" style="padding:0 16px 8px;margin-top:4px">
-              <label>Modelo de post</label>
-              <select id="ia-model-choice" onchange="setIaModelChoice(this.value)">
-                <option value="auto">IA escolhe o melhor modelo</option>
-              </select>
-            </div>
-            <div class="ia-model-grid" id="ia-model-grid"></div>
+            <div class="ia-panel-title" style="padding:12px 16px 0">+ Creative Strategist</div>
             <div class="bs-wrap" id="bs-image-wrap" style="border:none;background:transparent;margin-bottom:4px">
               <div class="bs-msgs" id="bs-image-msgs">
                 <div class="bs-placeholder">
@@ -13179,7 +13180,6 @@ function selectVoice(idx) {
 
 // Legacy stubs — mantidos para não quebrar chamadas existentes
 function renderModelGrid() {
-  setImageAgentStep(1);
   renderVoiceGrid();
   var grid = document.getElementById('modelo-grid');
   if (!grid) return;
