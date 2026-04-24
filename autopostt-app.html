@@ -917,11 +917,10 @@ tr:hover .td-actions { opacity: 1; }
 
 /* Brainstorm chat — taller in mid col */
 #pg-generate .bs-wrap {
-  min-height: 260px;
+  min-height: 320px;
 }
-#bs-image-msgs{min-height:76px;max-height:128px;}
 #pg-generate .bs-msgs {
-  min-height: 140px;
+  min-height: 200px;
 }
 
 /* Section labels in generate */
@@ -6019,10 +6018,10 @@ body.image-agent-refining #image-agent-refine-overlay{
   color: var(--tx-0) !important;
 }
 .fmt.v2-fmt.on {
-  background: linear-gradient(180deg, rgba(245,197,24,.22), rgba(120,70,8,.24)) !important;
-  border-color: rgba(245,197,24,.75) !important;
-  color: #F7E8BF !important;
-  box-shadow: 0 0 0 1px rgba(245,197,24,.18) inset, 0 8px 24px rgba(245,197,24,.16) !important;
+  background: rgba(245,197,24,.1) !important;
+  border-color: rgba(245,197,24,.38) !important;
+  color: var(--amber) !important;
+  box-shadow: 0 0 0 1px rgba(245,197,24,.07) inset !important;
 }
 
 /* ── BRAINSTORM WRAP ── */
@@ -6212,651 +6211,263 @@ body.image-agent-refining #image-agent-refine-overlay{
 .v2-result-actions .btn:hover { transform: translateY(-1px) !important; }
 </style>
 
-<style id="dash-redesign">
-/* ═══════════════════════════════════════════
-   SIDEBAR — FILLED ORANGE ACTIVE + PLAN SECTION
-═══════════════════════════════════════════ */
-.ni.on {
-  background: var(--a) !important;
-  color: #fff !important;
-  font-weight: 600 !important;
-  border-radius: 10px !important;
-}
-.ni.on .ni-ico svg { color: #fff !important; }
-.ni.on::after { display: none !important; }
-.ni:not(.on):hover { background: rgba(255,255,255,.05) !important; }
+<style id="premium-overhaul">
+/* ════════════════════════════════════════════════════
+   AUTOPOSTT STUDIO — PREMIUM DESIGN SYSTEM
+   Clean · Professional · Amber-accented
+════════════════════════════════════════════════════ */
 
+/* ── SIDEBAR ACTIVE STATE ── */
+.ni.on {
+  background: rgba(245,197,24,.08) !important;
+  color: var(--amber) !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  position: relative !important;
+}
+.ni.on::before {
+  content: '' !important;
+  position: absolute !important;
+  left: 0 !important; top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 2px !important; height: 14px !important;
+  background: var(--amber) !important;
+  border-radius: 0 2px 2px 0 !important;
+}
+.ni.on::after { display: none !important; }
+.ni.on .ni-ico svg { color: var(--amber) !important; stroke: var(--amber) !important; }
+.ni:not(.on):hover { background: rgba(255,255,255,.04) !important; border-radius: 8px !important; }
+
+/* ── SIDEBAR PLAN SECTION ── */
 .sb-plan {
   margin-top: auto;
-  padding: 14px 12px 12px;
+  padding: 12px 14px 10px;
   border-top: 1px solid rgba(255,255,255,.06);
 }
 .sb-plan-label {
-  font-size: 9.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .1em;
-  color: rgba(255,255,255,.4);
-  margin-bottom: 6px;
+  font-size: 9px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .12em;
+  color: rgba(255,255,255,.28); margin-bottom: 5px;
 }
-.sb-plan-name {
-  font-size: 13px;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 2px;
-}
-.sb-plan-credits {
-  font-size: 11.5px;
-  color: rgba(255,255,255,.55);
-  margin-bottom: 8px;
-}
+.sb-plan-name { font-size: 12.5px; font-weight: 700; color: rgba(255,255,255,.9); }
+.sb-plan-credits { font-size: 11px; color: rgba(255,255,255,.45); margin: 2px 0 9px; }
 .sb-plan-bar-track {
-  height: 4px;
-  background: rgba(255,255,255,.1);
-  border-radius: 999px;
-  margin-bottom: 10px;
-  overflow: hidden;
+  height: 3px; background: rgba(255,255,255,.07);
+  border-radius: 999px; margin-bottom: 10px; overflow: hidden;
 }
 .sb-plan-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg,var(--a),var(--ah));
-  border-radius: 999px;
-  transition: width .6s;
+  background: linear-gradient(90deg, var(--amber), #FFD740);
+  border-radius: 999px; transition: width .6s;
 }
 .sb-plan-btn {
-  width: 100%;
-  padding: 8px 0;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--a);
-  background: rgba(232,84,26,.1);
-  border: 1px solid rgba(232,84,26,.3);
-  border-radius: 8px;
-  cursor: pointer;
-  font-family: var(--f,inherit);
-  transition: background .15s;
+  width: 100%; padding: 7px 0; font-size: 11.5px; font-weight: 700;
+  color: var(--amber); background: rgba(245,197,24,.08);
+  border: 1px solid rgba(245,197,24,.18); border-radius: 7px;
+  cursor: pointer; font-family: var(--f, inherit); transition: background .15s;
 }
-.sb-plan-btn:hover { background: rgba(232,84,26,.18) !important; }
+.sb-plan-btn:hover { background: rgba(245,197,24,.15) !important; }
 .sb-user-row {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 10px 12px 12px;
-  border-top: 1px solid rgba(255,255,255,.06);
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 14px 14px; cursor: pointer;
 }
 .sb-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: linear-gradient(135deg,var(--a),var(--ah));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: 800;
-  color: #fff;
-  flex-shrink: 0;
+  width: 30px; height: 30px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--amber) 0%, #D4A80E 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800; color: #0D0D0F; flex-shrink: 0;
 }
-.sb-user-name { font-size: 12.5px; font-weight: 700; color: var(--t0,#fff); }
-.sb-user-plan { font-size: 10.5px; color: var(--t3,rgba(255,255,255,.35)); }
+.sb-user-name { font-size: 12px; font-weight: 700; color: rgba(255,255,255,.9); line-height: 1.3; }
+.sb-user-plan { font-size: 10.5px; color: rgba(255,255,255,.3); }
 
-/* ═══════════════════════════════════════════
-   DASHBOARD REDESIGN
-═══════════════════════════════════════════ */
+/* ── GLOBAL CARDS ── */
+.card { border-radius: 10px !important; }
+.btn-p {
+  background: var(--amber) !important; color: #0D0D0F !important;
+  border: none !important; font-weight: 700 !important;
+  border-radius: 8px !important; transition: opacity .15s, transform .1s !important;
+}
+.btn-p:hover { opacity: .86 !important; transform: translateY(-1px) !important; }
+.btn-g {
+  background: rgba(255,255,255,.04) !important; color: rgba(255,255,255,.65) !important;
+  border: 1px solid rgba(255,255,255,.08) !important; border-radius: 8px !important;
+  transition: background .15s, color .15s, border-color .15s !important;
+}
+.btn-g:hover { background: rgba(255,255,255,.07) !important; color: rgba(255,255,255,.85) !important; border-color: rgba(255,255,255,.14) !important; }
+
+/* ════ DASHBOARD ════ */
 .dash-hdr {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 22px;
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 16px;
+  margin-bottom: 22px; padding-bottom: 18px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
 }
-.dash-hdr-left {}
-.dash-hdr-title {
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--t0,#fff);
-  letter-spacing: -.04em;
-  line-height: 1.15;
-}
-.dash-hdr-sub {
-  font-size: 13px;
-  color: var(--t3,rgba(255,255,255,.4));
-  margin-top: 3px;
-}
-.dash-hdr-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
+.dash-hdr-title { font-size: 19px; font-weight: 800; color: rgba(255,255,255,.95); letter-spacing: -.04em; }
+.dash-hdr-sub { font-size: 12.5px; color: rgba(255,255,255,.3); margin-top: 3px; }
+.dash-hdr-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .dash-date-range {
-  font-size: 12px;
-  color: var(--t2,rgba(255,255,255,.55));
-  padding: 6px 12px;
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.07);
-  border-radius: 8px;
-  cursor: pointer;
+  font-size: 12px; color: rgba(255,255,255,.45);
+  padding: 6px 12px; background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07); border-radius: 8px;
+  cursor: pointer; transition: border-color .15s; user-select: none;
 }
+.dash-date-range:hover { border-color: rgba(255,255,255,.13); }
 .dash-export-btn {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--t0,#fff);
-  padding: 7px 14px;
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 8px;
-  cursor: pointer;
-  font-family: var(--f,inherit);
-  transition: background .15s;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  font-size: 12px; font-weight: 700; color: rgba(255,255,255,.55);
+  padding: 6px 13px; background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07); border-radius: 8px;
+  cursor: pointer; font-family: var(--f, inherit); transition: all .15s;
+  display: flex; align-items: center; gap: 6px;
 }
-.dash-export-btn:hover { background: rgba(255,255,255,.1) !important; }
+.dash-export-btn:hover { background: rgba(255,255,255,.06) !important; color: rgba(255,255,255,.85); }
 
+/* KPI cards */
 .dash-kpi-row {
-  display: grid;
-  grid-template-columns: repeat(4,minmax(0,1fr));
-  gap: 14px;
-  margin-bottom: 20px;
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px; margin-bottom: 16px;
 }
 .dash-kpi {
-  background: var(--ink-2,#111);
-  border: 1px solid rgba(255,255,255,.07);
-  border-radius: 14px;
-  padding: 18px 18px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
+  background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.06);
+  border-radius: 10px; padding: 16px 16px 14px;
+  display: flex; flex-direction: column; transition: border-color .2s;
 }
-.dash-kpi-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-.dash-kpi-lbl {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--t2,rgba(255,255,255,.55));
-}
-.dash-kpi-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.dash-kpi-icon.orange { background: rgba(232,84,26,.15); }
-.dash-kpi-icon.orange svg { color: var(--a); }
-.dash-kpi-icon.purple { background: rgba(139,92,246,.15); }
-.dash-kpi-icon.purple svg { color: #8B5CF6; }
-.dash-kpi-icon.green  { background: rgba(34,197,94,.15); }
-.dash-kpi-icon.green  svg { color: #22C55E; }
-.dash-kpi-icon.blue   { background: rgba(59,130,246,.15); }
-.dash-kpi-icon.blue   svg { color: #3B82F6; }
-.dash-kpi-val {
-  font-size: 32px;
-  font-weight: 800;
-  letter-spacing: -.05em;
-  color: var(--t0,#fff);
-  line-height: 1;
-  margin-bottom: 4px;
-}
-.dash-kpi-delta {
-  font-size: 11px;
-  color: var(--t3,rgba(255,255,255,.35));
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
+.dash-kpi:hover { border-color: rgba(255,255,255,.1); }
+.dash-kpi-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.dash-kpi-lbl { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.3); text-transform: uppercase; letter-spacing: .09em; }
+.dash-kpi-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.dash-kpi-icon.orange { background: rgba(245,197,24,.1); }
+.dash-kpi-icon.orange svg { stroke: var(--amber); }
+.dash-kpi-icon.purple { background: rgba(139,92,246,.1); }
+.dash-kpi-icon.purple svg { stroke: #8B5CF6; }
+.dash-kpi-icon.green  { background: rgba(34,197,94,.1); }
+.dash-kpi-icon.green  svg { stroke: #22C55E; }
+.dash-kpi-icon.blue   { background: rgba(99,102,241,.1); }
+.dash-kpi-icon.blue   svg { stroke: #6366F1; }
+.dash-kpi-val { font-size: 28px; font-weight: 800; letter-spacing: -.05em; color: rgba(255,255,255,.95); line-height: 1; margin-bottom: 4px; }
+.dash-kpi-delta { font-size: 11px; color: rgba(255,255,255,.3); line-height: 1.4; }
 .dash-kpi-delta.pos { color: #22C55E; }
 .dash-kpi-delta.neg { color: #EF4444; }
 
-.dash-charts-row {
-  display: grid;
-  grid-template-columns: 1fr minmax(220px,.45fr);
-  gap: 14px;
-  margin-bottom: 14px;
-}
-.dash-card {
-  background: var(--ink-2,#111);
-  border: 1px solid rgba(255,255,255,.07);
-  border-radius: 14px;
-  padding: 18px 18px 14px;
-}
-.dash-card-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--t0,#fff);
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.dash-card-sub { font-size: 11px; color: var(--t3,rgba(255,255,255,.35)); font-weight: 400; }
-.dash-line-svg { width: 100%; height: 120px; }
-.dash-donut-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
-.dash-donut-svg { width: 120px; height: 120px; }
-.dash-donut-legend { width: 100%; display: flex; flex-direction: column; gap: 6px; }
-.dash-donut-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 11.5px;
-  color: var(--t2,rgba(255,255,255,.55));
-}
-.dash-donut-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dash-charts-row { display: grid; grid-template-columns: 1fr minmax(190px,.38fr); gap: 10px; margin-bottom: 10px; }
+.dash-card { background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.06); border-radius: 10px; padding: 16px 16px 12px; }
+.dash-card-title { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.35); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; text-transform: uppercase; letter-spacing: .1em; }
+.dash-card-sub { font-size: 10px; color: rgba(255,255,255,.25); font-weight: 400; text-transform: none; letter-spacing: 0; }
+.dash-line-svg { width: 100%; height: 100px; }
+.dash-donut-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.dash-donut-svg { width: 100px; height: 100px; }
+.dash-donut-legend { width: 100%; display: flex; flex-direction: column; gap: 5px; }
+.dash-donut-item { display: flex; align-items: center; gap: 7px; font-size: 11px; color: rgba(255,255,255,.45); }
+.dash-donut-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
-.dash-bottom-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 14px;
-}
-.dash-bar-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-bottom: 8px;
-}
-.dash-bar-label {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 11.5px;
-  color: var(--t2,rgba(255,255,255,.55));
-  margin-bottom: 2px;
-}
-.dash-bar-track {
-  height: 5px;
-  background: rgba(255,255,255,.07);
-  border-radius: 999px;
-  overflow: hidden;
-}
-.dash-bar-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: var(--a);
-}
-.dash-list-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(255,255,255,.05);
-  font-size: 12px;
-  color: var(--t1,rgba(255,255,255,.75));
-}
+.dash-bottom-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.dash-bar-item { margin-bottom: 9px; }
+.dash-bar-label { display: flex; justify-content: space-between; font-size: 11px; color: rgba(255,255,255,.4); margin-bottom: 5px; }
+.dash-bar-track { height: 3px; background: rgba(255,255,255,.06); border-radius: 999px; overflow: hidden; }
+.dash-bar-fill { height: 100%; border-radius: 999px; background: var(--amber); }
+.dash-list-item { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.05); font-size: 11.5px; color: rgba(255,255,255,.5); }
 .dash-list-item:last-child { border-bottom: none; }
-.dash-list-badge {
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: rgba(232,84,26,.12);
-  color: var(--a);
-}
-.dash-insight {
-  padding: 10px 12px;
-  background: rgba(255,255,255,.025);
-  border: 1px solid rgba(255,255,255,.06);
-  border-radius: 10px;
-  font-size: 12px;
-  color: var(--t2,rgba(255,255,255,.55));
-  line-height: 1.5;
-  margin-bottom: 8px;
-}
-.dash-insight-dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--a);
-  display: inline-block;
-  margin-right: 6px;
-  flex-shrink: 0;
-}
+.dash-list-badge { font-size: 9.5px; font-weight: 700; padding: 2px 7px; border-radius: 5px; background: rgba(245,197,24,.1); color: var(--amber); }
+.dash-insight { padding: 9px 11px; background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.05); border-radius: 8px; font-size: 11px; color: rgba(255,255,255,.45); line-height: 1.55; margin-bottom: 6px; display: flex; align-items: flex-start; gap: 8px; }
+.dash-insight-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--amber); display: inline-block; flex-shrink: 0; margin-top: 5px; }
 
 @media(max-width:1180px){
-  .dash-kpi-row { grid-template-columns: repeat(2,1fr) !important; }
-  .dash-charts-row,.dash-bottom-row { grid-template-columns: 1fr !important; }
+  .dash-kpi-row{grid-template-columns:repeat(2,1fr)!important}
+  .dash-charts-row,.dash-bottom-row{grid-template-columns:1fr!important}
 }
 
-/* ═══════════════════════════════════════════
-   IMAGE AGENT — 5-STEP WIZARD
-═══════════════════════════════════════════ */
+/* ════ IMAGE AGENT ════ */
 .ia-hdr {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 18px;
-  flex-wrap: wrap;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 18px; padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
 }
-.ia-hdr-left {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.ia-title {
-  font-size: 34px;
-  font-weight: 700;
-  color: var(--t0,#fff);
-  letter-spacing: -.02em;
-}
-.ia-credits-pill {
-  font-size: 11.5px;
-  font-weight: 600;
-  color: var(--t2,rgba(255,255,255,.55));
-  padding: 5px 11px;
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.07);
-  border-radius: 999px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-.ia-hist-btn {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--t1,rgba(255,255,255,.75));
-  padding: 6px 13px;
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 8px;
-  cursor: pointer;
-  font-family: var(--f,inherit);
-  transition: background .15s;
-}
-.ia-hist-btn:hover { background: rgba(255,255,255,.08) !important; }
+.ia-hdr-left { display: flex; align-items: center; gap: 10px; }
+.ia-title { font-size: 16px; font-weight: 800; color: rgba(255,255,255,.95); letter-spacing: -.03em; }
+.ia-beta { font-size: 8.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--amber); background: rgba(245,197,24,.08); border: 1px solid rgba(245,197,24,.18); border-radius: 4px; padding: 2px 6px; }
+.ia-credits-pill { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.5); padding: 5px 12px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07); border-radius: 7px; display: flex; align-items: center; gap: 5px; }
+.ia-credits-pill svg { stroke: var(--amber); }
+.ia-hist-btn { font-size: 12px; font-weight: 700; color: rgba(255,255,255,.55); padding: 5px 13px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07); border-radius: 7px; cursor: pointer; font-family: var(--f,inherit); transition: all .15s; }
+.ia-hist-btn:hover { background: rgba(255,255,255,.06) !important; color: rgba(255,255,255,.85); }
 
-/* Steps */
-.ia-steps-wrap {
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  padding: 10px 0 12px;
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  gap: 0;
-  overflow-x: auto;
-}
-.ia-steps {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  gap: 0;
-}
-.ia-step {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  flex: 1;
-  min-width: 0;
-}
-.ia-step-circle {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 1px solid rgba(255,255,255,.18);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 700;
-  color: rgba(255,255,255,.38);
-  flex-shrink: 0;
-  background: rgba(255,255,255,.02);
-  transition: all .2s;
-}
-.ia-step-lbl {
-  font-size: 22px;
-  font-weight: 700;
-  color: rgba(255,255,255,.34);
-  white-space: nowrap;
-  transition: color .2s;
-  display:flex;
-  align-items:baseline;
-  gap:4px;
-}
-.ia-step-sub{display:none;}
-.ia-step-line {
-  flex: 1;
-  height: 2px;
-  background: rgba(255,255,255,.14);
-  margin: 0 6px;
-  border-radius: 999px;
-  transition: background .3s;
-  min-width: 16px;
-}
-.ia-step.done .ia-step-circle {
-  background: rgba(245,197,24,.12);
-  border-color: rgba(245,197,24,.55);
-  color: var(--amber,#f5c518);
-}
-.ia-step.done .ia-step-lbl { color: rgba(255,255,255,.6); }
-.ia-step.done + .ia-step-line { background: var(--amber,#f5c518); }
-.ia-step.active .ia-step-circle {
-  background: var(--amber,#f5c518);
-  border-color: var(--amber,#f5c518);
-  color: #161616;
-  box-shadow: 0 0 0 3px rgba(245,197,24,.24);
-}
-.ia-step.active .ia-step-lbl { color: var(--amber,#f5c518); font-weight: 700; }
+/* 4-step wizard */
+.ia-steps-wrap { background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06); border-radius: 10px; padding: 13px 22px; margin-bottom: 16px; overflow-x: auto; }
+.ia-steps { display: flex; align-items: center; width: 100%; min-width: 480px; }
+.ia-step { display: flex; align-items: center; gap: 8px; }
+.ia-step-circle { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.1); display: flex; align-items: center; justify-content: center; font-size: 10.5px; font-weight: 700; color: rgba(255,255,255,.2); flex-shrink: 0; background: transparent; transition: all .25s; }
+.ia-step-lbl { font-size: 11px; font-weight: 500; color: rgba(255,255,255,.2); white-space: nowrap; transition: color .2s; }
+.ia-step-line { flex: 1; height: 1px; background: rgba(255,255,255,.07); margin: 0 10px; border-radius: 999px; transition: background .4s; min-width: 28px; }
+.ia-step.done .ia-step-circle { background: rgba(245,197,24,.1); border-color: rgba(245,197,24,.3); color: transparent; }
+.ia-step.done .ia-step-circle::after { content: '✓'; color: var(--amber); font-size: 10px; font-weight: 800; }
+.ia-step.done .ia-step-lbl { color: rgba(255,255,255,.45); }
+.ia-step.done + .ia-step-line { background: rgba(245,197,24,.25); }
+.ia-step.active .ia-step-circle { background: var(--amber); border-color: var(--amber); color: #0D0D0F; font-weight: 800; box-shadow: 0 0 0 3px rgba(245,197,24,.12); }
+.ia-step.active .ia-step-lbl { color: rgba(255,255,255,.9); font-weight: 700; }
 
-@media (max-width: 1100px){ .ia-custom-list{grid-template-columns:repeat(2,minmax(0,1fr));} }
-/* Two-column layout */
-.ia-layout {
-  display: grid;
-  grid-template-columns: 1fr minmax(0,.9fr);
-  gap: 14px;
-  align-items: start;
-}
-.ia-left { display: flex; flex-direction: column; gap: 10px; }
-.ia-right { display: flex; flex-direction: column; gap: 10px; }
+/* Layout */
+.ia-layout { display: grid; grid-template-columns: minmax(0,.95fr) minmax(0,1.05fr); gap: 12px; align-items: start; }
+.ia-left, .ia-right { display: flex; flex-direction: column; gap: 10px; }
+.ia-panel { background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.06); border-radius: 10px; padding: 14px 16px; transition: border-color .2s; }
+.ia-panel:focus-within { border-color: rgba(245,197,24,.2); }
+.ia-panel-title { font-size: 9.5px; font-weight: 700; color: rgba(255,255,255,.28); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 11px; }
 
-.ia-panel {
-  background:
-    radial-gradient(120% 140% at 50% -18%, rgba(245,197,24,.10) 0%, rgba(245,197,24,0) 54%),
-    linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.012));
-  border: 1px solid rgba(255,255,255,.14);
-  border-radius: 18px;
-  padding: 16px;
-  backdrop-filter: blur(10px) saturate(115%);
-  -webkit-backdrop-filter: blur(10px) saturate(115%);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 10px 26px rgba(0,0,0,.30);
-}
-.ia-panel-title {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--t2,rgba(255,255,255,.55));
-  text-transform: uppercase;
-  letter-spacing: .1em;
-  margin-bottom: 12px;
-}
-.ia-model-grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:6px;
-  max-height:170px;
-  overflow:auto;
-  margin:0 16px 10px;
-  padding-right:2px;
-}
-.ia-model-opt{
-  border:1px solid rgba(255,255,255,.1);
-  background:rgba(255,255,255,.02);
-  color:var(--t2);
-  border-radius:8px;
-  font-size:10px;
-  line-height:1.35;
-  padding:7px 8px;
-  cursor:pointer;
-  transition:.18s ease;
-}
-.ia-model-opt:hover{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.06)}
-.ia-model-opt.on{
-  border-color:var(--a);
-  background:rgba(232,84,26,.14);
-  color:var(--t0);
-}
+/* Format chips */
+.ia-fmt-chips { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+.ia-fmt-chip { padding: 6px 14px; font-size: 12px; font-weight: 600; color: rgba(255,255,255,.5); background: transparent; border: 1px solid rgba(255,255,255,.07); border-radius: 7px; cursor: pointer; font-family: var(--f,inherit); transition: all .15s; }
+.ia-fmt-chip:hover { color: rgba(255,255,255,.8); border-color: rgba(255,255,255,.14); background: rgba(255,255,255,.03); }
+.ia-fmt-chip.on { background: rgba(245,197,24,.1); border-color: rgba(245,197,24,.35); color: var(--amber); font-weight: 700; }
 
-.ia-custom-list { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
-.ia-custom-item {
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  font-size: 11px;
-  color: var(--t2,rgba(255,255,255,.55));
-  padding: 10px 12px;
-  background: rgba(255,255,255,.025);
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,.05);
-  text-transform:uppercase;
-  letter-spacing:.08em;
-}
-.ia-custom-val {
-  font-size: 12px;
-  color: var(--t0,#fff);
-  text-transform:none;
-  letter-spacing:0;
-  font-weight:600;
-}
+/* Network chips */
+.ia-network-row { display: flex; gap: 5px; flex-wrap: wrap; }
+.ia-net-chip { padding: 5px 11px; font-size: 11px; font-weight: 600; color: rgba(255,255,255,.35); background: transparent; border: 1px solid rgba(255,255,255,.06); border-radius: 6px; cursor: pointer; font-family: var(--f,inherit); transition: all .15s; }
+.ia-net-chip:hover { color: rgba(255,255,255,.65); border-color: rgba(255,255,255,.12); }
+.ia-net-chip.on { background: rgba(245,197,24,.08); border-color: rgba(245,197,24,.28); color: var(--amber); font-weight: 700; }
 
-.ia-nav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 4px;
-}
-.ia-back-btn {
-  padding: 9px 18px;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--t1,rgba(255,255,255,.75));
-  background: rgba(255,255,255,.05);
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 10px;
-  cursor: pointer;
-  font-family: var(--f,inherit);
-  transition: background .15s;
-}
-.ia-back-btn:hover { background: rgba(255,255,255,.09) !important; }
-.ia-gen-btn {
-  flex: 1;
-  padding: 10px 18px;
-  font-size: 13px;
-  font-weight: 800;
-  color: #fff;
-  background: linear-gradient(135deg,var(--a) 0%,var(--amber-l) 100%);
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-family: var(--f,inherit);
-  letter-spacing: -.02em;
-  box-shadow: 0 4px 18px rgba(232,84,26,.3);
-  transition: opacity .15s, transform .15s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-.ia-gen-btn:hover { opacity: .9; transform: translateY(-1px); }
+/* Variation buttons */
+.ia-var-row { display: flex; align-items: center; gap: 5px; }
+.ia-var-label { font-size: 9.5px; font-weight: 700; color: rgba(255,255,255,.28); text-transform: uppercase; letter-spacing: .1em; white-space: nowrap; margin-right: 4px; }
+.ia-var-btn { display: flex; flex-direction: column; align-items: center; padding: 6px 13px; background: transparent; border: 1px solid rgba(255,255,255,.07); border-radius: 7px; cursor: pointer; font-family: var(--f,inherit); transition: all .15s; min-width: 46px; }
+.ia-var-btn:hover { border-color: rgba(255,255,255,.14); background: rgba(255,255,255,.03); }
+.ia-var-btn.on { background: rgba(245,197,24,.1); border-color: rgba(245,197,24,.35); }
+.ia-var-btn .ia-var-n { font-size: 13px; font-weight: 800; color: rgba(255,255,255,.8); line-height: 1; }
+.ia-var-btn.on .ia-var-n { color: var(--amber); }
+.ia-var-btn .ia-var-cr { font-size: 9px; font-weight: 600; color: rgba(255,255,255,.25); margin-top: 2px; }
+.ia-var-btn.on .ia-var-cr { color: rgba(245,197,24,.55); }
 
-.ia-preview-card {
-  background:
-    radial-gradient(120% 140% at 50% -20%, rgba(245,197,24,.08) 0%, rgba(245,197,24,0) 56%),
-    linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.012));
-  border: 1px solid rgba(255,255,255,.14);
-  border-radius: 18px;
-  padding: 16px;
-  min-height: 260px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  backdrop-filter: blur(14px) saturate(120%);
-  -webkit-backdrop-filter: blur(14px) saturate(120%);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 12px 30px rgba(0,0,0,.3);
-}
-.ia-preview-title {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--t2,rgba(255,255,255,.55));
-  text-transform: uppercase;
-  letter-spacing: .1em;
-}
-.ia-preview-area {
-  flex: 1;
-  min-height: 200px;
-  display: flex;
-  align-items: stretch;
-  flex-direction: column;
-}
-.ia-action-row {
-  display: flex;
-  gap: 8px;
-}
-.ia-action-btn {
-  flex: 1;
-  padding: 8px 0;
-  font-size: 12px;
-  font-weight: 700;
-  border-radius: 9px;
-  cursor: pointer;
-  font-family: var(--f,inherit);
-  transition: background .15s;
-  border: 1px solid rgba(255,255,255,.08);
-  color: var(--t0,#fff);
-  background: rgba(255,255,255,.04);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-}
-.ia-action-btn:hover { background: rgba(255,255,255,.09) !important; }
-.ia-action-btn.primary {
-  background: rgba(232,84,26,.12);
-  border-color: rgba(232,84,26,.25);
-  color: var(--a);
-}
-.ia-action-btn.primary:hover { background: rgba(232,84,26,.2) !important; }
+/* Customizations bottom bar */
+.ia-custom-bar { display: grid; grid-template-columns: repeat(4,1fr); gap: 7px; }
+.ia-custom-cell { background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06); border-radius: 8px; padding: 9px 11px; }
+.ia-custom-cell-lbl { font-size: 9px; font-weight: 700; color: rgba(255,255,255,.25); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
+.ia-custom-cell-val { font-size: 11.5px; font-weight: 700; color: rgba(255,255,255,.75); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-.ia-tips-card {
-  background: rgba(232,84,26,.04);
-  border: 1px solid rgba(232,84,26,.14);
-  border-radius: 12px;
-  padding: 14px 15px;
-}
-.ia-tips-title {
-  font-size: 10px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .12em;
-  color: var(--a);
-  margin-bottom: 8px;
-}
-.ia-tip-item {
-  font-size: 11.5px;
-  color: var(--t2,rgba(255,255,255,.55));
-  line-height: 1.5;
-  margin-bottom: 5px;
-  padding-left: 12px;
-  position: relative;
-}
-.ia-tip-item::before {
-  content: '·';
-  position: absolute;
-  left: 2px;
-  color: var(--a);
-  font-weight: 800;
-}
+/* Nav buttons */
+.ia-nav { display: flex; align-items: center; gap: 7px; }
+.ia-back-btn { padding: 10px 18px; font-size: 12.5px; font-weight: 700; color: rgba(255,255,255,.5); background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07); border-radius: 9px; cursor: pointer; font-family: var(--f,inherit); transition: all .15s; flex-shrink: 0; }
+.ia-back-btn:hover { background: rgba(255,255,255,.07) !important; color: rgba(255,255,255,.8); }
+.ia-gen-btn { flex: 1; padding: 11px 20px; font-size: 13px; font-weight: 800; color: #0D0D0F; background: var(--amber); border: none; border-radius: 9px; cursor: pointer; font-family: var(--f,inherit); letter-spacing: -.02em; transition: opacity .15s, transform .1s; display: flex; align-items: center; justify-content: center; gap: 7px; }
+.ia-gen-btn:hover { opacity: .86; transform: translateY(-1px); }
+
+/* Preview */
+.ia-preview-card { background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.06); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-height: 260px; }
+.ia-preview-title { font-size: 9.5px; font-weight: 700; color: rgba(255,255,255,.28); text-transform: uppercase; letter-spacing: .12em; }
+.ia-preview-area { flex: 1; display: flex; flex-direction: column; }
+.ia-action-row { display: flex; gap: 6px; }
+.ia-action-btn { flex: 1; padding: 8px 0; font-size: 11.5px; font-weight: 600; border-radius: 8px; cursor: pointer; font-family: var(--f,inherit); transition: all .15s; border: 1px solid rgba(255,255,255,.07); color: rgba(255,255,255,.5); background: rgba(255,255,255,.03); display: flex; align-items: center; justify-content: center; gap: 5px; }
+.ia-action-btn:hover { background: rgba(255,255,255,.06) !important; color: rgba(255,255,255,.8); }
+.ia-action-btn.primary { background: rgba(245,197,24,.1); border-color: rgba(245,197,24,.22); color: var(--amber); }
+.ia-action-btn.primary:hover { background: rgba(245,197,24,.16) !important; }
+
+/* Tips */
+.ia-tips-card { background: rgba(245,197,24,.03); border: 1px solid rgba(245,197,24,.09); border-radius: 10px; padding: 13px 15px; }
+.ia-tips-title { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .13em; color: var(--amber); margin-bottom: 8px; opacity: .7; }
+.ia-tip-item { font-size: 11px; color: rgba(255,255,255,.4); line-height: 1.55; margin-bottom: 5px; padding-left: 12px; position: relative; }
+.ia-tip-item::before { content: '—'; position: absolute; left: 0; color: rgba(245,197,24,.35); font-weight: 700; }
+
+/* Fix generation progress bar */
+#gen-v2-bar { background: var(--amber) !important; }
 
 @media(max-width:1100px){
-  .ia-layout { grid-template-columns: 1fr !important; }
-  .ia-title { font-size: 24px; }
-  .ia-step-lbl { font-size: 14px; }
+  .ia-layout{grid-template-columns:1fr!important}
+  .ia-custom-bar{grid-template-columns:repeat(2,1fr)!important}
 }
 </style>
 
@@ -7373,12 +6984,12 @@ body.image-agent-refining #image-agent-refine-overlay{
           <svg class="dash-line-svg" id="dash-line-svg" viewBox="0 0 600 100" preserveAspectRatio="none">
             <defs>
               <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="var(--a)" stop-opacity=".35"/>
-                <stop offset="100%" stop-color="var(--a)" stop-opacity="0"/>
+                <stop offset="0%" stop-color="#E8541A" stop-opacity=".35"/>
+                <stop offset="100%" stop-color="#E8541A" stop-opacity="0"/>
               </linearGradient>
             </defs>
             <path id="dash-area-fill" fill="url(#lineGrad)" d=""/>
-            <path id="dash-line-path" fill="none" stroke="var(--a)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d=""/>
+            <path id="dash-line-path" fill="none" stroke="#E8541A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d=""/>
           </svg>
           <div id="dash-line-labels" style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:6px"></div>
         </div>
@@ -7387,12 +6998,12 @@ body.image-agent-refining #image-agent-refine-overlay{
           <div class="dash-donut-wrap">
             <svg class="dash-donut-svg" id="dash-donut-svg" viewBox="0 0 120 120">
               <circle cx="60" cy="60" r="44" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="16"/>
-              <circle id="donut-arc-1" cx="60" cy="60" r="44" fill="none" stroke="var(--a)" stroke-width="16" stroke-dasharray="0 276" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+              <circle id="donut-arc-1" cx="60" cy="60" r="44" fill="none" stroke="#E8541A" stroke-width="16" stroke-dasharray="0 276" stroke-linecap="round" transform="rotate(-90 60 60)"/>
               <circle id="donut-arc-2" cx="60" cy="60" r="44" fill="none" stroke="#8B5CF6" stroke-width="16" stroke-dasharray="0 276" stroke-linecap="round" transform="rotate(-90 60 60)"/>
               <circle id="donut-arc-3" cx="60" cy="60" r="44" fill="none" stroke="#22C55E" stroke-width="16" stroke-dasharray="0 276" stroke-linecap="round" transform="rotate(-90 60 60)"/>
             </svg>
             <div class="dash-donut-legend" id="dash-donut-legend">
-              <div class="dash-donut-item"><div class="dash-donut-dot" style="background:var(--a)"></div>Post único</div>
+              <div class="dash-donut-item"><div class="dash-donut-dot" style="background:#E8541A"></div>Post único</div>
               <div class="dash-donut-item"><div class="dash-donut-dot" style="background:#8B5CF6"></div>Carrossel</div>
               <div class="dash-donut-item"><div class="dash-donut-dot" style="background:#22C55E"></div>Outros</div>
             </div>
@@ -7408,7 +7019,7 @@ body.image-agent-refining #image-agent-refine-overlay{
           <div id="dash-bars">
             <div class="dash-bar-item">
               <div class="dash-bar-label"><span>Instagram</span><span>—</span></div>
-              <div class="dash-bar-track"><div class="dash-bar-fill" style="width:0%;background:var(--a)"></div></div>
+              <div class="dash-bar-track"><div class="dash-bar-fill" style="width:0%;background:#E8541A"></div></div>
             </div>
             <div class="dash-bar-item">
               <div class="dash-bar-label"><span>LinkedIn</span><span>—</span></div>
@@ -7452,102 +7063,102 @@ body.image-agent-refining #image-agent-refine-overlay{
 
     <!-- generate -->
     <div class="pg" id="pg-generate">
-      <!-- Image Agent Header -->
+
+      <!-- ── Header ── -->
       <div class="ia-hdr">
         <div class="ia-hdr-left">
           <div class="ia-title">Agente de Imagem</div>
+          <span class="ia-beta">BETA</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
           <div class="ia-credits-pill">
-            <svg style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <svg style="width:12px;height:12px;fill:none;stroke-width:2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             <span id="ia-credits-display">— créditos</span>
           </div>
           <button class="ia-hist-btn" onclick="navP('history')">Histórico</button>
         </div>
       </div>
 
-      <!-- 5-Step Wizard -->
+      <!-- ── 4-Step Wizard ── -->
       <div class="ia-steps-wrap">
         <div class="ia-steps" id="ia-steps">
-          <div class="ia-step" id="ia-step-1">
-            <div class="ia-step-circle">1</div>
-            <div class="ia-step-lbl">Configuração <span class="ia-step-sub">(formato do post)</span></div>
+          <div class="ia-step active" id="ia-step-1">
+            <div class="ia-step-circle"><span>1</span></div>
+            <div class="ia-step-lbl">Configuração</div>
           </div>
           <div class="ia-step-line" id="ia-line-1"></div>
           <div class="ia-step" id="ia-step-2">
-            <div class="ia-step-circle">2</div>
-            <div class="ia-step-lbl">Estratégia <span class="ia-step-sub">(Conversar com o agente)</span></div>
+            <div class="ia-step-circle"><span>2</span></div>
+            <div class="ia-step-lbl">Estratégia</div>
           </div>
           <div class="ia-step-line" id="ia-line-2"></div>
           <div class="ia-step" id="ia-step-3">
-            <div class="ia-step-circle">3</div>
-            <div class="ia-step-lbl">Refinamento <span class="ia-step-sub">(Após clicar em gerar imagem)</span></div>
+            <div class="ia-step-circle"><span>3</span></div>
+            <div class="ia-step-lbl">Refinamento</div>
           </div>
           <div class="ia-step-line" id="ia-line-3"></div>
           <div class="ia-step" id="ia-step-4">
-            <div class="ia-step-circle">4</div>
-            <div class="ia-step-lbl">Geração <span class="ia-step-sub">(Depois que o agente refinou)</span></div>
+            <div class="ia-step-circle"><span>4</span></div>
+            <div class="ia-step-lbl">Geração</div>
           </div>
         </div>
       </div>
 
-      <!-- Two-column layout -->
+      <!-- ── Two-column layout ── -->
       <div class="ia-layout">
-        <!-- LEFT: controls -->
+
+        <!-- LEFT -->
         <div class="ia-left">
-          <!-- Format + config panel -->
+
+          <!-- Config panel -->
           <div class="ia-panel">
             <div class="ia-panel-title">Configuração</div>
-            <!-- Format buttons -->
-            <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:10px">
-              <button class="fmt v2-fmt on" id="f-post"     onclick="selFmt('post')">Post único</button>
-              <button class="fmt v2-fmt"    id="f-carrossel" onclick="selFmt('carrossel')">Carrossel</button>
-              <button class="fmt v2-fmt"    id="f-story"    onclick="selFmt('story')">Story</button>
-              <button class="fmt v2-fmt"    id="f-anuncio"  onclick="selFmt('anuncio')">Anúncio</button>
-              <button class="fmt v2-fmt"    id="f-thumb"    onclick="selFmt('thumb')">Thumbnail</button>
+
+            <!-- Format chips -->
+            <div class="ia-fmt-chips">
+              <button class="ia-fmt-chip on" id="f-post"      onclick="iaSelFmt('post',this)">Post único</button>
+              <button class="ia-fmt-chip"    id="f-carrossel" onclick="iaSelFmt('carrossel',this)">Carrossel</button>
+              <button class="ia-fmt-chip"    id="f-story"     onclick="iaSelFmt('story',this)">Story</button>
+              <button class="ia-fmt-chip"    id="f-anuncio"   onclick="iaSelFmt('anuncio',this)">Anúncio</button>
+              <button class="ia-fmt-chip"    id="f-thumbnail" onclick="iaSelFmt('thumbnail',this)">Thumbnail</button>
             </div>
-            <!-- Image config -->
-            <div class="img-config-row" id="img-config-row">
-              <select class="img-config-select" id="sel-post-type" onchange="updateImageConfig('postType',this.value)">
-                <option value="">Tipo de post…</option>
-                <option value="single">Post único</option>
-                <option value="carousel">Carrossel</option>
-                <option value="story">Story</option>
-                <option value="ad">Anúncio</option>
-                <option value="thumbnail">Thumbnail</option>
-              </select>
-              <select class="img-config-select" id="sel-platform" onchange="updateImageConfig('platform',this.value)">
-                <option value="">Rede social…</option>
-                <option value="instagram">Instagram</option>
-                <option value="facebook">Facebook</option>
-                <option value="linkedin">LinkedIn</option>
-                <option value="tiktok">TikTok</option>
-                <option value="google">Google Ads</option>
-              </select>
+
+            <!-- Social network chips -->
+            <div style="margin-bottom:10px">
+              <div class="ia-panel-title" style="margin-bottom:7px">Rede social</div>
+              <div class="ia-network-row" id="ia-network-row">
+                <button class="ia-net-chip" data-net="instagram" onclick="iaSelNet('instagram',this)">Instagram</button>
+                <button class="ia-net-chip" data-net="facebook"  onclick="iaSelNet('facebook',this)">Facebook</button>
+                <button class="ia-net-chip" data-net="linkedin"  onclick="iaSelNet('linkedin',this)">LinkedIn</button>
+                <button class="ia-net-chip" data-net="tiktok"    onclick="iaSelNet('tiktok',this)">TikTok</button>
+                <button class="ia-net-chip" data-net="youtube"   onclick="iaSelNet('youtube',this)">YouTube</button>
+              </div>
             </div>
-            <!-- Variation count -->
-            <div id="v2-var-count-row" style="display:flex;align-items:center;gap:8px;margin-bottom:0;padding:8px 0 0;border:none">
-              <span style="font-size:9.5px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;flex-shrink:0">Variações</span>
-              <button class="v2-var-count on" id="vc-1" onclick="selVarCount(1)"><span>1</span><span class="vc-cr">2 cr</span></button>
-              <button class="v2-var-count"    id="vc-2" onclick="selVarCount(2)"><span>2</span><span class="vc-cr">4 cr</span></button>
-              <button class="v2-var-count"    id="vc-3" onclick="selVarCount(3)"><span>3</span><span class="vc-cr">5 cr</span></button>
-              <button class="v2-var-count"    id="vc-4" onclick="selVarCount(4)"><span>4</span><span class="vc-cr">7 cr</span></button>
-            </div>
-            <!-- Slide count (carrossel) -->
-            <div id="slide-count-row" style="display:none;align-items:center;gap:8px;padding:8px 0 0">
-              <span style="font-size:9.5px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;flex-shrink:0">Slides</span>
-              <button class="sc-btn on" data-n="3" data-cr="5" onclick="selSlides(this,3)">3 <span style="font-size:9px;opacity:.6">5cr</span></button>
-              <button class="sc-btn"    data-n="4" data-cr="7" onclick="selSlides(this,4)">4 <span style="font-size:9px;opacity:.6">7cr</span></button>
-              <button class="sc-btn"    data-n="5" data-cr="9" onclick="selSlides(this,5)">5 <span style="font-size:9px;opacity:.6">9cr</span></button>
-              <button class="sc-btn"    data-n="6" data-cr="11" onclick="selSlides(this,6)">6 <span style="font-size:9px;opacity:.6">11cr</span></button>
-              <button class="sc-btn"    data-n="7" data-cr="12" onclick="selSlides(this,7)">7 <span style="font-size:9px;opacity:.6">12cr</span></button>
+
+            <!-- Variations + Slide count -->
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+              <div class="ia-var-row" id="v2-var-count-row">
+                <span class="ia-var-label">Variações</span>
+                <button class="ia-var-btn on" id="vc-1" onclick="iaSelVar(1,this)"><span class="ia-var-n">1</span><span class="ia-var-cr">2 cr</span></button>
+                <button class="ia-var-btn"    id="vc-2" onclick="iaSelVar(2,this)"><span class="ia-var-n">2</span><span class="ia-var-cr">4 cr</span></button>
+                <button class="ia-var-btn"    id="vc-3" onclick="iaSelVar(3,this)"><span class="ia-var-n">3</span><span class="ia-var-cr">5 cr</span></button>
+                <button class="ia-var-btn"    id="vc-4" onclick="iaSelVar(4,this)"><span class="ia-var-n">4</span><span class="ia-var-cr">7 cr</span></button>
+              </div>
+              <div class="ia-var-row" id="slide-count-row" style="display:none">
+                <span class="ia-var-label">Slides</span>
+                <button class="ia-var-btn on" data-n="3" data-cr="5" onclick="selSlides(this,3)"><span class="ia-var-n">3</span><span class="ia-var-cr">5 cr</span></button>
+                <button class="ia-var-btn"    data-n="4" data-cr="7" onclick="selSlides(this,4)"><span class="ia-var-n">4</span><span class="ia-var-cr">7 cr</span></button>
+                <button class="ia-var-btn"    data-n="5" data-cr="9" onclick="selSlides(this,5)"><span class="ia-var-n">5</span><span class="ia-var-cr">9 cr</span></button>
+                <button class="ia-var-btn"    data-n="6" data-cr="11" onclick="selSlides(this,6)"><span class="ia-var-n">6</span><span class="ia-var-cr">11 cr</span></button>
+                <button class="ia-var-btn"    data-n="7" data-cr="12" onclick="selSlides(this,7)"><span class="ia-var-n">7</span><span class="ia-var-cr">12 cr</span></button>
+              </div>
             </div>
           </div>
 
           <!-- Strategist chat panel -->
           <div class="ia-panel" style="padding:0;overflow:hidden">
-            <div class="ia-panel-title" style="padding:12px 16px 0">+ Creative Strategist</div>
-            <div class="bs-wrap" id="bs-image-wrap" style="border:none;background:transparent;margin-bottom:4px">
+            <div class="ia-panel-title" style="padding:14px 16px 0">Creative Strategist</div>
+            <div class="bs-wrap" id="bs-image-wrap" style="border:none;background:transparent">
               <div class="bs-msgs" id="bs-image-msgs">
                 <div class="bs-placeholder">
                   <div class="bs-placeholder-icon">✦</div>
@@ -7557,7 +7168,7 @@ body.image-agent-refining #image-agent-refine-overlay{
               <div class="bs-ref-strip" id="bs-ref-strip"></div>
               <div class="bs-input-row">
                 <textarea id="bs-image-input" rows="2" placeholder="O que você quer criar?" onkeydown="bsKeydown(event,'image')"></textarea>
-                <button class="bs-img-btn" onclick="document.getElementById('bs-ref-input').click()" title="Enviar imagem de referência">
+                <button class="bs-img-btn" onclick="document.getElementById('bs-ref-input').click()" title="Imagem de referência">
                   <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                 </button>
                 <input type="file" id="bs-ref-input" accept="image/*" multiple style="display:none" onchange="handleBsImgUpload(this)">
@@ -7566,57 +7177,70 @@ body.image-agent-refining #image-agent-refine-overlay{
                 </button>
               </div>
               <div class="bs-footer">
-                <span class="bs-cost-hint">Enter para enviar · Shift+Enter nova linha · 📎 imagem de referência</span>
+                <span class="bs-cost-hint">Enter para enviar · Shift+Enter nova linha · 📎 referência</span>
               </div>
             </div>
           </div>
 
-          <!-- Customizations list -->
-          <div class="ia-panel" id="ia-custom-panel">
-            <div class="ia-panel-title">Personalizações</div>
-            <div class="ia-custom-list" id="ia-custom-list">
-              <div class="ia-custom-item"><span>Formato</span><span class="ia-custom-val" id="ia-cv-format">Post único</span></div>
-              <div class="ia-custom-item"><span>Rede social</span><span class="ia-custom-val" id="ia-cv-platform">—</span></div>
-              <div class="ia-custom-item"><span>Variações</span><span class="ia-custom-val" id="ia-cv-vars">1</span></div>
-              <div class="ia-custom-item"><span>Tipo de post</span><span class="ia-custom-val" id="ia-cv-type">—</span></div>
+          <!-- Personalizações bar -->
+          <div class="ia-custom-bar">
+            <div class="ia-custom-cell">
+              <div class="ia-custom-cell-lbl">Formato</div>
+              <div class="ia-custom-cell-val" id="ia-cv-format">Post único</div>
+            </div>
+            <div class="ia-custom-cell">
+              <div class="ia-custom-cell-lbl">Tamanho</div>
+              <div class="ia-custom-cell-val" id="ia-cv-size">1080×1080</div>
+            </div>
+            <div class="ia-custom-cell">
+              <div class="ia-custom-cell-lbl">Rede social</div>
+              <div class="ia-custom-cell-val" id="ia-cv-platform">—</div>
+            </div>
+            <div class="ia-custom-cell">
+              <div class="ia-custom-cell-lbl">Variações</div>
+              <div class="ia-custom-cell-val" id="ia-cv-vars">1</div>
             </div>
           </div>
 
           <!-- Nav buttons -->
           <div class="ia-nav">
-            <button class="ia-back-btn" onclick="iaBack()">← Voltar</button>
+            <button class="ia-back-btn" onclick="iaBack()">← Dashboard</button>
             <button class="ia-gen-btn" id="btn-gerar-v2" onclick="gerarV2()">
-              <svg style="width:15px;height:15px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-              <span id="btn-gerar-v2-label">✦ Gerar Imagem</span>
-              <span id="v2-credits-label" style="margin-left:auto;font-size:10px;font-weight:500;opacity:.75;background:rgba(0,0,0,.2);border-radius:10px;padding:2px 7px">2 créditos</span>
+              <svg style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.5" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span id="btn-gerar-v2-label">Gerar Imagem</span>
+              <span id="v2-credits-label" style="margin-left:auto;font-size:10px;opacity:.7;background:rgba(0,0,0,.2);border-radius:6px;padding:2px 7px">2 cr</span>
             </button>
           </div>
 
-          <!-- compat hidden elements -->
+          <!-- compat hidden -->
           <textarea id="gen-in" style="display:none"></textarea>
           <div id="refined-prompt-wrap" style="display:none"><div id="refined-prompt-box"></div></div>
           <div id="bs-image-refined-wrap" style="display:none"><div id="bs-image-refined-text"></div></div>
-          <div id="bs-image-gerar-btn" style="display:none">
-            <div id="bs-blueprint-preview" style="display:none"><div id="bs-blueprint-headline"></div><div id="bs-blueprint-style"></div></div>
-            <button id="bs-image-gerar-main-btn" style="display:none" onclick="startGenPipeline()"></button>
-          </div>
+          <div id="bs-image-gerar-btn" style="display:none"><div id="bs-blueprint-preview" style="display:none"><div id="bs-blueprint-headline"></div><div id="bs-blueprint-style"></div></div><button id="bs-image-gerar-main-btn" style="display:none" onclick="startGenPipeline()"></button></div>
           <div id="bs-refine-unified-wrap" style="display:none!important"></div>
           <div id="bs-image-strategist-hint" style="display:none"></div>
+          <!-- hidden legacy selects for compat -->
+          <div style="display:none">
+            <select id="sel-post-type" onchange="updateImageConfig('postType',this.value)"></select>
+            <select id="sel-platform" onchange="updateImageConfig('platform',this.value)"></select>
+            <div id="img-config-row"></div>
+          </div>
         </div>
 
-        <!-- RIGHT: Preview + tips -->
+        <!-- RIGHT -->
         <div class="ia-right">
-          <!-- Preview card -->
           <div class="ia-preview-card">
             <div class="ia-preview-title">Pré-visualização</div>
             <div class="ia-preview-area">
-              <!-- Empty state -->
-              <div id="gen-v2-empty" style="flex:1;background:rgba(255,255,255,.02);border:1.5px dashed rgba(255,255,255,.1);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center">
-                <svg style="width:32px;height:32px;fill:none;stroke:rgba(255,255,255,.2);stroke-width:1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                <div style="font-size:12px;color:var(--t3);line-height:1.5">Converse com a IA e clique em<br><strong style="color:var(--tx)">Gerar</strong> para criar sua imagem</div>
+
+              <!-- Empty -->
+              <div id="gen-v2-empty" style="flex:1;background:rgba(255,255,255,.02);border:1.5px dashed rgba(255,255,255,.08);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:32px 24px;text-align:center">
+                <svg style="width:28px;height:28px;fill:none;stroke:rgba(255,255,255,.15);stroke-width:1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <div style="font-size:12px;color:rgba(255,255,255,.25);line-height:1.6">Descreva sua ideia e clique em<br><strong style="color:rgba(255,255,255,.6)">Gerar Imagem</strong></div>
               </div>
-              <!-- Loading state -->
-              <div id="gen-v2-loading" style="display:none;flex:1;background:rgba(255,255,255,.02);border-radius:10px;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px 24px;min-height:200px">
+
+              <!-- Loading -->
+              <div id="gen-v2-loading" style="display:none;flex:1;background:rgba(255,255,255,.02);border-radius:10px;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px 24px;min-height:220px">
                 <div class="gen-v2-pipeline">
                   <div class="gen-v2-step active" id="v2-step-1"><div class="gen-v2-step-dot"></div>Estratégia</div>
                   <div class="gen-v2-step-line"></div>
@@ -7624,62 +7248,61 @@ body.image-agent-refining #image-agent-refine-overlay{
                   <div class="gen-v2-step-line"></div>
                   <div class="gen-v2-step" id="v2-step-3"><div class="gen-v2-step-dot"></div>Geração</div>
                 </div>
-                <div style="width:100%;background:rgba(255,255,255,.07);border-radius:4px;height:3px;overflow:hidden">
-                  <div id="gen-v2-bar" style="height:100%;background:var(--a);border-radius:4px;width:0%;transition:width .9s ease"></div>
+                <div style="width:100%;background:rgba(255,255,255,.06);border-radius:4px;height:2px;overflow:hidden">
+                  <div id="gen-v2-bar" style="height:100%;border-radius:4px;width:0%;transition:width .9s ease"></div>
                 </div>
-                <div style="width:24px;height:24px;border:2.5px solid rgba(255,255,255,.12);border-top-color:var(--a);border-radius:50%;animation:spin .7s linear infinite"></div>
-                <div id="gen-v2-stage" style="font-size:12px;font-weight:700;color:var(--tx);text-align:center">Estruturando prompt visual...</div>
-                <div id="gen-v2-stage-sub" style="font-size:10px;color:var(--t3);text-align:center">Haiku analisando conversa</div>
+                <div style="width:22px;height:22px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--amber);border-radius:50%;animation:spin .7s linear infinite"></div>
+                <div id="gen-v2-stage" style="font-size:12px;font-weight:700;color:rgba(255,255,255,.8);text-align:center">Estruturando prompt visual...</div>
+                <div id="gen-v2-stage-sub" style="font-size:10.5px;color:rgba(255,255,255,.35);text-align:center">Haiku analisando conversa</div>
               </div>
-              <!-- Result state -->
-              <div id="gen-v2-result" style="display:none;flex:1;flex-direction:column">
+
+              <!-- Result -->
+              <div id="gen-v2-result" style="display:none;flex:1;flex-direction:column;gap:10px">
                 <div id="gen-v2-variations" class="v2-variations-grid"></div>
-                <div class="ia-action-row" style="margin-top:10px">
+                <div class="ia-action-row">
                   <button class="ia-action-btn primary" onclick="downloadImgV2()">
-                    <svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <svg style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     Baixar
                   </button>
                   <button class="ia-action-btn" onclick="gerarV2()">
-                    <svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
+                    <svg style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
                     Regerar
                   </button>
                 </div>
-                <details style="margin-top:8px">
-                  <summary style="font-size:10px;color:var(--t3);cursor:pointer;user-select:none">Ver prompts usados</summary>
-                  <div style="margin-top:6px;display:flex;flex-direction:column;gap:6px">
-                    <div style="font-size:9px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.06em">Haiku Draft</div>
-                    <div id="gen-v2-prompt-used" style="padding:8px;background:rgba(255,255,255,.03);border-radius:8px;font-size:10px;color:var(--t3);line-height:1.5;word-break:break-word"></div>
-                    <div style="font-size:9px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.06em">GPT-5.2 Polished</div>
-                    <div id="gen-v2-polished-prompt" style="padding:8px;background:rgba(232,84,26,.05);border:1px solid rgba(232,84,26,.15);border-radius:8px;font-size:10px;color:var(--t3);line-height:1.5;word-break:break-word"></div>
+                <details style="margin-top:4px">
+                  <summary style="font-size:10px;color:rgba(255,255,255,.3);cursor:pointer;user-select:none">Ver prompts usados</summary>
+                  <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px">
+                    <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.06em">Draft</div>
+                    <div id="gen-v2-prompt-used" style="padding:8px;background:rgba(255,255,255,.03);border-radius:7px;font-size:10px;color:rgba(255,255,255,.4);line-height:1.5;word-break:break-word"></div>
+                    <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.06em">Polished</div>
+                    <div id="gen-v2-polished-prompt" style="padding:8px;background:rgba(245,197,24,.04);border:1px solid rgba(245,197,24,.1);border-radius:7px;font-size:10px;color:rgba(255,255,255,.4);line-height:1.5;word-break:break-word"></div>
                   </div>
                 </details>
               </div>
+
               <!-- Carousel result -->
-              <div id="gen-v2-carousel" style="display:none;flex:1;flex-direction:column">
+              <div id="gen-v2-carousel" style="display:none;flex:1;flex-direction:column;gap:10px">
                 <div id="gen-v2-carousel-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
-                <button class="ia-action-btn" onclick="gerarV2()" style="margin-top:10px;width:100%;justify-content:center">
-                  <svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
+                <button class="ia-action-btn" onclick="gerarV2()" style="width:100%;justify-content:center">
+                  <svg style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.8"/></svg>
                   Regerar carrossel
                 </button>
               </div>
-            </div>
-          </div>
 
-          <!-- Tips card -->
+            </div><!-- /ia-preview-area -->
+          </div><!-- /ia-preview-card -->
+
+          <!-- Tips -->
           <div class="ia-tips-card">
             <div class="ia-tips-title">Dicas pro</div>
-            <div class="ia-tip-item">Descreva o cenário, iluminação e estilo na conversa para prompts mais ricos.</div>
-            <div class="ia-tip-item">Use "fundo neutro" ou "fundo branco" para posts de produto.</div>
-            <div class="ia-tip-item">Mencione a paleta de cores da sua marca para consistência visual.</div>
+            <div class="ia-tip-item">Descreva o cenário, iluminação e estilo para prompts mais ricos.</div>
+            <div class="ia-tip-item">Use "fundo neutro" para posts de produto.</div>
+            <div class="ia-tip-item">Mencione as cores da sua marca para consistência visual.</div>
           </div>
 
-          <!-- Legacy hidden output elements (JS compat) -->
+          <!-- Legacy hidden elements -->
           <div style="display:none">
-            <div id="gen-visual-slot"><div id="ref-visual-wrap"></div><div id="out-tab-imagem">
-              <div id="img-preview-empty"></div>
-              <div id="img-preview-wrap"><div id="img-preview-thumb"></div></div>
-              <div id="img-gen-loading"><div id="img-gen-bar"></div><div id="img-gen-stage"></div><div id="img-gen-brief"><div id="img-gen-headline"></div><div id="img-gen-mood"></div></div></div>
-            </div></div>
+            <div id="gen-visual-slot"><div id="ref-visual-wrap"></div><div id="out-tab-imagem"><div id="img-preview-empty"></div><div id="img-preview-wrap"><div id="img-preview-thumb"></div></div><div id="img-gen-loading"><div id="img-gen-bar"></div><div id="img-gen-stage"></div><div id="img-gen-brief"><div id="img-gen-headline"></div><div id="img-gen-mood"></div></div></div></div>
             <div id="bs-sel-panel"><div id="bs-sel-subfmt-container"></div><div id="bs-panel-voice-grid"></div><div id="bs-refine-unified-wrap2"></div></div>
             <div id="out-tab-conceitos"><div id="out-e"></div><div id="sk-w"><div id="sk-t"></div></div><div id="out-r"><div id="out-hd-conceitos"><span id="out-hd-lbl"></span></div></div></div>
             <div id="img-mode-box"></div>
@@ -7687,8 +7310,8 @@ body.image-agent-refining #image-agent-refine-overlay{
             <button id="btn-gerar-img"></button>
             <div class="out-tabs"><div id="tab-conceitos"></div><div id="tab-imagem"></div></div>
           </div>
-        </div>
-      </div>
+        </div><!-- /ia-right -->
+      </div><!-- /ia-layout -->
 
     <!-- dummy gen-col-left for compat -->
     <div style="display:none">
@@ -8236,9 +7859,6 @@ body.image-agent-refining #image-agent-refine-overlay{
           </div>
           <div class="bs-refined-wrap" id="bs-legenda-refined-wrap" style="display:none;margin-bottom:12px"><div class="bs-refined-header"><span class="bs-refined-label">✦ Prompt refinado</span><div class="bs-refined-actions"><button class="btn btn-g btn-sm" onclick="bsEditRefined('legenda')" style="font-size:10px">Editar</button><button class="btn btn-g btn-sm" onclick="bsReset('legenda')" style="font-size:10px">Resetar</button></div></div><div class="bs-refined-text" id="bs-legenda-refined-text"></div></div>
           <textarea id="ag-legenda-in" style="display:none"></textarea>
-          <div class="form-row" style="margin-top:12px"><label>Rede social</label>
-            <select id="ag-legenda-rede"><option value="instagram">Instagram</option><option value="facebook">Facebook</option><option value="linkedin">LinkedIn</option><option value="tiktok">TikTok</option><option value="youtube">YouTube</option></select>
-          </div>
           <div class="form-row" style="margin-top:12px"><label>Tom de voz <span style="color:var(--t3);font-weight:400;text-transform:none">(opcional)</span></label>
             <select id="ag-legenda-tom"><option value="">Usar perfil de marca</option>              <option>Autoridade</option>
               <option>Provocativo</option>
@@ -8248,6 +7868,17 @@ body.image-agent-refining #image-agent-refine-overlay{
               <option>Premium</option></select>
           </div>
           <div class="form-row" style="margin-top:12px">
+            <label>Rede social <span style="color:var(--t3);font-weight:400;text-transform:none">(opcional)</span></label>
+            <div class="ia-net-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">
+              <button class="ia-net-chip" data-net="instagram" onclick="lgSelNet('instagram',this)">Instagram</button>
+              <button class="ia-net-chip" data-net="facebook" onclick="lgSelNet('facebook',this)">Facebook</button>
+              <button class="ia-net-chip" data-net="linkedin" onclick="lgSelNet('linkedin',this)">LinkedIn</button>
+              <button class="ia-net-chip" data-net="tiktok" onclick="lgSelNet('tiktok',this)">TikTok</button>
+              <button class="ia-net-chip" data-net="youtube" onclick="lgSelNet('youtube',this)">YouTube</button>
+              <button class="ia-net-chip" data-net="twitter" onclick="lgSelNet('twitter',this)">Twitter/X</button>
+            </div>
+          </div>
+          <div class="form-row" style="margin-top:12px">
             <label style="display:flex;align-items:center;justify-content:space-between">
               <span>Mídia de referência <span style="font-size:10px;color:var(--t3);font-weight:400">(opcional)</span></span>
               <button class="btn btn-g btn-sm" style="font-size:10px;padding:3px 8px" onclick="document.getElementById('ag-legenda-media').click()">+ Anexar</button>
@@ -8255,7 +7886,7 @@ body.image-agent-refining #image-agent-refine-overlay{
             <input type="file" id="ag-legenda-media" accept="image/*,video/*" multiple style="display:none" onchange="handleAgentMedia('legenda',this.files)">
             <div id="ag-legenda-media-previews" class="agent-media-previews" style="min-height:0;margin-top:6px"></div>
           </div>
-          <button class="btn btn-p btn-full" style="margin-top:16px" onclick="runAgent('legenda','post',document.getElementById('ag-legenda-rede')?.value||'instagram')">
+          <button class="btn btn-p btn-full" style="margin-top:16px" onclick="runAgent('legenda','post',_legendaNet||'post')">
             <svg class="ico ico-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Gerar Legenda
           </button>
         </div>
@@ -8276,7 +7907,7 @@ body.image-agent-refining #image-agent-refine-overlay{
               <span style="font-size:10px;font-weight:700;color:var(--a);letter-spacing:.06em;text-transform:uppercase">Gerado</span>
               <div style="display:flex;gap:6px">
                 <button class="btn btn-g btn-sm" onclick="copyAgentResult('ag-legenda-content')">Copiar</button>
-                <button class="btn btn-g btn-sm" onclick="runAgent('legenda','post',document.getElementById('ag-legenda-rede')?.value||'instagram')">&#8635; Regerar</button>
+                <button class="btn btn-g btn-sm" onclick="runAgent('legenda','post','legenda')">&#8635; Regerar</button>
               </div>
             </div>
             <div class="agent-result-content" id="ag-legenda-content"></div>
@@ -8979,14 +8610,7 @@ function selFmt(f) {
   var lbl = document.getElementById('btn-gerar-v2-label');
   if (lbl) { var _fn={post:'Post único',carrossel:'Carrossel',story:'Story',anuncio:'Anúncio',thumb:'Thumbnail',banner:'Banner'}; lbl.textContent='Gerar '+(_fn[f]||f); }
 
-  var mappedType = _fmtToPostType[f] || null;
-  var postTypeSel = document.getElementById('sel-post-type');
-  if (postTypeSel && mappedType) postTypeSel.value = mappedType;
-  if (mappedType) updateImageConfig('postType', mappedType);
-
-  syncIaCustomizations();
   renderBsSubFmtGrid(f);
-  refreshIaModelOptions();
   var gerarBtn = document.getElementById('bs-image-gerar-main-btn');
   if (gerarBtn) gerarBtn.textContent = 'Gerar ' + (_fmtBtnLabels[f] || f);
   var gb = document.getElementById('bs-image-gerar-btn');
@@ -9012,7 +8636,6 @@ function selSlides(el, n) {
   document.querySelectorAll('.sc-btn').forEach(function(b) { b.classList.remove('on'); });
   el.classList.add('on');
   _updateV2Credits();
-  syncIaCustomizations();
 }
 async function sendFeedback(slug, rating, btnEl) {
   try {
@@ -9633,7 +9256,6 @@ function _bsRender(ctx) {
 }
 
 async function sendBrainstorm(ctx) {
-  if (ctx === 'image') setImageAgentStep(2);
   const inputEl = document.getElementById(`bs-${ctx}-input`);
   const sendEl  = document.getElementById(`bs-${ctx}-send`);
   if (!inputEl) return;
@@ -9675,6 +9297,7 @@ async function sendBrainstorm(ctx) {
     state.messages.push({ role: 'assistant', content: d.reply });
     _bsRender(ctx);
     if (me) { me.quota_used=(me.quota_used||0)+1; updateQuota(); }
+    if (ctx === 'image') setIaStep(2);
   } catch(e) {
     dot.remove(); toast('Erro de conexão','err'); state.messages.pop(); _bsRender(ctx);
   } finally {
@@ -10113,76 +9736,12 @@ const _netMap2 = { ig:'Instagram', li:'LinkedIn', yt:'YouTube', tt:'TikTok', fb:
 
 // Image generation config state
 const _imageGenConfig = { postType: null, platform: null };
-const _fmtToPostType = { post:'single', carrossel:'carousel', story:'story', anuncio:'ad', banner:'banner', thumb:'thumbnail' };
-const _postTypeModels = {
-  single: ['Modelo 1','Modelo 2','Modelo 3','Modelo 4','Modelo 5','Modelo 6','Modelo 7','Modelo 8','Modelo 9','Modelo 10'],
-  carousel: ['Modelo 1','Modelo 2','Modelo 3','Modelo 4','Modelo 5','Modelo 6','Modelo 7','Modelo 8','Modelo 9','Modelo 10'],
-  story: ['Modelo 1','Modelo 2','Modelo 3','Modelo 4','Modelo 5','Modelo 6','Modelo 7','Modelo 8','Modelo 9','Modelo 10'],
-  ad: ['Modelo 1','Modelo 2','Modelo 3','Modelo 4','Modelo 5','Modelo 6','Modelo 7','Modelo 8','Modelo 9','Modelo 10'],
-  banner: ['Modelo 1','Modelo 2','Modelo 3','Modelo 4','Modelo 5','Modelo 6','Modelo 7','Modelo 8','Modelo 9','Modelo 10'],
-  thumbnail: ['Modelo 1','Modelo 2','Modelo 3','Modelo 4','Modelo 5','Modelo 6','Modelo 7','Modelo 8','Modelo 9','Modelo 10']
-};
 
 function updateImageConfig(key, value) {
-  if (key === 'postType' || key === 'platform') setImageAgentStep(1);
   _imageGenConfig[key] = value || null;
   const elId = key === 'postType' ? 'sel-post-type' : 'sel-platform';
   const el = document.getElementById(elId);
   if (el) { value ? el.classList.add('has-value') : el.classList.remove('has-value'); }
-  if (key === 'postType') refreshIaModelOptions();
-  syncIaCustomizations();
-}
-
-
-function setImageAgentStep(step) {
-  for (var i = 1; i <= 4; i++) {
-    var el = document.getElementById('ia-step-' + i);
-    if (!el) continue;
-    el.classList.remove('done','active');
-    if (step <= 0) continue;
-    if (i < step) el.classList.add('done');
-    else if (i === step) el.classList.add('active');
-  }
-}
-function refreshIaModelOptions() {
-  const type = _imageGenConfig.postType || _fmtToPostType[_currentFmt] || 'single';
-  const list = _postTypeModels[type] || _postTypeModels.single;
-  const sel = document.getElementById('ia-model-choice');
-  const grid = document.getElementById('ia-model-grid');
-  if (sel) {
-    sel.innerHTML = '<option value="auto">IA escolhe o melhor modelo</option>' + list.map(function(n, idx) {
-      return '<option value="' + (idx + 1) + '">' + n + '</option>';
-    }).join('');
-  }
-  if (grid) {
-    let html = '<button class="ia-model-opt" data-model="auto" onclick="setIaModelChoice(\'auto\')">IA escolhe o melhor modelo</button>';
-    html += list.map(function(n, idx){
-      var v = String(idx + 1);
-      return '<button class="ia-model-opt" data-model="' + v + '" onclick="setIaModelChoice(\'' + v + '\')">' + n + '</button>';
-    }).join('');
-    grid.innerHTML = html;
-  }
-  setIaModelChoice(window._iaModelChoice || 'auto');
-}
-function setIaModelChoice(value){
-  window._iaModelChoice = value || 'auto';
-  var sel = document.getElementById('ia-model-choice');
-  if (sel && sel.value !== window._iaModelChoice) sel.value = window._iaModelChoice;
-  document.querySelectorAll('#ia-model-grid .ia-model-opt').forEach(function(el){
-    el.classList.toggle('on', el.dataset.model === window._iaModelChoice);
-  });
-}
-
-function syncIaCustomizations(){
-  var fmtLbl = {post:'Post único',carrossel:'Carrossel',story:'Story',anuncio:'Anúncio',banner:'Banner',thumb:'Thumbnail'}[_currentFmt||'post'] || 'Post único';
-  var selectedType = _imageGenConfig.postType || _fmtToPostType[_currentFmt||'post'] || 'single';
-  var typeLbl = {single:'Post único',carousel:'Carrossel',story:'Story',ad:'Anúncio',banner:'Banner',thumbnail:'Thumbnail'}[selectedType] || fmtLbl;
-  var platformLbl = {instagram:'Instagram',facebook:'Facebook',linkedin:'LinkedIn',tiktok:'TikTok',google:'Google Ads',youtube:'YouTube'}[_imageGenConfig.platform] || '—';
-  var formatSize = {single:'1080x1080',carousel:'1080x1080',story:'1080x1920',ad:'1080x1080',banner:'1584x396',thumbnail:'1280x720'}[selectedType] || 'Padrão';
-  var f = document.getElementById('ia-cv-format'); if (f) f.textContent = formatSize;
-  var p = document.getElementById('ia-cv-platform'); if (p) p.textContent = platformLbl;
-  var v = document.getElementById('ia-cv-vars'); if (v) v.textContent = String(_variationCount || 1);
-  var t = document.getElementById('ia-cv-type'); if (t) t.textContent = typeLbl;
 }
 
 function selStyle(s) {
@@ -10197,8 +9756,58 @@ function selVarCount(n) {
   document.querySelectorAll('.v2-var-count').forEach(function(b){ b.classList.remove('on'); });
   const el = document.getElementById('vc-' + n);
   if (el) el.classList.add('on');
-  syncIaCustomizations();
   _updateV2Credits();
+}
+
+// ---- Image Agent new UI helpers ----
+const _IA_SIZES = { post:'1080×1080', carrossel:'1080×1080', story:'1080×1920', anuncio:'1200×628', thumbnail:'1280×720' };
+
+function setIaStep(n) {
+  for (let i = 1; i <= 4; i++) {
+    const s = document.getElementById('ia-step-' + i);
+    const l = document.getElementById('ia-line-' + i);
+    if (!s) continue;
+    s.classList.remove('active', 'done');
+    if (i < n) s.classList.add('done');
+    else if (i === n) s.classList.add('active');
+    if (l) l.classList.toggle('done', i < n);
+  }
+}
+
+function iaSelFmt(fmt, el) {
+  document.querySelectorAll('.ia-fmt-chip').forEach(function(c){ c.classList.remove('on'); });
+  if (el) el.classList.add('on');
+  selFmt(fmt);
+  const cv = document.getElementById('ia-cv-format');
+  if (cv) cv.textContent = el ? el.textContent : fmt;
+  const sz = document.getElementById('ia-cv-size');
+  if (sz) sz.textContent = _IA_SIZES[fmt] || '1080×1080';
+}
+
+function iaSelNet(net, el) {
+  document.querySelectorAll('.ia-net-chip').forEach(function(c){ c.classList.remove('on'); });
+  if (el) el.classList.add('on');
+  _currentNet = net;
+  const pl = document.getElementById('ia-cv-platform');
+  if (pl) pl.textContent = el ? el.textContent : net;
+}
+
+function iaSelVar(n, el) {
+  document.querySelectorAll('.ia-var-btn').forEach(function(c){ c.classList.remove('on'); });
+  if (el) el.classList.add('on');
+  selVarCount(n);
+  const v = document.getElementById('ia-cv-vars');
+  if (v) v.textContent = n;
+}
+// ---- End Image Agent UI helpers ----
+
+var _legendaNet = '';
+function lgSelNet(net, el) {
+  var wasOn = el && el.classList.contains('on');
+  var chips = el && el.closest('.ia-net-chips');
+  if (chips) chips.querySelectorAll('.ia-net-chip').forEach(function(c){ c.classList.remove('on'); });
+  if (!wasOn && el) el.classList.add('on');
+  _legendaNet = (!wasOn && el) ? net : '';
 }
 
 function handleBsImgUpload(input) {
@@ -10254,7 +9863,6 @@ function _v2SetStageSub(txt) {
 }
 
 async function gerarV2() {
-  setImageAgentStep(3);
   const state = _bsGet('image');
   if (!state.messages.length) { toast('Converse com a IA primeiro para criar sua imagem','err'); return; }
 
@@ -10290,6 +9898,7 @@ async function gerarV2() {
     if (sub !== undefined) _v2SetStageSub(sub);
   }
 
+  setIaStep(3);
   showV2('gen-v2-loading');
   _v2SetPipelineStep(1);
   setBar(5); setStage('Estruturando prompt visual...', 'Haiku analisando conversa');
@@ -10352,7 +9961,6 @@ async function gerarV2() {
       stageTimers.forEach(clearTimeout);
       if (loadingEl) loadingEl.style.display = 'none';
       setBar(100); setStage('Carrossel completo!', '');
-      setImageAgentStep(4);
       toast('Carrossel gerado! ' + totalSlides + ' slides prontos.', 'ok');
       if (me) { me.quota_used = (me.quota_used||0) + (_carrosselCreditMap[totalSlides] || totalSlides); updateQuota(); }
     } else {
@@ -10394,9 +10002,9 @@ async function gerarV2() {
       }
 
       showV2('gen-v2-result');
-      setImageAgentStep(4);
+      setIaStep(4);
       const _cfgParts = [];
-      if (_imageGenConfig.postType) _cfgParts.push({single:'Post único',carousel:'Carrossel',story:'Story',ad:'Anúncio',banner:'Banner',thumbnail:'Thumbnail'}[_imageGenConfig.postType]||_imageGenConfig.postType);
+      if (_imageGenConfig.postType) _cfgParts.push({single:'Post único',carousel:'Carrossel',story:'Story',ad:'Anúncio',banner:'Banner'}[_imageGenConfig.postType]||_imageGenConfig.postType);
       if (_imageGenConfig.platform) _cfgParts.push({instagram:'Instagram',facebook:'Facebook',linkedin:'LinkedIn',tiktok:'TikTok',google:'Google Ads'}[_imageGenConfig.platform]||_imageGenConfig.platform);
       toast((_currentImagesB64.length > 1 ? _currentImagesB64.length + ' variações geradas' : 'Imagem gerada') + (_cfgParts.length ? ' · ' + _cfgParts.join(' / ') : '') + '!', 'ok');
       const credits = _varCreditMap[_variationCount] || 2;
@@ -11617,7 +11225,7 @@ async function loadDashboard() {
       const top = Object.entries(fmtCounts).sort((a,b) => b[1]-a[1]).slice(0,3);
       const total = gens.length || 1;
       const CIRC = Math.PI * 2 * 44;
-      const colors = ['var(--a)','#8B5CF6','#22C55E'];
+      const colors = ['#E8541A','#8B5CF6','#22C55E'];
       let offset = 0;
       ['donut-arc-1','donut-arc-2','donut-arc-3'].forEach((id, i) => {
         const el = document.getElementById(id);
@@ -11643,7 +11251,7 @@ async function loadDashboard() {
       gens.forEach(g => { const n = g.network || 'outro'; netCounts[n] = (netCounts[n] || 0) + 1; });
       const sorted = Object.entries(netCounts).sort((a,b) => b[1]-a[1]).slice(0,4);
       const maxN = sorted[0] ? sorted[0][1] : 1;
-      const colors = ['var(--a)','#8B5CF6','#22C55E','#3B82F6'];
+      const colors = ['#E8541A','#8B5CF6','#22C55E','#3B82F6'];
       const barsEl = document.getElementById('dash-bars');
       if (barsEl && sorted.length) {
         barsEl.innerHTML = sorted.map((s,i) => `
@@ -13186,9 +12794,6 @@ function renderModelGrid() {
   _updateFormatBadge();
 
   var list = MODELS[_modelFmt];
-  var baseList = (list || []).slice(0,10);
-  list = baseList.slice();
-  if (list.length) list.unshift({n:'IA',name:'Escolha automática',ratio:'Auto',svg:list[0].svg,auto:true});
 
   // Fallback: try post_instagram
   if (!list || !list.length) {
@@ -13202,11 +12807,6 @@ function renderModelGrid() {
   }
 
   var html = '';
-  var modelSelect = document.getElementById('ia-model-choice');
-  if (modelSelect) {
-    modelSelect.innerHTML = '<option value="auto">IA escolhe o melhor modelo</option>' + baseList.map(function(m,idx){ return '<option value="'+idx+'">Modelo '+m.n+' — '+m.name+'</option>'; }).join('');
-  }
-
   for (var i = 0; i < list.length; i++) {
     var m = list[i];
     var ratio = m.ratio ? ' \xb7 ' + m.ratio : '';
@@ -13272,21 +12872,14 @@ function _updateFormatBadge() {
   };
   var label = fmtLabels[_modelFmt] || _modelFmt;
   badge.innerHTML = '<svg style="width:10px;height:10px;fill:none;stroke:var(--amber);stroke-width:2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> '
-    + label + ' <span style="font-weight:400;color:var(--t2)">\xe2\x80\x94 10 estilos</span>';
+    + label + ' <span style="font-weight:400;color:var(--t2)">\xe2\x80\x94 20 estilos</span>';
 }
 
 function _getModelDesc(n) { return _MODEL_DESCS[n] || ''; }
 
 function selectModel(idx) {
-  var pool = (MODELS[_modelFmt] || []).slice(0,10);
-  var list = pool.slice();
-  if (list.length) list.unshift({n:'IA',name:'Escolha automática',ratio:'Auto',svg:list[0].svg,auto:true});
-  var chosen = list[idx];
-  if (chosen && chosen.auto) {
-    chosen = pool[Math.floor(Math.random()*pool.length)] || chosen;
-  }
-  _selectedModel        = chosen;
-  setImageAgentStep(3);
+  var list = MODELS[_modelFmt] || [];
+  _selectedModel        = list[idx];
   window._selectedModel = _selectedModel;
 
   var cards = document.querySelectorAll('#modelo-grid > div');
@@ -15050,9 +14643,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   document.addEventListener('DOMContentLoaded', function(){
     sanitizeDuplicateVisuals();
-    setImageAgentStep(0);
-    refreshIaModelOptions();
-    syncIaCustomizations();
   });
 })();
 </script>
