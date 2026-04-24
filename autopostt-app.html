@@ -919,9 +919,9 @@ tr:hover .td-actions { opacity: 1; }
 #pg-generate .bs-wrap {
   min-height: 260px;
 }
-#bs-image-msgs{min-height:120px;max-height:220px;}
+#bs-image-msgs{min-height:92px;max-height:160px;}
 #pg-generate .bs-msgs {
-  min-height: 200px;
+  min-height: 140px;
 }
 
 /* Section labels in generate */
@@ -6584,10 +6584,10 @@ body.image-agent-refining #image-agent-refine-overlay{
 
 /* Steps */
 .ia-steps-wrap {
-  background: var(--ink-2,#111);
-  border: 1px solid rgba(255,255,255,.07);
+  background: linear-gradient(180deg,rgba(245,197,24,.05),rgba(0,0,0,0));
+  border: 1px solid rgba(255,255,255,.06);
   border-radius: 12px;
-  padding: 16px 20px;
+  padding: 12px 18px;
   margin-bottom: 18px;
   display: flex;
   align-items: center;
@@ -6608,14 +6608,14 @@ body.image-agent-refining #image-agent-refine-overlay{
   min-width: 0;
 }
 .ia-step-circle {
-  width: 28px;
-  height: 28px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   border: 2px solid rgba(255,255,255,.12);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
   color: rgba(255,255,255,.3);
   flex-shrink: 0;
@@ -6623,7 +6623,7 @@ body.image-agent-refining #image-agent-refine-overlay{
   transition: all .2s;
 }
 .ia-step-lbl {
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   color: rgba(255,255,255,.3);
   white-space: nowrap;
@@ -6646,10 +6646,10 @@ body.image-agent-refining #image-agent-refine-overlay{
 .ia-step.done .ia-step-lbl { color: rgba(255,255,255,.6); }
 .ia-step.done + .ia-step-line { background: var(--a); }
 .ia-step.active .ia-step-circle {
-  background: var(--a);
-  border-color: var(--a);
-  color: #fff;
-  box-shadow: 0 0 0 4px rgba(232,84,26,.2);
+  background: #f5c518;
+  border-color: #f5c518;
+  color: #111;
+  box-shadow: 0 0 0 3px rgba(245,197,24,.15);
 }
 .ia-step.active .ia-step-lbl { color: var(--t0,#fff); font-weight: 700; }
 
@@ -6664,9 +6664,9 @@ body.image-agent-refining #image-agent-refine-overlay{
 .ia-right { display: flex; flex-direction: column; gap: 10px; }
 
 .ia-panel {
-  background: var(--ink-2,#111);
-  border: 1px solid rgba(255,255,255,.07);
-  border-radius: 14px;
+  background: linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 16px;
   padding: 16px;
 }
 .ia-panel-title {
@@ -6677,8 +6677,35 @@ body.image-agent-refining #image-agent-refine-overlay{
   letter-spacing: .1em;
   margin-bottom: 12px;
 }
+.ia-model-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:6px;
+  max-height:122px;
+  overflow:auto;
+  margin:0 16px 10px;
+  padding-right:2px;
+}
+.ia-model-opt{
+  border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.02);
+  color:var(--t2);
+  border-radius:8px;
+  font-size:10px;
+  line-height:1.35;
+  padding:7px 8px;
+  cursor:pointer;
+  transition:.18s ease;
+}
+.ia-model-opt:hover{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.06)}
+.ia-model-opt.on{
+  border-color:var(--a);
+  background:rgba(232,84,26,.14);
+  color:var(--t0);
+}
 
 .ia-custom-list { display: flex; flex-direction: column; gap: 8px; }
+.ia-custom-list-inline{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .ia-custom-item {
   display: flex;
   align-items: center;
@@ -6694,6 +6721,8 @@ body.image-agent-refining #image-agent-refine-overlay{
   font-size: 12px;
   color: var(--t3,rgba(255,255,255,.35));
 }
+.ia-bottom-wrap{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.ia-panel-bottom{padding:12px}
 
 .ia-nav {
   display: flex;
@@ -6734,6 +6763,13 @@ body.image-agent-refining #image-agent-refine-overlay{
   gap: 6px;
 }
 .ia-gen-btn:hover { opacity: .9; transform: translateY(-1px); }
+.ia-nav-bottom .ia-gen-btn{
+  background:#f5d84a;
+  color:#111;
+  box-shadow:0 4px 16px rgba(245,197,24,.22);
+}
+.ia-nav-bottom .ia-gen-btn svg{stroke:#111!important}
+.ia-nav-bottom #v2-credits-label{background:rgba(0,0,0,.15);color:#111;opacity:.92}
 
 .ia-preview-card {
   background: var(--ink-2,#111);
@@ -7513,13 +7549,14 @@ body.image-agent-refining #image-agent-refine-overlay{
           <!-- Strategist chat panel -->
           <div class="ia-panel" style="padding:0;overflow:hidden">
             <div class="ia-panel-title" style="padding:12px 16px 0">Creative Strategist</div>
-            <div class="form-row" style="padding:0 16px 10px;margin-top:4px">
+            <div class="form-row" style="padding:0 16px 8px;margin-top:4px">
               <label>Modelo de post</label>
               <select id="ia-model-choice" onchange="setIaModelChoice(this.value)">
                 <option value="auto">IA escolhe o melhor modelo</option>
               </select>
             </div>
-            <div class="bs-wrap" id="bs-image-wrap" style="border:none;background:transparent;margin-bottom:8px">
+            <div class="ia-model-grid" id="ia-model-grid"></div>
+            <div class="bs-wrap" id="bs-image-wrap" style="border:none;background:transparent;margin-bottom:4px">
               <div class="bs-msgs" id="bs-image-msgs">
                 <div class="bs-placeholder">
                   <div class="bs-placeholder-icon">✦</div>
@@ -7541,27 +7578,6 @@ body.image-agent-refining #image-agent-refine-overlay{
                 <span class="bs-cost-hint">Enter para enviar · Shift+Enter nova linha · 📎 imagem de referência</span>
               </div>
             </div>
-          </div>
-
-          <!-- Customizations list -->
-          <div class="ia-panel" id="ia-custom-panel">
-            <div class="ia-panel-title">Personalizações</div>
-            <div class="ia-custom-list" id="ia-custom-list">
-              <div class="ia-custom-item"><span>Formato</span><span class="ia-custom-val" id="ia-cv-format">Post único</span></div>
-              <div class="ia-custom-item"><span>Rede social</span><span class="ia-custom-val" id="ia-cv-platform">—</span></div>
-              <div class="ia-custom-item"><span>Variações</span><span class="ia-custom-val" id="ia-cv-vars">1</span></div>
-              <div class="ia-custom-item"><span>Tipo de post</span><span class="ia-custom-val" id="ia-cv-type">—</span></div>
-            </div>
-          </div>
-
-          <!-- Nav buttons -->
-          <div class="ia-nav">
-            <button class="ia-back-btn" onclick="iaBack()">← Voltar</button>
-            <button class="ia-gen-btn" id="btn-gerar-v2" onclick="gerarV2()">
-              <svg style="width:15px;height:15px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-              <span id="btn-gerar-v2-label">✦ Gerar Imagem</span>
-              <span id="v2-credits-label" style="margin-left:auto;font-size:10px;font-weight:500;opacity:.75;background:rgba(0,0,0,.2);border-radius:10px;padding:2px 7px">2 créditos</span>
-            </button>
           </div>
 
           <!-- compat hidden elements -->
@@ -7659,6 +7675,27 @@ body.image-agent-refining #image-agent-refine-overlay{
             <button id="btn-gerar-img"></button>
             <div class="out-tabs"><div id="tab-conceitos"></div><div id="tab-imagem"></div></div>
           </div>
+        </div>
+      </div>
+
+      <!-- Bottom personalization and actions -->
+      <div class="ia-bottom-wrap">
+        <div class="ia-panel ia-panel-bottom" id="ia-custom-panel">
+          <div class="ia-panel-title">Personalizações</div>
+          <div class="ia-custom-list ia-custom-list-inline" id="ia-custom-list">
+            <div class="ia-custom-item"><span>Formato</span><span class="ia-custom-val" id="ia-cv-format">1080x1080</span></div>
+            <div class="ia-custom-item"><span>Rede social</span><span class="ia-custom-val" id="ia-cv-platform">—</span></div>
+            <div class="ia-custom-item"><span>Variações</span><span class="ia-custom-val" id="ia-cv-vars">1</span></div>
+            <div class="ia-custom-item"><span>Tipo de post</span><span class="ia-custom-val" id="ia-cv-type">Post único</span></div>
+          </div>
+        </div>
+        <div class="ia-nav ia-nav-bottom">
+          <button class="ia-back-btn" onclick="iaBack()">← Voltar</button>
+          <button class="ia-gen-btn" id="btn-gerar-v2" onclick="gerarV2()">
+            <svg style="width:15px;height:15px;fill:none;stroke:#fff;stroke-width:2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span id="btn-gerar-v2-label">✦ Gerar Imagem</span>
+            <span id="v2-credits-label" style="margin-left:auto;font-size:10px;font-weight:500;opacity:.75;background:rgba(0,0,0,.2);border-radius:10px;padding:2px 7px">2 créditos</span>
+          </button>
         </div>
       </div>
 
@@ -8951,8 +8988,14 @@ function selFmt(f) {
   var lbl = document.getElementById('btn-gerar-v2-label');
   if (lbl) { var _fn={post:'Post único',carrossel:'Carrossel',story:'Story',anuncio:'Anúncio',thumb:'Thumbnail',banner:'Banner'}; lbl.textContent='Gerar '+(_fn[f]||f); }
 
+  var mappedType = _fmtToPostType[f] || null;
+  var postTypeSel = document.getElementById('sel-post-type');
+  if (postTypeSel && mappedType) postTypeSel.value = mappedType;
+  if (mappedType) updateImageConfig('postType', mappedType);
+
   syncIaCustomizations();
   renderBsSubFmtGrid(f);
+  refreshIaModelOptions();
   var gerarBtn = document.getElementById('bs-image-gerar-main-btn');
   if (gerarBtn) gerarBtn.textContent = 'Gerar ' + (_fmtBtnLabels[f] || f);
   var gb = document.getElementById('bs-image-gerar-btn');
@@ -10079,6 +10122,15 @@ const _netMap2 = { ig:'Instagram', li:'LinkedIn', yt:'YouTube', tt:'TikTok', fb:
 
 // Image generation config state
 const _imageGenConfig = { postType: null, platform: null };
+const _fmtToPostType = { post:'single', carrossel:'carousel', story:'story', anuncio:'ad', banner:'banner', thumb:'thumbnail' };
+const _postTypeModels = {
+  single: ['Modelo 1','Modelo 2','Modelo 3','Modelo 4','Modelo 5','Modelo 6','Modelo 7','Modelo 8','Modelo 9','Modelo 10'],
+  carousel: ['Modelo 1','Modelo 2','Modelo 3','Modelo 4','Modelo 5','Modelo 6','Modelo 7','Modelo 8','Modelo 9','Modelo 10'],
+  story: ['Modelo 1','Modelo 2','Modelo 3','Modelo 4','Modelo 5','Modelo 6','Modelo 7','Modelo 8','Modelo 9','Modelo 10'],
+  ad: ['Modelo 1','Modelo 2','Modelo 3','Modelo 4','Modelo 5','Modelo 6','Modelo 7','Modelo 8','Modelo 9','Modelo 10'],
+  banner: ['Modelo 1','Modelo 2','Modelo 3','Modelo 4','Modelo 5','Modelo 6','Modelo 7','Modelo 8','Modelo 9','Modelo 10'],
+  thumbnail: ['Modelo 1','Modelo 2','Modelo 3','Modelo 4','Modelo 5','Modelo 6','Modelo 7','Modelo 8','Modelo 9','Modelo 10']
+};
 
 function updateImageConfig(key, value) {
   if (key === 'postType' || key === 'platform') setImageAgentStep(1);
@@ -10086,6 +10138,7 @@ function updateImageConfig(key, value) {
   const elId = key === 'postType' ? 'sel-post-type' : 'sel-platform';
   const el = document.getElementById(elId);
   if (el) { value ? el.classList.add('has-value') : el.classList.remove('has-value'); }
+  if (key === 'postType') refreshIaModelOptions();
   syncIaCustomizations();
 }
 
@@ -10095,17 +10148,46 @@ function setImageAgentStep(step) {
     var el = document.getElementById('ia-step-' + i);
     if (!el) continue;
     el.classList.remove('done','active');
+    if (step <= 0) continue;
     if (i < step) el.classList.add('done');
     else if (i === step) el.classList.add('active');
   }
 }
-function setIaModelChoice(value){ window._iaModelChoice = value || 'auto'; }
+function refreshIaModelOptions() {
+  const type = _imageGenConfig.postType || _fmtToPostType[_currentFmt] || 'single';
+  const list = _postTypeModels[type] || _postTypeModels.single;
+  const sel = document.getElementById('ia-model-choice');
+  const grid = document.getElementById('ia-model-grid');
+  if (sel) {
+    sel.innerHTML = '<option value="auto">IA escolhe o melhor modelo</option>' + list.map(function(n, idx) {
+      return '<option value="' + (idx + 1) + '">' + n + '</option>';
+    }).join('');
+  }
+  if (grid) {
+    let html = '<button class="ia-model-opt" data-model="auto" onclick="setIaModelChoice(\'auto\')">IA escolhe o melhor modelo</button>';
+    html += list.map(function(n, idx){
+      var v = String(idx + 1);
+      return '<button class="ia-model-opt" data-model="' + v + '" onclick="setIaModelChoice(\'' + v + '\')">' + n + '</button>';
+    }).join('');
+    grid.innerHTML = html;
+  }
+  setIaModelChoice(window._iaModelChoice || 'auto');
+}
+function setIaModelChoice(value){
+  window._iaModelChoice = value || 'auto';
+  var sel = document.getElementById('ia-model-choice');
+  if (sel && sel.value !== window._iaModelChoice) sel.value = window._iaModelChoice;
+  document.querySelectorAll('#ia-model-grid .ia-model-opt').forEach(function(el){
+    el.classList.toggle('on', el.dataset.model === window._iaModelChoice);
+  });
+}
 
 function syncIaCustomizations(){
   var fmtLbl = {post:'Post único',carrossel:'Carrossel',story:'Story',anuncio:'Anúncio',banner:'Banner',thumb:'Thumbnail'}[_currentFmt||'post'] || 'Post único';
   var typeLbl = {single:'Post único',carousel:'Carrossel',story:'Story',ad:'Anúncio',banner:'Banner',thumbnail:'Thumbnail'}[_imageGenConfig.postType] || fmtLbl;
   var platformLbl = {instagram:'Instagram',facebook:'Facebook',linkedin:'LinkedIn',tiktok:'TikTok',google:'Google Ads',youtube:'YouTube'}[_imageGenConfig.platform] || '—';
-  var formatSize = {single:'1080x1080',carousel:'1080x1080',story:'1080x1920',ad:'1080x1080',banner:'1584x396',thumbnail:'1280x720'}[_imageGenConfig.postType] || 'Padrão';
+  var fallbackType = _imageGenConfig.postType || (_fmtToPostType[_currentFmt] || 'single');
+  var formatSize = {single:'1080x1080',carousel:'1080x1080',story:'1080x1920',ad:'1080x1080',banner:'1584x396',thumbnail:'1280x720'}[fallbackType] || '1080x1080';
   var f = document.getElementById('ia-cv-format'); if (f) f.textContent = formatSize;
   var p = document.getElementById('ia-cv-platform'); if (p) p.textContent = platformLbl;
   var v = document.getElementById('ia-cv-vars'); if (v) v.textContent = String(_variationCount || 1);
@@ -10124,6 +10206,7 @@ function selVarCount(n) {
   document.querySelectorAll('.v2-var-count').forEach(function(b){ b.classList.remove('on'); });
   const el = document.getElementById('vc-' + n);
   if (el) el.classList.add('on');
+  syncIaCustomizations();
   _updateV2Credits();
 }
 
@@ -10180,7 +10263,7 @@ function _v2SetStageSub(txt) {
 }
 
 async function gerarV2() {
-  setImageAgentStep(4);
+  setImageAgentStep(3);
   const state = _bsGet('image');
   if (!state.messages.length) { toast('Converse com a IA primeiro para criar sua imagem','err'); return; }
 
@@ -10278,6 +10361,7 @@ async function gerarV2() {
       stageTimers.forEach(clearTimeout);
       if (loadingEl) loadingEl.style.display = 'none';
       setBar(100); setStage('Carrossel completo!', '');
+      setImageAgentStep(4);
       toast('Carrossel gerado! ' + totalSlides + ' slides prontos.', 'ok');
       if (me) { me.quota_used = (me.quota_used||0) + (_carrosselCreditMap[totalSlides] || totalSlides); updateQuota(); }
     } else {
@@ -10319,6 +10403,7 @@ async function gerarV2() {
       }
 
       showV2('gen-v2-result');
+      setImageAgentStep(4);
       const _cfgParts = [];
       if (_imageGenConfig.postType) _cfgParts.push({single:'Post único',carousel:'Carrossel',story:'Story',ad:'Anúncio',banner:'Banner',thumbnail:'Thumbnail'}[_imageGenConfig.postType]||_imageGenConfig.postType);
       if (_imageGenConfig.platform) _cfgParts.push({instagram:'Instagram',facebook:'Facebook',linkedin:'LinkedIn',tiktok:'TikTok',google:'Google Ads'}[_imageGenConfig.platform]||_imageGenConfig.platform);
@@ -14975,7 +15060,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   document.addEventListener('DOMContentLoaded', function(){
     sanitizeDuplicateVisuals();
-    setImageAgentStep(1);
+    setImageAgentStep(0);
+    refreshIaModelOptions();
     syncIaCustomizations();
   });
 })();
